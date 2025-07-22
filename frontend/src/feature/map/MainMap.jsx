@@ -3,6 +3,7 @@ import { GoogleMap, useJsApiLoader, Marker } from "@react-google-maps/api";
 import Spinner from "react-bootstrap/Spinner";
 import Papa from "papaparse";
 import { useNavigate } from "react-router-dom";
+import { GOOGLE_MAPS_API_KEY } from "../../key/googleapi";
 
 export function MainMap() {
   const containerStyle = {
@@ -18,7 +19,7 @@ export function MainMap() {
 
   const { isLoaded, loadError } = useJsApiLoader({
     id: "google-map-script",
-    googleMapsApiKey: "AIzaSyCRqOMeNtDSYIrnOd9feqOMFtDV54sXzh4",
+    googleMapsApiKey: GOOGLE_MAPS_API_KEY,
     libraries: ["places"],
     language: "ko",
     region: "KR",
