@@ -113,3 +113,19 @@ Git 커밋 메시지는 다음 컨벤션을 따릅니다.
 * **design:** UI/UX 디자인 변경
 
 **예시:**
+
+feat: 유기동물 입양 정보 조회 기능 추가
+fix: 로그인 시 비밀번호 오류 수정
+docs: README.md 개발 환경 설정 업데이트
+
+---
+
+## 🌐 관련 링크
+
+* **GitHub Repository:** `https://github.com/your-github-org/pet-topia` (이 주소는 실제 프로젝트 저장소 URL로 변경해주세요)
+* **GitHub Wiki:** `https://github.com/your-github-org/pet-topia/wiki` (프로젝트 문서 및 상세 가이드)
+* **API 문서:** (Swagger/Spring REST Docs 등을 사용한다면 해당 링크)
+* **프로젝트 관리 툴:** (Jira, Notion, Trello 등 사용한다면 해당 링크)
+
+---
+
