@@ -19,7 +19,7 @@
 이 프로젝트는 자바 풀스택 개발을 기반으로 안정적이고 확장 가능한 서비스를 구축합니다.
 
 ### Backend
-* **Java 17**
+* **Java 21**
 * **Spring Boot 3.x**
     * Spring Data JPA
     * Spring Security
