@@ -13,7 +13,9 @@ import { MemberLogin } from "./feature/member/MemberLogin.jsx";
 import { MemberLogout } from "./feature/member/MemberLogout.jsx";
 import { AuthenticationContextProvider } from "./common/AuthenticationContextProvider.jsx";
 import { MainMap } from "./feature/map/MainMap.jsx";
-import { MapDetail } from "./feature/map/MapDetail.jsx"; // ✅ 추가
+import { MapDetail } from "./feature/map/MapDetail.jsx";
+import { KakaoMap } from "./KakaoMap";
+
 
 function App() {
   return (
@@ -34,6 +36,7 @@ function App() {
             <Route path="/member/edit" element={<MemberEdit />} />
             <Route path="/main/map" element={<MainMap />} />
             <Route path="/facility/:name" element={<MapDetail />} />{" "}
+            <Route path="/kakaoMap" element={<KakaoMap />} />
             {/* ✅ 여기 추가 */}
           </Route>
         </Routes>
