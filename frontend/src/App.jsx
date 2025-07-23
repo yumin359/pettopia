@@ -16,7 +16,6 @@ import { MainMap } from "./feature/map/MainMap.jsx";
 import { MapDetail } from "./feature/map/MapDetail.jsx";
 import { KakaoMap } from "./KakaoMap";
 
-
 function App() {
   return (
     <AuthenticationContextProvider value={{}}>
@@ -34,7 +33,7 @@ function App() {
             <Route path="/member" element={<MemberDetail />} />
             <Route path="/member/list" element={<MemberList />} />
             <Route path="/member/edit" element={<MemberEdit />} />
-            <Route path="/main/map" element={<MainMap />} />
+            {/*<Route path="/main/map" element={<MainMap />} /> 구글맵 빠이...*/}
             <Route path="/facility/:name" element={<MapDetail />} />{" "}
             <Route path="/kakaoMap" element={<KakaoMap />} />
             {/* ✅ 여기 추가 */}
