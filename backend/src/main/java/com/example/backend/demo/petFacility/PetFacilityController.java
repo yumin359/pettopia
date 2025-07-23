@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/pet-facilities") // 새로운 엔드포인트
+@RequestMapping("/api/pet_facilities") // 새로운 엔드포인트
 @CrossOrigin(origins = "http://localhost:5173")
 public class PetFacilityController {
 
