@@ -7,16 +7,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-// Make sure to import the Location entity and LocationRepository
-import com.example.backend.demo.Location; // Location 엔티티의 실제 패키지 경로에 맞게 수정
-import com.example.backend.demo.LocationRepository; // LocationRepository의 실제 패키지 경로에 맞게 수정
-
-@RestController // Indicates this class is a RESTful web service controller
-@RequestMapping("/api/locations") // Base path for all endpoints in this controller
-@CrossOrigin(origins = "http://localhost:5173") // Allows requests from the React development server (Vite default port)
+@RestController
+@RequestMapping("/api/locations")
+@CrossOrigin(origins = "http://localhost:5173")
 public class LocationController {
 
-    private final LocationRepository locationRepository; // Injects LocationRepository
+    private final LocationRepository locationRepository;
 
     // Constructor injection for LocationRepository
     public LocationController(LocationRepository locationRepository) {
