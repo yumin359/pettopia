@@ -1,5 +1,6 @@
 package com.example.backend.member.service;
 
+import com.example.backend.auth.repository.AuthRepository;
 import com.example.backend.board.repository.BoardRepository;
 import com.example.backend.comment.repository.CommentRepository;
 import com.example.backend.like.repository.BoardLikeRepository;
@@ -25,6 +26,7 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 public class MemberService {
 
+    private final AuthRepository authRepository;
     private final MemberRepository memberRepository;
     private final JwtEncoder jwtEncoder;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -152,7 +154,12 @@ public class MemberService {
         }
 
         // 권한 목록 조회
-        List<String> authList = memberRepository.findAuthNamesByMemberEmail(member.getId());
+//        List<String> authList = memberRepository.findAuthNamesByMemberEmail(member.getEmail());
+        // 이제 AuthRepository를 통해 권한을 조회합니다.
+        List<String> authList = authRepository.findAuthNamesByMemberId(member.getId()); // member.getId() 전달
+        // 또는
+        // List<String> authNames = authRepository.findAuthNamesByMemberEmail(form.getEmail()); // email 전달
+
 
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuer("self")

@@ -16,8 +16,9 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     List<MemberListInfo> findAllBy();
 
     // 기본키를 id로 바꿔서 ..
-    @Query("SELECT a.authName FROM Auth a WHERE a.memberId = :id")
-    List<String> findAuthNamesByMemberEmail(@Param("${id}") Long id);
+    // 이거 authRepository로 이동.. 왜?
+//    @Query("SELECT a.authName FROM Auth a WHERE a.member.id = :id")
+//    List<String> findAuthNamesByMemberEmail(@Param("email") String email);
 
     Optional<Member> findByEmail(String email);
 
