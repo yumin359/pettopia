@@ -5,6 +5,7 @@ import com.example.backend.comment.repository.CommentRepository;
 import com.example.backend.like.repository.BoardLikeRepository;
 import com.example.backend.member.dto.*;
 import com.example.backend.member.entity.Member;
+import com.example.backend.member.entity.Member.Role;
 import com.example.backend.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -33,12 +34,16 @@ public class MemberService {
 
     public void add(MemberForm memberForm) {
         this.validate(memberForm);
+        // TODO 구글 로그인(패스워스 없을 때)
+//        if (memberForm.getPassword().isBlank()) {
+//        }
 
         Member member = new Member();
         member.setEmail(memberForm.getEmail().trim());
         member.setPassword(bCryptPasswordEncoder.encode(memberForm.getPassword().trim()));
         member.setInfo(memberForm.getInfo());
         member.setNickName(memberForm.getNickName().trim());
+        member.setRole(Role.USER);
 
         memberRepository.save(member);
     }
@@ -57,7 +62,7 @@ public class MemberService {
             throw new RuntimeException("이메일 형식에 맞지 않습니다.");
         }
 
-        Optional<Member> optionalMemberByEmail = memberRepository.findById(email);
+        Optional<Member> optionalMemberByEmail = memberRepository.findByEmail(email);
         if (optionalMemberByEmail.isPresent()) {
             throw new RuntimeException("이미 가입된 이메일입니다.");
         }
@@ -91,7 +96,7 @@ public class MemberService {
     }
 
     public MemberDto get(String email) {
-        Member member = memberRepository.findById(email)
+        Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("해당 이메일의 회원이 존재하지 않습니다."));
 
         return MemberDto.builder()
@@ -103,7 +108,7 @@ public class MemberService {
     }
 
     public void delete(MemberForm memberForm) {
-        Member member = memberRepository.findById(memberForm.getEmail())
+        Member member = memberRepository.findByEmail(memberForm.getEmail())
                 .orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
 
         if (!bCryptPasswordEncoder.matches(memberForm.getPassword(), member.getPassword())) {
@@ -125,7 +130,7 @@ public class MemberService {
 
 
     public void update(MemberForm memberForm) {
-        Member member = memberRepository.findById(memberForm.getEmail())
+        Member member = memberRepository.findByEmail(memberForm.getEmail())
                 .orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
 
         if (!bCryptPasswordEncoder.matches(memberForm.getPassword(), member.getPassword())) {
@@ -139,7 +144,7 @@ public class MemberService {
     }
 
     public String getToken(MemberLoginForm loginForm) {
-        Member member = memberRepository.findById(loginForm.getEmail())
+        Member member = memberRepository.findByEmail(loginForm.getEmail())
                 .orElseThrow(() -> new RuntimeException("이메일 또는 비밀번호가 일치하지 않습니다."));
 
         if (!bCryptPasswordEncoder.matches(loginForm.getPassword(), member.getPassword())) {
@@ -147,7 +152,7 @@ public class MemberService {
         }
 
         // 권한 목록 조회
-        List<String> authList = memberRepository.findAuthNamesByMemberEmail(member.getEmail());
+        List<String> authList = memberRepository.findAuthNamesByMemberEmail(member.getId());
 
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuer("self")
@@ -162,7 +167,7 @@ public class MemberService {
 
 
     public void changePassword(ChangePasswordForm form) {
-        Member member = memberRepository.findById(form.getEmail())
+        Member member = memberRepository.findByEmail(form.getEmail())
                 .orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
 
         // 기존 비밀번호가 일치하는지 확인

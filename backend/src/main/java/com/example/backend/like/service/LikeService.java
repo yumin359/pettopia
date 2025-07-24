@@ -36,12 +36,12 @@ public class LikeService {
         } else {
             var board = boardRepository.findById(boardId)
                     .orElseThrow(() -> new RuntimeException("게시물 없음"));
-            var member = memberRepository.findById(email)
+            var member = memberRepository.findByEmail(email)
                     .orElseThrow(() -> new RuntimeException("회원 없음"));
 
             BoardLikeId boardLikeId = new BoardLikeId();
             boardLikeId.setBoardId(boardId);
-            boardLikeId.setMemberEmail(email);
+//            boardLikeId.setMemberId(email);
 
             BoardLike newLike = new BoardLike();
             newLike.setId(boardLikeId);

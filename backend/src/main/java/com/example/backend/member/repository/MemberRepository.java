@@ -9,14 +9,19 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
-public interface MemberRepository extends JpaRepository<Member, String> {
+public interface MemberRepository extends JpaRepository<Member, Long> {
     // 닉네임 중복 검사용 메서드가 이미 있다면 그대로 사용
     Optional<Member> findByNickName(String nickName);
 
     List<MemberListInfo> findAllBy();
 
-    @Query("SELECT a.authName FROM Auth a WHERE a.memberEmail = :email")
-    List<String> findAuthNamesByMemberEmail(@Param("email") String email);
+    // 기본키를 id로 바꿔서 ..
+    @Query("SELECT a.authName FROM Auth a WHERE a.memberId = :id")
+    List<String> findAuthNamesByMemberEmail(@Param("${id}") Long id);
 
     Optional<Member> findByEmail(String email);
+
+//    String id(Long id);
+//
+//    Long id(Long id);
 }

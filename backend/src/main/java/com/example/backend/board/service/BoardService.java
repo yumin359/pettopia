@@ -82,7 +82,7 @@ public class BoardService {
                 .map(Authentication::getName)
                 .orElseThrow(() -> new RuntimeException("권한이 없습니다."));
 
-        Member member = memberRepository.findById(email)
+        Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("회원 정보를 찾을 수 없습니다."));
 
         Board board = new Board();
