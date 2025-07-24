@@ -13,38 +13,38 @@ import java.util.Set; // Set 타입을 사용하는 다른 필터를 위해 필�
 @Repository
 public interface PetFacilityRepository extends JpaRepository<PetFacility, Long> {
 
-    @Query(value = "SELECT pf FROM PetFacility pf WHERE " +
-            "( :sidoName IS NULL OR lower(pf.sidoName) LIKE lower(concat('%', :sidoName, '%')) ) AND " +
-            "( :sigunguName IS NULL OR lower(pf.sigunguName) LIKE lower(concat('%', :sigunguName, '%')) ) AND " +
-            "( :category1 IS NULL OR :category1 IS EMPTY OR pf.category1 IN :category1 ) AND " +
-            "( :category2 IS NULL OR :category2 IS EMPTY OR pf.category2 IN :category2 ) AND " +
-            "( :allowedPetSize IS NULL OR :allowedPetSize IS EMPTY OR pf.allowedPetSize IN :allowedPetSize ) AND " +
-            "( :parkingAvailable IS NULL OR lower(pf.parkingAvailable) LIKE lower(concat('%', :parkingAvailable, '%')) ) AND " +
-            "( :indoorFacility IS NULL OR lower(pf.indoorFacility) LIKE lower(concat('%', :indoorFacility, '%')) ) AND " +
-            "( :outdoorFacility IS NULL OR lower(pf.outdoorFacility) LIKE lower(concat('%', :outdoorFacility, '%')) ) AND " +
-            "( :holiday IS NULL OR lower(pf.holiday) LIKE lower(concat('%', :holiday, '%')) ) AND " +
-            "( :operatingHours IS NULL OR lower(pf.operatingHours) LIKE lower(concat('%', :operatingHours, '%')) ) AND " +
-            "( :petFriendlyInfo IS NULL OR pf.petFriendlyInfo = :petFriendlyInfo ) AND " +
-            "( :petOnlyInfo IS NULL OR pf.petOnlyInfo = :petOnlyInfo ) AND " +
-            // --- petRestrictions 변경 시작: String 타입 + LIKE 검색 ---
-            "( :petRestrictions IS NULL OR lower(pf.petRestrictions) LIKE lower(concat('%', :petRestrictions, '%')) )",
-            // --- petRestrictions 변경 끝 ---
-            countQuery = "SELECT COUNT(pf) FROM PetFacility pf WHERE " +
-                    "( :sidoName IS NULL OR lower(pf.sidoName) LIKE lower(concat('%', :sidoName, '%')) ) AND " +
-                    "( :sigunguName IS NULL OR lower(pf.sigunguName) LIKE lower(concat('%', :sigunguName, '%')) ) AND " +
-                    "( :category1 IS NULL OR :category1 IS EMPTY OR pf.category1 IN :category1 ) AND " +
-                    "( :category2 IS NULL OR :category2 IS EMPTY OR pf.category2 IN :category2 ) AND " +
-                    "( :allowedPetSize IS NULL OR :allowedPetSize IS EMPTY OR pf.allowedPetSize IN :allowedPetSize ) AND " +
-                    "( :parkingAvailable IS NULL OR lower(pf.parkingAvailable) LIKE lower(concat('%', :parkingAvailable, '%')) ) AND " +
-                    "( :indoorFacility IS NULL OR lower(pf.indoorFacility) LIKE lower(concat('%', :indoorFacility, '%')) ) AND " +
-                    "( :outdoorFacility IS NULL OR lower(pf.outdoorFacility) LIKE lower(concat('%', :outdoorFacility, '%')) ) AND " +
-                    "( :holiday IS NULL OR lower(pf.holiday) LIKE lower(concat('%', :holiday, '%')) ) AND " +
-                    "( :operatingHours IS NULL OR lower(pf.operatingHours) LIKE lower(concat('%', :operatingHours, '%')) ) AND " +
-                    "( :petFriendlyInfo IS NULL OR pf.petFriendlyInfo = :petFriendlyInfo ) AND " +
-                    "( :petOnlyInfo IS NULL OR pf.petOnlyInfo = :petOnlyInfo ) AND " +
-                    // --- petRestrictions 변경 시작: String 타입 + LIKE 검색 ---
-                    "( :petRestrictions IS NULL OR lower(pf.petRestrictions) LIKE lower(concat('%', :petRestrictions, '%')) )"
-            // --- petRestrictions 변경 끝 ---
+    @Query(value = """
+            SELECT pf FROM PetFacility pf WHERE
+            ( :sidoName IS NULL OR lower(pf.sidoName) LIKE lower(concat('%', :sidoName, '%')) ) AND
+            ( :sigunguName IS NULL OR lower(pf.sigunguName) LIKE lower(concat('%', :sigunguName, '%')) ) AND
+            ( :category1 IS NULL OR :category1 IS EMPTY OR pf.category1 IN :category1 ) AND
+            ( :category2 IS NULL OR :category2 IS EMPTY OR pf.category2 IN :category2 ) AND
+            ( :allowedPetSize IS NULL OR :allowedPetSize IS EMPTY OR pf.allowedPetSize IN :allowedPetSize ) AND
+            ( :parkingAvailable IS NULL OR lower(pf.parkingAvailable) LIKE lower(concat('%', :parkingAvailable, '%')) ) AND
+            ( :indoorFacility IS NULL OR lower(pf.indoorFacility) LIKE lower(concat('%', :indoorFacility, '%')) ) AND
+            ( :outdoorFacility IS NULL OR lower(pf.outdoorFacility) LIKE lower(concat('%', :outdoorFacility, '%')) ) AND
+            ( :holiday IS NULL OR lower(pf.holiday) LIKE lower(concat('%', :holiday, '%')) ) AND
+            ( :operatingHours IS NULL OR lower(pf.operatingHours) LIKE lower(concat('%', :operatingHours, '%')) ) AND
+            ( :petFriendlyInfo IS NULL OR pf.petFriendlyInfo = :petFriendlyInfo ) AND
+            ( :petOnlyInfo IS NULL OR pf.petOnlyInfo = :petOnlyInfo ) AND
+            ( :petRestrictions IS NULL OR lower(pf.petRestrictions) LIKE lower(concat('%', :petRestrictions, '%')) )
+            """,
+            countQuery = """
+                    SELECT COUNT(pf) FROM PetFacility pf WHERE
+                    ( :sidoName IS NULL OR lower(pf.sidoName) LIKE lower(concat('%', :sidoName, '%')) ) AND
+                    ( :sigunguName IS NULL OR lower(pf.sigunguName) LIKE lower(concat('%', :sigunguName, '%')) ) AND
+                    ( :category1 IS NULL OR :category1 IS EMPTY OR pf.category1 IN :category1 ) AND
+                    ( :category2 IS NULL OR :category2 IS EMPTY OR pf.category2 IN :category2 ) AND
+                    ( :allowedPetSize IS NULL OR :allowedPetSize IS EMPTY OR pf.allowedPetSize IN :allowedPetSize ) AND
+                    ( :parkingAvailable IS NULL OR lower(pf.parkingAvailable) LIKE lower(concat('%', :parkingAvailable, '%')) ) AND
+                    ( :indoorFacility IS NULL OR lower(pf.indoorFacility) LIKE lower(concat('%', :indoorFacility, '%')) ) AND
+                    ( :outdoorFacility IS NULL OR lower(pf.outdoorFacility) LIKE lower(concat('%', :outdoorFacility, '%')) ) AND
+                    ( :holiday IS NULL OR lower(pf.holiday) LIKE lower(concat('%', :holiday, '%')) ) AND
+                    ( :operatingHours IS NULL OR lower(pf.operatingHours) LIKE lower(concat('%', :operatingHours, '%')) ) AND
+                    ( :petFriendlyInfo IS NULL OR pf.petFriendlyInfo = :petFriendlyInfo ) AND
+                    ( :petOnlyInfo IS NULL OR pf.petOnlyInfo = :petOnlyInfo ) AND
+                    ( :petRestrictions IS NULL OR lower(pf.petRestrictions) LIKE lower(concat('%', :petRestrictions, '%')) )
+                    """
     )
     Page<PetFacility> findFacilitiesByFilters(
             @Param("sidoName") String sidoName,
@@ -59,9 +59,7 @@ public interface PetFacilityRepository extends JpaRepository<PetFacility, Long> 
             @Param("operatingHours") String operatingHours,
             @Param("petFriendlyInfo") String petFriendlyInfo,
             @Param("petOnlyInfo") String petOnlyInfo,
-            // --- petRestrictions 변경 시작: Set<String> -> String ---
             @Param("petRestrictions") String petRestrictions,
-            // --- petRestrictions 변경 끝 ---
             Pageable pageable
     );
 
@@ -97,7 +95,6 @@ public interface PetFacilityRepository extends JpaRepository<PetFacility, Long> 
     @Query("SELECT DISTINCT pf.operatingHours FROM PetFacility pf WHERE pf.operatingHours IS NOT NULL AND pf.operatingHours != '' ORDER BY pf.operatingHours")
     List<String> findDistinctOperatingHours();
 
-    // petRestrictions 필드가 String 타입이므로, String 값들을 distinct하여 반환
     @Query("SELECT DISTINCT pf.petRestrictions FROM PetFacility pf WHERE pf.petRestrictions IS NOT NULL AND pf.petRestrictions != '' ORDER BY pf.petRestrictions")
     List<String> findDistinctPetRestrictions();
 }
