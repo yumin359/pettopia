@@ -41,7 +41,7 @@ public class LikeService {
 
             BoardLikeId boardLikeId = new BoardLikeId();
             boardLikeId.setBoardId(boardId);
-//            boardLikeId.setMemberId(email);
+//            boardLikeId.setMemberId(member.getId()); // 이건 없어도 동작이 일단 하는디 왜 있지
 
             BoardLike newLike = new BoardLike();
             newLike.setId(boardLikeId);

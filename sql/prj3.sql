@@ -297,7 +297,12 @@ CREATE TABLE board_like
     FOREIGN KEY (board_id) REFERENCES board (id) ON DELETE CASCADE,
     FOREIGN KEY (member_id) REFERENCES member (id) ON DELETE CASCADE
 );
-
+-- 제약사항 확인 후 board_like에 있던 member_email 삭제 후 member_id로
+SHOW CREATE TABLE board_like;
+ALTER TABLE board_like
+    DROP FOREIGN KEY FKbqb0t5x7xin0ikshr6cnm8puj;
+ALTER TABLE board_like
+    DROP COLUMN member_email;
 # ---------------------------------------------------------------------------------
 
 -- 파일 첨부 테이블
