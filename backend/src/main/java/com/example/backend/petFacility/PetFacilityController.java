@@ -31,15 +31,18 @@ public class PetFacilityController {
             @RequestParam(required = false) String parkingAvailable,
             @RequestParam(required = false) String indoorFacility,
             @RequestParam(required = false) String outdoorFacility,
-            // --- 새로운 필터 파라미터 시작 (petRestrictions 변경됨) ---
             @RequestParam(required = false) String holiday,
             @RequestParam(required = false) String operatingHours,
             @RequestParam(required = false) String petFriendlyInfo,
             @RequestParam(required = false) String petOnlyInfo,
-            @RequestParam(required = false) String petRestrictions, // <-- 변경! Set<String> -> String
-            // --- 새로운 필터 파라미터 끝 ---
+            @RequestParam(required = false) String petRestrictions,
             @PageableDefault(size = 10, sort = "name", direction = Sort.Direction.ASC) Pageable pageable
     ) {
+        // ✅ 빈 Set은 null로 바꾸기 (JPA IN 절 오류 방지)
+        if (category1 != null && category1.isEmpty()) category1 = null;
+        if (category2 != null && category2.isEmpty()) category2 = null;
+        if (allowedPetSize != null && allowedPetSize.isEmpty()) allowedPetSize = null;
+
         return petFacilityRepository.findFacilitiesByFilters(
                 sidoName,
                 sigunguName,
@@ -49,16 +52,15 @@ public class PetFacilityController {
                 parkingAvailable,
                 indoorFacility,
                 outdoorFacility,
-                // --- 새로운 필터 파라미터 전달 시작 (petRestrictions 변경됨) ---
                 holiday,
                 operatingHours,
                 petFriendlyInfo,
                 petOnlyInfo,
-                petRestrictions, // <-- 변경! Set<String> -> String
-                // --- 새로운 필터 파라미터 전달 끝 ---
+                petRestrictions,
                 pageable
         );
     }
+
 
     // 기존 단일 조회 엔드포인트들 (필요하다면 유지)
     @GetMapping
