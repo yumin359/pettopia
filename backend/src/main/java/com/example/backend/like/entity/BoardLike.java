@@ -11,7 +11,7 @@ import lombok.ToString;
 @Setter
 @ToString
 @Entity
-@Table(name = "board_like", schema = "prj3")
+@Table(name = "board_like", schema = "prj04")
 public class BoardLike {
     @EmbeddedId
     private BoardLikeId id;
@@ -21,9 +21,9 @@ public class BoardLike {
     @JoinColumn(name = "board_id", nullable = false)
     private Board board;
 
-    @MapsId("memberEmail")
+    @MapsId("memberId")
     @ManyToOne(optional = false)
-    @JoinColumn(name = "member_email", nullable = false)
+    @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
 }

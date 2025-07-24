@@ -9,7 +9,7 @@ import lombok.ToString;
 @Setter
 @ToString
 @Entity
-@Table(name = "board_file", schema = "prj3")
+@Table(name = "board_file", schema = "prj04")
 public class BoardFile {
     @EmbeddedId
     private BoardFileId id;

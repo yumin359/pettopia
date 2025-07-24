@@ -82,7 +82,7 @@ public class BoardService {
                 .map(Authentication::getName)
                 .orElseThrow(() -> new RuntimeException("권한이 없습니다."));
 
-        Member member = memberRepository.findById(email)
+        Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("회원 정보를 찾을 수 없습니다."));
 
         Board board = new Board();
@@ -123,6 +123,11 @@ public class BoardService {
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("해당 게시물이 없습니다."));
 
+        // TODO :
+        // 구글 로그인 같은 거 추가하면
+        // getAttribute("email") 이런식으로 해야
+        // 아래 if 문에 동작할 수 있음
+        // 단순히 getName()한다고 들어오는 게 아님
         if (!board.getAuthor().getEmail().equals(email)) {
             throw new RuntimeException("본인 게시물만 수정할 수 있습니다.");
         }
@@ -158,6 +163,7 @@ public class BoardService {
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("해당 게시물이 없습니다."));
 
+        // TODO : 여기도
         if (!board.getAuthor().getEmail().equals(email)) {
             throw new RuntimeException("본인만 삭제할 수 있습니다.");
         }
@@ -214,7 +220,7 @@ public class BoardService {
             dto.setId(b.getId());
             dto.setTitle(b.getTitle());
             dto.setContent(b.getContent());
-            dto.setAuthorEmail(b.getAuthor().getEmail());
+            dto.setAuthorEmail(b.getAuthor().getEmail()); // 왜지? 게시물 특정 지을라는건가 ㅝ지
             dto.setAuthorNickName(b.getAuthor().getNickName());
             dto.setInsertedAt(b.getInsertedAt());
 

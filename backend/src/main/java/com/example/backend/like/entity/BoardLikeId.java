@@ -19,8 +19,8 @@ public class BoardLikeId implements Serializable {
     @Column(name = "board_id", nullable = false)
     private Integer boardId;
 
-    @Column(name = "member_email", nullable = false)
-    private String memberEmail;
+    @Column(name = "member_id", nullable = false)
+    private Long memberId;
 
     @Override
     public boolean equals(Object o) {
@@ -28,12 +28,12 @@ public class BoardLikeId implements Serializable {
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
         BoardLikeId entity = (BoardLikeId) o;
         return Objects.equals(this.boardId, entity.boardId) &&
-                Objects.equals(this.memberEmail, entity.memberEmail);
+                Objects.equals(this.memberId, entity.memberId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(boardId, memberEmail);
+        return Objects.hash(boardId, memberId);
     }
 
 }
