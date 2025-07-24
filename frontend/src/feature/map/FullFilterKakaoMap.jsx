@@ -861,7 +861,6 @@ const FullFilterKakaoMap = () => {
         style={{ width: "600px", minWidth: "450px", flexShrink: 0 }}
       >
         {" "}
-        {/* 맵 크기 더 줄임 */}
         {(!isMapReady || isDataLoading) && ( // 맵 초기화 중이거나 데이터 로딩 중일 때 오버레이 표시
           <div className="position-absolute top-0 start-0 w-100 h-100 bg-light bg-opacity-75 d-flex justify-content-center align-items-center z-3">
             <div className="text-center text-primary">
