@@ -16,6 +16,48 @@ CREATE TABLE member
     inserted_at DATETIME DEFAULT NOW() NOT NULL,
     CONSTRAINT pk_member PRIMARY KEY (email)
 );
+-- PK 제약 조건 제거
+ALTER TABLE member
+    DROP PRIMARY KEY;
+-- 새로운 PK 설정
+ALTER TABLE member
+    ADD COLUMN id BIGINT AUTO_INCREMENT PRIMARY KEY FIRST;
+-- email에 UNIQUE 제약 조건 추가
+ALTER TABLE member
+    ADD CONSTRAINT UQ_member_email UNIQUE (email);
+-- password NULL 로 설정
+ALTER TABLE member
+    MODIFY COLUMN password VARCHAR(255) NULL;
+-- provider 추가
+ALTER TABLE member
+    ADD COLUMN provider VARCHAR(50) NULL;
+-- provider_id 추가
+ALTER TABLE member
+    ADD COLUMN provider_id VARCHAR(255) NULL;
+-- role 추가
+ALTER TABLE member
+    ADD COLUMN role VARCHAR(50) DEFAULT 'USER' NOT NULL;
+-- 얜 아직 안 함
+# ALTER TABLE member
+#     ADD COLUMN updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL;
+
+-- 회원 테이블 아래와 같이 바꿈
+CREATE TABLE member
+(
+    id          BIGINT AUTO_INCREMENT PRIMARY KEY,
+    email       VARCHAR(255)               NOT NULL UNIQUE,
+    password    VARCHAR(255)               NULL,     -- 해싱된 비밀번호 저장, 외부 회원가입 하면 비밀번호 미제공으로 null로 설정
+    nick_name   VARCHAR(255)               NOT NULL UNIQUE,
+    info        VARCHAR(3000)              NULL,
+    provider    VARCHAR(50)                NULL,     -- 'local', 'google', 'kakao' 등, 기본값 NULL
+    provider_id VARCHAR(255)               NULL,     -- 소셜 로그인 시 해당 플랫폼의 사용자 고유 ID, 기본값 NULL
+    role        VARCHAR(50) DEFAULT 'USER' NOT NULL, -- 'USER', 'ADMIN' 등
+    inserted_at DATETIME    DEFAULT NOW()  NOT NULL
+#     updated_at  TIMESTAMP   DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    # 아직 얘는 추가 안 함
+    -- 만약 provider와 provider_id 조합으로 고유성을 보장하려면 아래와 같이 복합 UNIQUE 제약 조건 추가
+    -- UNIQUE (provider, provider_id)
+);
 
 -- 권한 테이블
 CREATE TABLE auth
