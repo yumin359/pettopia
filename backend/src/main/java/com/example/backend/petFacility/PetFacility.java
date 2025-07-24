@@ -1,4 +1,4 @@
-package com.example.backend.demo.petFacility;
+package com.example.backend.petFacility;
 
 import jakarta.persistence.*;
 import lombok.Getter;
