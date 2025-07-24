@@ -1,5 +1,9 @@
 package com.example.backend.petFacility;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,17 +21,19 @@ public class PetFacilityController {
     }
 
     // New unified search endpoint
+    // Updated search endpoint to support pagination
     @GetMapping("/search")
-    public List<PetFacility> searchPetFacilities(
-            @RequestParam(required = false) String sidoName,
-            @RequestParam(required = false) String sigunguName,
-            @RequestParam(required = false) Set<String> category1, // Use Set to handle multiple values
-            @RequestParam(required = false) Set<String> category2, // Use Set to handle multiple values
-            @RequestParam(required = false) Set<String> allowedPetSize, // Use Set to handle multiple values
-            @RequestParam(required = false) String parkingAvailable,
-            @RequestParam(required = false) String indoorFacility,
-            @RequestParam(required = false) String outdoorFacility) {
-
+    public Page<PetFacility> searchPetFacilities( // Return type changed to Page<PetFacility>
+                                                  @RequestParam(required = false) String sidoName,
+                                                  @RequestParam(required = false) String sigunguName,
+                                                  @RequestParam(required = false) Set<String> category1,
+                                                  @RequestParam(required = false) Set<String> category2,
+                                                  @RequestParam(required = false) Set<String> allowedPetSize,
+                                                  @RequestParam(required = false) String parkingAvailable,
+                                                  @RequestParam(required = false) String indoorFacility,
+                                                  @RequestParam(required = false) String outdoorFacility,
+                                                  @PageableDefault(size = 10, sort = "name", direction = Sort.Direction.ASC) Pageable pageable // Add Pageable
+    ) {
         return petFacilityRepository.findFacilitiesByFilters(
                 sidoName,
                 sigunguName,
@@ -36,7 +42,8 @@ public class PetFacilityController {
                 allowedPetSize,
                 parkingAvailable,
                 indoorFacility,
-                outdoorFacility
+                outdoorFacility,
+                pageable // Pass pageable to repository
         );
     }
 

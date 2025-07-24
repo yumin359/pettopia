@@ -1,5 +1,7 @@
 package com.example.backend.petFacility;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -9,17 +11,26 @@ import java.util.Set;
 
 public interface PetFacilityRepository extends JpaRepository<PetFacility, Long> {
 
-    // New custom query for combined filtering
-    @Query("SELECT pf FROM PetFacility pf WHERE " +
+
+    @Query(value = "SELECT pf FROM PetFacility pf WHERE " +
             "( :sidoName IS NULL OR lower(pf.sidoName) LIKE lower(concat('%', :sidoName, '%')) ) AND " +
             "( :sigunguName IS NULL OR lower(pf.sigunguName) LIKE lower(concat('%', :sigunguName, '%')) ) AND " +
-            "( :category1 IS NULL OR pf.category1 IN :category1 ) AND " + // Use IN for Set
-            "( :category2 IS NULL OR pf.category2 IN :category2 ) AND " + // Use IN for Set
-            "( :allowedPetSize IS NULL OR pf.allowedPetSize IN :allowedPetSize ) AND " + // Use IN for Set
+            "( :category1 IS NULL OR pf.category1 IN :category1 ) AND " +
+            "( :category2 IS NULL OR pf.category2 IN :category2 ) AND " +
+            "( :allowedPetSize IS NULL OR pf.allowedPetSize IN :allowedPetSize ) AND " +
             "( :parkingAvailable IS NULL OR lower(pf.parkingAvailable) LIKE lower(concat('%', :parkingAvailable, '%')) ) AND " +
             "( :indoorFacility IS NULL OR lower(pf.indoorFacility) LIKE lower(concat('%', :indoorFacility, '%')) ) AND " +
-            "( :outdoorFacility IS NULL OR lower(pf.outdoorFacility) LIKE lower(concat('%', :outdoorFacility, '%')) )")
-    List<PetFacility> findFacilitiesByFilters(
+            "( :outdoorFacility IS NULL OR lower(pf.outdoorFacility) LIKE lower(concat('%', :outdoorFacility, '%')) )",
+            countQuery = "SELECT COUNT(pf) FROM PetFacility pf WHERE " + // 총 개수를 위한 쿼리 추가
+                    "( :sidoName IS NULL OR lower(pf.sidoName) LIKE lower(concat('%', :sidoName, '%')) ) AND " +
+                    "( :sigunguName IS NULL OR lower(pf.sigunguName) LIKE lower(concat('%', :sigunguName, '%')) ) AND " +
+                    "( :category1 IS NULL OR pf.category1 IN :category1 ) AND " +
+                    "( :category2 IS NULL OR pf.category2 IN :category2 ) AND " +
+                    "( :allowedPetSize IS NULL OR pf.allowedPetSize IN :allowedPetSize ) AND " +
+                    "( :parkingAvailable IS NULL OR lower(pf.parkingAvailable) LIKE lower(concat('%', :parkingAvailable, '%')) ) AND " +
+                    "( :indoorFacility IS NULL OR lower(pf.indoorFacility) LIKE lower(concat('%', :indoorFacility, '%')) ) AND " +
+                    "( :outdoorFacility IS NULL OR lower(pf.outdoorFacility) LIKE lower(concat('%', :outdoorFacility, '%')) )")
+    Page<PetFacility> findFacilitiesByFilters(
             @Param("sidoName") String sidoName,
             @Param("sigunguName") String sigunguName,
             @Param("category1") Set<String> category1,
@@ -27,10 +38,10 @@ public interface PetFacilityRepository extends JpaRepository<PetFacility, Long> 
             @Param("allowedPetSize") Set<String> allowedPetSize,
             @Param("parkingAvailable") String parkingAvailable,
             @Param("indoorFacility") String indoorFacility,
-            @Param("outdoorFacility") String outdoorFacility
+            @Param("outdoorFacility") String outdoorFacility,
+            Pageable pageable // Pageable 파라미터 추가
     );
 
-    // Existing methods (keep them)
     List<PetFacility> findByCategory1ContainingIgnoreCase(String category1);
 
     List<PetFacility> findByCategory2ContainingIgnoreCase(String category2);
