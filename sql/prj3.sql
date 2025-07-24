@@ -113,6 +113,31 @@ create table prj04.auth
         foreign key (member_id) references prj04.member (id)
             on delete cascade
 );
+create table prj04.auth
+(
+    auth_name    varchar(255) not null,
+    member_id    bigint       not null,
+    member_email varchar(255) not null,
+    primary key (member_id, auth_name),
+    constraint FK_auth_member_id
+        foreign key (member_id) references prj04.member (id)
+            on delete cascade
+);
+
+ALTER TABLE auth
+    DROP COLUMN member_email;
+
+create table prj04.auth
+(
+    auth_name varchar(255) not null,
+    member_id bigint       not null,
+    primary key (member_id, auth_name),
+    constraint FK_auth_member_id
+        foreign key (member_id) references prj04.member (id)
+            on delete cascade
+);
+
+
 # ---------------------------------------------------------------------------------
 
 -- 게시판 테이블
@@ -178,6 +203,27 @@ create table prj04.board
 );
 -- 참조하는 거는 타입이 같아야 한대서 author 가 bigint로 되어있음
 -- 가져올 때만 잘 가져오면 되는 듯
+
+SHOW CREATE TABLE board;
+ALTER TABLE board
+    DROP FOREIGN KEY FKr892y1856tug5ylld6ytg2akw;
+ALTER TABLE board
+    DROP COLUMN author_member_id;
+
+create table prj04.board
+(
+    id          int auto_increment
+        primary key,
+    title       varchar(255)                           null,
+    content     varchar(255)                           null,
+    is_private  tinyint(1) default 0                   not null,
+    inserted_at datetime   default current_timestamp() not null,
+    author      bigint                                 not null,
+    constraint FK_board_author_member_id
+        foreign key (author) references prj04.member (id)
+            on delete cascade
+);
+
 
 
 # ---------------------------------------------------------------------------------
