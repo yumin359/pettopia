@@ -151,26 +151,33 @@ ALTER TABLE board
     ADD CONSTRAINT FK_board_author_member_id
         FOREIGN KEY (author_member_id) REFERENCES member (id) ON DELETE CASCADE;
 
+
+-- author fk 삭제
+ALTER TABLE board
+    DROP FOREIGN KEY FKhcuk8g1so4urnbhi2mtq0gw82;
+-- author 컬럼 삭제
+ALTER TABLE board
+    DROP COLUMN author;
+
+-- 작성자 컬럼명 변경
+ALTER TABLE board RENAME COLUMN author_member_id TO author;
+
 # 완성된 board
 create table prj04.board
 (
-    id               int auto_increment
+    id          int auto_increment
         primary key,
-    title            varchar(255)                           null,
-    content          varchar(255)                           null,
-    author           varchar(255)                           not null,
-    is_private       tinyint(1) default 0                   not null,
-    inserted_at      datetime   default current_timestamp() not null,
-    author_member_id bigint                                 not null,
+    title       varchar(255)                           null,
+    content     varchar(255)                           null,
+    is_private  tinyint(1) default 0                   not null,
+    inserted_at datetime   default current_timestamp() not null,
+    author      bigint                                 not null,
     constraint FK_board_author_member_id
-        foreign key (author_member_id) references prj04.member (id)
+        foreign key (author) references prj04.member (id)
             on delete cascade
 );
-
-create index author
-    on prj04.board (author);
-
-# 아마 나중에 author 지울..? 이 아니라 게시물이면 있어야 하지 않나;
+-- 참조하는 거는 타입이 같아야 한대서 author 가 bigint로 되어있음
+-- 가져올 때만 잘 가져오면 되는 듯
 
 
 # ---------------------------------------------------------------------------------
