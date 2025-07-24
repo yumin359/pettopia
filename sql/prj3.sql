@@ -217,26 +217,32 @@ ALTER TABLE comment
     ADD CONSTRAINT FK_comment_author_member_id
         FOREIGN KEY (author_member_id) REFERENCES member (id) ON DELETE CASCADE;
 
+SHOW CREATE TABLE comment;
+-- author 에 있는 참조 제거
+ALTER TABLE comment
+    DROP FOREIGN KEY FK1p7wco1f9ni3w0rrbl5opcs5;
+-- author 컬럼 제거
+ALTER TABLE comment
+    DROP COLUMN author;
+-- 컬럼명 변경
+ALTER TABLE comment
+    CHANGE author_member_id author BIGINT NOT NULL;
 # 완성된 comment
 create table prj04.comment
 (
-    id               int auto_increment
+    id          int auto_increment
         primary key,
-    board_id         int                                  not null,
-    author           varchar(255)                         not null,
-    comment          varchar(255)                         null,
-    inserted_at      datetime default current_timestamp() not null,
-    author_member_id bigint                               not null,
+    board_id    int                                  not null,
+    comment     varchar(255)                         null,
+    inserted_at datetime default current_timestamp() not null,
+    author      bigint                               not null,
     constraint FK_comment_author_member_id
-        foreign key (author_member_id) references prj04.member (id)
+        foreign key (author) references prj04.member (id)
             on delete cascade,
     constraint comment_ibfk_1
         foreign key (board_id) references prj04.board (id)
             on delete cascade
 );
-
-create index author
-    on prj04.comment (author);
 
 create index board_id
     on prj04.comment (board_id);
