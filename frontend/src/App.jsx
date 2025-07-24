@@ -13,7 +13,7 @@ import { MemberLogin } from "./feature/member/MemberLogin.jsx";
 import { MemberLogout } from "./feature/member/MemberLogout.jsx";
 import { AuthenticationContextProvider } from "./common/AuthenticationContextProvider.jsx";
 import { MapDetail } from "./feature/map/MapDetail.jsx";
-import KakaoMap from "./KakaoMap.jsx";
+import FullFilterKakaoMap from "./feature/map/FullFilterKakaoMap";
 
 function App() {
   return (
@@ -32,9 +32,8 @@ function App() {
             <Route path="/member" element={<MemberDetail />} />
             <Route path="/member/list" element={<MemberList />} />
             <Route path="/member/edit" element={<MemberEdit />} />
-            <Route path="/facility/:name" element={<MapDetail />} />{" "}
-            <Route path="/kakaoMap" element={<KakaoMap />} />
-            {/* ✅ 여기 추가 */}
+            <Route path="/facility/:name" element={<MapDetail />} />
+            <Route path="/KakaoMap" element={<FullFilterKakaoMap />} />
           </Route>
         </Routes>
       </BrowserRouter>
