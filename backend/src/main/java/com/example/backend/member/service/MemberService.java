@@ -1,20 +1,32 @@
 package com.example.backend.member.service;
 
 import com.example.backend.auth.repository.AuthRepository;
+import com.example.backend.board.entity.BoardFile;
+import com.example.backend.board.entity.BoardFileId;
 import com.example.backend.board.repository.BoardRepository;
 import com.example.backend.comment.repository.CommentRepository;
 import com.example.backend.like.repository.BoardLikeRepository;
 import com.example.backend.member.dto.*;
 import com.example.backend.member.entity.Member;
 import com.example.backend.member.entity.Member.Role;
+import com.example.backend.member.entity.MemberFile;
+import com.example.backend.member.entity.MemberFileId;
+import com.example.backend.member.repository.MemberFileRepository;
 import com.example.backend.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.time.Instant;
 import java.util.List;
@@ -28,11 +40,45 @@ public class MemberService {
 
     private final AuthRepository authRepository;
     private final MemberRepository memberRepository;
+    private final MemberFileRepository memberFileRepository;
     private final JwtEncoder jwtEncoder;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final CommentRepository commentRepository;
     private final BoardRepository boardRepository;
     private final BoardLikeRepository boardLikeRepository;
+    private final S3Client s3Client;
+
+    @Value("${image.prefix}")
+    private String imagePrefix;
+
+    @Value("${aws.s3.bucket.name}")
+    private String bucketName;
+
+    // S3에 파일 업로드
+    private void uploadFile(MultipartFile file, String objectKey) {
+        try {
+            PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(objectKey)
+                    .acl(ObjectCannedACL.PUBLIC_READ) // 공개 읽기 권한
+                    .build();
+
+            s3Client.putObject(putObjectRequest,
+                    RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
+        } catch (Exception e) {
+            throw new RuntimeException("파일 업로드 실패: " + objectKey, e);
+        }
+    }
+
+    // S3에서 파일 삭제
+    private void deleteFile(String objectKey) {
+        DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
+                .bucket(bucketName)
+                .key(objectKey)
+                .build();
+
+        s3Client.deleteObject(deleteObjectRequest);
+    }
 
     public void add(MemberForm memberForm) {
         this.validate(memberForm);
@@ -48,6 +94,31 @@ public class MemberService {
         member.setRole(Role.USER);
 
         memberRepository.save(member);
+
+        saveFiles(member, memberForm);
+    }
+
+    // 프로필 사진 저장 (DB 저장 + S3 업로드)
+    private void saveFiles(Member member, MemberForm memberForm) {
+        List<MultipartFile> files = memberForm.getFiles();
+        if (files != null && !files.isEmpty()) {
+            for (MultipartFile file : files) {
+                if (file != null && file.getSize() > 0) {
+                    // DB에 파일 메타정보 저장
+                    MemberFile memberFile = new MemberFile();
+                    MemberFileId id = new MemberFileId();
+                    id.setMemberId(member.getId());
+                    id.setName(file.getOriginalFilename());
+                    memberFile.setMember(member);
+                    memberFile.setId(id);
+                    memberFileRepository.save(memberFile);
+
+                    // S3에 파일 업로드
+                    String objectKey = "prj3/board/" + member.getId() + "/" + file.getOriginalFilename();
+                    uploadFile(file, objectKey);
+                }
+            }
+        }
     }
 
     private void validate(MemberForm memberForm) {
