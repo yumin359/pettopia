@@ -28,9 +28,11 @@ public class Member {
     private String provider;
     private String providerId;
 
-    // 나중에 Enum?으로 바꿀 듯
-    private String role;
+    // 흠
+    private Role role;
 
     @Column(insertable = false, updatable = false)
     private LocalDateTime insertedAt;
+
+    public enum Role {USER, ADMIN}
 }

@@ -23,9 +23,11 @@ public class Comment {
     @JoinColumn(name = "board_id")
     private Board board;
 
+    private String author;
+    // 아마 여기도 아래가 작성자가 될 듯
     @ManyToOne
-    @JoinColumn(name = "author")
-    private Member author;
+    @JoinColumn(name = "author_member_id")
+    private Member authorMember;
 
     private String comment;
 

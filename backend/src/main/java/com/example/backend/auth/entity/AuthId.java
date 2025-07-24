@@ -4,14 +4,14 @@ import java.io.Serializable;
 import java.util.Objects;
 
 public class AuthId implements Serializable {
-    private String memberEmail;  // 변경됨: member -> memberEmail
+    private Long memberId;
     private String authName;
 
     public AuthId() {
     }
 
-    public AuthId(String memberEmail, String authName) {
-        this.memberEmail = memberEmail;
+    public AuthId(Long memberId, String authName) {
+        this.memberId = memberId;
         this.authName = authName;
     }
 
@@ -20,11 +20,11 @@ public class AuthId implements Serializable {
         if (this == o) return true;
         if (!(o instanceof AuthId)) return false;
         AuthId authId = (AuthId) o;
-        return memberEmail.equals(authId.memberEmail) && authName.equals(authId.authName);
+        return memberId.equals(authId.memberId) && authName.equals(authId.authName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(memberEmail, authName);
+        return Objects.hash(memberId, authName);
     }
 }

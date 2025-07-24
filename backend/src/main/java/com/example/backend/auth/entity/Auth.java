@@ -12,8 +12,8 @@ import lombok.*;
 @AllArgsConstructor
 public class Auth {
     @Id
-    @Column(name = "member_email")
-    private String memberEmail;
+    @Column(name = "member_id")
+    private Long memberId;
 
     @Id
     @Column(name = "auth_name")

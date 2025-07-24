@@ -21,15 +21,19 @@ public class Board {
     private String title;
     private String content;
 
-    @ManyToOne
-    @JoinColumn(name = "author")
-    private Member author;
+    private String author;
 
     @Column(updatable = false, insertable = false) // 생성 시각 자동 default NOW();
     private LocalDateTime insertedAt;
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<BoardFile> files = new ArrayList<>();
+
+    // 아마 얘가 작성자가 될 듯
+    @ManyToOne
+    @JoinColumn(name = "author_member_id")
+    private Member authorMember;
+
 
     // 공개/비공개 추가
 
