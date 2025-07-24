@@ -21,7 +21,7 @@ public class Board {
     private String title;
     private String content;
 
-    private String author;
+//    private String author;
 
     @Column(updatable = false, insertable = false) // 생성 시각 자동 default NOW();
     private LocalDateTime insertedAt;
@@ -32,7 +32,7 @@ public class Board {
     // 아마 얘가 작성자가 될 듯
     @ManyToOne
     @JoinColumn(name = "author_member_id")
-    private Member authorMember;
+    private Member author;
 
 
     // 공개/비공개 추가
