@@ -235,7 +235,7 @@ const FullFilterKakaoMap = () => {
   ]);
 
   // 리스트 아이템 클릭 (KakaoMapComponent로 전달)
-  const handleListItemClick = useCallback((facility) => {
+  const handleListItemClick = useCallback(() => {
     // KakaoMapComponent 내부에서 지도 이동 및 마커 클릭 로직 처리
     // 이 함수는 단순히 KakaoMapComponent에 전달되어 마커 클릭 시 사용됩니다.
     // 지도 중심 이동 로직은 KakaoMapComponent 내부의 useEffect에서 처리됩니다.
