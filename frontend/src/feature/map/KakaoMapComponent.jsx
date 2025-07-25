@@ -1,5 +1,6 @@
 // src/feature/map/KakaoMapComponent.js
 import React, { useEffect, useRef, useCallback } from "react";
+import { createInfoWindowContent } from "./mapUtils";
 
 const KakaoMapComponent = ({
   isMapReady,
@@ -66,7 +67,7 @@ const KakaoMapComponent = ({
       const borderRadius = 8; // 모서리 둥글게
 
       const pointerWidth = 10; // 아래 삼각형 포인터의 너비
-      const pointerHeight = 7; // 아래 삼각형 포인터의 높이
+      // const pointerHeight = 7; // 아래 삼각형 포인터의 높이
 
       const markerSvg = `
         <svg xmlns="http://www.w3.org/2000/svg" width="${markerWidth}" height="${markerHeight}" viewBox="0 0 ${markerWidth} ${markerHeight}">
@@ -97,37 +98,6 @@ const KakaoMapComponent = ({
       marker.infowindow = null;
 
       return marker;
-    },
-    [categoryColors],
-  );
-
-  // 정보창 내용 생성
-  const createInfoWindowContent = useCallback(
-    (facility) => {
-      const categoryColor =
-        categoryColors[facility.category1] || // category1 먼저 확인
-        categoryColors[facility.category2] ||
-        "#6c757d";
-
-      return `
-      <div class="card shadow p-2" style="width: 220px; font-size: 11px; border: none;">
-        <div class="card-body p-1">
-          <h6 class="card-title mb-1" style="font-size: 12px; font-weight: bold;">
-            ${facility.name || "이름 없음"}
-            <span class="badge ms-1" style="background-color:${categoryColor}; font-size: 8px;">
-              ${facility.category2 || facility.category1 || ""}
-            </span>
-          </h6>
-          <p class="mb-1 small text-secondary">📍 ${facility.roadAddress || facility.jibunAddress || "주소 정보 없음"}</p>
-          ${facility.phoneNumber ? `<p class="text-primary mb-1 small">📞 ${facility.phoneNumber}</p>` : ""}
-          ${facility.allowedPetSize ? `<p class="text-success mb-1 small">🐕 ${facility.allowedPetSize}</p>` : ""}
-          ${facility.parkingAvailable === "Y" ? `<p class="text-info mb-1 small">🅿️ 주차가능</p>` : ""}
-          ${facility.holiday ? `<p class="text-muted mb-1 small">🗓️ 휴무: ${facility.holiday}</p>` : ""}
-          ${facility.operatingHours ? `<p class="text-muted mb-1 small">⏰ ${facility.operatingHours}</p>` : ""}
-          ${facility.petRestrictions ? `<p class="text-warning mb-1 small">🚫 ${facility.petRestrictions}</p>` : ""}
-        </div>
-      </div>
-    `;
     },
     [categoryColors],
   );
@@ -168,7 +138,7 @@ const KakaoMapComponent = ({
         window.kakao.maps.event.addListener(marker, "mouseover", () => {
           if (!marker.infowindow) {
             marker.infowindow = new window.kakao.maps.InfoWindow({
-              content: createInfoWindowContent(facility),
+              content: createInfoWindowContent(facility, categoryColors),
               removable: false,
             });
           }
@@ -189,7 +159,8 @@ const KakaoMapComponent = ({
           // 클릭된 마커의 정보창 열기
           if (!marker.infowindow) {
             marker.infowindow = new window.kakao.maps.InfoWindow({
-              content: createInfoWindowContent(facility),
+              // mapUtils에서 임포트한 createInfoWindowContent 함수 사용
+              content: createInfoWindowContent(facility, categoryColors),
               removable: true,
             });
           }
@@ -216,7 +187,7 @@ const KakaoMapComponent = ({
       });
       mapInstance.current.setBounds(bounds);
     }
-  }, [facilities, isMapReady, createCustomMarker, createInfoWindowContent]);
+  }, [facilities, isMapReady, createCustomMarker, categoryColors]); // categoryColors도 의존성 배열에 추가
 
   // 리스트에서 클릭된 시설로 지도 이동
   useEffect(() => {
@@ -244,7 +215,8 @@ const KakaoMapComponent = ({
           // 해당 마커의 정보창 열기
           if (!targetMarker.infowindow) {
             targetMarker.infowindow = new window.kakao.maps.InfoWindow({
-              content: createInfoWindowContent(facility),
+              // mapUtils에서 임포트한 createInfoWindowContent 함수 사용
+              content: createInfoWindowContent(facility, categoryColors),
               removable: true,
             });
           }
@@ -255,7 +227,7 @@ const KakaoMapComponent = ({
       // 전역에 함수 등록 (임시 방법)
       window.handleMapFacilityClick = handleExternalClick;
     }
-  }, [handleListItemClick, createInfoWindowContent]);
+  }, [handleListItemClick, categoryColors]); // categoryColors도 의존성 배열에 추가
 
   return (
     <div className="col-7 position-relative p-0">

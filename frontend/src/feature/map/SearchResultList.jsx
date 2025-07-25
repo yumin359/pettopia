@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { createInfoWindowContent } from "./mapUtils";
 
 const SearchResultList = ({
   facilities,
@@ -16,14 +17,17 @@ const SearchResultList = ({
 
   const handleListItemClick = (facility) => {
     navigate(`/facility/${encodeURIComponent(facility.name)}`);
+    if (window.handleMapFacilityClick) {
+      window.handleMapFacilityClick(facility);
+    }
   };
 
-  // 페이지 네이션
+  // 페이지네이션 렌더링 로직 (기존과 동일)
   const renderPagination = () => {
     if (totalPages <= 1) return null;
 
     const pageNumbers = [];
-    const maxPageButtons = 5; // 표시할 페이지 버튼의 최대 개수
+    const maxPageButtons = 5;
     let startPage = Math.max(0, currentPage - Math.floor(maxPageButtons / 2));
     let endPage = Math.min(totalPages - 1, startPage + maxPageButtons - 1);
 
@@ -41,9 +45,8 @@ const SearchResultList = ({
           <li className={`page-item ${currentPage === 0 ? "disabled" : ""}`}>
             <button
               className="page-link"
-              onClick={() => handlePageChange(0)} // 처음 페이지로
+              onClick={() => handlePageChange(0)}
               disabled={currentPage === 0}
-              // 페이지네이션 버튼 크기 및 여백 조절 (더 작게)
               style={{ fontSize: "0.65rem", padding: "0.2rem 0.4rem" }}
             >
               ◀
@@ -54,7 +57,6 @@ const SearchResultList = ({
               className="page-link"
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 0}
-              // 페이지네이션 버튼 크기 및 여백 조절 (더 작게)
               style={{ fontSize: "0.65rem", padding: "0.2rem 0.4rem" }}
             >
               ◁
@@ -64,7 +66,6 @@ const SearchResultList = ({
             <li className="page-item disabled">
               <span
                 className="page-link"
-                // 페이지네이션 버튼 크기 및 여백 조절 (더 작게)
                 style={{ fontSize: "0.65rem", padding: "0.2rem 0.4rem" }}
               >
                 ...
@@ -79,7 +80,6 @@ const SearchResultList = ({
               <button
                 className="page-link"
                 onClick={() => handlePageChange(page)}
-                // 페이지네이션 버튼 크기 및 여백 조절 (더 작게)
                 style={{ fontSize: "0.65rem", padding: "0.2rem 0.4rem" }}
               >
                 {page + 1}
@@ -90,7 +90,6 @@ const SearchResultList = ({
             <li className="page-item disabled">
               <span
                 className="page-link"
-                // 페이지네이션 버튼 크기 및 여백 조절 (더 작게)
                 style={{ fontSize: "0.65rem", padding: "0.2rem 0.4rem" }}
               >
                 ...
@@ -102,22 +101,8 @@ const SearchResultList = ({
           >
             <button
               className="page-link"
-              onClick={() => handlePageChange(currentPage + 1)}
+              onClick={() => handlePageChange(totalPages - 1)}
               disabled={currentPage === totalPages - 1}
-              // 페이지네이션 버튼 크기 및 여백 조절 (더 작게)
-              style={{ fontSize: "0.65rem", padding: "0.2rem 0.4rem" }}
-            >
-              ▷
-            </button>
-          </li>
-          <li
-            className={`page-item ${currentPage === totalPages - 1 ? "disabled" : ""}`}
-          >
-            <button
-              className="page-link"
-              onClick={() => handlePageChange(totalPages - 1)} // 끝 페이지로
-              disabled={currentPage === totalPages - 1}
-              // 페이지네이션 버튼 크기 및 여백 조절 (더 작게)
               style={{ fontSize: "0.65rem", padding: "0.2rem 0.4rem" }}
             >
               ▶
@@ -128,11 +113,13 @@ const SearchResultList = ({
     );
   };
 
+  // 검색결과 카드
   const renderFacilityCard = (facility) => {
-    const categoryColor =
-      categoryColors[facility.category1] || // category1 먼저 확인
-      categoryColors[facility.category2] ||
-      "#6c757d"; // 기본 색상
+    // createInfoWindowContent 함수로 전체 HTML 문자열을 가져옴
+    const fullInfoWindowHtml = createInfoWindowContent(
+      facility,
+      categoryColors,
+    );
 
     return (
       <div
@@ -141,60 +128,9 @@ const SearchResultList = ({
         onClick={() => handleListItemClick(facility)}
         style={{ cursor: "pointer", fontSize: "11px" }}
       >
-        <div className="card-body p-2">
-          <div className="d-flex align-items-start">
-            <div
-              className="rounded-circle me-2 mt-1"
-              style={{
-                width: "8px",
-                height: "8px",
-                backgroundColor: categoryColor,
-                flexShrink: 0,
-              }}
-            ></div>
-            <div className="flex-grow-1">
-              <h6 className="card-title mb-1 small fw-bold">{facility.name}</h6>
-              <p className="card-text text-muted mb-1 small">
-                <span
-                  className="badge me-1"
-                  style={{
-                    backgroundColor: categoryColor,
-                    fontSize: "8px",
-                    color: "white",
-                  }}
-                >
-                  {facility.category2 || facility.category1}
-                </span>
-              </p>
-              <p className="card-text text-secondary mb-1 small">
-                📍{" "}
-                {(facility.roadAddress || facility.jibunAddress || "").length >
-                30
-                  ? (
-                      facility.roadAddress ||
-                      facility.jibunAddress ||
-                      ""
-                    ).substring(0, 30) + "..."
-                  : facility.roadAddress ||
-                    facility.jibunAddress ||
-                    "주소 정보 없음"}
-              </p>
-
-              <div className="small text-muted">
-                {facility.phoneNumber && <div>📞 {facility.phoneNumber}</div>}
-                {facility.allowedPetSize && (
-                  <div>🐕 {facility.allowedPetSize}</div>
-                )}
-                {facility.parkingAvailable === "Y" && <div>🅿️ 주차가능</div>}
-                {facility.holiday && <div>🗓️ 휴무: {facility.holiday}</div>}
-                {facility.operatingHours && (
-                  <div>⏰ {facility.operatingHours}</div>
-                )}
-                {facility.petRestrictions && (
-                  <div>🚫 {facility.petRestrictions}</div>
-                )}
-              </div>
-            </div>
+        <div className="card-body">
+          <div className="flex-grow-1">
+            <div dangerouslySetInnerHTML={{ __html: fullInfoWindowHtml }} />
           </div>
         </div>
       </div>
