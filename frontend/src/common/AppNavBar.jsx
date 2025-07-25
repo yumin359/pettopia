@@ -57,7 +57,7 @@ export function AppNavBar() {
             )}
           </Nav>
           <Nav.Link as={NavLink} to="/chatbot">
-            챗봇
+            챗봇(쓰지마)
           </Nav.Link>
         </Navbar.Collapse>
       </Container>
