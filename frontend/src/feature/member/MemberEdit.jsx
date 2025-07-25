@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   Button,
@@ -15,20 +15,31 @@ import {
 import axios from "axios";
 import { toast } from "react-toastify";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
+import { FaPlus, FaTrashAlt } from "react-icons/fa";
 
 export function MemberEdit() {
   // 상태 정의
+  // 회원 정보 상태
   const [member, setMember] = useState(null);
+  // 모달 및 비밀번호 관련 상태
   const [modalShow, setModalShow] = useState(false);
   const [passwordModalShow, setPasswordModalShow] = useState(false);
   const [password, setPassword] = useState("");
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword1, setNewPassword1] = useState("");
   const [newPassword2, setNewPassword2] = useState("");
+  // 라우팅 및 인증 관련 훅
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const { hasAccess } = useContext(AuthenticationContext);
   const isSelf = member ? hasAccess(member.email) : false;
+
+  // 프로필 이미지 관련 상태
+  const [currentProfileDisplayUrl, setCurrentProfileDisplayUrl] =
+    useState(null); // 현재 표시될 이미지 URL (기존 또는 새로 선택된 Blob URL)
+  const [fileToUpload, setFileToUpload] = useState(null); // 백엔드로 전송할 실제 파일 객체 (새로 선택된 경우)
+  const [isProfileImageDeleted, setIsProfileImageDeleted] = useState(false); // 프로필 이미지가 명시적으로 삭제되었는지 여부
+  const fileInputRef = useRef(null); // 숨겨진 파일 input 참조
 
   // 정규식
   const passwordRegex =
@@ -39,12 +50,39 @@ export function MemberEdit() {
   useEffect(() => {
     axios
       .get(`/api/member?email=${params.get("email")}`)
-      .then((res) => setMember(res.data))
+      .then((res) => {
+        setMember(res.data);
+        // 기존 프로필 이미지가 있다면 미리보기에 설정
+        const existingProfileImage = res.data.files?.find((fileUrl) =>
+          /\.(jpg|jpeg|png|gif|webp)$/i.test(fileUrl),
+        );
+        if (existingProfileImage) {
+          setCurrentProfileDisplayUrl(existingProfileImage); // 기존 이미지 URL 설정
+        } else {
+          setCurrentProfileDisplayUrl(null); // 기존 이미지가 없으면 null로 초기화
+        }
+        setFileToUpload(null); // 새로 선택된 파일 없음
+        setIsProfileImageDeleted(false); // 삭제 상태 아님
+      })
       .catch((err) => {
         console.error("회원 정보 로딩 실패", err);
         toast.error("회원 정보를 불러오는 중 오류가 발생했습니다.");
       });
   }, [params]);
+
+  // 흠
+  // 컴포넌트 언마운트 시 또는 새 파일 선택 시 기존 미리보기 Blob URL 해제 (메모리 관리)
+  useEffect(() => {
+    return () => {
+      // 컴포넌트 언마운트 시 현재 표시 중인 URL이 Blob URL이면 해제
+      if (
+        currentProfileDisplayUrl &&
+        currentProfileDisplayUrl.startsWith("blob:")
+      ) {
+        URL.revokeObjectURL(currentProfileDisplayUrl);
+      }
+    };
+  }, [currentProfileDisplayUrl]); // currentProfileDisplayUrl이 변경될 때마다 cleanup 함수가 다시 등록됨
 
   if (!member) {
     return (
@@ -68,6 +106,51 @@ export function MemberEdit() {
     !isPasswordValid ||
     !isPasswordMatch;
 
+  // 프로필 이미지 클릭 시 숨겨진 파일 input 활성화
+  const handleProfileClick = () => {
+    if (isSelf && fileInputRef.current) {
+      // 본인만 클릭 가능
+      fileInputRef.current.click();
+    }
+  };
+
+  // 파일 선택 시 처리하는 함수
+  const handleFileChange = (e) => {
+    const file = e.target.files[0]; // 선택된 파일 중 첫 번째만 가져옴
+    if (file) {
+      // 기존 미리보기 URL이 Blob URL이었다면 해제
+      if (
+        currentProfileDisplayUrl &&
+        currentProfileDisplayUrl.startsWith("blob:")
+      ) {
+        URL.revokeObjectURL(currentProfileDisplayUrl);
+      }
+      setFileToUpload(file); // 백엔드로 전송할 파일 객체 설정
+      setCurrentProfileDisplayUrl(URL.createObjectURL(file)); // 새 파일의 미리보기 URL 설정
+      setIsProfileImageDeleted(false); // 파일이 선택되었으므로 삭제 상태 해제
+    } else {
+      // 파일 선택이 취소된 경우: 현재 상태 유지 (기존 이미지가 있었다면 그대로 보임)
+      // setFileToUpload(null); // 이 경우 null로 설정하지 않음
+      // setIsProfileImageDeleted(false); // 이 경우 삭제 상태 해제하지 않음
+    }
+  };
+
+  // 프로필 이미지 제거 버튼 클릭 시 처리하는 함수
+  const handleRemoveProfile = () => {
+    if (
+      currentProfileDisplayUrl &&
+      currentProfileDisplayUrl.startsWith("blob:")
+    ) {
+      URL.revokeObjectURL(currentProfileDisplayUrl); // 생성된 Blob URL 해제
+    }
+    setFileToUpload(null); // 백엔드로 보낼 파일 없음
+    setCurrentProfileDisplayUrl(null); // 미리보기 비움
+    setIsProfileImageDeleted(true); // 프로필 이미지가 명시적으로 삭제됨을 표시
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ""; // 파일 input 값 초기화
+    }
+  };
+
   // 가입일시 포맷 통일
   const formattedInsertedAt = member.insertedAt
     ? member.insertedAt.replace("T", " ").substring(0, 16)
@@ -75,17 +158,36 @@ export function MemberEdit() {
 
   // 정보 수정 요청
   const handleSaveButtonClick = () => {
+    const formData = new FormData();
+    formData.append("email", member.email);
+    formData.append("nickName", member.nickName);
+    formData.append("info", member.info || ""); // null일때 빈문자열 전송
+
+    // 현재 비밀번호 확인용 (모달에서 입력받은 경우에만 전송)
+    if (password) {
+      formData.append("password", password);
+    }
+
+    // 파일 처리 로직 (가장 중요!)
+    if (fileToUpload) {
+      // 1. 새 파일이 선택된 경우 (기존 이미지 대체 또는 새로 추가)
+      formData.append("profileImage", fileToUpload); // 백엔드에서 받을 파라미터 이름 ("profileImage"로 가정)
+    } else if (isProfileImageDeleted) {
+      // 2. 프로필 이미지를 명시적으로 삭제한 경우
+      formData.append("deleteProfileImage", "true"); // 백엔드에 삭제 플래그 전송
+    }
+    // 3. else: fileToUpload도 없고 isProfileImageDeleted도 false인 경우
+    //    -> 프로필 이미지 변경 없음 (기존 이미지가 있다면 유지, 없다면 계속 없음)
+    //    이 경우에는 formData에 파일 관련 아무것도 추가하지 않음
+
     axios
-      .put(`/api/member`, {
-        email: member.email,
-        nickName: member.nickName,
-        info: member.info,
-        password,
+      .put(`/api/member`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
       })
       .then((res) => {
         const message = res.data.message;
         if (message) toast(message.text, { type: message.type });
-        navigate("/");
+        navigate("/member/detail?email=${member.email}");
       })
       .catch((err) => {
         const message = err.response?.data?.message;
@@ -136,6 +238,70 @@ export function MemberEdit() {
 
         <Card className="shadow-sm border-0 rounded-3 mb-4">
           <Card.Body>
+            {/* 프로필 사진 업로드 섹션 */}
+            <FormGroup className="mb-4">
+              <div className="d-flex justify-content-center flex-column align-items-center gap-2">
+                {/* 프로필 이미지 미리보기 또는 아이콘 */}
+                <div
+                  className="profile-upload-area shadow rounded-circle d-flex justify-content-center align-items-center"
+                  onClick={handleProfileClick} // 본인만 클릭 가능 로직은 handleProfileClick 내에서 처리
+                  style={{
+                    width: "150px", // 원하는 크기
+                    height: "150px", // 원하는 크기
+                    border: `2px solid ${isSelf ? "#ddd" : "#eee"}`, // 수정 권한 없으면 테두리 색 다르게
+                    cursor: isSelf ? "pointer" : "default", // 본인만 커서 변경
+                    overflow: "hidden", // 이미지가 영역을 벗어나지 않도록
+                    backgroundColor: currentProfileDisplayUrl
+                      ? "transparent"
+                      : "#f8f9fa", // 배경색
+                  }}
+                >
+                  {currentProfileDisplayUrl ? (
+                    <img
+                      src={currentProfileDisplayUrl}
+                      alt="프로필 미리보기"
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                      }}
+                    />
+                  ) : (
+                    <FaPlus size={40} color="#6c757d" /> // 이미지가 없을 때 + 아이콘
+                  )}
+                </div>
+
+                {/* 실제 파일 선택 input (숨김) */}
+                <FormControl
+                  type="file"
+                  ref={fileInputRef} // useRef로 참조
+                  onChange={handleFileChange}
+                  style={{ display: "none" }} // 숨김
+                  accept="image/*" // 이미지 파일만 선택하도록 제한
+                  disabled={!isSelf} // 본인만 파일 선택 가능
+                  // 이전에 선택된 파일을 다시 선택해도 onChange 이벤트가 발생하도록 value를 초기화
+                  onClick={(e) => {
+                    e.target.value = null;
+                  }}
+                />
+
+                {/* 프로필 사진 제거 버튼 */}
+                {isSelf &&
+                  currentProfileDisplayUrl && ( // 본인이고 현재 표시될 이미지가 있을 때만 보임
+                    <Button
+                      variant="outline-danger"
+                      size="sm"
+                      onClick={handleRemoveProfile}
+                      className="mt-2 d-flex align-items-center gap-1"
+                    >
+                      <FaTrashAlt /> 프로필 사진 제거
+                    </Button>
+                  )}
+              </div>
+            </FormGroup>
+
+            <hr />
+
             <FormGroup controlId="email1" className="mb-3">
               <FormLabel>이메일</FormLabel>
               <FormControl

@@ -212,7 +212,7 @@ public class MemberService {
         memberRepository.delete(member);
     }
 
-
+    // 회원 정보 수정
     public void update(MemberForm memberForm) {
         Member member = memberRepository.findByEmail(memberForm.getEmail())
                 .orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
