@@ -373,6 +373,16 @@ CREATE TABLE member_file
 );
 
 
+# ---------------------------------------------------------------------------------
+
+SHOW CREATE TABLE auth;
+ALTER TABLE auth
+    DROP COLUMN member_email;
+SHOW CREATE TABLE board_like;
+ALTER TABLE board_like
+    DROP COLUMN member_email;
+
+
 
 # ---------------------------------------------------------------------------------
 
