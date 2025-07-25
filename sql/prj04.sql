@@ -363,6 +363,29 @@ CREATE TABLE board_file
 
 # ---------------------------------------------------------------------------------
 
+-- 회원 프로필 사진 첨부 테이블
+CREATE TABLE member_file
+(
+    member_id BIGINT       NOT NULL,
+    name      VARCHAR(300) NOT NULL,
+    PRIMARY KEY (member_id, name),
+    FOREIGN KEY (member_id) REFERENCES member (id) ON DELETE CASCADE
+);
+
+
+# ---------------------------------------------------------------------------------
+
+SHOW CREATE TABLE auth;
+ALTER TABLE auth
+    DROP COLUMN member_email;
+SHOW CREATE TABLE board_like;
+ALTER TABLE board_like
+    DROP COLUMN member_email;
+
+
+
+# ---------------------------------------------------------------------------------
+
 -- 관리자 계정 생성
 INSERT INTO member (email, nick_name, password, inserted_at)
 VALUES ('admin@email.com', 'admin', '1234', NOW());
