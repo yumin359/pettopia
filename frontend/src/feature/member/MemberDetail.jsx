@@ -5,6 +5,8 @@ import {
   FormControl,
   FormGroup,
   FormLabel,
+  ListGroup,
+  ListGroupItem,
   Modal,
   Row,
   Spinner,
@@ -14,6 +16,8 @@ import axios from "axios";
 import { useNavigate, useSearchParams } from "react-router";
 import { toast } from "react-toastify";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
+import { FaDownload, FaUserCircle } from "react-icons/fa";
+import { FiUser } from "react-icons/fi";
 
 export function MemberDetail() {
   const [member, setMember] = useState(null);
@@ -70,6 +74,12 @@ export function MemberDetail() {
     ? member.insertedAt.replace("T", " ").substring(0, 16)
     : "";
 
+  // 프로필 이미지 URL 찾기
+  // 이미지 확장자를 가진 파일 중 첫 번째를 프로필 이미지로 간주합니다.
+  const profileImageUrl = member.files?.find((file) =>
+    /\.(jpg|jpeg|png|gif|webp)$/i.test(file),
+  );
+
   return (
     <Row className="justify-content-center my-4">
       <Col xs={12} md={8} lg={6}>
@@ -86,6 +96,41 @@ export function MemberDetail() {
 
         <Card className="shadow-sm border-0 rounded-3">
           <Card.Body>
+            {/* 프로필 이미지 미리보기 */}
+            <div className="mb-4 d-flex justify-content-center">
+              {profileImageUrl ? (
+                // 이미지가 있을 경우
+                <img
+                  src={profileImageUrl}
+                  alt="프로필 이미지"
+                  className="shadow rounded-circle" // 원형 스타일
+                  style={{
+                    width: "120px", // 원하는 크기로 조절
+                    height: "120px", // 원하는 크기로 조절
+                    objectFit: "cover", // 이미지가 잘리지 않게 채움
+                    border: "2px solid #ddd", // 테두리 (선택 사항)
+                  }}
+                />
+              ) : (
+                // 이미지가 없을 경우 사용자 아이콘 표시
+                <div
+                  className="shadow rounded-circle d-flex justify-content-center align-items-center"
+                  style={{
+                    width: "120px", // 이미지와 동일한 크기
+                    height: "120px", // 이미지와 동일한 크기
+                    backgroundColor: "#e9ecef", // 배경색 (회색 계열)
+                    border: "2px solid #ddd", // 테두리
+                    color: "#6c757d", // 아이콘 색상
+                  }}
+                >
+                  <FiUser size={80} /> {/* 아이콘 크기 조절 */}
+                </div>
+              )}
+            </div>
+
+            {/* 프로필 이미지가 없는 경우를 대비한 여백 (선택 사항) */}
+            {!profileImageUrl && <br />}
+
             <FormGroup controlId="email1" className="mb-3">
               <FormLabel>이메일</FormLabel>
               <FormControl
