@@ -2,6 +2,8 @@ import { Link, NavLink } from "react-router";
 import { Navbar, Nav, Container } from "react-bootstrap";
 import { useContext } from "react";
 import { AuthenticationContext } from "./AuthenticationContextProvider.jsx";
+import { FiUser } from "react-icons/fi";
+import { FaUserCircle } from "react-icons/fa";
 
 export function AppNavBar() {
   const { user, isAdmin } = useContext(AuthenticationContext);
@@ -28,6 +30,8 @@ export function AppNavBar() {
               </Nav.Link>
             ) : (
               <Nav.Link as={NavLink} to={`/member?email=${user.email}`}>
+                <FaUserCircle size={19} className="me-1" />
+                {/* 아이콘 크기 조절 나중에 관리자면 색깔 바꿀까 .. */}
                 {user.nickName}
               </Nav.Link>
             )}
