@@ -7,7 +7,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Set; // 다른 Set 타입 파라미터를 위해 필요
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/pet_facilities")
@@ -20,57 +20,38 @@ public class PetFacilityController {
         this.petFacilityRepository = petFacilityRepository;
     }
 
-    // 통합 검색 엔드포인트
+    // 통합 검색 엔드포인트 (간소화됨)
     @GetMapping("/search")
     public Page<PetFacility> searchPetFacilities(
             @RequestParam(required = false) String sidoName,
             @RequestParam(required = false) String sigunguName,
-            @RequestParam(required = false) Set<String> category1,
             @RequestParam(required = false) Set<String> category2,
             @RequestParam(required = false) Set<String> allowedPetSize,
             @RequestParam(required = false) String parkingAvailable,
             @RequestParam(required = false) String indoorFacility,
             @RequestParam(required = false) String outdoorFacility,
-            @RequestParam(required = false) String holiday,
-            @RequestParam(required = false) String operatingHours,
-            @RequestParam(required = false) String petFriendlyInfo,
-            @RequestParam(required = false) String petOnlyInfo,
-            @RequestParam(required = false) String petRestrictions,
-            @PageableDefault(size = 10, sort = "name", direction = Sort.Direction.ASC) Pageable pageable
+            @PageableDefault(size = 15, sort = "name", direction = Sort.Direction.ASC) Pageable pageable
     ) {
-        // ✅ 빈 Set은 null로 바꾸기 (JPA IN 절 오류 방지)
-        if (category1 != null && category1.isEmpty()) category1 = null;
+        // 빈 Set은 null로 바꾸기 (JPA IN 절 오류 방지)
         if (category2 != null && category2.isEmpty()) category2 = null;
         if (allowedPetSize != null && allowedPetSize.isEmpty()) allowedPetSize = null;
 
         return petFacilityRepository.findFacilitiesByFilters(
                 sidoName,
                 sigunguName,
-                category1,
                 category2,
                 allowedPetSize,
                 parkingAvailable,
                 indoorFacility,
                 outdoorFacility,
-                holiday,
-                operatingHours,
-                petFriendlyInfo,
-                petOnlyInfo,
-                petRestrictions,
                 pageable
         );
     }
-
 
     // 기존 단일 조회 엔드포인트들 (필요하다면 유지)
     @GetMapping
     public List<PetFacility> getAllPetFacilities() {
         return petFacilityRepository.findAll();
-    }
-
-    @GetMapping("/category1/{category1}")
-    public List<PetFacility> getByCategory1(@PathVariable String category1) {
-        return petFacilityRepository.findByCategory1ContainingIgnoreCase(category1);
     }
 
     @GetMapping("/category2/{category2}")
@@ -83,20 +64,7 @@ public class PetFacilityController {
         return petFacilityRepository.findBySidoNameContainingIgnoreCase(sidoName);
     }
 
-    @GetMapping("/region/{sidoName}/category1/{category1}")
-    public List<PetFacility> getBySidoAndCategory1(
-            @PathVariable String sidoName,
-            @PathVariable String category1) {
-        return petFacilityRepository.findBySidoNameContainingIgnoreCaseAndCategory1ContainingIgnoreCase(
-                sidoName, category1);
-    }
-
     // 프론트엔드에서 필터 옵션을 채우기 위한 DISTINCT 값 조회 엔드포인트들
-    @GetMapping("/categories/category1")
-    public List<String> getDistinctCategory1() {
-        return petFacilityRepository.findDistinctCategory1();
-    }
-
     @GetMapping("/categories/category2")
     public List<String> getDistinctCategory2() {
         return petFacilityRepository.findDistinctCategory2();
@@ -107,46 +75,26 @@ public class PetFacilityController {
         return petFacilityRepository.findDistinctSidoName();
     }
 
+    // 전체 시군구 조회 또는 지역별 시군구 조회
     @GetMapping("/sigungu")
-    public List<String> getDistinctSigungu() {
-        return petFacilityRepository.findDistinctSigunguName();
+    public List<String> getDistinctSigungu(@RequestParam(required = false) String region) {
+        try {
+            if (region != null && !region.equals("전체") && !region.trim().isEmpty()) {
+                List<String> result = petFacilityRepository.findDistinctSigunguNameByRegion(region.trim());
+                System.out.println("지역별 시군구 조회 - 지역: " + region + ", 결과: " + result.size() + "개");
+                return result;
+            }
+            List<String> result = petFacilityRepository.findDistinctSigunguName();
+            System.out.println("전체 시군구 조회 - 결과: " + result.size() + "개");
+            return result;
+        } catch (Exception e) {
+            System.err.println("시군구 조회 오류: " + e.getMessage());
+            return List.of(); // 빈 리스트 반환
+        }
     }
 
     @GetMapping("/petsizes")
     public List<String> getDistinctPetSizes() {
         return petFacilityRepository.findDistinctAllowedPetSize();
-    }
-
-    // --- 새로운 필드에 대한 distinct 값 조회 엔드포인트 ---
-    @GetMapping("/holidays")
-    public List<String> getDistinctHolidays() {
-        return petFacilityRepository.findDistinctHoliday();
-    }
-
-    @GetMapping("/operatingHours")
-    public List<String> getDistinctOperatingHours() {
-        return petFacilityRepository.findDistinctOperatingHours();
-    }
-
-    // petFriendlyInfo와 petOnlyInfo는 "Y", "N"으로 고정될 가능성이 높으므로,
-    // 별도의 distinct 엔드포인트 없이 프론트엔드에서 옵션을 직접 정의하는 것이 효율적일 수 있습니다.
-    // 필요하다면 아래처럼 추가할 수 있습니다.
-    /*
-    @GetMapping("/petfriendlyinfo")
-    public List<String> getDistinctPetFriendlyInfo() {
-        // 이 필드가 String 타입이라고 가정하고, 실제 DB 값을 조회
-        return petFacilityRepository.findDistinctPetFriendlyInfo();
-    }
-
-    @GetMapping("/petonlyinfo")
-    public List<String> getDistinctPetOnlyInfo() {
-        // 이 필드가 String 타입이라고 가정하고, 실제 DB 값을 조회
-        return petFacilityRepository.findDistinctPetOnlyInfo();
-    }
-    */
-
-    @GetMapping("/petrestrictions")
-    public List<String> getDistinctPetRestrictions() {
-        return petFacilityRepository.findDistinctPetRestrictions();
     }
 }

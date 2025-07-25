@@ -13,69 +13,45 @@ import java.util.Set;
 @Repository
 public interface PetFacilityRepository extends JpaRepository<PetFacility, Long> {
 
+    // 간소화된 필터 검색 쿼리
     @Query(value = """
             SELECT pf FROM PetFacility pf WHERE
             (:sidoName IS NULL OR lower(pf.sidoName) LIKE lower(concat('%', :sidoName, '%')))
             AND (:sigunguName IS NULL OR lower(pf.sigunguName) LIKE lower(concat('%', :sigunguName, '%')))
-            AND (:category1 IS NULL OR pf.category1 IN :category1)
             AND (:category2 IS NULL OR pf.category2 IN :category2)
             AND (:allowedPetSize IS NULL OR pf.allowedPetSize IN :allowedPetSize)
             AND (:parkingAvailable IS NULL OR lower(pf.parkingAvailable) LIKE lower(concat('%', :parkingAvailable, '%')))
             AND (:indoorFacility IS NULL OR lower(pf.indoorFacility) LIKE lower(concat('%', :indoorFacility, '%')))
             AND (:outdoorFacility IS NULL OR lower(pf.outdoorFacility) LIKE lower(concat('%', :outdoorFacility, '%')))
-            AND (:holiday IS NULL OR lower(pf.holiday) LIKE lower(concat('%', :holiday, '%')))
-            AND (:operatingHours IS NULL OR lower(pf.operatingHours) LIKE lower(concat('%', :operatingHours, '%')))
-            AND (:petFriendlyInfo IS NULL OR pf.petFriendlyInfo = :petFriendlyInfo)
-            AND (:petOnlyInfo IS NULL OR pf.petOnlyInfo = :petOnlyInfo)
-            AND (:petRestrictions IS NULL OR lower(pf.petRestrictions) LIKE lower(concat('%', :petRestrictions, '%')))
             """,
             countQuery = """
                     SELECT COUNT(pf) FROM PetFacility pf WHERE
                     (:sidoName IS NULL OR lower(pf.sidoName) LIKE lower(concat('%', :sidoName, '%')))
                     AND (:sigunguName IS NULL OR lower(pf.sigunguName) LIKE lower(concat('%', :sigunguName, '%')))
-                    AND (:category1 IS NULL OR pf.category1 IN :category1)
                     AND (:category2 IS NULL OR pf.category2 IN :category2)
                     AND (:allowedPetSize IS NULL OR pf.allowedPetSize IN :allowedPetSize)
                     AND (:parkingAvailable IS NULL OR lower(pf.parkingAvailable) LIKE lower(concat('%', :parkingAvailable, '%')))
                     AND (:indoorFacility IS NULL OR lower(pf.indoorFacility) LIKE lower(concat('%', :indoorFacility, '%')))
                     AND (:outdoorFacility IS NULL OR lower(pf.outdoorFacility) LIKE lower(concat('%', :outdoorFacility, '%')))
-                    AND (:holiday IS NULL OR lower(pf.holiday) LIKE lower(concat('%', :holiday, '%')))
-                    AND (:operatingHours IS NULL OR lower(pf.operatingHours) LIKE lower(concat('%', :operatingHours, '%')))
-                    AND (:petFriendlyInfo IS NULL OR pf.petFriendlyInfo = :petFriendlyInfo)
-                    AND (:petOnlyInfo IS NULL OR pf.petOnlyInfo = :petOnlyInfo)
-                    AND (:petRestrictions IS NULL OR lower(pf.petRestrictions) LIKE lower(concat('%', :petRestrictions, '%')))
                     """
     )
     Page<PetFacility> findFacilitiesByFilters(
             @Param("sidoName") String sidoName,
             @Param("sigunguName") String sigunguName,
-            @Param("category1") Set<String> category1,
             @Param("category2") Set<String> category2,
             @Param("allowedPetSize") Set<String> allowedPetSize,
             @Param("parkingAvailable") String parkingAvailable,
             @Param("indoorFacility") String indoorFacility,
             @Param("outdoorFacility") String outdoorFacility,
-            @Param("holiday") String holiday,
-            @Param("operatingHours") String operatingHours,
-            @Param("petFriendlyInfo") String petFriendlyInfo,
-            @Param("petOnlyInfo") String petOnlyInfo,
-            @Param("petRestrictions") String petRestrictions,
             Pageable pageable
     );
 
     // 단일 필드 검색용
-    List<PetFacility> findByCategory1ContainingIgnoreCase(String category1);
-
     List<PetFacility> findByCategory2ContainingIgnoreCase(String category2);
 
     List<PetFacility> findBySidoNameContainingIgnoreCase(String sidoName);
 
-    List<PetFacility> findBySidoNameContainingIgnoreCaseAndCategory1ContainingIgnoreCase(String sidoName, String category1);
-
     // DISTINCT 조회용
-    @Query("SELECT DISTINCT pf.category1 FROM PetFacility pf WHERE pf.category1 IS NOT NULL AND pf.category1 != '' ORDER BY pf.category1")
-    List<String> findDistinctCategory1();
-
     @Query("SELECT DISTINCT pf.category2 FROM PetFacility pf WHERE pf.category2 IS NOT NULL AND pf.category2 != '' ORDER BY pf.category2")
     List<String> findDistinctCategory2();
 
@@ -85,15 +61,10 @@ public interface PetFacilityRepository extends JpaRepository<PetFacility, Long> 
     @Query("SELECT DISTINCT pf.sigunguName FROM PetFacility pf WHERE pf.sigunguName IS NOT NULL AND pf.sigunguName != '' ORDER BY pf.sigunguName")
     List<String> findDistinctSigunguName();
 
+    // 지역별 시군구 조회 - 정확한 매칭
+    @Query("SELECT DISTINCT pf.sigunguName FROM PetFacility pf WHERE pf.sidoName = :sidoName AND pf.sigunguName IS NOT NULL AND TRIM(pf.sigunguName) != '' ORDER BY pf.sigunguName")
+    List<String> findDistinctSigunguNameByRegion(@Param("sidoName") String sidoName);
+
     @Query("SELECT DISTINCT pf.allowedPetSize FROM PetFacility pf WHERE pf.allowedPetSize IS NOT NULL AND pf.allowedPetSize != '' ORDER BY pf.allowedPetSize")
     List<String> findDistinctAllowedPetSize();
-
-    @Query("SELECT DISTINCT pf.holiday FROM PetFacility pf WHERE pf.holiday IS NOT NULL AND pf.holiday != '' ORDER BY pf.holiday")
-    List<String> findDistinctHoliday();
-
-    @Query("SELECT DISTINCT pf.operatingHours FROM PetFacility pf WHERE pf.operatingHours IS NOT NULL AND pf.operatingHours != '' ORDER BY pf.operatingHours")
-    List<String> findDistinctOperatingHours();
-
-    @Query("SELECT DISTINCT pf.petRestrictions FROM PetFacility pf WHERE pf.petRestrictions IS NOT NULL AND pf.petRestrictions != '' ORDER BY pf.petRestrictions")
-    List<String> findDistinctPetRestrictions();
 }
