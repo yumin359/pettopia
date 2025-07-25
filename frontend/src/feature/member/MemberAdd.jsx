@@ -9,11 +9,11 @@ import {
   Row,
   Spinner,
 } from "react-bootstrap";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router";
-import { FaFileAlt, FaTrashAlt } from "react-icons/fa";
+import { FaFileAlt, FaTrashAlt, FaPlus } from "react-icons/fa";
 
 export function MemberAdd() {
   // 입력값 상태 정의
@@ -25,6 +25,9 @@ export function MemberAdd() {
   const [info, setInfo] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const navigate = useNavigate();
+
+  // 숨겨진 파일 인풋을 참조하기 위한 useRef
+  const fileInputRef = useRef(null); // 추가: useRef 훅
 
   // 정규식 (백엔드와 동일한 조건)
   const emailRegex = /^[\w.-]+@[\w.-]+\.[a-zA-Z]{2,}$/;
@@ -47,23 +50,26 @@ export function MemberAdd() {
     !isProcessing
   );
 
-  // 파일 첨부 시 처리하는 함수
+  // 파일 첨부 시 처리하는 함수 (프로필 사진은 하나만)
   const handleFileChange = (e) => {
-    const selectedFiles = Array.from(e.target.files);
-    setFiles((prevFiles) => {
-      const newFiles = selectedFiles.map((file) => ({
-        file,
-        previewUrl: file.type.startsWith("image/")
-          ? URL.createObjectURL(file)
-          : null, // 이미지 파일일 경우 미리보기 URL 생성
-      }));
-      return [...prevFiles, ...newFiles];
-    });
+    const selectedFile = e.target.files[0]; // 선택된 파일 중 첫 번째만 가져옵니다.
+    if (selectedFile) {
+      // 새로운 파일을 받으면 기존 파일들을 대체
+      setFiles([
+        {
+          file: selectedFile,
+          previewUrl: URL.createObjectURL(selectedFile), // 이미지 미리보기 URL 생성
+        },
+      ]);
+    } else {
+      // 파일 선택이 취소된 경우
+      setFiles([]); // 파일 목록 초기화
+    }
   };
 
-  // 파일 삭제 시 처리하는 함수
-  const handleFileRemove = (idx) => {
-    setFiles(files.filter((_, i) => i !== idx));
+  // 프로필 이미지 클릭 시 숨겨진 파일 인풋 클릭
+  const handleProfileClick = () => {
+    fileInputRef.current.click();
   };
 
   function handleSaveClick() {
@@ -74,7 +80,12 @@ export function MemberAdd() {
     formData.append("password", password);
     formData.append("nickName", nickName);
     formData.append("info", info);
-    files.forEach((fileObj) => formData.append("files", fileObj.file));
+
+    // files 배열에 프로필 이미지가 있다면 첫 번째 파일만 추가
+    if (files.length > 0) {
+      formData.append("files", files[0].file);
+    }
+    // files.forEach((fileObj) => formData.append("files", fileObj.file));
 
     // 걍 방식 차이인가?
     axios
@@ -99,10 +110,60 @@ export function MemberAdd() {
       });
   }
 
+  // 현재 선택된 프로필 이미지의 미리보기 URL
+  const currentProfilePreview = files.length > 0 ? files[0].previewUrl : null;
+
   return (
     <Row className="justify-content-center">
       <Col xs={12} md={8} lg={6}>
         <h2 className="mb-4">회원 가입</h2>
+
+        {/* 프로필 사진 업로드 섹션 */}
+        <FormGroup className="mb-4">
+          <FormLabel className="d-block text-center mb-3">
+            프로필 사진
+          </FormLabel>
+          <div className="d-flex justify-content-center">
+            {/* 프로필 이미지 미리보기 또는 아이콘 */}
+            <div
+              className="profile-upload-area shadow rounded-circle d-flex justify-content-center align-items-center"
+              onClick={handleProfileClick}
+              style={{
+                width: "150px", // 원하는 크기
+                height: "150px", // 원하는 크기
+                border: "2px solid #ddd",
+                cursor: "pointer",
+                overflow: "hidden", // 이미지가 영역을 벗어나지 않도록
+                backgroundColor: currentProfilePreview
+                  ? "transparent"
+                  : "#f8f9fa", // 배경색
+              }}
+            >
+              {currentProfilePreview ? (
+                <img
+                  src={currentProfilePreview}
+                  alt="프로필 미리보기"
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                />
+              ) : (
+                <FaPlus size={40} color="#6c757d" /> // 이미지가 없을 때 + 아이콘
+              )}
+            </div>
+
+            {/* 실제 파일 선택 input (숨김) */}
+            <FormControl
+              type="file"
+              ref={fileInputRef} // useRef로 참조
+              onChange={handleFileChange}
+              style={{ display: "none" }} // 숨김
+              accept="image/*" // 이미지 파일만 선택하도록 제한
+              disabled={isProcessing}
+            />
+          </div>
+        </FormGroup>
+
+        <hr />
+        {/* 프로필 사진 섹션과 다른 폼 필드 구분 */}
 
         {/* 이메일 */}
         <FormGroup className="mb-3" controlId="email1">
@@ -185,60 +246,6 @@ export function MemberAdd() {
             onChange={(e) => setInfo(e.target.value)}
           />
         </FormGroup>
-
-        {/* 그리고 나서 파일 선택 input */}
-        <FormGroup className="mb-4">
-          <FormLabel>프로필 사진</FormLabel>
-          <FormControl
-            type="file"
-            multiple
-            onChange={handleFileChange}
-            disabled={isProcessing}
-          />
-        </FormGroup>
-        {/* 파일 첨부된 목록 먼저 보여줌 */}
-        {files.length > 0 && (
-          <div className="mb-4">
-            <ListGroup>
-              {files.map((fileObj, idx) => (
-                <ListGroup.Item
-                  key={idx}
-                  className="d-flex justify-content-between align-items-center"
-                >
-                  {/* 미리보기 이미지 왼쪽에 배치 */}
-                  {fileObj.previewUrl && (
-                    <img
-                      src={fileObj.previewUrl}
-                      alt={fileObj.file.name}
-                      style={{
-                        width: "50px",
-                        height: "50px",
-                        objectFit: "cover",
-                        marginRight: "10px", // 이미지와 파일명 간의 간격 조정
-                      }}
-                    />
-                  )}
-
-                  {/* 파일명과 삭제 버튼 오른쪽에 배치 */}
-                  <div className="d-flex justify-content-between align-items-center w-100">
-                    <span className="text-truncate d-flex align-items-center gap-2">
-                      <FaFileAlt /> {fileObj.file.name}
-                    </span>
-                    <Button
-                      variant="outline-danger"
-                      size="sm"
-                      className="p-1 d-flex"
-                      onClick={() => handleFileRemove(idx)}
-                      disabled={isProcessing}
-                    >
-                      <FaTrashAlt />
-                    </Button>
-                  </div>
-                </ListGroup.Item>
-              ))}
-            </ListGroup>
-          </div>
-        )}
 
         {/* 가입 버튼 */}
         <div className="mb-3">
