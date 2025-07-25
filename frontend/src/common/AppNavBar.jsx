@@ -12,7 +12,7 @@ export function AppNavBar() {
         {/* 1. 로고 */}
         <Navbar.Brand as={Link} to="/" className="fs-3 fw-bold me-4">
           <img
-            src="/kuromi.png"
+            src="/pet-topia.png"
             alt="로고"
             height="40"
             style={{ marginRight: "10px" }}
