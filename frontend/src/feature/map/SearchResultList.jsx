@@ -42,6 +42,8 @@ const SearchResultList = ({
               className="page-link"
               onClick={() => handlePageChange(0)} // 처음 페이지로
               disabled={currentPage === 0}
+              // 페이지네이션 버튼 크기 및 여백 조절 (더 작게)
+              style={{ fontSize: "0.65rem", padding: "0.2rem 0.4rem" }}
             >
               ◀
             </button>
@@ -51,13 +53,21 @@ const SearchResultList = ({
               className="page-link"
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 0}
+              // 페이지네이션 버튼 크기 및 여백 조절 (더 작게)
+              style={{ fontSize: "0.65rem", padding: "0.2rem 0.4rem" }}
             >
               ◁
             </button>
           </li>
           {startPage > 0 && (
             <li className="page-item disabled">
-              <span className="page-link">...</span>
+              <span
+                className="page-link"
+                // 페이지네이션 버튼 크기 및 여백 조절 (더 작게)
+                style={{ fontSize: "0.65rem", padding: "0.2rem 0.4rem" }}
+              >
+                ...
+              </span>
             </li>
           )}
           {pageNumbers.map((page) => (
@@ -68,6 +78,8 @@ const SearchResultList = ({
               <button
                 className="page-link"
                 onClick={() => handlePageChange(page)}
+                // 페이지네이션 버튼 크기 및 여백 조절 (더 작게)
+                style={{ fontSize: "0.65rem", padding: "0.2rem 0.4rem" }}
               >
                 {page + 1}
               </button>
@@ -75,7 +87,13 @@ const SearchResultList = ({
           ))}
           {endPage < totalPages - 1 && (
             <li className="page-item disabled">
-              <span className="page-link">...</span>
+              <span
+                className="page-link"
+                // 페이지네이션 버튼 크기 및 여백 조절 (더 작게)
+                style={{ fontSize: "0.65rem", padding: "0.2rem 0.4rem" }}
+              >
+                ...
+              </span>
             </li>
           )}
           <li
@@ -85,6 +103,8 @@ const SearchResultList = ({
               className="page-link"
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages - 1}
+              // 페이지네이션 버튼 크기 및 여백 조절 (더 작게)
+              style={{ fontSize: "0.65rem", padding: "0.2rem 0.4rem" }}
             >
               ▷
             </button>
@@ -96,6 +116,8 @@ const SearchResultList = ({
               className="page-link"
               onClick={() => handlePageChange(totalPages - 1)} // 끝 페이지로
               disabled={currentPage === totalPages - 1}
+              // 페이지네이션 버튼 크기 및 여백 조절 (더 작게)
+              style={{ fontSize: "0.65rem", padding: "0.2rem 0.4rem" }}
             >
               ▶
             </button>

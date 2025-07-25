@@ -1,7 +1,6 @@
 // src/feature/map/FilterPanel.js
 import React from "react";
 
-// CheckboxGroup 컴포넌트를 직접 여기에 포함
 const CheckboxGroup = ({
   title,
   options,
@@ -9,8 +8,6 @@ const CheckboxGroup = ({
   setFunction, // 👈 부모로부터 받은 상태 변경 함수
   categoryColors,
 }) => {
-  // ❗ 내부에 있던 별도의 handleSetFilter 함수를 완전히 제거합니다.
-
   return (
     <div className="mb-2">
       <label className="form-label small fw-bold mb-1">{title}</label>
@@ -39,7 +36,6 @@ const CheckboxGroup = ({
                 type="checkbox"
                 className="visually-hidden"
                 checked={isChecked}
-                // ✅ 부모로부터 받은 함수(setFunction)를 선택된 옵션(option)과 함께 직접 호출합니다.
                 onChange={() => setFunction(option)}
                 autoComplete="off"
               />
@@ -60,7 +56,7 @@ const FilterPanel = ({
   setSelectedSigungu,
   sigungus,
   selectedCategories2,
-  setSelectedCategories2, // 👈 이 prop이 CheckboxGroup의 setFunction으로 전달됩니다.
+  setSelectedCategories2,
   categories2,
   selectedPetSizes,
   setSelectedPetSizes,

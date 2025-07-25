@@ -55,24 +55,36 @@ const KakaoMapComponent = ({
         categoryColors[facility.category2] ||
         "#666666";
       const shortName =
-        facility.name.length > 5
-          ? facility.name.substring(0, 5) + "..."
+        facility.name.length > 7 // 글자수를 7자로 늘려 더 많은 정보를 표시
+          ? facility.name.substring(0, 7) + "..."
           : facility.name;
 
+      // 마커의 크기 및 구성 요소 정의
+      const markerWidth = 80;
+      const markerHeight = 35;
+      const rectHeight = 28; // 메인 사각형 부분의 높이
+      const borderRadius = 8; // 모서리 둥글게
+
+      const pointerWidth = 10; // 아래 삼각형 포인터의 너비
+      const pointerHeight = 7; // 아래 삼각형 포인터의 높이
+
       const markerSvg = `
-        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="24" viewBox="0 0 40 24">
-          <rect x="0" y="0" width="40" height="20" rx="4" ry="4" fill="${color}" stroke="#fff" stroke-width="2"/>
-          <text x="20" y="13" font-family="Arial, sans-serif" font-size="9" fill="white" text-anchor="middle" alignment-baseline="middle">
+        <svg xmlns="http://www.w3.org/2000/svg" width="${markerWidth}" height="${markerHeight}" viewBox="0 0 ${markerWidth} ${markerHeight}">
+          <rect x="0" y="0" width="${markerWidth}" height="${rectHeight}" rx="${borderRadius}" ry="${borderRadius}" fill="${color}" stroke="#fff" stroke-width="1.5"/>
+          <path d="M${markerWidth / 2} ${markerHeight} L${markerWidth / 2 - pointerWidth / 2} ${rectHeight} L${markerWidth / 2 + pointerWidth / 2} ${rectHeight} Z" fill="${color}" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/>
+          <text x="${markerWidth / 2}" y="${rectHeight / 2 + 2}" 
+                font-family="Pretendard, 'Malgun Gothic', sans-serif" 
+                font-size="10" font-weight="bold" fill="white" 
+                text-anchor="middle" alignment-baseline="middle">
             ${shortName}
           </text>
-          <path d="M20 24 L17 20 L23 20 Z" fill="${color}"/>
         </svg>
       `;
 
       const markerImage = new window.kakao.maps.MarkerImage(
         `data:image/svg+xml;charset=utf-8,${encodeURIComponent(markerSvg)}`,
-        new window.kakao.maps.Size(40, 24),
-        { offset: new window.kakao.maps.Point(20, 24) },
+        new window.kakao.maps.Size(markerWidth, markerHeight),
+        { offset: new window.kakao.maps.Point(markerWidth / 2, markerHeight) }, // 마커 이미지의 중심을 포인터 끝에 맞춤
       );
 
       const marker = new window.kakao.maps.Marker({
