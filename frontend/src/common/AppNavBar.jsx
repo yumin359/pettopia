@@ -43,13 +43,8 @@ export function AppNavBar() {
               지도
             </Nav.Link>
             <Nav.Link as={NavLink} to="/board/list">
-              게시판 목록
+              커뮤니티
             </Nav.Link>
-            {user && (
-              <Nav.Link as={NavLink} to="/board/add">
-                게시글 작성
-              </Nav.Link>
-            )}
             {isAdmin() && (
               <Nav.Link as={NavLink} to="/member/list">
                 회원 목록
