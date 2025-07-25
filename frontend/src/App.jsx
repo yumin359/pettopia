@@ -31,7 +31,7 @@ function App() {
             <Route path="/board/edit" element={<BoardEdit />} />
             <Route path="/signup" element={<MemberAdd />} />
             <Route path="/login" element={<MemberLogin />} />
-            <Route path="/logout" element={<MemberLogout />} />
+            {/*<Route path="/logout" element={<MemberLogout />} />*/}
             <Route path="/member" element={<MemberDetail />} />
             <Route path="/member/list" element={<MemberList />} />
             <Route path="/member/edit" element={<MemberEdit />} />
