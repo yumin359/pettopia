@@ -5,6 +5,8 @@ import {
   FormControl,
   FormGroup,
   FormLabel,
+  ListGroup,
+  ListGroupItem,
   Modal,
   Row,
   Spinner,
@@ -14,6 +16,7 @@ import axios from "axios";
 import { useNavigate, useSearchParams } from "react-router";
 import { toast } from "react-toastify";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
+import { FaDownload } from "react-icons/fa";
 
 export function MemberDetail() {
   const [member, setMember] = useState(null);
@@ -86,6 +89,72 @@ export function MemberDetail() {
 
         <Card className="shadow-sm border-0 rounded-3">
           <Card.Body>
+            {/* 이미지 미리보기 */}
+            {Array.isArray(member.files) &&
+              member.files.some((file) =>
+                /\.(jpg|jpeg|png|gif|webp)$/i.test(file),
+              ) && (
+                <div className="mb-4 d-flex flex-column gap-3">
+                  {member.files
+                    .filter((file) => /\.(jpg|jpeg|png|gif|webp)$/i.test(file))
+                    .map((file, idx) => (
+                      <img
+                        key={idx}
+                        src={file}
+                        alt={`첨부 이미지 ${idx + 1}`}
+                        className="shadow rounded"
+                        style={{ maxWidth: "100%", objectFit: "contain" }}
+                      />
+                    ))}
+                </div>
+              )}
+            <br />
+            {/* 첨부 파일 목록 */}
+            {Array.isArray(member.files) && member.files.length > 0 && (
+              <div className="mb-4">
+                <ListGroup variant="flush">
+                  {member.files.map((file, idx) => {
+                    const fileName = file.split("/").pop();
+                    return (
+                      <ListGroupItem
+                        key={idx}
+                        className="d-flex justify-content-between align-items-center px-2 py-1 border-0"
+                        style={{
+                          fontSize: "0.85rem",
+                          color: "#6c757d",
+                          backgroundColor: "transparent",
+                        }}
+                      >
+                        <span
+                          className="text-truncate"
+                          style={{
+                            maxWidth: "85%",
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                          }}
+                          title={fileName}
+                        >
+                          {fileName}
+                        </span>
+                        <Button
+                          variant="outline-primary"
+                          size="sm"
+                          href={file}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="d-flex align-items-center justify-content-center p-1"
+                          style={{ fontSize: "0.8rem" }}
+                        >
+                          <FaDownload />
+                        </Button>
+                      </ListGroupItem>
+                    );
+                  })}
+                </ListGroup>
+              </div>
+            )}
+            
             <FormGroup controlId="email1" className="mb-3">
               <FormLabel>이메일</FormLabel>
               <FormControl

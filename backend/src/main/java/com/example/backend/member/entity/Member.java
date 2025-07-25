@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "member")
@@ -29,6 +31,9 @@ public class Member {
     // 흠
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    private List<MemberFile> files = new ArrayList<>();
 
     @Column(insertable = false, updatable = false)
     private LocalDateTime insertedAt;

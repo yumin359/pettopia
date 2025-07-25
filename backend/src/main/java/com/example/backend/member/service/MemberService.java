@@ -32,6 +32,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -172,11 +173,16 @@ public class MemberService {
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("해당 이메일의 회원이 존재하지 않습니다."));
 
+        List<String> fileUrls = member.getFiles().stream() // 'getFiles()'는 Member 엔티티에 정의된 연관 관계 메서드를 가정합니다.
+                .map(mf -> imagePrefix + "prj3/member/" + member.getId() + "/" + mf.getId().getName()) // member_file 엔티티의 name 필드 사용
+                .collect(Collectors.toList());
+
         return MemberDto.builder()
                 .email(member.getEmail())
                 .nickName(member.getNickName())
                 .info(member.getInfo())
                 .insertedAt(member.getInsertedAt())
+                .files(fileUrls)
                 .build();
     }
 
