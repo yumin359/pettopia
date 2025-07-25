@@ -1,5 +1,5 @@
-// src/feature/map/SearchResultList.js
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const SearchResultList = ({
                             facilities,
@@ -8,11 +8,16 @@ const SearchResultList = ({
                             currentPage,
                             totalPages,
                             handlePageChange,
-                            handleListItemClick,
                             categoryColors,
                             ITEMS_PER_PAGE,
                             hasSearched,
                           }) => {
+  const navigate = useNavigate();
+
+  const handleListItemClick = (facility) => {
+    navigate(`/facility/${encodeURIComponent(facility.name)}`);
+  };
+
   const renderPagination = () => {
     if (totalPages <= 1) return null;
 
@@ -31,9 +36,7 @@ const SearchResultList = ({
           <li className="page-item active">
             <span className="page-link">{currentPage + 1}</span>
           </li>
-          <li
-            className={`page-item ${currentPage === totalPages - 1 ? "disabled" : ""}`}
-          >
+          <li className={`page-item ${currentPage === totalPages - 1 ? "disabled" : ""}`}>
             <button
               className="page-link"
               onClick={() => handlePageChange(currentPage + 1)}
@@ -48,7 +51,6 @@ const SearchResultList = ({
   };
 
   const renderFacilityCard = (facility) => {
-    // 카테고리2에 따른 색상 결정
     const categoryColor =
       categoryColors[facility.category2] ||
       categoryColors[facility.category1] ||
@@ -88,32 +90,18 @@ const SearchResultList = ({
               </p>
               <p className="card-text text-secondary mb-1 small">
                 📍{" "}
-                {(facility.roadAddress || facility.jibunAddress || "").length >
-                30
-                  ? (
-                  facility.roadAddress ||
-                  facility.jibunAddress ||
-                  ""
-                ).substring(0, 30) + "..."
-                  : facility.roadAddress ||
-                  facility.jibunAddress ||
-                  "주소 정보 없음"}
+                {(facility.roadAddress || facility.jibunAddress || "").length > 30
+                  ? (facility.roadAddress || facility.jibunAddress || "").substring(0, 30) + "..."
+                  : facility.roadAddress || facility.jibunAddress || "주소 정보 없음"}
               </p>
 
-              {/* 추가 정보들 */}
               <div className="small text-muted">
                 {facility.phoneNumber && <div>📞 {facility.phoneNumber}</div>}
-                {facility.allowedPetSize && (
-                  <div>🐕 {facility.allowedPetSize}</div>
-                )}
+                {facility.allowedPetSize && <div>🐕 {facility.allowedPetSize}</div>}
                 {facility.parkingAvailable === "Y" && <div>🅿️ 주차가능</div>}
                 {facility.holiday && <div>🗓️ 휴무: {facility.holiday}</div>}
-                {facility.operatingHours && (
-                  <div>⏰ {facility.operatingHours}</div>
-                )}
-                {facility.petRestrictions && (
-                  <div>🚫 {facility.petRestrictions}</div>
-                )}
+                {facility.operatingHours && <div>⏰ {facility.operatingHours}</div>}
+                {facility.petRestrictions && <div>🚫 {facility.petRestrictions}</div>}
               </div>
             </div>
           </div>
