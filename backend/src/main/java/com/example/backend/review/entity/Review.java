@@ -7,6 +7,7 @@ import lombok.*;
 import java.time.Instant;
 
 @Entity
+@Setter
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
