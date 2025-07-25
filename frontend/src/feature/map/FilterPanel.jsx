@@ -6,32 +6,10 @@ const CheckboxGroup = ({
   title,
   options,
   selectedSet,
-  setFunction,
+  setFunction, // 👈 부모로부터 받은 상태 변경 함수
   categoryColors,
 }) => {
-  const handleSetFilter = (value) => {
-    const newSet = new Set(selectedSet);
-
-    if (value === "전체") {
-      if (newSet.has("전체") && newSet.size === 1) {
-        newSet.clear();
-      } else {
-        newSet.clear();
-        newSet.add("전체");
-      }
-    } else {
-      newSet.delete("전체");
-      if (newSet.has(value)) {
-        newSet.delete(value);
-      } else {
-        newSet.add(value);
-      }
-      if (newSet.size === 0) {
-        newSet.add("전체");
-      }
-    }
-    setFunction(newSet);
-  };
+  // ❗ 내부에 있던 별도의 handleSetFilter 함수를 완전히 제거합니다.
 
   return (
     <div className="mb-2">
@@ -61,7 +39,8 @@ const CheckboxGroup = ({
                 type="checkbox"
                 className="visually-hidden"
                 checked={isChecked}
-                onChange={() => handleSetFilter(option)}
+                // ✅ 부모로부터 받은 함수(setFunction)를 선택된 옵션(option)과 함께 직접 호출합니다.
+                onChange={() => setFunction(option)}
                 autoComplete="off"
               />
               {option}
@@ -81,7 +60,7 @@ const FilterPanel = ({
   setSelectedSigungu,
   sigungus,
   selectedCategories2,
-  setSelectedCategories2,
+  setSelectedCategories2, // 👈 이 prop이 CheckboxGroup의 setFunction으로 전달됩니다.
   categories2,
   selectedPetSizes,
   setSelectedPetSizes,
@@ -91,7 +70,7 @@ const FilterPanel = ({
   facilityType,
   setFacilityType,
   categoryColors,
-  onSearch, // 검색 실행 함수
+  onSearch,
 }) => {
   return (
     <div
@@ -138,7 +117,7 @@ const FilterPanel = ({
           title="🏪 카테고리"
           options={categories2}
           selectedSet={selectedCategories2}
-          setFunction={setSelectedCategories2}
+          setFunction={setSelectedCategories2} // ✅ 수정된 CheckboxGroup에 상태변경 함수 전달
           categoryColors={categoryColors}
         />
 
@@ -146,7 +125,7 @@ const FilterPanel = ({
           title="🐕 반려동물 크기"
           options={petSizes}
           selectedSet={selectedPetSizes}
-          setFunction={setSelectedPetSizes}
+          setFunction={setSelectedPetSizes} // ✅ 수정된 CheckboxGroup에 상태변경 함수 전달
         />
 
         <div className="mb-2">
