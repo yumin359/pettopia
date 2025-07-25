@@ -29,7 +29,7 @@ const KakaoMapComponent = ({
 
       try {
         const options = {
-          center: new window.kakao.maps.LatLng(37.566826, 126.9786567),
+          center: new window.kakao.maps.LatLng(37.566826, 126.9786567), // 서울 중심
           level: 8,
         };
         mapInstance.current = new window.kakao.maps.Map(
@@ -49,16 +49,19 @@ const KakaoMapComponent = ({
 
   // 커스텀 마커 생성
   const createCustomMarker = useCallback(
-    (position, category, facilityName, facilityId) => {
-      const color = categoryColors[category] || "#666666";
+    (position, facility) => {
+      const color =
+        categoryColors[facility.category2] ||
+        categoryColors[facility.category1] ||
+        "#666666";
       const shortName =
-        facilityName.length > 5
-          ? facilityName.substring(0, 5) + "..."
-          : facilityName;
+        facility.name.length > 5
+          ? facility.name.substring(0, 5) + "..."
+          : facility.name;
 
       const markerSvg = `
         <svg xmlns="http://www.w3.org/2000/svg" width="40" height="24" viewBox="0 0 40 24">
-          <rect x="0" y="0" width="40" height="20" rx="4" ry="4" fill="${color}" stroke="#fff" stroke-width="1"/>
+          <rect x="0" y="0" width="40" height="20" rx="4" ry="4" fill="${color}" stroke="#fff" stroke-width="2"/>
           <text x="20" y="13" font-family="Arial, sans-serif" font-size="9" fill="white" text-anchor="middle" alignment-baseline="middle">
             ${shortName}
           </text>
@@ -75,9 +78,10 @@ const KakaoMapComponent = ({
       const marker = new window.kakao.maps.Marker({
         position: position,
         image: markerImage,
-        title: facilityName,
+        title: facility.name,
       });
-      marker.facilityId = facilityId;
+      marker.facilityId = facility.id;
+      marker.facility = facility;
       marker.infowindow = null;
 
       return marker;
@@ -85,9 +89,40 @@ const KakaoMapComponent = ({
     [categoryColors],
   );
 
+  // 정보창 내용 생성
+  const createInfoWindowContent = useCallback(
+    (facility) => {
+      const categoryColor =
+        categoryColors[facility.category2] ||
+        categoryColors[facility.category1] ||
+        "#6c757d";
+
+      return `
+      <div class="card shadow p-2" style="width: 220px; font-size: 11px; border: none;">
+        <div class="card-body p-1">
+          <h6 class="card-title mb-1" style="font-size: 12px; font-weight: bold;">
+            ${facility.name || "이름 없음"}
+            <span class="badge ms-1" style="background-color:${categoryColor}; font-size: 8px;">
+              ${facility.category2 || facility.category1 || ""}
+            </span>
+          </h6>
+          <p class="mb-1 small text-secondary">📍 ${facility.roadAddress || facility.jibunAddress || "주소 정보 없음"}</p>
+          ${facility.phoneNumber ? `<p class="text-primary mb-1 small">📞 ${facility.phoneNumber}</p>` : ""}
+          ${facility.allowedPetSize ? `<p class="text-success mb-1 small">🐕 ${facility.allowedPetSize}</p>` : ""}
+          ${facility.parkingAvailable === "Y" ? `<p class="text-info mb-1 small">🅿️ 주차가능</p>` : ""}
+          ${facility.holiday ? `<p class="text-muted mb-1 small">🗓️ 휴무: ${facility.holiday}</p>` : ""}
+          ${facility.operatingHours ? `<p class="text-muted mb-1 small">⏰ ${facility.operatingHours}</p>` : ""}
+          ${facility.petRestrictions ? `<p class="text-warning mb-1 small">🚫 ${facility.petRestrictions}</p>` : ""}
+        </div>
+      </div>
+    `;
+    },
+    [categoryColors],
+  );
+
   // 시설 데이터가 변경될 때마다 마커 업데이트
   useEffect(() => {
-    if (!mapInstance.current || !isMapReady || !facilities) return;
+    if (!mapInstance.current || !isMapReady) return;
 
     // 기존 마커 제거
     markersRef.current.forEach((marker) => {
@@ -95,6 +130,9 @@ const KakaoMapComponent = ({
       marker.setMap(null);
     });
     markersRef.current = [];
+
+    // facilities가 빈 배열이면 마커를 생성하지 않음 (초기 상태)
+    if (!facilities || facilities.length === 0) return;
 
     // 새 마커 생성
     const newMarkers = [];
@@ -109,41 +147,16 @@ const KakaoMapComponent = ({
           facility.latitude,
           facility.longitude,
         );
-        const marker = createCustomMarker(
-          markerPosition,
-          facility.category1,
-          facility.name || "이름 없음",
-          facility.id,
-        );
+        const marker = createCustomMarker(markerPosition, facility);
 
         marker.setMap(mapInstance.current);
         newMarkers.push(marker);
 
-        // 호버 이벤트 및 클릭 이벤트 (handleListItemClick 활용)
+        // 호버 이벤트
         window.kakao.maps.event.addListener(marker, "mouseover", () => {
           if (!marker.infowindow) {
-            const infowindowContent = `
-              <div class="card shadow p-2" style="width: 200px; font-size: 11px;">
-                <div class="card-body p-1">
-                  <h6 class="card-title mb-1" style="font-size: 12px;">${facility.name || "이름 없음"}
-                    <span class="badge ms-1" style="background-color:${categoryColors[facility.category1] || "#6c757d"}; font-size: 8px;">
-                      ${facility.category1 || ""}
-                    </span>
-                  </h6>
-                  <p class="text-muted mb-1 small">${facility.category2 || ""}</p>
-                  <p class="mb-1 small">${facility.roadAddress || facility.jibunAddress || "주소 정보 없음"}</p>
-                  ${facility.phoneNumber ? `<p class="text-info mb-1 small">📞 ${facility.phoneNumber}</p>` : ""}
-                  ${facility.allowedPetSize ? `<p class="text-success mb-1 small">🐕 ${facility.allowedPetSize}</p>` : ""}
-                  ${facility.parkingAvailable === "Y" ? `<p class="text-secondary mb-1 small">🅿️ 주차가능</p>` : ""}
-                  <div class="d-flex align-items-center">
-                    <span class="text-warning small me-1">⭐⭐⭐⭐☆</span>
-                    <span class="text-muted small">(4.2) 리뷰 23개</span>
-                  </div>
-                </div>
-              </div>
-            `;
             marker.infowindow = new window.kakao.maps.InfoWindow({
-              content: infowindowContent,
+              content: createInfoWindowContent(facility),
               removable: false,
             });
           }
@@ -154,24 +167,36 @@ const KakaoMapComponent = ({
           if (marker.infowindow) marker.infowindow.close();
         });
 
+        // 클릭 이벤트
         window.kakao.maps.event.addListener(marker, "click", () => {
           // 다른 열린 정보창 닫기
           markersRef.current.forEach((m) => {
             if (m.infowindow && m.infowindow.getMap()) m.infowindow.close();
           });
+
           // 클릭된 마커의 정보창 열기
-          if (marker.infowindow) {
-            marker.infowindow.open(mapInstance.current, marker);
+          if (!marker.infowindow) {
+            marker.infowindow = new window.kakao.maps.InfoWindow({
+              content: createInfoWindowContent(facility),
+              removable: true,
+            });
           }
-          // handleListItemClick 호출 (지도 중심 이동)
-          handleListItemClick(facility);
+          marker.infowindow.open(mapInstance.current, marker);
+
+          // 지도 중심 이동
+          const moveLatLon = new window.kakao.maps.LatLng(
+            facility.latitude,
+            facility.longitude,
+          );
+          mapInstance.current.setCenter(moveLatLon);
+          mapInstance.current.setLevel(3);
         });
       }
     });
 
     markersRef.current = newMarkers;
 
-    // 지도 범위 재설정
+    // 마커가 있을 때만 지도 범위 재설정
     if (markersRef.current.length > 0) {
       const bounds = new window.kakao.maps.LatLngBounds();
       markersRef.current.forEach((marker) => {
@@ -179,13 +204,46 @@ const KakaoMapComponent = ({
       });
       mapInstance.current.setBounds(bounds);
     }
-  }, [
-    facilities,
-    isMapReady,
-    createCustomMarker,
-    handleListItemClick,
-    categoryColors,
-  ]);
+  }, [facilities, isMapReady, createCustomMarker, createInfoWindowContent]);
+
+  // 리스트에서 클릭된 시설로 지도 이동
+  useEffect(() => {
+    if (handleListItemClick && mapInstance.current) {
+      // handleListItemClick이 호출되면 해당 시설의 마커를 찾아서 클릭 이벤트 실행
+      const handleExternalClick = (facility) => {
+        const targetMarker = markersRef.current.find(
+          (marker) => marker.facilityId === facility.id,
+        );
+
+        if (targetMarker) {
+          // 지도 중심 이동
+          const moveLatLon = new window.kakao.maps.LatLng(
+            facility.latitude,
+            facility.longitude,
+          );
+          mapInstance.current.setCenter(moveLatLon);
+          mapInstance.current.setLevel(3);
+
+          // 다른 정보창 닫기
+          markersRef.current.forEach((m) => {
+            if (m.infowindow && m.infowindow.getMap()) m.infowindow.close();
+          });
+
+          // 해당 마커의 정보창 열기
+          if (!targetMarker.infowindow) {
+            targetMarker.infowindow = new window.kakao.maps.InfoWindow({
+              content: createInfoWindowContent(facility),
+              removable: true,
+            });
+          }
+          targetMarker.infowindow.open(mapInstance.current, targetMarker);
+        }
+      };
+
+      // 전역에 함수 등록 (임시 방법)
+      window.handleMapFacilityClick = handleExternalClick;
+    }
+  }, [handleListItemClick, createInfoWindowContent]);
 
   return (
     <div className="col-7 position-relative p-0">
@@ -207,33 +265,39 @@ const KakaoMapComponent = ({
       <div
         ref={mapContainer}
         className="w-100 h-100 rounded"
-        style={{ minHeight: "100vh" }}
+        style={{ minHeight: "100%" }}
       />
 
-      {/* 범례 */}
-      {isMapReady && facilities.length > 0 && (
+      {/* 범례 - 검색 결과가 있을 때만 표시 */}
+      {isMapReady && facilities && facilities.length > 0 && (
         <div
           className="position-absolute bottom-0 end-0 p-2 m-2 bg-white rounded shadow-sm"
-          style={{ maxWidth: "120px", zIndex: 1000, fontSize: "10px" }}
+          style={{ maxWidth: "150px", zIndex: 1000, fontSize: "10px" }}
         >
           <h6 className="small mb-1">🎨 카테고리</h6>
           <div className="d-flex flex-wrap gap-1">
-            {Object.entries(categoryColors).map(([category, color]) => (
-              <div key={category} className="d-flex align-items-center mb-1">
-                <div
-                  className="rounded-circle me-1"
-                  style={{
-                    width: "8px",
-                    height: "8px",
-                    backgroundColor: color,
-                    border: "1px solid rgba(0,0,0,0.1)",
-                  }}
-                ></div>
-                <span className="text-muted" style={{ fontSize: "9px" }}>
-                  {category}
-                </span>
-              </div>
-            ))}
+            {Object.entries(categoryColors)
+              .filter(([category]) =>
+                facilities.some(
+                  (f) => f.category2 === category || f.category1 === category,
+                ),
+              )
+              .map(([category, color]) => (
+                <div key={category} className="d-flex align-items-center mb-1">
+                  <div
+                    className="rounded-circle me-1"
+                    style={{
+                      width: "8px",
+                      height: "8px",
+                      backgroundColor: color,
+                      border: "1px solid rgba(0,0,0,0.1)",
+                    }}
+                  ></div>
+                  <span className="text-muted" style={{ fontSize: "9px" }}>
+                    {category}
+                  </span>
+                </div>
+              ))}
           </div>
         </div>
       )}
