@@ -207,6 +207,13 @@ public class MemberService {
         // 게시물 삭제
         boardRepository.deleteByAuthor(member);
 
+        // 프로필 사진 S3이랑 DB에서 삭제 (db는 cascade 로 삭제)
+        for (MemberFile file : member.getFiles()) {
+            String objectKey = "prj3/member/" + member.getId() + "/" + file.getId().getName();
+            deleteFile(objectKey);
+            memberFileRepository.delete(file);
+        }
+
         // 회원 삭제
         memberRepository.delete(member);
     }
