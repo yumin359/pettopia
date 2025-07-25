@@ -18,6 +18,7 @@ const SearchResultList = ({
     navigate(`/facility/${encodeURIComponent(facility.name)}`);
   };
 
+  // 페이지 네이션
   const renderPagination = () => {
     if (totalPages <= 1) return null;
 
