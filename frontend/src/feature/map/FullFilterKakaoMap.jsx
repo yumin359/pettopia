@@ -31,7 +31,7 @@ const FullFilterKakaoMap = () => {
   const [sigungus, setSigungus] = useState([]);
   const [categories2, setCategories2] = useState([]);
 
-  // 반려동물 크기 옵션 (정리된 버전)
+  // ⚠️ 반려동물 크기 옵션 (정리가 안되었어..)
   const petSizeOptions = [
     "전체",
     "개",

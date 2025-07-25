@@ -43,7 +43,7 @@ const SearchResultList = ({
               onClick={() => handlePageChange(0)} // 처음 페이지로
               disabled={currentPage === 0}
             >
-              처음
+              ◀
             </button>
           </li>
           <li className={`page-item ${currentPage === 0 ? "disabled" : ""}`}>
@@ -52,7 +52,7 @@ const SearchResultList = ({
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 0}
             >
-              이전
+              ◁
             </button>
           </li>
           {startPage > 0 && (
@@ -86,7 +86,7 @@ const SearchResultList = ({
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages - 1}
             >
-              다음
+              ▷
             </button>
           </li>
           <li
@@ -97,7 +97,7 @@ const SearchResultList = ({
               onClick={() => handlePageChange(totalPages - 1)} // 끝 페이지로
               disabled={currentPage === totalPages - 1}
             >
-              끝
+              ▶
             </button>
           </li>
         </ul>
