@@ -1,8 +1,6 @@
 package com.example.backend.member.service;
 
 import com.example.backend.auth.repository.AuthRepository;
-import com.example.backend.board.entity.BoardFile;
-import com.example.backend.board.entity.BoardFileId;
 import com.example.backend.board.repository.BoardRepository;
 import com.example.backend.comment.repository.CommentRepository;
 import com.example.backend.like.repository.BoardLikeRepository;
@@ -31,6 +29,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -213,18 +212,91 @@ public class MemberService {
     }
 
     // 회원 정보 수정
-    public void update(MemberForm memberForm) {
+    public void update(MemberForm memberForm,
+                       List<MultipartFile> profileFiles, // 새로 업로드할 파일들
+                       List<String> deleteProfileFileNames) { // 삭제할 기존 파일 이름들
+
         Member member = memberRepository.findByEmail(memberForm.getEmail())
                 .orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
 
-        if (!bCryptPasswordEncoder.matches(memberForm.getPassword(), member.getPassword())) {
+        // 비밀번호 확인 (프론트에서 `password` 필드로 현재 비밀번호를 보냈을 경우)
+        // password 필드가 비어있지 않다면(즉, 모달을 통해 입력받았다면) 검증
+        if (memberForm.getPassword() != null && !memberForm.getPassword().isBlank() &&
+                !bCryptPasswordEncoder.matches(memberForm.getPassword(), member.getPassword())) {
             throw new RuntimeException("암호가 일치하지 않습니다.");
         }
 
+        // 텍스트 정보 업데이트 (닉네임, 자기소개)
         member.setNickName(memberForm.getNickName().trim());
         member.setInfo(memberForm.getInfo());
+        memberRepository.save(member); // 변경된 회원 정보 저장
 
-        memberRepository.save(member);
+        // 1. 삭제할 프로필 파일 처리
+        if (deleteProfileFileNames != null && !deleteProfileFileNames.isEmpty()) {
+            deleteProfileFiles(member, deleteProfileFileNames); // 분리된 삭제 헬퍼 메서드 호출
+        }
+
+        // 2. 새로운 프로필 파일 처리
+        if (profileFiles != null && !profileFiles.isEmpty()) {
+            // 프로필 이미지는 단 하나만 허용되는 경우,
+            // 새 파일이 들어오면 기존에 남아있는 모든 프로필 이미지를 삭제하고 새로운 이미지를 저장
+            // deleteProfileFileNames에 이미 추가된 것 외에, 남아있는 기존 프로필 이미지가 있다면 추가 삭제
+            List<String> currentImageFileNames = member.getFiles().stream()
+                    .filter(mf -> mf.getId().getName().matches(".*\\.(jpg|jpeg|png|gif|webp)$"))
+                    .map(mf -> mf.getId().getName())
+                    .collect(Collectors.toList());
+
+            // deleteProfileFileNames에 이미 있는 파일은 중복 삭제 방지
+            List<String> filesToActuallyDelete = currentImageFileNames.stream()
+                    .filter(fileName -> !deleteProfileFileNames.contains(fileName))
+                    .collect(Collectors.toList());
+
+            if (!filesToActuallyDelete.isEmpty()) {
+                deleteProfileFiles(member, filesToActuallyDelete); // 추가 삭제할 파일이 있다면 삭제 헬퍼 메서드 호출
+            }
+
+            saveNewProfileFiles(member, profileFiles); // 분리된 저장 헬퍼 메서드 호출
+        }
+    }
+
+    // ✅ 새로운 프로필 파일 저장 로직 (이전에 제공된 코드와 동일)
+    private void saveNewProfileFiles(Member member, List<MultipartFile> files) {
+        for (MultipartFile file : files) {
+            if (!file.isEmpty()) {
+                String originalFileName = file.getOriginalFilename();
+                String uuidFileName = UUID.randomUUID().toString() + "_" + originalFileName; // UUID 사용하여 고유한 파일명 생성
+                String objectKey = "prj3/member/" + member.getId() + "/" + uuidFileName;
+
+                uploadFile(file, objectKey); // S3에 업로드
+
+                MemberFile newMemberFile = new MemberFile();
+                MemberFileId id = new MemberFileId(); // 인자 없는 기본 생성자 호출
+                id.setName(uuidFileName);             // setName 메서드를 사용하여 파일 이름 설정
+                id.setMemberId(member.getId());       // setMemberId 메서드를 사용하여 멤버 ID 설정
+                newMemberFile.setId(id);              // 설정된 id 객체를 MemberFile에 연결
+                newMemberFile.setMember(member);
+                memberFileRepository.save(newMemberFile);
+            }
+        }
+    }
+
+    // ✅ 프로필 파일 삭제 로직 (이전에 제공된 코드와 동일)
+    private void deleteProfileFiles(Member member, List<String> fileNamesToDelete) {
+        for (String fileName : fileNamesToDelete) {
+            MemberFileId fileIdToDelete = new MemberFileId(); // 인자 없는 기본 생성자 호출
+            fileIdToDelete.setName(fileName);                // setName() 메서드로 파일 이름 설정
+            fileIdToDelete.setMemberId(member.getId());      // setMemberId() 메서드로 멤버 ID 설정
+
+            Optional<MemberFile> memberFileOptional = memberFileRepository.findById(fileIdToDelete);
+
+            if (memberFileOptional.isPresent()) {
+                MemberFile fileToDelete = memberFileOptional.get();
+                String objectKey = "prj3/member/" + member.getId() + "/" + fileToDelete.getId().getName();
+                deleteFile(objectKey); // S3에서 파일 삭제
+                memberFileRepository.delete(fileToDelete); // DB에서 파일 메타정보 삭제
+                member.getFiles().remove(fileToDelete);
+            }
+        }
     }
 
     public String getToken(MemberLoginForm loginForm) {

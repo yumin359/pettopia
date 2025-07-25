@@ -8,6 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -67,15 +68,19 @@ public class MemberController {
 
     @PutMapping
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> update(@RequestBody MemberForm memberForm,
+    public ResponseEntity<?> update(@ModelAttribute MemberForm memberForm,
+                                    @RequestPart(value = "profileFiles", required = false) List<MultipartFile> profileFiles,
+                                    @RequestParam(value = "deleteProfileFileNames", required = false) List<String> deleteProfileFileNames,
                                     Authentication authentication) {
+
         if (!authentication.getName().equals(memberForm.getEmail())) {
             return ResponseEntity.status(403).build();
         }
+//        MemberForm form = new MemberForm();
+//        form.setFiles(profileFiles); // 새로 추가된 파일
 
-//        System.out.println(memberForm);
         try {
-            memberService.update(memberForm);
+            memberService.update(memberForm, profileFiles, deleteProfileFileNames);
 
         } catch (Exception e) {
             e.printStackTrace();
