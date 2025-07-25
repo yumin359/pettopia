@@ -58,7 +58,8 @@ export function MemberDetail() {
 
   function handleLogoutClick() {
     logout();
-    navigate("/");
+    navigate("/login");
+    toast("로그아웃 되었습니다.", { type: "success" });
   }
 
   if (!member) {
