@@ -4,7 +4,7 @@ import { AuthenticationContext } from "../../common/AuthenticationContextProvide
 import axios from "axios";
 
 export function MapDetail() {
-  const { name } = useParams(); // URL에서 시설명 받기
+  const { name } = useParams();
   const decodedName = decodeURIComponent(name);
   const navigate = useNavigate();
   const { user } = useContext(AuthenticationContext);
@@ -12,21 +12,22 @@ export function MapDetail() {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchReviews = async () => {
-      try {
-        const res = await axios.get("/api/review/list", {
-          params: { facilityName: decodedName },
-        });
-        setReviews(res.data || []);
-      } catch (err) {
-        console.error("리뷰 목록 조회 실패:", err);
-        setReviews([]);
-      } finally {
-        setLoading(false);
-      }
-    };
+  // ⭐ 리뷰 목록 가져오기
+  const fetchReviews = async () => {
+    try {
+      const res = await axios.get("/api/review/list", {
+        params: { facilityName: decodedName },
+      });
+      setReviews(res.data || []);
+    } catch (err) {
+      console.error("리뷰 목록 조회 실패:", err);
+      setReviews([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchReviews();
   }, [decodedName]);
 
@@ -34,7 +35,29 @@ export function MapDetail() {
     navigate(`/facility/${encodeURIComponent(decodedName)}/review/add`);
   };
 
-  // ⭐ 별점 시각화 함수
+  // ⭐ 수정 버튼
+  const handleEdit = (review) => {
+    navigate(`/review/edit/${review.id}`, {
+      state: { review },
+    });
+  };
+
+  // ⭐ 삭제 버튼
+  const handleDelete = async (id) => {
+    if (!window.confirm("정말 삭제하시겠습니까?")) return;
+
+    try {
+      await axios.delete(`/api/review/delete/${id}`, {
+        params: { email: user.email }, // 본인 확인용
+      });
+      alert("삭제 완료");
+      fetchReviews(); // 다시 목록 불러오기
+    } catch (err) {
+      alert("삭제 실패: " + err.response?.data?.message || err.message);
+    }
+  };
+
+  // ⭐ 별점 렌더링
   const renderStars = (rating) => {
     return [...Array(5)].map((_, i) => (
       <span key={i} style={{ color: i < rating ? "#ffc107" : "#e4e5e9" }}>★</span>
@@ -92,6 +115,41 @@ export function MapDetail() {
                   작성자: {r.memberEmailNickName || "알 수 없음"} |{" "}
                   {r.insertedAt?.split("T")[0] || "날짜 없음"}
                 </small>
+
+                {/* ⭐ 본인 리뷰일 경우에만 수정/삭제 버튼 표시 */}
+                {user?.email === r.memberEmail && (
+                  <div style={{ marginTop: "0.5rem" }}>
+                    <button
+                      onClick={() => handleEdit(r)}
+                      style={{
+                        marginRight: "0.5rem",
+                        padding: "0.3rem 0.8rem",
+                        fontSize: "0.9rem",
+                        backgroundColor: "#6c757d",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "4px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      수정
+                    </button>
+                    <button
+                      onClick={() => handleDelete(r.id)}
+                      style={{
+                        padding: "0.3rem 0.8rem",
+                        fontSize: "0.9rem",
+                        backgroundColor: "#dc3545",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "4px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      삭제
+                    </button>
+                  </div>
+                )}
               </li>
             ))}
           </ul>

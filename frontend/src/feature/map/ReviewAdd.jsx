@@ -81,7 +81,7 @@ export function ReviewAdd() {
   return (
     <Row className="justify-content-center my-4">
       <Col xs={12} md={8} lg={6}>
-        <h3 className="mb-3 text-center">📝 {decodedName} 리뷰 작성</h3>
+        <h3 className="mb-3 text-center">📝 {decodedName} 리뷰</h3>
 
         <Card className="shadow-sm rounded-3 border-0">
           <Card.Body>

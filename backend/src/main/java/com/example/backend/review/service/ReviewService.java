@@ -51,4 +51,30 @@ public class ReviewService {
                         .build())
                 .collect(Collectors.toList());
     }
+    public void update(Integer id, ReviewDto dto) {
+        Review review = reviewRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("리뷰를 찾을 수 없습니다: " + id));
+
+        // 작성자 본인 확인
+        if (!review.getMemberEmail().getEmail().equals(dto.getMemberEmail())) {
+            throw new SecurityException("자신이 작성한 리뷰만 수정할 수 있습니다.");
+        }
+
+        review.setReview(dto.getReview());
+        review.setRating(dto.getRating());
+        reviewRepository.save(review);
+    }
+
+    public void delete(Integer id, String requesterEmail) {
+        Review review = reviewRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("리뷰를 찾을 수 없습니다: " + id));
+
+        // 작성자 본인 확인
+        if (!review.getMemberEmail().getEmail().equals(requesterEmail)) {
+            throw new SecurityException("자신이 작성한 리뷰만 삭제할 수 있습니다.");
+        }
+
+        reviewRepository.deleteById(id);
+    }
+
 }
