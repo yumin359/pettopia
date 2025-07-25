@@ -15,7 +15,7 @@ import { AuthenticationContextProvider } from "./common/AuthenticationContextPro
 import { MapDetail } from "./feature/map/MapDetail.jsx";
 import FullFilterKakaoMap from "./feature/map/FullFilterKakaoMap";
 import { ReviewAdd } from "./feature/map/ReviewAdd.jsx";
-
+import { Chatbot } from "./feature/openai/Chatbot";
 
 function App() {
   return (
@@ -37,6 +37,7 @@ function App() {
             <Route path="/facility/:name" element={<MapDetail />} />
             <Route path="/KakaoMap" element={<FullFilterKakaoMap />} />
             <Route path="/facility/:name/review/add" element={<ReviewAdd />} />
+            <Route path="/chatbot" element={<Chatbot />} />
           </Route>
         </Routes>
       </BrowserRouter>
