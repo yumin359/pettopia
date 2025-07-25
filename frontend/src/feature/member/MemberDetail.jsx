@@ -73,6 +73,12 @@ export function MemberDetail() {
     ? member.insertedAt.replace("T", " ").substring(0, 16)
     : "";
 
+  // 프로필 이미지 URL 찾기
+  // 이미지 확장자를 가진 파일 중 첫 번째를 프로필 이미지로 간주합니다.
+  const profileImageUrl = member.files?.find((file) =>
+    /\.(jpg|jpeg|png|gif|webp)$/i.test(file),
+  );
+
   return (
     <Row className="justify-content-center my-4">
       <Col xs={12} md={8} lg={6}>
@@ -89,71 +95,27 @@ export function MemberDetail() {
 
         <Card className="shadow-sm border-0 rounded-3">
           <Card.Body>
-            {/* 이미지 미리보기 */}
-            {Array.isArray(member.files) &&
-              member.files.some((file) =>
-                /\.(jpg|jpeg|png|gif|webp)$/i.test(file),
-              ) && (
-                <div className="mb-4 d-flex flex-column gap-3">
-                  {member.files
-                    .filter((file) => /\.(jpg|jpeg|png|gif|webp)$/i.test(file))
-                    .map((file, idx) => (
-                      <img
-                        key={idx}
-                        src={file}
-                        alt={`첨부 이미지 ${idx + 1}`}
-                        className="shadow rounded"
-                        style={{ maxWidth: "100%", objectFit: "contain" }}
-                      />
-                    ))}
-                </div>
-              )}
-            <br />
-            {/* 첨부 파일 목록 */}
-            {Array.isArray(member.files) && member.files.length > 0 && (
-              <div className="mb-4">
-                <ListGroup variant="flush">
-                  {member.files.map((file, idx) => {
-                    const fileName = file.split("/").pop();
-                    return (
-                      <ListGroupItem
-                        key={idx}
-                        className="d-flex justify-content-between align-items-center px-2 py-1 border-0"
-                        style={{
-                          fontSize: "0.85rem",
-                          color: "#6c757d",
-                          backgroundColor: "transparent",
-                        }}
-                      >
-                        <span
-                          className="text-truncate"
-                          style={{
-                            maxWidth: "85%",
-                            whiteSpace: "nowrap",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                          }}
-                          title={fileName}
-                        >
-                          {fileName}
-                        </span>
-                        <Button
-                          variant="outline-primary"
-                          size="sm"
-                          href={file}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="d-flex align-items-center justify-content-center p-1"
-                          style={{ fontSize: "0.8rem" }}
-                        >
-                          <FaDownload />
-                        </Button>
-                      </ListGroupItem>
-                    );
-                  })}
-                </ListGroup>
+            {/* 프로필 이미지 미리보기 */}
+            {profileImageUrl && (
+              <div className="mb-4 d-flex justify-content-center">
+                {" "}
+                {/* 이미지 중앙 정렬 */}
+                <img
+                  src={profileImageUrl}
+                  alt="프로필 이미지"
+                  className="shadow rounded-circle" // 원형 스타일
+                  style={{
+                    width: "120px", // 원하는 크기로 조절
+                    height: "120px", // 원하는 크기로 조절
+                    objectFit: "cover", // 이미지가 잘리지 않게 채움
+                    border: "2px solid #ddd", // 테두리 (선택 사항)
+                  }}
+                />
               </div>
             )}
+
+            {/* 프로필 이미지가 없는 경우를 대비한 여백 (선택 사항) */}
+            {!profileImageUrl && <br />}
             
             <FormGroup controlId="email1" className="mb-3">
               <FormLabel>이메일</FormLabel>

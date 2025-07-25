@@ -100,24 +100,29 @@ public class MemberService {
     }
 
     // 프로필 사진 저장 (DB 저장 + S3 업로드)
+    // MemberService.java (위에서 제시된 수정된 saveFiles 메서드)
     private void saveFiles(Member member, MemberForm memberForm) {
         List<MultipartFile> files = memberForm.getFiles();
         if (files != null && !files.isEmpty()) {
-            for (MultipartFile file : files) {
-                if (file != null && file.getSize() > 0) {
-                    // DB에 파일 메타정보 저장
-                    MemberFile memberFile = new MemberFile();
-                    MemberFileId id = new MemberFileId();
-                    id.setMemberId(member.getId());
-                    id.setName(file.getOriginalFilename());
-                    memberFile.setMember(member);
-                    memberFile.setId(id);
-                    memberFileRepository.save(memberFile);
+            // 프로필 사진은 하나만 허용할 것이므로 첫 번째 파일만 처리
+            MultipartFile file = files.get(0); // <--- 여기! 첫 번째 파일만 가져옵니다.
+            if (file != null && file.getSize() > 0) {
+                // (선택 사항) 기존 프로필 파일이 있다면 삭제하는 로직 추가
+                // memberFileRepository.findByMemberId(member.getId()).forEach(...)
+                // ... (위 코드 참고)
 
-                    // S3에 파일 업로드
-                    String objectKey = "prj3/board/" + member.getId() + "/" + file.getOriginalFilename();
-                    uploadFile(file, objectKey);
-                }
+                // DB에 파일 메타정보 저장 (기존 파일 삭제 후 저장)
+                MemberFile memberFile = new MemberFile();
+                MemberFileId id = new MemberFileId();
+                id.setMemberId(member.getId());
+                id.setName(file.getOriginalFilename());
+                memberFile.setMember(member);
+                memberFile.setId(id);
+                memberFileRepository.save(memberFile);
+
+                // S3에 파일 업로드
+                String objectKey = "prj3/member/" + member.getId() + "/" + file.getOriginalFilename();
+                uploadFile(file, objectKey);
             }
         }
     }
