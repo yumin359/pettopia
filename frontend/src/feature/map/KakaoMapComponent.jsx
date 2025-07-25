@@ -51,8 +51,8 @@ const KakaoMapComponent = ({
   const createCustomMarker = useCallback(
     (position, facility) => {
       const color =
+        categoryColors[facility.category1] || // category1 먼저 확인
         categoryColors[facility.category2] ||
-        categoryColors[facility.category1] ||
         "#666666";
       const shortName =
         facility.name.length > 5
@@ -93,8 +93,8 @@ const KakaoMapComponent = ({
   const createInfoWindowContent = useCallback(
     (facility) => {
       const categoryColor =
+        categoryColors[facility.category1] || // category1 먼저 확인
         categoryColors[facility.category2] ||
-        categoryColors[facility.category1] ||
         "#6c757d";
 
       return `
@@ -274,7 +274,6 @@ const KakaoMapComponent = ({
           className="position-absolute bottom-0 end-0 p-2 m-2 bg-white rounded shadow-sm"
           style={{ maxWidth: "150px", zIndex: 1000, fontSize: "10px" }}
         >
-          <h6 className="small mb-1">🎨 카테고리</h6>
           <div className="d-flex flex-wrap gap-1">
             {Object.entries(categoryColors)
               .filter(([category]) =>

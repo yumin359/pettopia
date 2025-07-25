@@ -2,16 +2,16 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 
 const SearchResultList = ({
-                            facilities,
-                            totalElements,
-                            isDataLoading,
-                            currentPage,
-                            totalPages,
-                            handlePageChange,
-                            categoryColors,
-                            ITEMS_PER_PAGE,
-                            hasSearched,
-                          }) => {
+  facilities,
+  totalElements,
+  isDataLoading,
+  currentPage,
+  totalPages,
+  handlePageChange,
+  categoryColors,
+  ITEMS_PER_PAGE,
+  hasSearched,
+}) => {
   const navigate = useNavigate();
 
   const handleListItemClick = (facility) => {
@@ -21,9 +21,31 @@ const SearchResultList = ({
   const renderPagination = () => {
     if (totalPages <= 1) return null;
 
+    const pageNumbers = [];
+    const maxPageButtons = 5; // 표시할 페이지 버튼의 최대 개수
+    let startPage = Math.max(0, currentPage - Math.floor(maxPageButtons / 2));
+    let endPage = Math.min(totalPages - 1, startPage + maxPageButtons - 1);
+
+    if (endPage - startPage + 1 < maxPageButtons) {
+      startPage = Math.max(0, endPage - maxPageButtons + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pageNumbers.push(i);
+    }
+
     return (
       <nav className="mt-2">
         <ul className="pagination pagination-sm justify-content-center mb-0">
+          <li className={`page-item ${currentPage === 0 ? "disabled" : ""}`}>
+            <button
+              className="page-link"
+              onClick={() => handlePageChange(0)} // 처음 페이지로
+              disabled={currentPage === 0}
+            >
+              처음
+            </button>
+          </li>
           <li className={`page-item ${currentPage === 0 ? "disabled" : ""}`}>
             <button
               className="page-link"
@@ -33,16 +55,49 @@ const SearchResultList = ({
               이전
             </button>
           </li>
-          <li className="page-item active">
-            <span className="page-link">{currentPage + 1}</span>
-          </li>
-          <li className={`page-item ${currentPage === totalPages - 1 ? "disabled" : ""}`}>
+          {startPage > 0 && (
+            <li className="page-item disabled">
+              <span className="page-link">...</span>
+            </li>
+          )}
+          {pageNumbers.map((page) => (
+            <li
+              key={page}
+              className={`page-item ${currentPage === page ? "active" : ""}`}
+            >
+              <button
+                className="page-link"
+                onClick={() => handlePageChange(page)}
+              >
+                {page + 1}
+              </button>
+            </li>
+          ))}
+          {endPage < totalPages - 1 && (
+            <li className="page-item disabled">
+              <span className="page-link">...</span>
+            </li>
+          )}
+          <li
+            className={`page-item ${currentPage === totalPages - 1 ? "disabled" : ""}`}
+          >
             <button
               className="page-link"
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages - 1}
             >
               다음
+            </button>
+          </li>
+          <li
+            className={`page-item ${currentPage === totalPages - 1 ? "disabled" : ""}`}
+          >
+            <button
+              className="page-link"
+              onClick={() => handlePageChange(totalPages - 1)} // 끝 페이지로
+              disabled={currentPage === totalPages - 1}
+            >
+              끝
             </button>
           </li>
         </ul>
@@ -52,9 +107,9 @@ const SearchResultList = ({
 
   const renderFacilityCard = (facility) => {
     const categoryColor =
+      categoryColors[facility.category1] || // category1 먼저 확인
       categoryColors[facility.category2] ||
-      categoryColors[facility.category1] ||
-      "#6c757d";
+      "#6c757d"; // 기본 색상
 
     return (
       <div
@@ -90,18 +145,31 @@ const SearchResultList = ({
               </p>
               <p className="card-text text-secondary mb-1 small">
                 📍{" "}
-                {(facility.roadAddress || facility.jibunAddress || "").length > 30
-                  ? (facility.roadAddress || facility.jibunAddress || "").substring(0, 30) + "..."
-                  : facility.roadAddress || facility.jibunAddress || "주소 정보 없음"}
+                {(facility.roadAddress || facility.jibunAddress || "").length >
+                30
+                  ? (
+                      facility.roadAddress ||
+                      facility.jibunAddress ||
+                      ""
+                    ).substring(0, 30) + "..."
+                  : facility.roadAddress ||
+                    facility.jibunAddress ||
+                    "주소 정보 없음"}
               </p>
 
               <div className="small text-muted">
                 {facility.phoneNumber && <div>📞 {facility.phoneNumber}</div>}
-                {facility.allowedPetSize && <div>🐕 {facility.allowedPetSize}</div>}
+                {facility.allowedPetSize && (
+                  <div>🐕 {facility.allowedPetSize}</div>
+                )}
                 {facility.parkingAvailable === "Y" && <div>🅿️ 주차가능</div>}
                 {facility.holiday && <div>🗓️ 휴무: {facility.holiday}</div>}
-                {facility.operatingHours && <div>⏰ {facility.operatingHours}</div>}
-                {facility.petRestrictions && <div>🚫 {facility.petRestrictions}</div>}
+                {facility.operatingHours && (
+                  <div>⏰ {facility.operatingHours}</div>
+                )}
+                {facility.petRestrictions && (
+                  <div>🚫 {facility.petRestrictions}</div>
+                )}
               </div>
             </div>
           </div>

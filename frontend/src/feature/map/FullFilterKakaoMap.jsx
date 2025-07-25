@@ -44,6 +44,12 @@ const FullFilterKakaoMap = () => {
 
   // 카테고리별 색상 매핑 (소분류 기준)
   const categoryColors = {
+    반려문화시설: "#088804",
+    반려동반여행: "#003fff",
+    반려동물식당카페: "#FF6B6B",
+    반려의료: "#96CEB4",
+    "반려동물 서비스": "#45B7D1",
+    여행: "#4ECDC4",
     펜션: "#FF6B6B",
     호텔: "#FF8E8E",
     모텔: "#FFB6B6",
