@@ -134,7 +134,7 @@ public class MemberController {
     }
 
     @PostMapping("add")
-    public ResponseEntity<?> add(@RequestBody MemberForm memberForm) {
+    public ResponseEntity<?> add(@ModelAttribute MemberForm memberForm) {
 //        System.out.println("memberForm = " + memberForm);
         try {
             memberService.add(memberForm);
