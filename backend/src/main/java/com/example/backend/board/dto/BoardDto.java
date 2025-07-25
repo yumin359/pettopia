@@ -14,7 +14,7 @@ public class BoardDto {
     private Integer id;
     private String title;
     private String content;
-    private String authorEmail;
+    private String authorEmail; // 이게 왜 필요할까
     private String authorNickName;
     private LocalDateTime insertedAt;
 

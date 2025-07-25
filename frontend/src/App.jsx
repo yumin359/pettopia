@@ -12,8 +12,11 @@ import { MemberEdit } from "./feature/member/MemberEdit.jsx";
 import { MemberLogin } from "./feature/member/MemberLogin.jsx";
 import { MemberLogout } from "./feature/member/MemberLogout.jsx";
 import { AuthenticationContextProvider } from "./common/AuthenticationContextProvider.jsx";
-import { MainMap } from "./feature/map/MainMap.jsx";
-import { MapDetail } from "./feature/map/MapDetail.jsx"; // ✅ 추가
+import { MapDetail } from "./feature/map/MapDetail.jsx";
+import FullFilterKakaoMap from "./feature/map/FullFilterKakaoMap";
+import { ReviewAdd } from "./feature/map/ReviewAdd.jsx";
+import { Chatbot } from "./feature/openai/Chatbot";
+import { ReviewEdit } from "./feature/map/ReviewEdit.jsx";
 
 function App() {
   return (
@@ -32,9 +35,11 @@ function App() {
             <Route path="/member" element={<MemberDetail />} />
             <Route path="/member/list" element={<MemberList />} />
             <Route path="/member/edit" element={<MemberEdit />} />
-            <Route path="/main/map" element={<MainMap />} />
-            <Route path="/facility/:name" element={<MapDetail />} />{" "}
-            {/* ✅ 여기 추가 */}
+            <Route path="/facility/:name" element={<MapDetail />} />
+            <Route path="/KakaoMap" element={<FullFilterKakaoMap />} />
+            <Route path="/facility/:name/review/add" element={<ReviewAdd />} />
+            <Route path="/chatbot" element={<Chatbot />} />
+            <Route path="/review/edit/:id" element={<ReviewEdit />} />
           </Route>
         </Routes>
       </BrowserRouter>

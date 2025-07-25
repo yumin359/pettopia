@@ -39,7 +39,7 @@ export function AppNavBar() {
         {/* 3. 메뉴 (Collapse 안, order-lg-1로 로고 옆에 위치) */}
         <Navbar.Collapse id="main-nav" className="order-lg-1">
           <Nav>
-            <Nav.Link as={NavLink} to="/main/map">
+            <Nav.Link as={NavLink} to="/kakaoMap">
               지도
             </Nav.Link>
             <Nav.Link as={NavLink} to="/board/list">
@@ -56,6 +56,9 @@ export function AppNavBar() {
               </Nav.Link>
             )}
           </Nav>
+          <Nav.Link as={NavLink} to="/chatbot">
+            챗봇
+          </Nav.Link>
         </Navbar.Collapse>
       </Container>
     </Navbar>
