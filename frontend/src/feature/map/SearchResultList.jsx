@@ -1,17 +1,20 @@
 // src/feature/map/SearchResultList.js
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const SearchResultList = ({
-  facilities,
-  totalElements,
-  isDataLoading,
-  currentPage,
-  totalPages,
-  handlePageChange,
-  handleListItemClick,
-  categoryColors,
-  ITEMS_PER_PAGE,
-}) => {
+                            facilities,
+                            totalElements,
+                            isDataLoading,
+                            currentPage,
+                            totalPages,
+                            handlePageChange,
+                            handleListItemClick,
+                            categoryColors,
+                            ITEMS_PER_PAGE,
+                          }) => {
+  const navigate = useNavigate();
+
   const renderPagination = () => {
     if (totalPages <= 1) return null;
 
@@ -79,7 +82,7 @@ const SearchResultList = ({
               <div
                 key={facility.id}
                 className="card mb-1 border-0 shadow-sm"
-                onClick={() => handleListItemClick(facility)}
+                onClick={() => navigate(`/facility/${encodeURIComponent(facility.name)}`)}
                 style={{ cursor: "pointer", fontSize: "11px" }}
               >
                 <div className="card-body p-2">
@@ -103,10 +106,10 @@ const SearchResultList = ({
                         {(facility.roadAddress || facility.jibunAddress || "")
                           .length > 25
                           ? (
-                              facility.roadAddress ||
-                              facility.jibunAddress ||
-                              ""
-                            ).substring(0, 25) + "..."
+                          facility.roadAddress ||
+                          facility.jibunAddress ||
+                          ""
+                        ).substring(0, 25) + "..."
                           : facility.roadAddress || facility.jibunAddress || ""}
                       </p>
                       <div className="d-flex align-items-center">
