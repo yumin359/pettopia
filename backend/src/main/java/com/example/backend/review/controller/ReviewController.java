@@ -22,21 +22,21 @@ public class ReviewController {
         return ResponseEntity.ok("리뷰가 등록되었습니다.");
     }
 
-    // 특정 시설 리뷰 조회
-    // ✅ 기존 (PathVariable 방식) 유지
+    // 특정 시설 리뷰 조회 (PathVariable)
     @GetMapping("/facility/{facilityName}")
     public ResponseEntity<List<ReviewDto>> getReviewsByFacilityName(@PathVariable String facilityName) {
         List<ReviewDto> reviews = reviewService.findAllByFacilityName(facilityName);
         return ResponseEntity.ok(reviews);
     }
 
-    // ✅ 추가 (RequestParam 방식) → 메서드 이름만 다르게
+    // 특정 시설 리뷰 조회 (RequestParam)
     @GetMapping("/list")
     public ResponseEntity<List<ReviewDto>> getReviewsByFacilityNameFromQuery(@RequestParam String facilityName) {
         List<ReviewDto> reviews = reviewService.findAllByFacilityName(facilityName);
         return ResponseEntity.ok(reviews);
     }
 
+    // 리뷰 수정
     @PutMapping("/update/{id}")
     public ResponseEntity<String> updateReview(@PathVariable Integer id, @RequestBody ReviewDto dto) {
         reviewService.update(id, dto);
@@ -50,4 +50,10 @@ public class ReviewController {
         return ResponseEntity.ok("리뷰가 삭제되었습니다.");
     }
 
+    // 최신 리뷰 5개 조회
+    @GetMapping("/latest")
+    public ResponseEntity<List<ReviewDto>> getLatestReviews() {
+        List<ReviewDto> latestReviews = reviewService.getLatestReviews();
+        return ResponseEntity.ok(latestReviews);
+    }
 }

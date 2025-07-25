@@ -36,7 +36,7 @@ public class ReviewService {
         reviewRepository.save(review);
     }
 
-    // 특정 시설의 리뷰 목록 조회
+    // 특정 시설 리뷰 목록 조회
     public List<ReviewDto> findAllByFacilityName(String facilityName) {
         return reviewRepository.findAllByFacilityNameOrderByInsertedAtDesc(facilityName)
                 .stream()
@@ -51,11 +51,12 @@ public class ReviewService {
                         .build())
                 .collect(Collectors.toList());
     }
+
+    // 리뷰 수정
     public void update(Integer id, ReviewDto dto) {
         Review review = reviewRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("리뷰를 찾을 수 없습니다: " + id));
 
-        // 작성자 본인 확인
         if (!review.getMemberEmail().getEmail().equals(dto.getMemberEmail())) {
             throw new SecurityException("자신이 작성한 리뷰만 수정할 수 있습니다.");
         }
@@ -65,11 +66,11 @@ public class ReviewService {
         reviewRepository.save(review);
     }
 
+    // 리뷰 삭제
     public void delete(Integer id, String requesterEmail) {
         Review review = reviewRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("리뷰를 찾을 수 없습니다: " + id));
 
-        // 작성자 본인 확인
         if (!review.getMemberEmail().getEmail().equals(requesterEmail)) {
             throw new SecurityException("자신이 작성한 리뷰만 삭제할 수 있습니다.");
         }
@@ -77,4 +78,19 @@ public class ReviewService {
         reviewRepository.deleteById(id);
     }
 
+    // ✅ 최신 리뷰 5개 조회
+    public List<ReviewDto> getLatestReviews() {
+        return reviewRepository.findTop5ByOrderByInsertedAtDesc()
+                .stream()
+                .map(review -> ReviewDto.builder()
+                        .id(review.getId())
+                        .facilityName(review.getFacilityName())
+                        .memberEmail(review.getMemberEmail().getEmail())
+                        .memberEmailNickName(review.getMemberEmail().getNickName())
+                        .review(review.getReview())
+                        .rating(review.getRating())
+                        .insertedAt(review.getInsertedAt())
+                        .build())
+                .collect(Collectors.toList());
+    }
 }
