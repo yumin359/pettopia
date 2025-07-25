@@ -35,33 +35,37 @@ export function MapDetail() {
     navigate(`/facility/${encodeURIComponent(decodedName)}/review/add`);
   };
 
-  // ⭐ 수정 버튼
   const handleEdit = (review) => {
     navigate(`/review/edit/${review.id}`, {
       state: { review },
     });
   };
 
-  // ⭐ 삭제 버튼
   const handleDelete = async (id) => {
     if (!window.confirm("정말 삭제하시겠습니까?")) return;
 
     try {
       await axios.delete(`/api/review/delete/${id}`, {
-        params: { email: user.email }, // 본인 확인용
+        params: { email: user.email },
       });
       alert("삭제 완료");
-      fetchReviews(); // 다시 목록 불러오기
+      fetchReviews();
     } catch (err) {
-      alert("삭제 실패: " + err.response?.data?.message || err.message);
+      alert("삭제 실패: " + (err.response?.data?.message || err.message));
     }
   };
 
-  // ⭐ 별점 렌더링
   const renderStars = (rating) => {
     return [...Array(5)].map((_, i) => (
       <span key={i} style={{ color: i < rating ? "#ffc107" : "#e4e5e9" }}>★</span>
     ));
+  };
+
+  // ⭐ 평균 평점 계산
+  const getAverageRating = () => {
+    if (reviews.length === 0) return null;
+    const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
+    return (sum / reviews.length).toFixed(1);
   };
 
   return (
@@ -90,6 +94,15 @@ export function MapDetail() {
         </p>
       )}
 
+      {/* ⭐ 평균 평점 표시 */}
+      {reviews.length > 0 && (
+        <div style={{ marginTop: "1rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+          <strong>⭐ 평균 평점:</strong>
+          <span style={{ fontSize: "1.1rem" }}>{getAverageRating()} / 5</span>
+          <span style={{ fontSize: "0.9rem", color: "gray" }}>({reviews.length}명)</span>
+        </div>
+      )}
+
       <div style={{ marginTop: "2rem" }}>
         <h4>📝 리뷰 목록</h4>
         {loading ? (
@@ -116,7 +129,6 @@ export function MapDetail() {
                   {r.insertedAt?.split("T")[0] || "날짜 없음"}
                 </small>
 
-                {/* ⭐ 본인 리뷰일 경우에만 수정/삭제 버튼 표시 */}
                 {user?.email === r.memberEmail && (
                   <div style={{ marginTop: "0.5rem" }}>
                     <button
