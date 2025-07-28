@@ -72,7 +72,7 @@ export function ReviewAdd() {
 
       // 3. 파일 데이터 추가
       files.forEach((fileObj) => {
-        formData.append("file", fileObj.file);
+        formData.append("files", fileObj.file);
       });
 
       // 4. 요청
