@@ -2,6 +2,7 @@ package com.example.backend.review.controller;
 
 import com.example.backend.review.dto.ReviewDto;
 import com.example.backend.review.service.ReviewService;
+import jakarta.servlet.annotation.MultipartConfig;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +18,7 @@ public class ReviewController {
 
     // 리뷰 등록
     @PostMapping("/add")
-    public ResponseEntity<String> addReview(@RequestBody ReviewDto dto) {
+    public ResponseEntity<String> addReview(@ModelAttribute ReviewDto dto) {
         reviewService.save(dto);
         return ResponseEntity.ok("리뷰가 등록되었습니다.");
     }

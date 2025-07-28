@@ -42,8 +42,8 @@ export function ReviewAdd() {
           previewUrl: file.type.startsWith("image/")
             ? URL.createObjectURL(file)
             : null,
-        }))
-      )
+        })),
+      ),
     );
   };
 
@@ -61,11 +61,23 @@ export function ReviewAdd() {
     setIsProcessing(true);
 
     try {
-      await axios.post("/api/review/add", {
-        facilityName: decodedName,
-        memberEmail: user.email,
-        review: content.trim(),
-        rating: rating,
+      // 1. formdata 객체 생성
+      const formData = new FormData();
+
+      // 2. 텍스트 데이터 추가
+      formData.append("facilityName", decodedName);
+      formData.append("memberEmail", user.email);
+      formData.append("review", content.trim());
+      formData.append("rating", rating);
+
+      // 3. 파일 데이터 추가
+      files.forEach((fileObj) => {
+        formData.append("file", fileObj.file);
+      });
+
+      // 4. 요청
+      await axios.post("/api/review/add", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
       });
 
       toast.success("리뷰가 저장되었습니다.");
@@ -123,7 +135,10 @@ export function ReviewAdd() {
             {files.length > 0 && (
               <ListGroup className="mb-3">
                 {files.map((f, idx) => (
-                  <ListGroup.Item key={idx} className="d-flex justify-content-between">
+                  <ListGroup.Item
+                    key={idx}
+                    className="d-flex justify-content-between"
+                  >
                     {f.previewUrl && (
                       <img
                         src={f.previewUrl}
@@ -167,7 +182,9 @@ export function ReviewAdd() {
                 disabled={!isValid || isProcessing}
                 onClick={() => setModalShow(true)}
               >
-                {isProcessing && <Spinner animation="border" size="sm" className="me-2" />}
+                {isProcessing && (
+                  <Spinner animation="border" size="sm" className="me-2" />
+                )}
                 <FaSave /> 저장
               </Button>
             </div>

@@ -4,7 +4,13 @@ import React from "react";
 function ReviewPreview({ review }) {
   const renderStars = (rating) =>
     [...Array(5)].map((_, i) => (
-      <span key={i} style={{ color: i < rating ? "#ffc107" : "#e4e5e9", fontSize: "1.1rem" }}>
+      <span
+        key={i}
+        style={{
+          color: i < rating ? "#ffc107" : "#e4e5e9",
+          fontSize: "1.1rem",
+        }}
+      >
         ★
       </span>
     ));
@@ -21,9 +27,13 @@ function ReviewPreview({ review }) {
   return (
     <div style={{ marginBottom: "1.5rem", fontSize: "0.95rem" }}>
       <div>{renderStars(review.rating)}</div>
-      <p style={{ margin: "0.5rem 0", whiteSpace: "pre-wrap" }}>{review.review}</p>
+      <p style={{ margin: "0.5rem 0", whiteSpace: "pre-wrap" }}>
+        {review.review}
+      </p>
+      {/*여기에 사진 ?*/}
       <div style={{ fontSize: "0.8rem", color: "#555" }}>
-        작성자: {review.memberEmailNickName || "알 수 없음"} | {formatDate(review.insertedAt)}
+        작성자: {review.memberEmailNickName || "알 수 없음"} |{" "}
+        {formatDate(review.insertedAt)}
       </div>
     </div>
   );

@@ -3,8 +3,10 @@ package com.example.backend.review.dto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Instant;
+import java.util.List;
 
 @Getter
 @Setter
@@ -17,4 +19,5 @@ public class ReviewDto {
     private String review;
     private Integer rating;
     private Instant insertedAt;
+    private List<MultipartFile> files;
 }
