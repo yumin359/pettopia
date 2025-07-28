@@ -30,12 +30,14 @@ public class ReviewController {
         return ResponseEntity.ok(reviews);
     }
 
+    // 왜 둘 다 쓰이지? 뭐지? 뭔데 뭐야!!
+
     // 특정 시설 리뷰 조회 (RequestParam)
-//    @GetMapping("/list")
-//    public ResponseEntity<List<ReviewListDto>> getReviewsByFacilityNameFromQuery(@RequestParam String facilityName) {
-//        List<ReviewListDto> reviews = reviewService.findAllByFacilityName(facilityName);
-//        return ResponseEntity.ok(reviews);
-//    }
+    @GetMapping("/list")
+    public ResponseEntity<List<ReviewListDto>> getReviewsByFacilityNameFromQuery(@RequestParam String facilityName) {
+        List<ReviewListDto> reviews = reviewService.findAllByFacilityName(facilityName);
+        return ResponseEntity.ok(reviews);
+    }
 
     // 리뷰 수정
     @PutMapping("/update/{id}")

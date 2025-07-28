@@ -30,7 +30,6 @@ function ReviewPreview({ review }) {
       <p style={{ margin: "0.5rem 0", whiteSpace: "pre-wrap" }}>
         {review.review}
       </p>
-      {/*여기에 사진 ?*/}
       <div style={{ fontSize: "0.8rem", color: "#555" }}>
         작성자: {review.memberEmailNickName || "알 수 없음"} |{" "}
         {formatDate(review.insertedAt)}
