@@ -5,16 +5,19 @@ import {
   FormGroup,
   FormLabel,
   FormText,
+  ListGroup,
   Row,
   Spinner,
 } from "react-bootstrap";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router";
+import { FaFileAlt, FaTrashAlt, FaPlus } from "react-icons/fa";
 
 export function MemberAdd() {
   // 입력값 상태 정의
+  const [files, setFiles] = useState([]);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [password2, setPassword2] = useState("");
@@ -22,6 +25,9 @@ export function MemberAdd() {
   const [info, setInfo] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const navigate = useNavigate();
+
+  // 숨겨진 파일 인풋을 참조하기 위한 useRef
+  const fileInputRef = useRef(null); // 추가: useRef 훅
 
   // 정규식 (백엔드와 동일한 조건)
   const emailRegex = /^[\w.-]+@[\w.-]+\.[a-zA-Z]{2,}$/;
@@ -44,14 +50,47 @@ export function MemberAdd() {
     !isProcessing
   );
 
+  // 파일 첨부 시 처리하는 함수 (프로필 사진은 하나만)
+  const handleFileChange = (e) => {
+    const selectedFile = e.target.files[0]; // 선택된 파일 중 첫 번째만 가져옵니다.
+    if (selectedFile) {
+      // 새로운 파일을 받으면 기존 파일들을 대체
+      setFiles([
+        {
+          file: selectedFile,
+          previewUrl: URL.createObjectURL(selectedFile), // 이미지 미리보기 URL 생성
+        },
+      ]);
+    } else {
+      // 파일 선택이 취소된 경우
+      setFiles([]); // 파일 목록 초기화
+    }
+  };
+
+  // 프로필 이미지 클릭 시 숨겨진 파일 인풋 클릭
+  const handleProfileClick = () => {
+    fileInputRef.current.click();
+  };
+
   function handleSaveClick() {
     setIsProcessing(true);
+
+    const formData = new FormData();
+    formData.append("email", email);
+    formData.append("password", password);
+    formData.append("nickName", nickName);
+    formData.append("info", info);
+
+    // files 배열에 프로필 이미지가 있다면 첫 번째 파일만 추가
+    if (files.length > 0) {
+      formData.append("files", files[0].file);
+    }
+    // files.forEach((fileObj) => formData.append("files", fileObj.file));
+
+    // 걍 방식 차이인가?
     axios
-      .post("/api/member/add", {
-        email: email,
-        password: password,
-        nickName: nickName,
-        info: info,
+      .post("/api/member/add", formData, {
+        headers: { "Content-type": "multipart/form-data" },
       })
       .then((res) => {
         const message = res.data.message;
@@ -71,10 +110,60 @@ export function MemberAdd() {
       });
   }
 
+  // 현재 선택된 프로필 이미지의 미리보기 URL
+  const currentProfilePreview = files.length > 0 ? files[0].previewUrl : null;
+
   return (
     <Row className="justify-content-center">
       <Col xs={12} md={8} lg={6}>
         <h2 className="mb-4">회원 가입</h2>
+
+        {/* 프로필 사진 업로드 섹션 */}
+        <FormGroup className="mb-4">
+          <FormLabel className="d-block text-center mb-3">
+            프로필 사진
+          </FormLabel>
+          <div className="d-flex justify-content-center">
+            {/* 프로필 이미지 미리보기 또는 아이콘 */}
+            <div
+              className="profile-upload-area shadow rounded-circle d-flex justify-content-center align-items-center"
+              onClick={handleProfileClick}
+              style={{
+                width: "150px", // 원하는 크기
+                height: "150px", // 원하는 크기
+                border: "2px solid #ddd",
+                cursor: "pointer",
+                overflow: "hidden", // 이미지가 영역을 벗어나지 않도록
+                backgroundColor: currentProfilePreview
+                  ? "transparent"
+                  : "#f8f9fa", // 배경색
+              }}
+            >
+              {currentProfilePreview ? (
+                <img
+                  src={currentProfilePreview}
+                  alt="프로필 미리보기"
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                />
+              ) : (
+                <FaPlus size={40} color="#6c757d" /> // 이미지가 없을 때 + 아이콘
+              )}
+            </div>
+
+            {/* 실제 파일 선택 input (숨김) */}
+            <FormControl
+              type="file"
+              ref={fileInputRef} // useRef로 참조
+              onChange={handleFileChange}
+              style={{ display: "none" }} // 숨김
+              accept="image/*" // 이미지 파일만 선택하도록 제한
+              disabled={isProcessing}
+            />
+          </div>
+        </FormGroup>
+
+        <hr />
+        {/* 프로필 사진 섹션과 다른 폼 필드 구분 */}
 
         {/* 이메일 */}
         <FormGroup className="mb-3" controlId="email1">
@@ -128,6 +217,7 @@ export function MemberAdd() {
           )}
         </FormGroup>
 
+        <hr />
         {/* 닉네임 */}
         <FormGroup className="mb-3" controlId="nickName1">
           <FormLabel>별명</FormLabel>
@@ -149,10 +239,10 @@ export function MemberAdd() {
           <FormLabel>자기 소개</FormLabel>
           <FormControl
             as="textarea"
-            rows={6}
+            rows={3}
             value={info}
             maxLength={3000}
-            placeholder="자기 소개를 입력하세요. 3000자 이내. (선택)"
+            placeholder="자기 소개를 입력하세요. 1000자 이내. (선택)"
             onChange={(e) => setInfo(e.target.value)}
           />
         </FormGroup>

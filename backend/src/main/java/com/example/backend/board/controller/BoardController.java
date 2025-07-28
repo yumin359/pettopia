@@ -60,7 +60,12 @@ public class BoardController {
     // ✅ 수정 (본인만 가능)
     @PutMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> update(@PathVariable Integer id, @RequestParam("title") String title, @RequestParam("content") String content, @RequestParam(value = "files", required = false) List<MultipartFile> files, @RequestParam(value = "deleteFileNames", required = false) List<String> deleteFileNames, Authentication authentication) {
+    public ResponseEntity<?> update(@PathVariable Integer id,
+                                    @RequestParam("title") String title,
+                                    @RequestParam("content") String content,
+                                    @RequestParam(value = "files", required = false) List<MultipartFile> files,
+                                    @RequestParam(value = "deleteFileNames", required = false) List<String> deleteFileNames,
+                                    Authentication authentication) {
         BoardAddForm form = new BoardAddForm();
         form.setId(id);
         form.setTitle(title);

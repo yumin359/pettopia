@@ -1,25 +1,42 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { createInfoWindowContent } from "./mapUtils";
 
 const SearchResultList = ({
-                            facilities,
-                            totalElements,
-                            isDataLoading,
-                            currentPage,
-                            totalPages,
-                            handlePageChange,
-                            categoryColors,
-                            ITEMS_PER_PAGE,
-                            hasSearched,
-                          }) => {
+  facilities,
+  totalElements,
+  isDataLoading,
+  currentPage,
+  totalPages,
+  handlePageChange,
+  categoryColors,
+  ITEMS_PER_PAGE,
+  hasSearched,
+}) => {
   const navigate = useNavigate();
 
   const handleListItemClick = (facility) => {
     navigate(`/facility/${encodeURIComponent(facility.name)}`);
+    if (window.handleMapFacilityClick) {
+      window.handleMapFacilityClick(facility);
+    }
   };
 
+  // 페이지 네이션
   const renderPagination = () => {
     if (totalPages <= 1) return null;
+    const pageNumbers = [];
+    const maxPageButtons = 5; // 표시할 페이지 버튼의 최대 개수
+    let startPage = Math.max(0, currentPage - Math.floor(maxPageButtons / 2));
+    let endPage = Math.min(totalPages - 1, startPage + maxPageButtons - 1);
+
+    if (endPage - startPage + 1 < maxPageButtons) {
+      startPage = Math.max(0, endPage - maxPageButtons + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pageNumbers.push(i);
+    }
 
     return (
       <nav className="mt-2">
@@ -27,22 +44,85 @@ const SearchResultList = ({
           <li className={`page-item ${currentPage === 0 ? "disabled" : ""}`}>
             <button
               className="page-link"
-              onClick={() => handlePageChange(currentPage - 1)}
+              onClick={() => handlePageChange(0)}
               disabled={currentPage === 0}
+              style={{ fontSize: "0.65rem", padding: "0.2rem 0.4rem" }}
             >
-              이전
+              ◀
             </button>
           </li>
-          <li className="page-item active">
-            <span className="page-link">{currentPage + 1}</span>
+
+          <li className={`page-item ${currentPage === 0 ? "disabled" : ""}`}>
+            <button
+              className="page-link"
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 0}
+              style={{ fontSize: "0.65rem", padding: "0.2rem 0.4rem" }}
+            >
+              ◁
+            </button>
           </li>
-          <li className={`page-item ${currentPage === totalPages - 1 ? "disabled" : ""}`}>
+
+          {startPage > 0 && (
+            <li className="page-item disabled">
+              <span
+                className="page-link"
+                style={{ fontSize: "0.65rem", padding: "0.2rem 0.4rem" }}
+              >
+                ...
+              </span>
+            </li>
+          )}
+
+          {pageNumbers.map((page) => (
+            <li
+              key={page}
+              className={`page-item ${currentPage === page ? "active" : ""}`}
+            >
+              <button
+                className="page-link"
+                onClick={() => handlePageChange(page)}
+                style={{ fontSize: "0.65rem", padding: "0.2rem 0.4rem" }}
+              >
+                {page + 1}
+              </button>
+            </li>
+          ))}
+
+          {endPage < totalPages - 1 && (
+            <li className="page-item disabled">
+              <span
+                className="page-link"
+                style={{ fontSize: "0.65rem", padding: "0.2rem 0.4rem" }}
+              >
+                ...
+              </span>
+            </li>
+          )}
+
+          <li
+            className={`page-item ${currentPage === totalPages - 1 ? "disabled" : ""}`}
+          >
             <button
               className="page-link"
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages - 1}
+              style={{ fontSize: "0.65rem", padding: "0.2rem 0.4rem" }}
             >
-              다음
+              ▷
+            </button>
+          </li>
+
+          <li
+            className={`page-item ${currentPage === totalPages - 1 ? "disabled" : ""}`}
+          >
+            <button
+              className="page-link"
+              onClick={() => handlePageChange(totalPages - 1)}
+              disabled={currentPage === totalPages - 1}
+              style={{ fontSize: "0.65rem", padding: "0.2rem 0.4rem" }}
+            >
+              ▶
             </button>
           </li>
         </ul>
@@ -50,11 +130,13 @@ const SearchResultList = ({
     );
   };
 
+  // 검색결과 카드
   const renderFacilityCard = (facility) => {
-    const categoryColor =
-      categoryColors[facility.category2] ||
-      categoryColors[facility.category1] ||
-      "#6c757d";
+    // createInfoWindowContent 함수로 전체 HTML 문자열을 가져옴
+    const fullInfoWindowHtml = createInfoWindowContent(
+      facility,
+      categoryColors,
+    );
 
     return (
       <div
@@ -63,47 +145,9 @@ const SearchResultList = ({
         onClick={() => handleListItemClick(facility)}
         style={{ cursor: "pointer", fontSize: "11px" }}
       >
-        <div className="card-body p-2">
-          <div className="d-flex align-items-start">
-            <div
-              className="rounded-circle me-2 mt-1"
-              style={{
-                width: "8px",
-                height: "8px",
-                backgroundColor: categoryColor,
-                flexShrink: 0,
-              }}
-            ></div>
-            <div className="flex-grow-1">
-              <h6 className="card-title mb-1 small fw-bold">{facility.name}</h6>
-              <p className="card-text text-muted mb-1 small">
-                <span
-                  className="badge me-1"
-                  style={{
-                    backgroundColor: categoryColor,
-                    fontSize: "8px",
-                    color: "white",
-                  }}
-                >
-                  {facility.category2 || facility.category1}
-                </span>
-              </p>
-              <p className="card-text text-secondary mb-1 small">
-                📍{" "}
-                {(facility.roadAddress || facility.jibunAddress || "").length > 30
-                  ? (facility.roadAddress || facility.jibunAddress || "").substring(0, 30) + "..."
-                  : facility.roadAddress || facility.jibunAddress || "주소 정보 없음"}
-              </p>
-
-              <div className="small text-muted">
-                {facility.phoneNumber && <div>📞 {facility.phoneNumber}</div>}
-                {facility.allowedPetSize && <div>🐕 {facility.allowedPetSize}</div>}
-                {facility.parkingAvailable === "Y" && <div>🅿️ 주차가능</div>}
-                {facility.holiday && <div>🗓️ 휴무: {facility.holiday}</div>}
-                {facility.operatingHours && <div>⏰ {facility.operatingHours}</div>}
-                {facility.petRestrictions && <div>🚫 {facility.petRestrictions}</div>}
-              </div>
-            </div>
+        <div className="card-body">
+          <div className="flex-grow-1">
+            <div dangerouslySetInnerHTML={{ __html: fullInfoWindowHtml }} />
           </div>
         </div>
       </div>

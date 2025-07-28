@@ -1,38 +1,13 @@
 // src/feature/map/FilterPanel.js
 import React from "react";
 
-// CheckboxGroup 컴포넌트를 직접 여기에 포함
 const CheckboxGroup = ({
   title,
   options,
   selectedSet,
-  setFunction,
+  setFunction, // 👈 부모로부터 받은 상태 변경 함수
   categoryColors,
 }) => {
-  const handleSetFilter = (value) => {
-    const newSet = new Set(selectedSet);
-
-    if (value === "전체") {
-      if (newSet.has("전체") && newSet.size === 1) {
-        newSet.clear();
-      } else {
-        newSet.clear();
-        newSet.add("전체");
-      }
-    } else {
-      newSet.delete("전체");
-      if (newSet.has(value)) {
-        newSet.delete(value);
-      } else {
-        newSet.add(value);
-      }
-      if (newSet.size === 0) {
-        newSet.add("전체");
-      }
-    }
-    setFunction(newSet);
-  };
-
   return (
     <div className="mb-2">
       <label className="form-label small fw-bold mb-1">{title}</label>
@@ -61,7 +36,7 @@ const CheckboxGroup = ({
                 type="checkbox"
                 className="visually-hidden"
                 checked={isChecked}
-                onChange={() => handleSetFilter(option)}
+                onChange={() => setFunction(option)}
                 autoComplete="off"
               />
               {option}
@@ -91,7 +66,7 @@ const FilterPanel = ({
   facilityType,
   setFacilityType,
   categoryColors,
-  onSearch, // 검색 실행 함수
+  onSearch,
 }) => {
   return (
     <div
@@ -138,7 +113,7 @@ const FilterPanel = ({
           title="🏪 카테고리"
           options={categories2}
           selectedSet={selectedCategories2}
-          setFunction={setSelectedCategories2}
+          setFunction={setSelectedCategories2} // ✅ 수정된 CheckboxGroup에 상태변경 함수 전달
           categoryColors={categoryColors}
         />
 
@@ -146,7 +121,7 @@ const FilterPanel = ({
           title="🐕 반려동물 크기"
           options={petSizes}
           selectedSet={selectedPetSizes}
-          setFunction={setSelectedPetSizes}
+          setFunction={setSelectedPetSizes} // ✅ 수정된 CheckboxGroup에 상태변경 함수 전달
         />
 
         <div className="mb-2">

@@ -4,6 +4,7 @@ import { BoardListMini } from "./BoardListMini.jsx";
 import img1 from "../../assets/01.png";
 import img2 from "../../assets/02.jpg";
 import img3 from "../../assets/03.jpg";
+import {ReviewListMini} from "./ReviewListMini.jsx";
 
 export function BoardLayout() {
   const [activeTab, setActiveTab] = useState("2"); // 탭 상태
@@ -82,6 +83,11 @@ export function BoardLayout() {
             <Tab eventKey="2" title="최신글">
               <div className="p-3">
                 {activeTab === "2" && <BoardListMini />}
+              </div>
+            </Tab>
+            <Tab eventKey="3" title="최신리뷰">
+              <div className="p-3">
+                {activeTab === "3" && <ReviewListMini />}
               </div>
             </Tab>
           </Tabs>
