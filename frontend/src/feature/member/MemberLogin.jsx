@@ -13,6 +13,7 @@ import { useNavigate } from "react-router";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
+import { FaGoogle } from "react-icons/fa";
 
 export function MemberLogin() {
   const [email, setEmail] = useState("");
@@ -59,6 +60,15 @@ export function MemberLogin() {
     } finally {
       setLoading(false);
     }
+  }
+
+  // 구글 로그인 핸들러 (실제 로직은 백엔드 연동 필요)
+  function handleGoogleLoginClick() {
+    // 여기에 Google OAuth2 인증 흐름을 시작하는 로직이 들어갑니다.
+    // 보통 백엔드의 Google 로그인 엔드포인트로 리다이렉트하거나 팝업을 띄웁니다.
+    // 예: window.location.href = '/oauth2/authorization/google';
+    toast.info("Google 로그인 기능은 아직 구현되지 않았습니다.");
+    console.log("Google 로그인 버튼 클릭됨");
   }
 
   return (
@@ -110,6 +120,23 @@ export function MemberLogin() {
             )}
           </Button>
         </div>
+
+        <div className="d-grid mb-3">
+          <Button
+            onClick={handleGoogleLoginClick}
+            disabled={loading}
+            variant="outline-dark"
+          >
+            <img
+              src="/img_1.png"
+              alt="google"
+              style={{ width: "22px", marginRight: "10px" }}
+            />
+            <span>구글로 로그인</span>
+          </Button>
+        </div>
+
+        <hr />
 
         {/* 회원가입 버튼 추가 */}
         <div className="d-grid">

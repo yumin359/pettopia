@@ -22,12 +22,11 @@ const SearchResultList = ({
     }
   };
 
-  // 페이지네이션 렌더링 로직 (기존과 동일)
+  // 페이지 네이션
   const renderPagination = () => {
     if (totalPages <= 1) return null;
-
     const pageNumbers = [];
-    const maxPageButtons = 5;
+    const maxPageButtons = 5; // 표시할 페이지 버튼의 최대 개수
     let startPage = Math.max(0, currentPage - Math.floor(maxPageButtons / 2));
     let endPage = Math.min(totalPages - 1, startPage + maxPageButtons - 1);
 
@@ -52,6 +51,7 @@ const SearchResultList = ({
               ◀
             </button>
           </li>
+
           <li className={`page-item ${currentPage === 0 ? "disabled" : ""}`}>
             <button
               className="page-link"
@@ -62,6 +62,7 @@ const SearchResultList = ({
               ◁
             </button>
           </li>
+
           {startPage > 0 && (
             <li className="page-item disabled">
               <span
@@ -72,6 +73,7 @@ const SearchResultList = ({
               </span>
             </li>
           )}
+
           {pageNumbers.map((page) => (
             <li
               key={page}
@@ -86,6 +88,7 @@ const SearchResultList = ({
               </button>
             </li>
           ))}
+
           {endPage < totalPages - 1 && (
             <li className="page-item disabled">
               <span
@@ -96,6 +99,20 @@ const SearchResultList = ({
               </span>
             </li>
           )}
+
+          <li
+            className={`page-item ${currentPage === totalPages - 1 ? "disabled" : ""}`}
+          >
+            <button
+              className="page-link"
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages - 1}
+              style={{ fontSize: "0.65rem", padding: "0.2rem 0.4rem" }}
+            >
+              ▷
+            </button>
+          </li>
+
           <li
             className={`page-item ${currentPage === totalPages - 1 ? "disabled" : ""}`}
           >

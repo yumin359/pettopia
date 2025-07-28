@@ -15,6 +15,24 @@ const KakaoMapComponent = ({
   const mapInstance = useRef(null);
   const markersRef = useRef([]);
 
+  // **정보창 콘텐츠를 스타일링하여 반환하는 헬퍼 함수**
+  // 부트스트랩 클래스 및 넉넉한 너비를 적용합니다.
+  const createStyledInfoWindow = useCallback((facility, colors) => {
+    const content = createInfoWindowContent(facility, colors);
+    // 부트스트랩 클래스를 최상위 div에 적용하여 스타일링 강화
+    // max-width를 넉넉하게 조정하고, padding, rounded, shadow 등을 추가합니다.
+    return `
+      <div class="p-2 bg-white rounded shadow-sm" style="
+        max-width: 350px; /* 정보창 너비를 더 넉넉하게 조정 */
+        white-space: normal; /* 텍스트가 자동으로 줄바꿈되도록 설정 */
+        word-break: break-word; /* 긴 단어도 줄바꿈되도록 설정 */
+        box-sizing: border-box; /* 패딩이 너비에 포함되도록 설정 */
+      ">
+        ${content}
+      </div>
+    `;
+  }, []); // 의존성 배열이 비어있으므로 컴포넌트 마운트 시 한 번만 생성됩니다.
+
   // 카카오맵 초기화
   useEffect(() => {
     const initializeMap = () => {
@@ -138,8 +156,8 @@ const KakaoMapComponent = ({
         window.kakao.maps.event.addListener(marker, "mouseover", () => {
           if (!marker.infowindow) {
             marker.infowindow = new window.kakao.maps.InfoWindow({
-              content: createInfoWindowContent(facility, categoryColors),
-              removable: false,
+              content: createStyledInfoWindow(facility, categoryColors),
+              removable: false, // 호버 시에는 닫기 버튼 없음
             });
           }
           marker.infowindow.open(mapInstance.current, marker);
@@ -159,9 +177,8 @@ const KakaoMapComponent = ({
           // 클릭된 마커의 정보창 열기
           if (!marker.infowindow) {
             marker.infowindow = new window.kakao.maps.InfoWindow({
-              // mapUtils에서 임포트한 createInfoWindowContent 함수 사용
-              content: createInfoWindowContent(facility, categoryColors),
-              removable: true,
+              content: createStyledInfoWindow(facility, categoryColors),
+              removable: true, // 클릭 시에는 닫기 버튼 있음
             });
           }
           marker.infowindow.open(mapInstance.current, marker);
@@ -187,7 +204,13 @@ const KakaoMapComponent = ({
       });
       mapInstance.current.setBounds(bounds);
     }
-  }, [facilities, isMapReady, createCustomMarker, categoryColors]); // categoryColors도 의존성 배열에 추가
+  }, [
+    facilities,
+    isMapReady,
+    createCustomMarker,
+    createStyledInfoWindow,
+    categoryColors,
+  ]); // createStyledInfoWindow를 의존성 배열에 추가
 
   // 리스트에서 클릭된 시설로 지도 이동
   useEffect(() => {
@@ -215,8 +238,7 @@ const KakaoMapComponent = ({
           // 해당 마커의 정보창 열기
           if (!targetMarker.infowindow) {
             targetMarker.infowindow = new window.kakao.maps.InfoWindow({
-              // mapUtils에서 임포트한 createInfoWindowContent 함수 사용
-              content: createInfoWindowContent(facility, categoryColors),
+              content: createStyledInfoWindow(facility, categoryColors),
               removable: true,
             });
           }
@@ -227,7 +249,7 @@ const KakaoMapComponent = ({
       // 전역에 함수 등록 (임시 방법)
       window.handleMapFacilityClick = handleExternalClick;
     }
-  }, [handleListItemClick, categoryColors]); // categoryColors도 의존성 배열에 추가
+  }, [handleListItemClick, categoryColors, createStyledInfoWindow]); // createStyledInfoWindow를 의존성 배열에 추가
 
   return (
     <div className="col-7 position-relative p-0">

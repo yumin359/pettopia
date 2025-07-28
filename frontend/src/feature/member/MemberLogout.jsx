@@ -18,3 +18,5 @@ export function MemberLogout() {
   }, []);
   return <Spinner />;
 }
+
+// 나중에 마스터에서 이 컴포넌트 지우기
