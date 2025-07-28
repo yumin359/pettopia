@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState, useContext } from "react";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
+import ReviewPreview from "../map/ReviewPreview.jsx"; // ReviewPreview 컴포넌트 import
 import axios from "axios";
 
 export function MapDetail() {
@@ -57,7 +58,9 @@ export function MapDetail() {
 
   const renderStars = (rating) => {
     return [...Array(5)].map((_, i) => (
-      <span key={i} style={{ color: i < rating ? "#ffc107" : "#e4e5e9" }}>★</span>
+      <span key={i} style={{ color: i < rating ? "#ffc107" : "#e4e5e9" }}>
+        ★
+      </span>
     ));
   };
 
@@ -96,10 +99,19 @@ export function MapDetail() {
 
       {/* ⭐ 평균 평점 표시 */}
       {reviews.length > 0 && (
-        <div style={{ marginTop: "1rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+        <div
+          style={{
+            marginTop: "1rem",
+            display: "flex",
+            alignItems: "center",
+            gap: "0.5rem",
+          }}
+        >
           <strong>⭐ 평균 평점:</strong>
           <span style={{ fontSize: "1.1rem" }}>{getAverageRating()} / 5</span>
-          <span style={{ fontSize: "0.9rem", color: "gray" }}>({reviews.length}명)</span>
+          <span style={{ fontSize: "0.9rem", color: "gray" }}>
+            ({reviews.length}명)
+          </span>
         </div>
       )}
 
@@ -111,59 +123,59 @@ export function MapDetail() {
           <p>아직 리뷰가 없습니다.</p>
         ) : (
           <ul style={{ paddingLeft: 0, listStyle: "none" }}>
-            {reviews.map((r, index) => (
-              <li
-                key={index}
-                style={{
-                  padding: "1rem",
-                  marginBottom: "1rem",
-                  border: "1px solid #ccc",
-                  borderRadius: "6px",
-                  backgroundColor: "#f9f9f9",
-                }}
-              >
-                <div style={{ marginBottom: "0.5rem" }}>{renderStars(r.rating)}</div>
-                <p style={{ whiteSpace: "pre-wrap", margin: "0.5rem 0" }}>{r.review}</p>
-                <small>
-                  작성자: {r.memberEmailNickName || "알 수 없음"} |{" "}
-                  {r.insertedAt?.split("T")[0] || "날짜 없음"}
-                </small>
+            {reviews.map(
+              (
+                r, // key는 review.id를 사용해야 더 안정적입니다.
+              ) => (
+                <li
+                  key={r.id} // ⭐ key를 review.id로 변경 (더 안정적)
+                  style={{
+                    padding: "1rem",
+                    marginBottom: "1rem",
+                    border: "1px solid #ccc",
+                    borderRadius: "6px",
+                    backgroundColor: "#f9f9f9",
+                  }}
+                >
+                  {/* ⭐⭐⭐ ReviewPreview 컴포넌트를 여기서 사용! ⭐⭐⭐ */}
+                  <ReviewPreview review={r} />
 
-                {user?.email === r.memberEmail && (
-                  <div style={{ marginTop: "0.5rem" }}>
-                    <button
-                      onClick={() => handleEdit(r)}
-                      style={{
-                        marginRight: "0.5rem",
-                        padding: "0.3rem 0.8rem",
-                        fontSize: "0.9rem",
-                        backgroundColor: "#6c757d",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "4px",
-                        cursor: "pointer",
-                      }}
-                    >
-                      수정
-                    </button>
-                    <button
-                      onClick={() => handleDelete(r.id)}
-                      style={{
-                        padding: "0.3rem 0.8rem",
-                        fontSize: "0.9rem",
-                        backgroundColor: "#dc3545",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "4px",
-                        cursor: "pointer",
-                      }}
-                    >
-                      삭제
-                    </button>
-                  </div>
-                )}
-              </li>
-            ))}
+                  {user?.email === r.memberEmail && (
+                    <div style={{ marginTop: "0.5rem" }}>
+                      <button
+                        onClick={() => handleEdit(r)}
+                        style={{
+                          marginRight: "0.5rem",
+                          padding: "0.3rem 0.8rem",
+                          fontSize: "0.9rem",
+                          backgroundColor: "#6c757d",
+                          color: "white",
+                          border: "none",
+                          borderRadius: "4px",
+                          cursor: "pointer",
+                        }}
+                      >
+                        수정
+                      </button>
+                      <button
+                        onClick={() => handleDelete(r.id)}
+                        style={{
+                          padding: "0.3rem 0.8rem",
+                          fontSize: "0.9rem",
+                          backgroundColor: "#dc3545",
+                          color: "white",
+                          border: "none",
+                          borderRadius: "4px",
+                          cursor: "pointer",
+                        }}
+                      >
+                        삭제
+                      </button>
+                    </div>
+                  )}
+                </li>
+              ),
+            )}
           </ul>
         )}
       </div>
