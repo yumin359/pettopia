@@ -11,7 +11,7 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
-public class ReviewDto {
+public class ReviewListDto {
     private Integer id;
     private String facilityName;
     private String memberEmail;            // 작성자 이메일
@@ -19,5 +19,5 @@ public class ReviewDto {
     private String review;
     private Integer rating;
     private Instant insertedAt;
-    private List<MultipartFile> files;
+    private List<String> files;
 }

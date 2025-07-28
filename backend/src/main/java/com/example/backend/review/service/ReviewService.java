@@ -1,10 +1,9 @@
 package com.example.backend.review.service;
 
-import com.example.backend.board.entity.BoardFile;
-import com.example.backend.board.entity.BoardFileId;
 import com.example.backend.member.entity.Member;
 import com.example.backend.member.repository.MemberRepository;
-import com.example.backend.review.dto.ReviewDto;
+import com.example.backend.review.dto.ReviewFormDto;
+import com.example.backend.review.dto.ReviewListDto;
 import com.example.backend.review.entity.Review;
 import com.example.backend.review.entity.ReviewFile;
 import com.example.backend.review.entity.ReviewFileId;
@@ -13,6 +12,7 @@ import com.example.backend.review.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ReviewService {
 
     private final ReviewRepository reviewRepository;
@@ -67,7 +68,7 @@ public class ReviewService {
     }
 
     // 리뷰 저장
-    public void save(ReviewDto dto) {
+    public void save(ReviewFormDto dto) {
         Member member = memberRepository.findByEmail(dto.getMemberEmail())
                 .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없습니다: " + dto.getMemberEmail()));
 
@@ -85,7 +86,7 @@ public class ReviewService {
     }
 
     // 리뷰 사진 저장( DB 저장 + S3 업로드)
-    private void saveFiles(Review review, ReviewDto dto) {
+    private void saveFiles(Review review, ReviewFormDto dto) {
         List<MultipartFile> files = dto.getFiles();
         if (files != null && !files.isEmpty()) {
             for (MultipartFile file : files) {
@@ -108,23 +109,30 @@ public class ReviewService {
     }
 
     // 특정 시설 리뷰 목록 조회
-    public List<ReviewDto> findAllByFacilityName(String facilityName) {
+    public List<ReviewListDto> findAllByFacilityName(String facilityName) {
         return reviewRepository.findAllByFacilityNameOrderByInsertedAtDesc(facilityName)
                 .stream()
-                .map(review -> ReviewDto.builder()
-                        .id(review.getId())
-                        .facilityName(review.getFacilityName())
-                        .memberEmail(review.getMemberEmail().getEmail())
-                        .memberEmailNickName(review.getMemberEmail().getNickName()) // ✅ 닉네임 포함
-                        .review(review.getReview())
-                        .rating(review.getRating())
-                        .insertedAt(review.getInsertedAt())
-                        .build())
+                .map(review -> {
+                    List<String> fileUrl = review.getFiles().stream()
+                            .map(f -> imagePrefix + "prj3/review/" + review.getId() + "/" + f.getId().getName())
+                            .collect(Collectors.toList());
+
+                    return ReviewListDto.builder()
+                            .id(review.getId())
+                            .facilityName(review.getFacilityName())
+                            .memberEmail(review.getMemberEmail().getEmail())
+                            .memberEmailNickName(review.getMemberEmail().getNickName()) // ✅ 닉네임 포함
+                            .review(review.getReview())
+                            .rating(review.getRating())
+                            .insertedAt(review.getInsertedAt())
+                            .files(fileUrl)
+                            .build();
+                })
                 .collect(Collectors.toList());
     }
 
     // 리뷰 수정
-    public void update(Integer id, ReviewDto dto) {
+    public void update(Integer id, ReviewFormDto dto) {
         Review review = reviewRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("리뷰를 찾을 수 없습니다: " + id));
 
@@ -150,18 +158,26 @@ public class ReviewService {
     }
 
     // ✅ 최신 리뷰 5개 조회
-    public List<ReviewDto> getLatestReviews() {
+//    @Transactional(readOnly = true) // 읽기 전용 트랜잭션으로 성능 최적화(선택)
+    public List<ReviewListDto> getLatestReviews() {
         return reviewRepository.findTop5ByOrderByInsertedAtDesc()
                 .stream()
-                .map(review -> ReviewDto.builder()
-                        .id(review.getId())
-                        .facilityName(review.getFacilityName())
-                        .memberEmail(review.getMemberEmail().getEmail())
-                        .memberEmailNickName(review.getMemberEmail().getNickName())
-                        .review(review.getReview())
-                        .rating(review.getRating())
-                        .insertedAt(review.getInsertedAt())
-                        .build())
+                .map(review -> {
+                    List<String> fileUrls = review.getFiles().stream()
+                            .map(f -> imagePrefix + "prj3/review/" + review.getId() + "/" + f.getId().getName())
+                            .collect(Collectors.toList());
+
+                    return ReviewListDto.builder()
+                            .id(review.getId())
+                            .facilityName(review.getFacilityName())
+                            .memberEmail(review.getMemberEmail().getEmail())
+                            .memberEmailNickName(review.getMemberEmail().getNickName())
+                            .review(review.getReview())
+                            .rating(review.getRating())
+                            .insertedAt(review.getInsertedAt())
+                            .files(fileUrls)
+                            .build();
+                })
                 .collect(Collectors.toList());
     }
 }
