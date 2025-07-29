@@ -5,7 +5,10 @@ import { AppFooter } from "./AppFooter.jsx";
 
 export function MainLayout() {
   return (
-    <div className="d-flex flex-column min-vh-100">
+    <div
+      className="d-flex flex-column min-vh-100"
+      style={{ backgroundColor: "#FAF0E6" }}
+    >
       <div className="mb-3">
         <AppNavBar />
       </div>
