@@ -6,6 +6,7 @@ import com.example.backend.review.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -15,6 +16,8 @@ import java.util.List;
 public class ReviewController {
 
     private final ReviewService reviewService;
+
+    // 그리고 이것도 다 Authenticated 해줘야하지 않나
 
     // 리뷰 등록
     @PostMapping("/add")
@@ -41,8 +44,11 @@ public class ReviewController {
 
     // 리뷰 수정
     @PutMapping("/update/{id}")
-    public ResponseEntity<String> updateReview(@PathVariable Integer id, @RequestBody ReviewFormDto dto) {
-        reviewService.update(id, dto);
+    public ResponseEntity<String> updateReview(@PathVariable Integer id,
+                                               @ModelAttribute ReviewFormDto dto,
+                                               @RequestParam(value = "newFiles", required = false) List<MultipartFile> newFiles,
+                                               @RequestParam(value = "deleteFileNames", required = false) List<String> deleteFileNames) {
+        reviewService.update(id, dto, newFiles, deleteFileNames);
         return ResponseEntity.ok("리뷰가 수정되었습니다.");
     }
 
