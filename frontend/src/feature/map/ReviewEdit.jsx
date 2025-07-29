@@ -180,6 +180,7 @@ export function ReviewEdit() {
                   }}
                 />
               )}
+              {/*이거 이름 없애도 되지 않나*/}
               <span className="text-truncate flex-grow-1">
                 {getFileNameFromUrl(fileUrl)}
               </span>
