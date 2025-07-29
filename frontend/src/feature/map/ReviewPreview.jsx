@@ -1,4 +1,3 @@
-// src/feature/board/ReviewPreview.jsx
 import React from "react";
 import { ListGroup, ListGroupItem, Button, Image } from "react-bootstrap";
 import { FaDownload } from "react-icons/fa";
@@ -42,60 +41,21 @@ function ReviewPreview({ review }) {
         <div className="mb-4">
           {/* 이미지 미리보기 */}
           {review.files.filter(isImageFile).length > 0 && (
-            <div className="d-flex flex-column gap-3 mb-3">
+            <div className="flex flex-row flex-wrap gap-3 mb-3">
               {review.files.filter(isImageFile).map((fileUrl, idx) => (
                 <Image
                   key={idx}
                   src={fileUrl}
                   alt={`첨부 이미지 ${idx + 1}`}
                   className="shadow rounded"
-                  style={{ maxWidth: "100%", objectFit: "contain" }}
+                  style={{ maxWidth: "100px", objectFit: "contain" }}
                 />
               ))}
             </div>
           )}
 
-          {/* 모든 첨부 파일 (다운로드 링크) */}
-          <ListGroup variant="flush">
-            {review.files.map((fileUrl, idx) => {
-              const fileName = fileUrl.split("/").pop().split("?")[0];
-              return (
-                <ListGroupItem
-                  key={idx}
-                  className="d-flex justify-content-between align-items-center px-2 py-1 border-0"
-                  style={{
-                    fontSize: "0.85rem",
-                    color: "#6c757d",
-                    backgroundColor: "transparent",
-                  }}
-                >
-                  <span
-                    className="text-truncate"
-                    style={{
-                      maxWidth: "85%",
-                      whiteSpace: "nowrap",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                    }}
-                    title={fileName}
-                  >
-                    {fileName}
-                  </span>
-                  <Button
-                    variant="outline-primary"
-                    size="sm"
-                    href={fileUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="d-flex align-items-center justify-content-center p-1"
-                    style={{ fontSize: "0.8rem" }}
-                  >
-                    <FaDownload />
-                  </Button>
-                </ListGroupItem>
-              );
-            })}
-          </ListGroup>
+          {/* 다운로드 링크는 없앴다요 */}
+          {/* 사진 보이는 거 좀 수정 하고 싶음 */}
         </div>
       )}
 
