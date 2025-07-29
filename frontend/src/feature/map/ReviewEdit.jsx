@@ -44,15 +44,16 @@ export function ReviewEdit() {
     formData.append("rating", rating);
     formData.append("facilityName", review.facilityName);
     formData.append("memberEmail", review.memberEmail);
+    formData.append("id", review.id); // 이거 없어도 되는디
 
     // 삭제할 기존 파일 목록을 FormData에 추가
     deletefileNames.forEach((fileUrl) => {
-      formData.append("filesToDelete", fileUrl);
+      formData.append("files", fileUrl);
     });
 
     // 새로 추가할 파일 목록을 FormData에 추가
     newFiles.forEach((fileObj) => {
-      formData.append("newFiles", fileObj.file); // 실제 File 객체를 전송
+      formData.append("files", fileObj.file); // 실제 File 객체를 전송
     });
 
     try {

@@ -1,6 +1,8 @@
 package com.example.backend.review.service;
 
 import com.example.backend.member.entity.Member;
+import com.example.backend.member.entity.MemberFile;
+import com.example.backend.member.entity.MemberFileId;
 import com.example.backend.member.repository.MemberRepository;
 import com.example.backend.review.dto.ReviewFormDto;
 import com.example.backend.review.dto.ReviewListDto;
@@ -24,6 +26,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -135,7 +138,7 @@ public class ReviewService {
     // 리뷰 수정
     public void update(Integer id,
                        ReviewFormDto dto,
-//                       List<MultipartFile> newFiles,
+                       List<MultipartFile> newFiles,
                        List<String> deleteFileNames) {
 
         Review review = reviewRepository.findById(id)
@@ -154,8 +157,30 @@ public class ReviewService {
             deleteFiles(review, deleteFileNames);
         }
 
-        // 새로 추가된 파일 저장 (DB + S3)
-        saveFiles(review, dto);
+        // 새로 추가된 파일 있으면
+        if (newFiles != null && !newFiles.isEmpty()) {
+            newFiles(review, newFiles);
+        }
+    }
+
+    private void newFiles(Review review, List<MultipartFile> newFiles) {
+        for (MultipartFile file : newFiles) {
+            if (!file.isEmpty()) {
+                String originalFileName = file.getOriginalFilename();
+                String uuidFileName = UUID.randomUUID().toString() + "_" + originalFileName; // UUID 사용하여 고유한 파일명 생성
+                String objectKey = "prj3/review/" + review.getId() + "/" + uuidFileName;
+
+                uploadFile(file, objectKey); // S3에 업로드
+
+                ReviewFile newReviewFile = new ReviewFile();
+                ReviewFileId id = new ReviewFileId(); // 인자 없는 기본 생성자 호출
+                id.setName(uuidFileName);             // setName 메서드를 사용하여 파일 이름 설정
+                id.setReviewId(review.getId());       // setMemberId 메서드를 사용하여 멤버 ID 설정
+                newReviewFile.setId(id);              // 설정된 id 객체를 MemberFile에 연결
+                newReviewFile.setReview(review);
+                reviewFileRepository.save(newReviewFile);
+            }
+        }
     }
 
     private void deleteFiles(Review review, List<String> deleteFileNames) {
