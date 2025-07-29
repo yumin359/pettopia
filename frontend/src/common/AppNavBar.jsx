@@ -9,12 +9,21 @@ export function AppNavBar() {
   const { user, isAdmin } = useContext(AuthenticationContext);
 
   return (
-    <Navbar expand="lg" bg="light" fixed="top" className="bg-body-tertiary">
+    <Navbar
+      expand="lg"
+      // bg="light"
+      fixed="top"
+      // className="bg-body-tertiary"
+      style={{
+        backgroundColor: "#FAF0E6",
+        borderBottom: "1px solid #ccc",
+      }}
+    >
       <Container className="d-flex align-items-center">
         {/* 1. 로고 */}
         <Navbar.Brand as={Link} to="/" className="fs-3 fw-bold me-4">
           <img
-            src="/free-icon-pet-friendly-4261289.png"
+            src="/PETOPIA.png"
             alt="로고"
             height="40"
             style={{ marginRight: "10px" }}
