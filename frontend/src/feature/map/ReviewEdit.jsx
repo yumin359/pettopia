@@ -48,12 +48,15 @@ export function ReviewEdit() {
 
     // 삭제할 기존 파일 목록을 FormData에 추가
     deletefileNames.forEach((fileUrl) => {
-      formData.append("files", fileUrl);
+      const url = new URL(fileUrl);
+      const pathSegments = url.pathname.split("/");
+      const fileName = pathSegments[pathSegments.length - 1];
+      formData.append("deleteFileNames", fileName); // ✅ 'deleteFileNames' 키로 보내야 backend에서 받음
     });
 
     // 새로 추가할 파일 목록을 FormData에 추가
     newFiles.forEach((fileObj) => {
-      formData.append("files", fileObj.file); // 실제 File 객체를 전송
+      formData.append("newFiles", fileObj.file); // 실제 File 객체를 전송
     });
 
     try {
