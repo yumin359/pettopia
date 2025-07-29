@@ -2,13 +2,11 @@ import { Outlet } from "react-router";
 import { AppNavBar } from "./AppNavBar.jsx";
 import { Container } from "react-bootstrap";
 import { AppFooter } from "./AppFooter.jsx";
+import { ChatButton } from "./ChatButton.jsx"; // ✅ 추가
 
 export function MainLayout() {
   return (
-    <div
-      className="d-flex flex-column min-vh-100"
-      style={{ backgroundColor: "#FAF0E6" }}
-    >
+    <div className="d-flex flex-column min-vh-100">
       <div className="mb-3">
         <AppNavBar />
       </div>
@@ -18,6 +16,9 @@ export function MainLayout() {
       <br />
       <br />
       <AppFooter />
+
+      {/* ✅ 오른쪽 하단 채팅 버튼 */}
+      <ChatButton />
     </div>
   );
 }
