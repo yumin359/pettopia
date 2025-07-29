@@ -23,6 +23,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -134,7 +135,7 @@ public class ReviewService {
     // 리뷰 수정
     public void update(Integer id,
                        ReviewFormDto dto,
-                       List<MultipartFile> newFiles,
+//                       List<MultipartFile> newFiles,
                        List<String> deleteFileNames) {
 
         Review review = reviewRepository.findById(id)
@@ -150,22 +151,29 @@ public class ReviewService {
 
         // 삭제할 파일이 있으면 DB와 S3에서 삭제 처리
         if (deleteFileNames != null && !deleteFileNames.isEmpty()) {
-            for (String fileName : deleteFileNames) {
-                ReviewFileId reviewFileId = new ReviewFileId();
-                reviewFileId.setReviewId(id);
-                reviewFileId.setName(fileName);
-
-                // DB에서 파일 메타정보 삭제
-                reviewFileRepository.deleteById(reviewFileId);
-
-                // S3에서 파일 삭제
-                String objectKey = "prj3/review/" + id + "/" + fileName;
-                deleteFile(objectKey);
-            }
+            deleteFiles(review, deleteFileNames);
         }
 
         // 새로 추가된 파일 저장 (DB + S3)
         saveFiles(review, dto);
+    }
+
+    private void deleteFiles(Review review, List<String> deleteFileNames) {
+        for (String fileName : deleteFileNames) {
+            ReviewFileId fileId = new ReviewFileId();
+            fileId.setReviewId(review.getId());
+            fileId.setName(fileName);
+
+            Optional<ReviewFile> file = reviewFileRepository.findById(fileId);
+
+            if (file.isPresent()) {
+                ReviewFile deleteFile = file.get();
+                String objectKey = "prj3/review/" + review.getId() + "/" + fileName;
+                deleteFile(objectKey);
+                reviewFileRepository.delete(deleteFile);
+                review.getFiles().remove(deleteFile);
+            }
+        }
     }
 
     // 리뷰 삭제

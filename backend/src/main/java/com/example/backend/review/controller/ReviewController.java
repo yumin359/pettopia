@@ -48,7 +48,7 @@ public class ReviewController {
                                                @ModelAttribute ReviewFormDto dto,
                                                @RequestParam(value = "newFiles", required = false) List<MultipartFile> newFiles,
                                                @RequestParam(value = "deleteFileNames", required = false) List<String> deleteFileNames) {
-        reviewService.update(id, dto, newFiles, deleteFileNames);
+        reviewService.update(id, dto, deleteFileNames);
         return ResponseEntity.ok("리뷰가 수정되었습니다.");
     }
 
