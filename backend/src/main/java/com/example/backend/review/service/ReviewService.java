@@ -154,6 +154,14 @@ public class ReviewService {
             throw new SecurityException("자신이 작성한 리뷰만 삭제할 수 있습니다.");
         }
 
+        // 첨부 파일들 S3에서 삭제(DB는 cascade 있어서 자동 처리)
+        for (ReviewFile file : review.getFiles()) {
+            String objectKey = "prj3/review/" + id + "/" + file.getId().getName();
+            deleteFile(objectKey);
+            reviewFileRepository.delete(file);
+        }
+
+        // 리뷰 삭제
         reviewRepository.deleteById(id);
     }
 
