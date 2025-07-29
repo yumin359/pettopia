@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { createInfoWindowContent } from "./mapUtils";
+import { createInfoWindowContent } from "./MapUtils.jsx";
 
 const SearchResultList = ({
   facilities,

@@ -1,4 +1,4 @@
-// src/map/mapUtils.jsx
+// src/map/MapUtils.jsx
 export const createInfoWindowContent = (facility, categoryColors) => {
   const categoryColor =
     categoryColors[facility.category1] ||
@@ -14,6 +14,7 @@ export const createInfoWindowContent = (facility, categoryColors) => {
             ${facility.category2 || facility.category1 || ""}
           </span>
         </h6>
+        
         <p class="mb-1 small text-secondary">📍 ${facility.roadAddress || facility.jibunAddress || "주소 정보 없음"}</p>
         ${facility.phoneNumber ? `<p class="text-primary mb-1 small">📞 ${facility.phoneNumber}</p>` : ""}
         ${facility.allowedPetSize ? `<p class="text-success mb-1 small">🐕 ${facility.allowedPetSize}</p>` : ""}

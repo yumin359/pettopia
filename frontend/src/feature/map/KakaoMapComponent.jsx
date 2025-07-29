@@ -1,6 +1,6 @@
 // src/feature/map/KakaoMapComponent.js
 import React, { useEffect, useRef, useCallback } from "react";
-import { createInfoWindowContent } from "./mapUtils";
+import { createInfoWindowContent } from "./MapUtils.jsx";
 
 const KakaoMapComponent = ({
   isMapReady,
