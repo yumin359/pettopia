@@ -1,10 +1,17 @@
-// src/feature/board/ReviewPreview.jsx
 import React from "react";
+import { ListGroup, ListGroupItem, Button, Image } from "react-bootstrap";
+import { FaDownload } from "react-icons/fa";
 
 function ReviewPreview({ review }) {
   const renderStars = (rating) =>
     [...Array(5)].map((_, i) => (
-      <span key={i} style={{ color: i < rating ? "#ffc107" : "#e4e5e9", fontSize: "1.1rem" }}>
+      <span
+        key={i}
+        style={{
+          color: i < rating ? "#ffc107" : "#e4e5e9",
+          fontSize: "1.1rem",
+        }}
+      >
         ★
       </span>
     ));
@@ -18,12 +25,43 @@ function ReviewPreview({ review }) {
       .padStart(2, "0")}`;
   };
 
+  const isImageFile = (fileUrl) => {
+    return /\.(jpg|jpeg|png|gif|webp)$/i.test(fileUrl.split("?")[0]);
+  };
+
   return (
     <div style={{ marginBottom: "1.5rem", fontSize: "0.95rem" }}>
       <div>{renderStars(review.rating)}</div>
-      <p style={{ margin: "0.5rem 0", whiteSpace: "pre-wrap" }}>{review.review}</p>
+      <p style={{ margin: "0.5rem 0", whiteSpace: "pre-wrap" }}>
+        {review.review}
+      </p>
+
+      {/* 첨부 파일 처리 */}
+      {Array.isArray(review.files) && review.files.length > 0 && (
+        <div className="mb-4">
+          {/* 이미지 미리보기 */}
+          {review.files.filter(isImageFile).length > 0 && (
+            <div className="flex flex-row flex-wrap gap-3 mb-3">
+              {review.files.filter(isImageFile).map((fileUrl, idx) => (
+                <Image
+                  key={idx}
+                  src={fileUrl}
+                  alt={`첨부 이미지 ${idx + 1}`}
+                  className="shadow rounded"
+                  style={{ maxWidth: "100px", objectFit: "contain" }}
+                />
+              ))}
+            </div>
+          )}
+
+          {/* 다운로드 링크는 없앴다요 */}
+          {/* 사진 보이는 거 좀 수정 하고 싶음 */}
+        </div>
+      )}
+
       <div style={{ fontSize: "0.8rem", color: "#555" }}>
-        작성자: {review.memberEmailNickName || "알 수 없음"} | {formatDate(review.insertedAt)}
+        작성자: {review.memberEmailNickName || "알 수 없음"} |{" "}
+        {formatDate(review.insertedAt)}
       </div>
     </div>
   );

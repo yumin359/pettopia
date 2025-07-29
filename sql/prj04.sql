@@ -383,8 +383,36 @@ ALTER TABLE board_like
     DROP COLUMN member_email;
 
 
+# ---------------------------------------------------------------------------------
+create table prj04.review
+(
+    id            int auto_increment
+        primary key,
+    facility_name varchar(255)                         not null,
+    member_email  varchar(255)                         not null,
+    review        varchar(2000)                        not null,
+    rating        int                                  not null,
+    inserted_at   datetime default current_timestamp() not null,
+    constraint review_ibfk_1
+        foreign key (member_email) references prj04.member (email)
+            on delete cascade
+);
+
+create index member_email
+    on prj04.review (member_email);
+
 
 # ---------------------------------------------------------------------------------
+# 리뷰 사진
+CREATE TABLE review_file
+(
+    review_id INT          NOT NULL,
+    name      VARCHAR(300) NOT NULL,
+    PRIMARY KEY (review_id, name),
+    FOREIGN KEY (review_id) REFERENCES review (id) ON DELETE CASCADE
+);
+# ---------------------------------------------------------------------------------
+
 
 -- 관리자 계정 생성
 INSERT INTO member (email, nick_name, password, inserted_at)
