@@ -129,14 +129,6 @@ export function BoardLayout() {
             >
               회원목록 (관리자)
             </Button>
-            <Button
-              variant="outline-danger"
-              size="sm"
-              onClick={() => navigate("/service/list")}
-              style={{ minWidth: "120px" }}
-            >
-              문의내역보기 (관리자)
-            </Button>
           </Col>
         </Row>
       )}
