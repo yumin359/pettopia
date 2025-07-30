@@ -13,7 +13,7 @@ export function ChatButton() {
         style={{
           position: "fixed",
           bottom: "80px",
-          right: "120px",  // 여기 고정값으로 변경
+          right: "90px",
           backgroundColor: "#ff944d",
           color: "#fff",
           border: "none",
