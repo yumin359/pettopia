@@ -1,4 +1,12 @@
-import { Accordion, Carousel, Col, Row, Tab, Tabs, Button } from "react-bootstrap";
+import {
+  Accordion,
+  Carousel,
+  Col,
+  Row,
+  Tab,
+  Tabs,
+  Button,
+} from "react-bootstrap";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { BoardListMini } from "./BoardListMini.jsx";
@@ -88,7 +96,7 @@ export function BoardLayout() {
             <Button
               variant="outline-dark"
               size="lg"
-              onClick={() => navigate("/chatbot")}
+              onClick={() => navigate("/review/latest")}
               style={{ width: "80%", height: "100px" }}
             >
               최신 리뷰
