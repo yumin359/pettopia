@@ -107,18 +107,6 @@ export function AppNavBar() {
             >
               SUPPORT
             </NavLink>
-            {isAdmin() && (
-              <NavLink
-                to="/member/list"
-                style={({ isActive }) =>
-                  isActive
-                    ? { ...navLinkStyle, ...activeLinkStyle }
-                    : navLinkStyle
-                }
-              >
-                MEMBERLIST
-              </NavLink>
-            )}
           </Nav>
           {/* 로그인/사용자 정보 - 우측으로 이동 */}
           <Nav>

@@ -59,16 +59,7 @@ export function MainLayout() {
             }}
           >
             {/* 관리자 회원목록 버튼 - isAdmin 체크 */}
-            {isAdmin() && (
-              <Button
-                variant="outline-warning"
-                size="sm"
-                onClick={() => navigate("/member/list")}
-                style={{ minWidth: "120px" }}
-              >
-                회원목록 (관리자)
-              </Button>
-            )}
+
 
             <ChatButton />
           </div>

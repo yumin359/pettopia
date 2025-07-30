@@ -1,7 +1,8 @@
-package com.example.backend.support.repository;
+package com.example.backend.support.entity;
 
-import com.example.backend.support.entity.Support;
 import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.List;
 
 public interface SupportRepository extends JpaRepository<Support, Long> {
+    List<Support> findAllByOrderByInsertedAtDesc();
 }
