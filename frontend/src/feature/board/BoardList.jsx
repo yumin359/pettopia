@@ -94,56 +94,54 @@ export function BoardList() {
 
   return (
     <>
-      <div
-        className="text-center py-4"
-        style={{
-          fontSize: "2rem",
-          fontWeight: "bold",
-          borderRadius: "1px",
-          margin: "1px auto",
-          width: "fit-content",
-          paddingLeft: "10px",
-          paddingRight: "10px",
-          boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-        }}
-      >
-        NEWS
-      </div>
       <Row className="justify-content-center">
-        <Col xs={12} md={10} lg={8} style={{ maxWidth: "900px", margin: "0 auto" }}>
+        <Col
+          xs={12}
+          md={10}
+          lg={8}
+          style={{ maxWidth: "900px", margin: "0 auto" }}
+        >
           <br className="mb-4 h2" />
           {boardList.length > 0 ? (
             <Table
               striped
               hover
               responsive
-              style={{ tableLayout: "fixed", width: "100%", fontSize: "0.95rem" }}
+              style={{
+                tableLayout: "fixed",
+                width: "100%",
+                fontSize: "0.95rem",
+              }}
               className="align-middle"
             >
               <thead>
-              <tr style={{ fontSize: "0.85rem", color: "#6c757d" }}>
-                <th style={{ width: "45px" }}>#</th>
-                <th style={{ width: "45px" }}>
-                  <FaThumbsUp size={14} className="text-secondary" />
-                </th>
-                <th style={{ width: "100%" }}>제목</th>
-                <th style={{ width: "35%" }}>작성자</th>
-                <th style={{ width: "50%" }}>작성일시</th>
-              </tr>
+                <tr style={{ fontSize: "0.85rem", color: "#6c757d" }}>
+                  <th style={{ width: "45px" }}>#</th>
+                  <th style={{ width: "45px" }}>
+                    <FaThumbsUp size={14} className="text-secondary" />
+                  </th>
+                  <th style={{ width: "100%" }}>제목</th>
+                  <th style={{ width: "35%" }}>작성자</th>
+                  <th style={{ width: "50%" }}>작성일시</th>
+                </tr>
               </thead>
               <tbody>
-              {boardList.map((board) => (
-                <tr
-                  key={board.id}
-                  style={{ cursor: "pointer", fontSize: "0.95rem", verticalAlign: "middle" }}
-                  onClick={() => handleTableRowClick(board.id)}
-                >
-                  <td className="text-muted">{board.id}</td>
-                  <td className="text-muted" style={{ fontSize: "0.85em" }}>
-                    {board.countLike}
-                  </td>
-                  <td>
-                    <div className="d-flex gap-2 align-items-center">
+                {boardList.map((board) => (
+                  <tr
+                    key={board.id}
+                    style={{
+                      cursor: "pointer",
+                      fontSize: "0.95rem",
+                      verticalAlign: "middle",
+                    }}
+                    onClick={() => handleTableRowClick(board.id)}
+                  >
+                    <td className="text-muted">{board.id}</td>
+                    <td className="text-muted" style={{ fontSize: "0.85em" }}>
+                      {board.countLike}
+                    </td>
+                    <td>
+                      <div className="d-flex gap-2 align-items-center">
                         <span
                           className="fw-semibold text-dark"
                           style={{
@@ -156,42 +154,42 @@ export function BoardList() {
                           {board.title}
                         </span>
 
-                      {board.countComment > 0 && (
-                        <Badge bg="light" text="dark">
-                          <div className="d-flex gap-1">
-                            <FaRegComments />
-                            <span>{board.countComment}</span>
-                          </div>
-                        </Badge>
-                      )}
+                        {board.countComment > 0 && (
+                          <Badge bg="light" text="dark">
+                            <div className="d-flex gap-1">
+                              <FaRegComments />
+                              <span>{board.countComment}</span>
+                            </div>
+                          </Badge>
+                        )}
 
-                      {board.countFile > 0 && (
-                        <Badge bg="info">
-                          <div className="d-flex gap-1">
-                            <FaRegImages />
-                            <span>{board.countFile}</span>
-                          </div>
-                        </Badge>
-                      )}
-                    </div>
-                  </td>
-                  <td
-                    className="text-muted"
-                    style={{
-                      whiteSpace: "nowrap",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      fontSize: "0.85rem",
-                    }}
-                    title={board.nickName}
-                  >
-                    {board.nickName}
-                  </td>
-                  <td className="text-muted" style={{ fontSize: "0.85rem" }}>
-                    {board.timesAgo}
-                  </td>
-                </tr>
-              ))}
+                        {board.countFile > 0 && (
+                          <Badge bg="info">
+                            <div className="d-flex gap-1">
+                              <FaRegImages />
+                              <span>{board.countFile}</span>
+                            </div>
+                          </Badge>
+                        )}
+                      </div>
+                    </td>
+                    <td
+                      className="text-muted"
+                      style={{
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        fontSize: "0.85rem",
+                      }}
+                      title={board.nickName}
+                    >
+                      {board.nickName}
+                    </td>
+                    <td className="text-muted" style={{ fontSize: "0.85rem" }}>
+                      {board.timesAgo}
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </Table>
           ) : (
@@ -204,7 +202,12 @@ export function BoardList() {
 
       {pageInfo && (
         <Row className="my-4 justify-content-center mx-0">
-          <Col xs={12} md={10} lg={8} style={{ maxWidth: "900px", margin: "0 auto", paddingRight: 0 }}>
+          <Col
+            xs={12}
+            md={10}
+            lg={8}
+            style={{ maxWidth: "900px", margin: "0 auto", paddingRight: 0 }}
+          >
             <div className="d-flex flex-column gap-3 align-items-center">
               <div className="d-flex justify-content-end w-100">
                 <Button
@@ -218,8 +221,6 @@ export function BoardList() {
                 </Button>
               </div>
 
-
-
               {/* 🔵 Pagination 버튼 */}
               <Pagination className="mb-2" size="sm">
                 <Pagination.First
@@ -229,7 +230,9 @@ export function BoardList() {
                 />
                 <Pagination.Prev
                   disabled={pageInfo.leftPageNumber <= 1}
-                  onClick={() => handlePageNumberClick(pageInfo.leftPageNumber - 10)}
+                  onClick={() =>
+                    handlePageNumberClick(pageInfo.leftPageNumber - 10)
+                  }
                   className="rounded"
                 />
                 {pageNumbers.map((num) => (
@@ -239,7 +242,9 @@ export function BoardList() {
                     onClick={() => handlePageNumberClick(num)}
                     className="rounded"
                     variant={
-                      pageInfo.currentPageNumber === num ? "primary" : "outline-secondary"
+                      pageInfo.currentPageNumber === num
+                        ? "primary"
+                        : "outline-secondary"
                     }
                   >
                     {num}
@@ -247,7 +252,9 @@ export function BoardList() {
                 ))}
                 <Pagination.Next
                   disabled={pageInfo.rightPageNumber >= pageInfo.totalPages}
-                  onClick={() => handlePageNumberClick(pageInfo.rightPageNumber + 1)}
+                  onClick={() =>
+                    handlePageNumberClick(pageInfo.rightPageNumber + 1)
+                  }
                   className="rounded"
                 />
                 <Pagination.Last
