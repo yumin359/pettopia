@@ -90,9 +90,6 @@ export function BoardLayout() {
               { text: "지도", path: "/KakaoMap" },
               { text: "최신 리뷰", path: "/review/latest" },
               { text: "문의하기", path: "/service" },
-              ...(isAdmin()
-                ? [{ text: "문의내역보기", path: "/service/list" }]
-                : []),
             ].map(({ text, path }) => (
               <Button
                 key={text}
@@ -128,6 +125,14 @@ export function BoardLayout() {
               style={{ minWidth: "120px" }}
             >
               회원목록 (관리자)
+            </Button>
+            <Button
+              variant="outline-danger"
+              size="sm"
+              onClick={() => navigate("/service/list")}
+              style={{ minWidth: "120px" }}
+            >
+              문의내역보기 (관리자)
             </Button>
           </Col>
         </Row>
