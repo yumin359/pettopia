@@ -73,7 +73,7 @@ export function MapDetail() {
 
   return (
     <div style={{ padding: "2rem", maxWidth: "700px", margin: "0 auto" }}>
-      <h2>📍 시설명: {decodedName}</h2>
+      <h2>시설명: {decodedName}</h2>
 
       {user ? (
         <button

@@ -49,7 +49,7 @@ export function ReviewListMini() {
   return (
     <Row className="justify-content-center mt-4">
       <Col xs={12} md={10} lg={8} style={{ maxWidth: "900px" }}>
-        <h5 className="mb-3">📝 최신 리뷰 피드</h5>
+        <h5 className="mb-3">최신 리뷰 피드</h5>
         <div className="d-flex flex-column gap-3">
           {reviews.map((r) => (
             // 이거랑
@@ -133,7 +133,7 @@ export function ReviewListMini() {
                     style={{ cursor: "pointer" }}
                     onClick={() => handleFacilityButton(r.facilityName)}
                   >
-                    📍 {r.facilityName}
+                    {r.facilityName}
                   </div>
 
                   {/* 평점 */}

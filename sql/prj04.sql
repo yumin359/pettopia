@@ -435,3 +435,11 @@ CREATE TABLE review_like
     FOREIGN KEY (review_id) REFERENCES review (id) ON DELETE CASCADE,
     FOREIGN KEY (member_id) REFERENCES member (id) ON DELETE CASCADE
 );
+
+CREATE TABLE support (
+                         id          BIGINT AUTO_INCREMENT PRIMARY KEY,
+                         email       VARCHAR(255) NOT NULL,
+                         title       VARCHAR(300) NOT NULL,
+                         content     VARCHAR(10000) NOT NULL,
+                         inserted_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
