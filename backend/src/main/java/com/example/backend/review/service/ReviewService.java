@@ -222,7 +222,6 @@ public class ReviewService {
     }
 
     // ✅ 최신 리뷰 5개 조회
-//    @Transactional(readOnly = true) // 읽기 전용 트랜잭션으로 성능 최적화(선택)
     public List<ReviewListDto> getLatestReviews() {
         return reviewRepository.findTop5ByOrderByInsertedAtDesc()
                 .stream()

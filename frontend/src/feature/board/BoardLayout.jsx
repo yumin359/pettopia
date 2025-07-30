@@ -1,4 +1,16 @@
+import {
+  Accordion,
+  Carousel,
+  Col,
+  Row,
+  Tab,
+  Tabs,
+  Button,
+} from "react-bootstrap";
+import { useState } from "react";
+
 import { Accordion, Carousel, Col, Row, Tab, Tabs, Button } from "react-bootstrap";
+
 import { useNavigate } from "react-router-dom";
 import { BoardListMini } from "./BoardListMini.jsx";
 
@@ -48,7 +60,7 @@ export function BoardLayout() {
           >
             {[
               { text: "지도", path: "/KakaoMap" },
-              { text: "이벤트", path: "/board/list" },
+              { text: "최신 리뷰", path: "/review/latest" },
               { text: "문의하기", path: "/service" },
             ].map(({ text, path }) => (
               <Button
