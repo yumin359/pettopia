@@ -47,7 +47,7 @@ export function BoardLayout() {
             }}
           >
             {[
-              { text: "반려동물 업체지도", path: "/KakaoMap" },
+              { text: "지도", path: "/KakaoMap" },
               { text: "이벤트", path: "/board/list" },
               { text: "문의하기", path: "/service" },
             ].map(({ text, path }) => (
