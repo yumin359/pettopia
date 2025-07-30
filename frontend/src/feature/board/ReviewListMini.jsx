@@ -74,6 +74,9 @@ export function ReviewListMini() {
     );
   };
 
+  // 프로필 사진 없는 사람들
+  const defaultProfileImage = "/public/user.png";
+
   return (
     <Row className="justify-content-center mt-4">
       <Col xs={12} md={10} lg={8} style={{ maxWidth: "900px" }}>
@@ -168,7 +171,20 @@ export function ReviewListMini() {
 
                 {/* 작성자 & 날짜 (하단 작게) */}
                 <div className="text-muted mt-3" style={{ fontSize: "0.8rem" }}>
-                  <FiUser className="me-1" />
+                  {/*<FiUser className="me-1" size="1.2em" />*/}
+                  <Image
+                    roundedCircle
+                    className="me-1"
+                    src={defaultProfileImage}
+                    // 바꿔야함
+                    // src={r.files ||defaultProfileImage}
+                    alt={`${r.memberEmailNickName ?? "익명"} 프로필`}
+                    style={{
+                      width: "15px",
+                      height: "15px",
+                      objectFit: "cover",
+                    }}
+                  />
                   {r.memberEmailNickName ?? "익명 사용자"} ·{" "}
                   {r.insertedAt?.split("T")[0]}
                 </div>
