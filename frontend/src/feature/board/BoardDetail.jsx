@@ -71,7 +71,7 @@ export function BoardDetail() {
 
   return (
     <Row className="justify-content-center my-4">
-      <Col xs={12} md={8} lg={6}>
+      <Col xs={12} md={10} lg={8}>
         <div className="d-flex justify-content-between align-items-center mb-3">
           <h3 className="fw-bold mb-0 text-dark">{board.title}</h3>
           <small className="text-muted" style={{ fontSize: "0.85rem" }}>

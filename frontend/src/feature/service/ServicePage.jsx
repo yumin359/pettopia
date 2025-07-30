@@ -51,21 +51,6 @@ export default function ServicePage() {
 
   return (
     <div style={{ padding: "2rem" }}>
-      <div
-        className="text-center py-4"
-        style={{
-          fontSize: "2rem",
-          fontWeight: "bold",
-          borderRadius: "1px",
-          margin: "1px auto",
-          width: "fit-content",
-          paddingLeft: "10px",
-          paddingRight: "10px",
-          boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-        }}
-      >
-        SUPPORT
-      </div>
 
       {successMsg && <Alert variant="success">{successMsg}</Alert>}
       {errorMsg && <Alert variant="danger">{errorMsg}</Alert>}
