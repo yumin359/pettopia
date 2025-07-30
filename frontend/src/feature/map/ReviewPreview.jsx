@@ -29,6 +29,9 @@ function ReviewPreview({ review }) {
     return /\.(jpg|jpeg|png|gif|webp)$/i.test(fileUrl.split("?")[0]);
   };
 
+  // 프로필 사진 없는 사람들
+  const defaultProfileImage = "/user.png";
+
   return (
     <div style={{ marginBottom: "1.5rem", fontSize: "0.95rem" }}>
       <div>{renderStars(review.rating)}</div>
@@ -53,13 +56,21 @@ function ReviewPreview({ review }) {
               ))}
             </div>
           )}
-
-          {/* 다운로드 링크는 없앴다요 */}
-          {/* 사진 보이는 거 좀 수정 하고 싶음 */}
         </div>
       )}
 
       <div style={{ fontSize: "0.8rem", color: "#555" }}>
+        <Image
+          roundedCircle
+          className="me-2"
+          src={review.profileImageUrl || defaultProfileImage}
+          alt={`${review.memberEmailNickName ?? "익명"} 프로필`}
+          style={{
+            width: "23px",
+            height: "23px",
+            objectFit: "cover",
+          }}
+        />
         작성자: {review.memberEmailNickName || "알 수 없음"} |{" "}
         {formatDate(review.insertedAt)}
       </div>
