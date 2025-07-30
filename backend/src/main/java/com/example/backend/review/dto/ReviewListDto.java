@@ -19,5 +19,6 @@ public class ReviewListDto {
     private String review;
     private Integer rating;
     private Instant insertedAt;
-    private List<String> files;
+    private List<String> files; // 리뷰 첨부 이미지 여러개
+    private String profileImageUrl; // 프로필 이미지 한개만
 }
