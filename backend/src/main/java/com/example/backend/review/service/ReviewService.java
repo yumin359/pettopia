@@ -226,9 +226,21 @@ public class ReviewService {
         return reviewRepository.findTop5ByOrderByInsertedAtDesc()
                 .stream()
                 .map(review -> {
+                    // 리뷰 첨부 이미지들
                     List<String> fileUrls = review.getFiles().stream()
                             .map(f -> imagePrefix + "prj3/review/" + review.getId() + "/" + f.getId().getName())
                             .collect(Collectors.toList());
+
+                    // 작성자 프로필 이미지 (여러 개가 있을 수 있다면 첫 번째 것만 사용)
+                    List<MemberFile> memberFiles = review.getMemberEmail().getFiles();
+
+                    String profileImageUrl = null;
+                    if (memberFiles != null && !memberFiles.isEmpty()) {
+                        // 가장 첫 번째 이미지 사용 (혹은 원하는 로직으로 수정)
+                        MemberFile profileFile = memberFiles.get(0);
+                        profileImageUrl = imagePrefix + "prj3/member/" + review.getMemberEmail().getId() + "/" + profileFile.getId().getName();
+                    }
+
 
                     return ReviewListDto.builder()
                             .id(review.getId())
@@ -238,9 +250,11 @@ public class ReviewService {
                             .review(review.getReview())
                             .rating(review.getRating())
                             .insertedAt(review.getInsertedAt())
+                            .profileImageUrl(profileImageUrl) // ✅ 여기에 셋팅
                             .files(fileUrls)
                             .build();
                 })
                 .collect(Collectors.toList());
     }
+
 }

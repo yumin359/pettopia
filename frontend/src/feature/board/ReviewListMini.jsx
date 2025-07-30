@@ -88,17 +88,9 @@ export function ReviewListMini() {
             // TODO 날짜(몇시간전 그런식으로 바꾸기)
 
             const isExpanded = expandedIds.includes(r.id);
-            // Card 내부
-            const rawFiles = r.files;
-
-            // 문자열이면 쉼표 기준으로 나누기
-            const fileList =
-              typeof rawFiles === "string" ? rawFiles.split(",") : rawFiles;
-
-            // 이미지 파일만 필터링
-            const imageFiles = fileList ? fileList.filter(isImageFile) : [];
-
-            const firstImage = imageFiles.length > 0 ? imageFiles[0] : null;
+            // 리뷰 사진들 중에서 첫번째 사진 골라오기
+            const imageFiles = r.files?.filter(isImageFile) || [];
+            const firstImage = imageFiles[0] || null;
             const hasImages = !!firstImage;
 
             return (
@@ -182,14 +174,12 @@ export function ReviewListMini() {
                   {/*<FiUser className="me-1" size="1.2em" />*/}
                   <Image
                     roundedCircle
-                    className="me-1"
-                    // src={defaultProfileImage}
-                    // 바꿔야함
-                    src={r.files || defaultProfileImage}
+                    className="me-2"
+                    src={r.profileImageUrl || defaultProfileImage}
                     alt={`${r.memberEmailNickName ?? "익명"} 프로필`}
                     style={{
-                      width: "15px",
-                      height: "15px",
+                      width: "23px",
+                      height: "23px",
                       objectFit: "cover",
                     }}
                   />
