@@ -124,7 +124,7 @@ export function AppNavBar() {
           <Nav>
             {!user ? (
               <Button as={Link} to="/login" variant="light" size="sm">
-                로그인
+                LOGIN
               </Button>
             ) : (
               <Nav.Link
