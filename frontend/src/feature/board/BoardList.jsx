@@ -204,20 +204,21 @@ export function BoardList() {
 
       {pageInfo && (
         <Row className="my-4 justify-content-center mx-0">
-          <Col xs="auto" className="mx-auto" style={{ maxWidth: "500px", width: "100%" }}>
+          <Col xs={12} md={10} lg={8} style={{ maxWidth: "900px", margin: "0 auto", paddingRight: 0 }}>
             <div className="d-flex flex-column gap-3 align-items-center">
-
-              {/* ✏️ 글쓰기 버튼 (오른쪽 정렬) */}
-              <div className="w-100 d-flex justify-content-end">
+              <div className="d-flex justify-content-end w-100">
                 <Button
                   variant="primary"
                   size="sm"
                   className="mb-2"
                   onClick={() => navigate("/board/add")}
+                  style={{ minWidth: "100px" }}
                 >
                   공지 작성
                 </Button>
               </div>
+
+
 
               {/* 🔵 Pagination 버튼 */}
               <Pagination className="mb-2" size="sm">

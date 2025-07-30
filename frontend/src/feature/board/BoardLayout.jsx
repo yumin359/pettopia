@@ -1,16 +1,5 @@
-import {
-  Accordion,
-  Carousel,
-  Col,
-  Row,
-  Tab,
-  Tabs,
-  Button,
-} from "react-bootstrap";
 import { useState } from "react";
-
 import { Accordion, Carousel, Col, Row, Tab, Tabs, Button } from "react-bootstrap";
-
 import { useNavigate } from "react-router-dom";
 import { BoardListMini } from "./BoardListMini.jsx";
 
