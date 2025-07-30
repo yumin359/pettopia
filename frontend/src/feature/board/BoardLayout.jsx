@@ -10,16 +10,16 @@ export function BoardLayout() {
   const navigate = useNavigate();
 
   const slides = [
-    { id: 17, img: img1, title: "유기견 입양 안내", desc: "데려가 주세요" },
-    { id: 18, img: img2, title: "길고양이", desc: "길 고양이 밥주지마세요" },
-    { id: 19, img: img3, title: "특이한 반려동물", desc: "비쌀듯" },
+    { id: 17, img: img1, title: "유기견 입양 안내" },
+    { id: 18, img: img2, title: "길고양이" },
+    { id: 19, img: img3, title: "특이한 반려동물" },
   ];
 
   return (
     <div className="container mt-5">
       <Row className="align-items-center">
         <Col xs={12} md={7}>
-          <Carousel style={{ maxHeight: "300px", overflow: "hidden" }}>
+          <Carousel style={{ maxHeight: "360px", overflow: "hidden", position: "relative" }}>
             {slides.map(({ id, img, title, desc }, idx) => (
               <Carousel.Item
                 key={id}
@@ -30,20 +30,40 @@ export function BoardLayout() {
                     navigate(`/board/${id}`);
                   }
                 }}
-                style={{ cursor: "pointer" }}
+                style={{ cursor: "pointer", position: "relative", height: "360px" }}
               >
                 <img
                   className="d-block w-100"
                   src={img}
                   alt={`${idx + 1}번째 슬라이드`}
                   loading="lazy"
-                  style={{ height: "300px", objectFit: "cover" }}
+                  style={{ height: "360px", objectFit: "cover" }}
                 />
-                <Carousel.Caption>
-                  <h6 style={{ fontSize: "1.25rem" }}>{title}</h6>
-                  <p style={{ fontSize: "1rem" }}>{desc}</p>
-                </Carousel.Caption>
+
+                {/* 배경박스: 슬라이드 아래쪽부터 title+desc 높이만큼 꽉 채움 */}
+                <div
+                  style={{
+                    position: "absolute",
+                    bottom: 0,
+                    left: 0,
+                    width: "100%",
+                    height: "80px", // 글씨 영역 높이만큼 조절하세요 (예: 80px)
+                    backgroundColor: "rgba(0, 0, 0, 0.3)",
+                    color: "white",
+                    padding: "10px 15px",
+                    boxSizing: "border-box",
+                    textAlign: "center",
+                    borderRadius: "0 0 8px 8px",
+                    lineHeight: 1.2,
+                  }}
+                >
+                  {/* 글씨는 배경 박스 안에서 위쪽에 살짝 띄워서 배치 */}
+                  <h6 style={{ margin: 0, fontWeight: "bold", fontSize: "1.25rem", paddingTop: "4px" }}>{title}</h6>
+                  <p style={{ margin: 0, fontSize: "1rem" }}>{desc}</p>
+                </div>
               </Carousel.Item>
+
+
             ))}
           </Carousel>
         </Col>
