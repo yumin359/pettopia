@@ -1,16 +1,23 @@
 import { Outlet } from "react-router";
 import { AppNavBar } from "./AppNavBar.jsx";
-import { Card, Container } from "react-bootstrap";
+import { Card, Container, Button } from "react-bootstrap";
 import { AppFooter } from "./AppFooter.jsx";
 import { ChatButton } from "./ChatButton.jsx";
+import { useContext } from "react";
+import { AuthenticationContext } from "./AuthenticationContextProvider.jsx";
+import { useNavigate } from "react-router";
 
 export function MainLayout() {
+  const { isAdmin } = useContext(AuthenticationContext);
+  const navigate = useNavigate();
+
   return (
     <div
       className="min-vh-100"
       style={{
         backgroundColor: "#033C33", // 초록색 배경
         padding: "20px 0",
+        position: "relative", // 플로팅 버튼 절대 위치 기준
       }}
     >
       {/* 전체를 감싸는 카드 */}
@@ -22,6 +29,7 @@ export function MainLayout() {
             minHeight: "calc(100vh - 40px)", // 화면 높이에서 패딩 제외
             borderRadius: "12px",
             overflow: "hidden",
+            position: "relative", // 플로팅 버튼 절대 위치 기준
           }}
         >
           {/* 카드 내부 레이아웃 */}
@@ -44,8 +52,24 @@ export function MainLayout() {
               position: "absolute",
               bottom: "20px",
               right: "20px",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "flex-end",
+              gap: "10px",
             }}
           >
+            {/* 관리자 회원목록 버튼 - isAdmin 체크 */}
+            {isAdmin() && (
+              <Button
+                variant="outline-warning"
+                size="sm"
+                onClick={() => navigate("/member/list")}
+                style={{ minWidth: "120px" }}
+              >
+                회원목록 (관리자)
+              </Button>
+            )}
+
             <ChatButton />
           </div>
         </Card>
