@@ -102,7 +102,7 @@ export function ReviewListMini() {
                 {/* 상단: 시설명 + 별점 */}
                 <div className="d-flex justify-content-between align-items-center mb-2">
                   <div
-                    className="fw-semibold"
+                    className="fw-semibold hover-underline-on-hover"
                     style={{ cursor: "pointer", color: "#8B4513" }}
                     onClick={() => handleFacilityButton(r.facilityName)}
                   >
@@ -136,7 +136,7 @@ export function ReviewListMini() {
                           variant="link"
                           size="sm"
                           onClick={() => toggleExpand(r.id)}
-                          className="p-0 text-secondary"
+                          className="p-0 text-secondary hover-underline-on-hover"
                           style={{
                             textDecoration: "none",
                             fontSize: "0.85rem",
@@ -201,6 +201,10 @@ export function ReviewListMini() {
           -webkit-line-clamp: 3;
           -webkit-box-orient: vertical;
           overflow: hidden;
+        }
+        
+        .hover-underline-on-hover:hover {
+          text-decoration: underline !important;
         }
       `}</style>
     </Row>
