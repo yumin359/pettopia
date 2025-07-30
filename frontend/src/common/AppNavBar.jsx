@@ -26,48 +26,42 @@ export function AppNavBar() {
     // ✅ fixed-top 제거하고 카드 내부에서 작동하도록 수정
     <div style={{ position: "sticky", top: 0, zIndex: 1000 }}>
       {/* 1. 상단 바 (로고, 로그인) */}
-      <Navbar style={{ backgroundColor: "#FF9D00", padding: "0.5rem 0" }}>
-        <Container className="d-flex justify-content-center align-items-center">
+      <Navbar
+        style={{
+          backgroundColor: "#FF9D00",
+          padding: "0.5rem 0",
+          minHeight: "280px",
+        }}
+      >
+        <Container className="d-flex flex-column justify-content-center align-items-center">
           {/* 로고 */}
           <Navbar.Brand
             as={Link}
             to="/"
-            className="fs-3 fw-bold"
-            style={{ flexShrink: 0 }}
+            className="d-flex flex-column align-items-center"
+            style={{ textDecoration: "none" }}
           >
             <img
               src="/PETOPIA-Photoroom.png"
               alt="로고"
-              height="250" // 카드 안에 맞게 크기 조정
-              style={{ marginRight: "10px" }}
+              height="250"
+              style={{ filter: "brightness(0%)" }}
             />
+            <h6
+              className="text-center fw-bold fst-italic mb-0"
+              style={{ color: "black", marginTop: "-30px" }}
+            >
+              지금, 펫프렌들리 스팟을 발견하세요!
+            </h6>
+            <br />
           </Navbar.Brand>
-
-          {/* 로그인/사용자 정보 - 우측으로 이동 */}
-          <Nav>
-            {!user ? (
-              <Button as={Link} to="/login" variant="light" size="sm">
-                로그인
-              </Button>
-            ) : (
-              <Nav.Link
-                as={NavLink}
-                to={`/member?email=${user.email}`}
-                className="d-flex align-items-center"
-                style={{ color: "white" }}
-              >
-                <FaUserCircle size={22} className="me-2" />
-                {user.nickName}
-              </Nav.Link>
-            )}
-          </Nav>
         </Container>
       </Navbar>
 
       {/* 2. 하단 바 (메인 메뉴) */}
       <Navbar
         style={{
-          backgroundColor: "#FFC107",
+          backgroundColor: "#FF9D00",
           boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
         }}
       >
@@ -124,6 +118,24 @@ export function AppNavBar() {
               >
                 MEMBERLIST
               </NavLink>
+            )}
+          </Nav>
+          {/* 로그인/사용자 정보 - 우측으로 이동 */}
+          <Nav>
+            {!user ? (
+              <Button as={Link} to="/login" variant="light" size="sm">
+                로그인
+              </Button>
+            ) : (
+              <Nav.Link
+                as={NavLink}
+                to={`/member?email=${user.email}`}
+                className="d-flex align-items-center"
+                style={{ color: "white" }}
+              >
+                <FaUserCircle size={22} className="me-2" />
+                {user.nickName}
+              </Nav.Link>
             )}
           </Nav>
         </Container>
