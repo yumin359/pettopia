@@ -116,7 +116,12 @@ export function MapDetail() {
       )}
 
       <div style={{ marginTop: "2rem" }}>
-        <h4>📝 리뷰 목록</h4>
+        <h4>
+          📝 리뷰 목록{"   "}
+          <span style={{ color: "#aaa", fontWeight: "normal" }}>
+            ({reviews.length}개)
+          </span>
+        </h4>
         {loading ? (
           <p>불러오는 중...</p>
         ) : reviews.length === 0 ? (
