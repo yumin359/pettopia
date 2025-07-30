@@ -1,118 +1,133 @@
+// AppNavBar.jsx
+
 import { Link, NavLink } from "react-router-dom";
-import { Navbar, Nav, Container } from "react-bootstrap";
-import { useContext, useState, useEffect } from "react";
+import { Navbar, Nav, Container, Button } from "react-bootstrap";
+import { useContext } from "react";
 import { AuthenticationContext } from "./AuthenticationContextProvider.jsx";
 import { FaUserCircle } from "react-icons/fa";
 
 export function AppNavBar() {
   const { user, isAdmin } = useContext(AuthenticationContext);
-  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
-  useEffect(() => {
-    function handleResize() {
-      setWindowWidth(window.innerWidth);
-    }
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  // 화면 크기에 따라 값 점진적 조절
-  // 예: 1400px 이상: 크게, 1200 이상 조금 작게, 900 이상 중간, 600 이상 작게, 600 미만 매우 작게
-  let gap, paddingLR, fontSize;
-  if (windowWidth >= 1400) {
-    gap = "3rem";
-    paddingLR = "1.5rem";
-    fontSize = "1.1rem";
-  } else if (windowWidth >= 1200) {
-    gap = "2.5rem";
-    paddingLR = "1.3rem";
-    fontSize = "1rem";
-  } else if (windowWidth >= 900) {
-    gap = "2rem";
-    paddingLR = "1rem";
-    fontSize = "0.95rem";
-  } else if (windowWidth >= 600) {
-    gap = "1.3rem";
-    paddingLR = "0.7rem";
-    fontSize = "0.9rem";
-  } else {
-    gap = "0.8rem";
-    paddingLR = "0.4rem";
-    fontSize = "0.8rem";
-  }
+  // NavLink가 활성화되었을 때 적용할 스타일
+  const activeLinkStyle = {
+    fontWeight: "bold",
+    color: "black", // 활성화 시 색상 고정
+  };
 
   const navLinkStyle = {
-    paddingLeft: paddingLR,
-    paddingRight: paddingLR,
-    whiteSpace: "nowrap",
-    fontSize: fontSize,
+    color: "#333", // 비활성화 시 색상
+    textDecoration: "none",
+    margin: "0 1.5rem", // 메뉴 간 간격
+    fontSize: "1.1rem",
   };
 
   return (
-    <Navbar
-      expand={false}
-      fixed="top"
-      style={{
-        backgroundColor: "#FAF0E6",
-        borderBottom: "1px solid #ccc",
-      }}
-    >
-      <Container
-        className="d-flex justify-content-between align-items-center"
-        style={{ flexWrap: "nowrap", overflow: "hidden" }}
+    // ✅ fixed-top 제거하고 카드 내부에서 작동하도록 수정
+    <div style={{ position: "sticky", top: 0, zIndex: 1000 }}>
+      {/* 1. 상단 바 (로고, 로그인) */}
+      <Navbar style={{ backgroundColor: "#FF9D00", padding: "0.5rem 0" }}>
+        <Container className="d-flex justify-content-center align-items-center">
+          {/* 로고 */}
+          <Navbar.Brand
+            as={Link}
+            to="/"
+            className="fs-3 fw-bold"
+            style={{ flexShrink: 0 }}
+          >
+            <img
+              src="/PETOPIA-Photoroom.png"
+              alt="로고"
+              height="250" // 카드 안에 맞게 크기 조정
+              style={{ marginRight: "10px" }}
+            />
+          </Navbar.Brand>
+
+          {/* 로그인/사용자 정보 - 우측으로 이동 */}
+          <Nav>
+            {!user ? (
+              <Button as={Link} to="/login" variant="light" size="sm">
+                로그인
+              </Button>
+            ) : (
+              <Nav.Link
+                as={NavLink}
+                to={`/member?email=${user.email}`}
+                className="d-flex align-items-center"
+                style={{ color: "white" }}
+              >
+                <FaUserCircle size={22} className="me-2" />
+                {user.nickName}
+              </Nav.Link>
+            )}
+          </Nav>
+        </Container>
+      </Navbar>
+
+      {/* 2. 하단 바 (메인 메뉴) */}
+      <Navbar
+        style={{
+          backgroundColor: "#FFC107",
+          boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+        }}
       >
-        <Navbar.Brand as={Link} to="/" className="fs-3 fw-bold me-4" style={{ flexShrink: 0 }}>
-          <img src="/PETOPIA.png" alt="로고" height="40" style={{ marginRight: "10px" }} />
-        </Navbar.Brand>
-
-        <Nav
-          className="flex-row flex-nowrap"
-          style={{
-            overflowX: "hidden",
-            whiteSpace: "nowrap",
-            flexGrow: 1,
-            flexShrink: 1,
-            justifyContent: "center",
-            minWidth: 0,
-            gap: gap,
-          }}
-        >
-          <Nav.Link as={NavLink} to="/" style={navLinkStyle}>
-            HOME
-          </Nav.Link>
-          <Nav.Link as={NavLink} to="/kakaoMap" style={navLinkStyle}>
-            MAP
-          </Nav.Link>
-          <Nav.Link as={NavLink} to="/board/list" style={navLinkStyle}>
-            NEWS
-          </Nav.Link>
-          <Nav.Link as={NavLink} to="/service" style={navLinkStyle}>
-            SUPPORT
-          </Nav.Link>
-          {isAdmin() && (
-            <Nav.Link as={NavLink} to="/member/list" style={navLinkStyle}>
-              MEMBERLIST
-            </Nav.Link>
-          )}
-        </Nav>
-
-        <Nav className="ms-3" style={{ flexShrink: 0 }}>
-          {!user ? (
-            <Nav.Link as={NavLink} to="/login" style={{ whiteSpace: "nowrap", fontSize: fontSize }}>
-              로그인
-            </Nav.Link>
-          ) : (
-            <Nav.Link
-              as={NavLink}
-              to={`/member?email=${user.email}`}
-              style={{ whiteSpace: "nowrap", fontSize: fontSize }}
+        <Container className="justify-content-center">
+          <Nav>
+            <NavLink
+              to="/"
+              style={({ isActive }) =>
+                isActive
+                  ? { ...navLinkStyle, ...activeLinkStyle }
+                  : navLinkStyle
+              }
             >
-              <FaUserCircle size={19} className="me-1" />
-              {user.nickName}
-            </Nav.Link>
-          )}
-        </Nav>
-      </Container>
-    </Navbar>
+              HOME
+            </NavLink>
+            <NavLink
+              to="/kakaoMap"
+              style={({ isActive }) =>
+                isActive
+                  ? { ...navLinkStyle, ...activeLinkStyle }
+                  : navLinkStyle
+              }
+            >
+              MAP
+            </NavLink>
+            <NavLink
+              to="/board/list"
+              style={({ isActive }) =>
+                isActive
+                  ? { ...navLinkStyle, ...activeLinkStyle }
+                  : navLinkStyle
+              }
+            >
+              NEWS
+            </NavLink>
+            <NavLink
+              to="/service"
+              style={({ isActive }) =>
+                isActive
+                  ? { ...navLinkStyle, ...activeLinkStyle }
+                  : navLinkStyle
+              }
+            >
+              SUPPORT
+            </NavLink>
+            {isAdmin() && (
+              <NavLink
+                to="/member/list"
+                style={({ isActive }) =>
+                  isActive
+                    ? { ...navLinkStyle, ...activeLinkStyle }
+                    : navLinkStyle
+                }
+              >
+                MEMBERLIST
+              </NavLink>
+            )}
+          </Nav>
+        </Container>
+      </Navbar>
+    </div>
   );
 }
