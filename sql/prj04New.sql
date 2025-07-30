@@ -1,10 +1,10 @@
 # ---------------------------------------------------------------------------------
 CREATE TABLE `auth`
 (
-    `member_email` varchar(255) NOT NULL,
-    `auth_name`    varchar(255) NOT NULL,
-    PRIMARY KEY (`member_email`, `auth_name`),
-    CONSTRAINT `auth_ibfk_1` FOREIGN KEY (`member_email`) REFERENCES `member` (`email`) ON DELETE CASCADE
+    `auth_name` varchar(255) NOT NULL,
+    `member_id` bigint(20)   NOT NULL,
+    PRIMARY KEY (`member_id`, `auth_name`),
+    CONSTRAINT `FK_auth_member_id` FOREIGN KEY (`member_id`) REFERENCES `member` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
