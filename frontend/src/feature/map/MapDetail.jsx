@@ -116,7 +116,7 @@ export function MapDetail() {
       )}
 
       <div style={{ marginTop: "2rem" }}>
-        <h4>
+        <h4 className="mb-3">
           📝 리뷰 목록{"   "}
           <span style={{ color: "#aaa", fontWeight: "normal" }}>
             ({reviews.length}개)
