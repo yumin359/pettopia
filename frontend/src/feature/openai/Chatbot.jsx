@@ -114,6 +114,7 @@ export function Chatbot() {
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="메시지를 입력하세요..."
+          style={{ resize: "none" }}
         />
         <Button onClick={handleSend} variant="primary" disabled={loading}>
           전송
