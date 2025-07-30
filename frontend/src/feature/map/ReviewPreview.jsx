@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { ListGroup, ListGroupItem, Button, Image } from "react-bootstrap";
 import { FaDownload } from "react-icons/fa";
 
@@ -29,8 +29,29 @@ function ReviewPreview({ review }) {
     return /\.(jpg|jpeg|png|gif|webp)$/i.test(fileUrl.split("?")[0]);
   };
 
+  // 프로필 사진 없는 사람들
+  const defaultProfileImage = "/user.png";
+
   return (
     <div style={{ marginBottom: "1.5rem", fontSize: "0.95rem" }}>
+      {/* 프로필 사진, 작성자, 작성일자 */}
+      <div style={{ fontSize: "0.8rem", color: "#555" }}>
+        <Image
+          roundedCircle
+          className="me-2"
+          src={review.profileImageUrl || defaultProfileImage}
+          alt={`${review.memberEmailNickName ?? "익명"} 프로필`}
+          style={{
+            width: "23px",
+            height: "23px",
+            objectFit: "cover",
+          }}
+        />
+        작성자: {review.memberEmailNickName || "알 수 없음"} |{" "}
+        {formatDate(review.insertedAt)}
+      </div>
+
+      {/* 별점 */}
       <div>{renderStars(review.rating)}</div>
       <p style={{ margin: "0.5rem 0", whiteSpace: "pre-wrap" }}>
         {review.review}
@@ -53,16 +74,39 @@ function ReviewPreview({ review }) {
               ))}
             </div>
           )}
-
-          {/* 다운로드 링크는 없앴다요 */}
-          {/* 사진 보이는 거 좀 수정 하고 싶음 */}
         </div>
       )}
+      
+      {/*/!* 더보기 버튼 *!/*/}
+      {/*{clampedIds.includes(r.id) && (*/}
+      {/*  <div className="mt-2">*/}
+      {/*    <Button*/}
+      {/*      variant="link"*/}
+      {/*      size="sm"*/}
+      {/*      onClick={() => toggleExpand(r.id)}*/}
+      {/*      className="p-0 text-secondary hover-underline-on-hover"*/}
+      {/*      style={{*/}
+      {/*        textDecoration: "none",*/}
+      {/*        fontSize: "0.85rem",*/}
+      {/*      }}*/}
+      {/*    >*/}
+      {/*      {isExpanded ? "간략히 보기" : "더보기"}*/}
+      {/*    </Button>*/}
+      {/*  </div>*/}
+      {/*)}*/}
 
-      <div style={{ fontSize: "0.8rem", color: "#555" }}>
-        작성자: {review.memberEmailNickName || "알 수 없음"} |{" "}
-        {formatDate(review.insertedAt)}
-      </div>
+      <style>{`
+        .line-clamp {
+          display: -webkit-box;
+          -webkit-line-clamp: 3;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+        
+        .hover-underline-on-hover:hover {
+          text-decoration: underline !important;
+        }
+      `}</style>
     </div>
   );
 }
