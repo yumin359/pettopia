@@ -77,58 +77,48 @@ export function ReviewListMini() {
   return (
     <Row className="justify-content-center mt-4">
       <Col xs={12} md={10} lg={8} style={{ maxWidth: "900px" }}>
-        <h5 className="mb-3">📝 최신 리뷰 피드</h5>
+        <h3 className="mb-4 fw-bold text-center" style={{ color: "#8B4513" }}>
+          최신 리뷰
+        </h3>
         <div className="d-flex flex-column gap-3">
           {reviews.map((r) => {
             // TODO 날짜(몇시간전 그런식으로 바꾸기)
 
             const isExpanded = expandedIds.includes(r.id);
+            // 이미지 파일만 필터링, 첫번째 이미지만 가져옴
+            const imageFiles = r.files ? r.files.filter(isImageFile) : [];
+            const firstImage = imageFiles.length > 0 ? imageFiles[0] : null;
+            const hasImages = !!firstImage; // 첫 번째 이미지가 존재하는지 여부
 
             return (
-              <Card key={r.id} className="shadow-sm border-0 p-3">
-                <Row>
-                  {/* 작성자 + 날짜 */}
-                  <Col md={4} className="border-end pe-3 text-muted">
-                    <div className="fw-bold mb-2">
-                      <FiUser className="me-1" />
-                      {r.memberEmailNickName ?? "익명 사용자"}
-                    </div>
-                    <div>{r.insertedAt?.split("T")[0]}</div>
-                  </Col>
+              <Card
+                key={r.id}
+                className="shadow-sm border-0 p-3"
+                style={{ backgroundColor: "#fdfaf4" }}
+              >
+                {/* 상단: 시설명 + 별점 */}
+                <div className="d-flex justify-content-between align-items-center mb-2">
+                  <div
+                    className="fw-semibold"
+                    style={{ cursor: "pointer", color: "#8B4513" }}
+                    onClick={() => handleFacilityButton(r.facilityName)}
+                  >
+                    {r.facilityName}
+                  </div>
+                  <div className="text-warning small">
+                    {"★".repeat(r.rating)}{" "}
+                  </div>
+                </div>
+                <hr className="mt-1 border-gray-300" />
 
-                  {/* 리뷰 내용 */}
-                  <Col md={8} className="ps-3">
-                    {/* 시설 이름 */}
-                    <div
-                      className="mb-1 text-primary fw-semibold"
-                      style={{ cursor: "pointer" }}
-                      onClick={() => handleFacilityButton(r.facilityName)}
-                    >
-                      📍 {r.facilityName}
-                    </div>
-
-                    {/* 평점 */}
-                    <div className="mb-2 text-warning">
-                      {"⭐️".repeat(r.rating)} ({r.rating}점)
-                    </div>
-
-                    {/* 이미지가 있으면 */}
-                    {Array.isArray(r.files) &&
-                      r.files.filter(isImageFile).length > 0 && (
-                        <div className="d-flex flex-wrap gap-3 mb-3">
-                          {r.files.filter(isImageFile).map((file, idx) => (
-                            <Image
-                              key={idx}
-                              src={file}
-                              alt={`첨부 이미지 ${idx + 1}`}
-                              className="shadow rounded"
-                              style={{ maxWidth: "100px", objectFit: "cover" }}
-                            />
-                          ))}
-                        </div>
-                      )}
-
-                    {/* 리뷰 본문 */}
+                {/* ✅ 리뷰 본문과 이미지를 위한 새로운 Row */}
+                <Row className="align-items-start">
+                  {" "}
+                  {/* 이미지와 텍스트의 상단을 정렬 */}
+                  {/* 리뷰 본문 (왼쪽) */}
+                  <Col xs={12} md={hasImages ? 8 : 12}>
+                    {" "}
+                    {/* 이미지가 있으면 8칸, 없으면 12칸 차지 */}
                     <div
                       ref={(el) => (reviewRefs.current[r.id] = el)}
                       className={`${!isExpanded ? "line-clamp" : ""}`}
@@ -136,7 +126,6 @@ export function ReviewListMini() {
                     >
                       {r.review}
                     </div>
-
                     {/* 더보기 버튼 */}
                     {clampedIds.includes(r.id) && (
                       <div className="mt-2">
@@ -145,14 +134,44 @@ export function ReviewListMini() {
                           size="sm"
                           onClick={() => toggleExpand(r.id)}
                           className="p-0 text-secondary"
-                          style={{ textDecoration: "none" }}
+                          style={{
+                            textDecoration: "none",
+                            fontSize: "0.85rem",
+                          }}
                         >
                           {isExpanded ? "간략히 보기" : "더보기"}
                         </Button>
                       </div>
                     )}
                   </Col>
+                  {hasImages && ( // firstImage가 있을 때만 Col 렌더링
+                    <Col
+                      xs={12}
+                      md={4}
+                      className="mt-3 mt-md-0 d-flex justify-content-md-end"
+                    >
+                      <div className="d-flex flex-wrap gap-2 justify-content-center justify-content-md-end">
+                        <Image
+                          src={firstImage} // ✅ 첫 번째 이미지만 사용
+                          alt={`리뷰 이미지`}
+                          className="shadow rounded"
+                          style={{
+                            width: "100px",
+                            height: "100px",
+                            objectFit: "cover",
+                          }}
+                        />
+                      </div>
+                    </Col>
+                  )}
                 </Row>
+
+                {/* 작성자 & 날짜 (하단 작게) */}
+                <div className="text-muted mt-3" style={{ fontSize: "0.8rem" }}>
+                  <FiUser className="me-1" />
+                  {r.memberEmailNickName ?? "익명 사용자"} ·{" "}
+                  {r.insertedAt?.split("T")[0]}
+                </div>
               </Card>
             );
           })}
