@@ -82,7 +82,7 @@ export function Chatbot() {
           border: "1px solid #ccc",
           borderRadius: "8px",
           padding: "1rem",
-          height: "400px",
+          height: "500px",
           overflowY: "auto",
           marginBottom: "1rem",
           backgroundColor: "#f8f9fa",

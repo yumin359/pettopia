@@ -18,6 +18,7 @@ import { ReviewAdd } from "./feature/map/ReviewAdd.jsx";
 import { Chatbot } from "./feature/openai/Chatbot";
 import { ReviewEdit } from "./feature/map/ReviewEdit.jsx";
 import { ReviewListMini } from "./feature/board/ReviewListMini.jsx";
+import ServicePage from "./feature/service/ServicePage.jsx";
 
 function App() {
   return (
@@ -42,6 +43,7 @@ function App() {
             <Route path="/chatbot" element={<Chatbot />} />
             <Route path="/review/edit/:id" element={<ReviewEdit />} />
             <Route path="/review/latest" element={<ReviewListMini />} />
+            <Route path="/service" element={<ServicePage />} />
           </Route>
         </Routes>
       </BrowserRouter>

@@ -426,3 +426,12 @@ VALUES ('admin@email.com', 'admin');
 UPDATE member
 SET password = '$2a$10$gdx4VSoqzsQ.AOHLIfbr2..zcar8fELPhWhuNiepTQns9GXi7h93u'
 WHERE email = 'admin@email.com';
+
+CREATE TABLE review_like
+(
+    review_id  INT    NOT NULL,
+    member_id BIGINT NOT NULL,
+    PRIMARY KEY (review_id, member_id),
+    FOREIGN KEY (review_id) REFERENCES review (id) ON DELETE CASCADE,
+    FOREIGN KEY (member_id) REFERENCES member (id) ON DELETE CASCADE
+);

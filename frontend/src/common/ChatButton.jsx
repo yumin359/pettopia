@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FaCommentDots } from "react-icons/fa";
+import { FaRobot } from "react-icons/fa";
 import { Chatbot } from "../feature/openai/Chatbot";
 
 export function ChatButton() {
@@ -13,29 +13,34 @@ export function ChatButton() {
         style={{
           position: "fixed",
           bottom: "80px",
-          right: open ? "360px" : "60px", // 열리면 살짝 왼쪽으로 이동
+          right: "120px",  // 여기 고정값으로 변경
           backgroundColor: "#ff944d",
           color: "#fff",
           border: "none",
           borderRadius: "50%",
-          width: "56px",
-          height: "56px",
+          width: "70px",
+          height: "70px",
           boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
           zIndex: 9999,
           transition: "right 0.3s ease",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          cursor: "pointer",
         }}
+        aria-label={open ? "Close chat" : "Open chat"}
       >
-        <FaCommentDots size={22} />
+        <FaRobot size={30} />
       </button>
+
 
       {/* 슬라이딩 챗봇 창 */}
       <div
         style={{
           position: "fixed",
-          top: "80px",
+          top: "70px",
           right: open ? "0" : "-420px",
           width: "420px",
-
           height: "calc(100vh - 100px)",
           backgroundColor: "#fff",
           boxShadow: "-2px 0 10px rgba(0,0,0,0.1)",
@@ -68,6 +73,7 @@ export function ChatButton() {
               fontSize: "1.2rem",
               cursor: "pointer",
             }}
+            aria-label="Close chat"
           >
             ×
           </button>

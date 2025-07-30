@@ -49,76 +49,76 @@ export function BoardListMini() {
       responsive
       size="sm"
       className="align-middle text-secondary"
-      style={{ fontSize: "0.85rem", tableLayout: "fixed" }}
+      style={{ fontSize: "1.2rem", tableLayout: "fixed" }} // 글씨 크기 더 키움
     >
       <thead>
-        <tr className="text-muted">
-          <th style={{ width: "40px" }}>#</th>
-          <th style={{ width: "40px" }}>
-            <FaThumbsUp size={13} />
-          </th>
-          <th>제목</th>
-          <th style={{ width: "80px" }}>작성자</th>
-          <th style={{ width: "100px" }}>작성일</th>
-        </tr>
+      <tr className="text-muted" style={{ height: "45px" }}>
+        <th style={{ width: "50px" }}>#</th>
+        <th style={{ width: "50px" }}>
+          <FaThumbsUp size={18} />
+        </th>
+        <th>제목</th>
+        <th style={{ width: "100px" }}>작성자</th>
+        <th style={{ width: "120px" }}>작성일</th>
+      </tr>
       </thead>
       <tbody>
-        {boardList.map((board) => (
-          <tr
-            key={board.id}
-            onClick={() => navigate(`/board/${board.id}`)}
-            style={{ cursor: "pointer" }}
+      {boardList.map((board) => (
+        <tr
+          key={board.id}
+          onClick={() => navigate(`/board/${board.id}`)}
+          style={{ cursor: "pointer", height: "55px" }} // 행 높이도 더 키움
+        >
+          <td className="text-muted">{board.id}</td>
+          <td className="text-muted">{board.countLike}</td>
+          <td
+            className="text-dark"
+            style={{
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
           >
-            <td className="text-muted">{board.id}</td>
-            <td className="text-muted">{board.countLike}</td>
-            <td
-              className="text-dark"
+            <div
+              className="d-flex gap-2 align-items-center"
+              style={{ overflow: "hidden" }}
+            >
+            <span
               style={{
                 overflow: "hidden",
                 textOverflow: "ellipsis",
                 whiteSpace: "nowrap",
+                display: "inline-block",
+                maxWidth: "100%",
               }}
             >
-              <div
-                className="d-flex gap-2 align-items-center"
-                style={{ overflow: "hidden" }}
-              >
-                <span
-                  style={{
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
-                    display: "inline-block",
-                    maxWidth: "100%",
-                  }}
-                >
-                  {board.title}
-                </span>
+              {board.title}
+            </span>
 
-                {board.countComment > 0 && (
-                  <Badge bg="light" text="dark">
-                    <div className="d-flex align-items-center gap-1">
-                      <FaRegComments />
-                      <span>{board.countComment}</span>
-                    </div>
-                  </Badge>
-                )}
-                {board.countFile > 0 && (
-                  <Badge bg="info">
-                    <div className="d-flex align-items-center gap-1">
-                      <FaRegImages />
-                      <span>{board.countFile}</span>
-                    </div>
-                  </Badge>
-                )}
-              </div>
-            </td>
-            <td className="text-truncate text-muted" title={board.nickName}>
-              {board.nickName}
-            </td>
-            <td className="text-muted">{board.timesAgo}</td>
-          </tr>
-        ))}
+              {board.countComment > 0 && (
+                <Badge bg="light" text="dark">
+                  <div className="d-flex align-items-center gap-1">
+                    <FaRegComments />
+                    <span>{board.countComment}</span>
+                  </div>
+                </Badge>
+              )}
+              {board.countFile > 0 && (
+                <Badge bg="info">
+                  <div className="d-flex align-items-center gap-1">
+                    <FaRegImages />
+                    <span>{board.countFile}</span>
+                  </div>
+                </Badge>
+              )}
+            </div>
+          </td>
+          <td className="text-truncate text-muted" title={board.nickName}>
+            {board.nickName}
+          </td>
+          <td className="text-muted">{board.timesAgo}</td>
+        </tr>
+      ))}
       </tbody>
     </Table>
   );

@@ -107,7 +107,7 @@ export function BoardList() {
           boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
         }}
       >
-        EVENT
+        NEWS
       </div>
       <Row className="justify-content-center">
         <Col xs={12} md={10} lg={8} style={{ maxWidth: "900px", margin: "0 auto" }}>
