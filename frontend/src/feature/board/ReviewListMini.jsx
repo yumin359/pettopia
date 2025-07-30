@@ -74,6 +74,9 @@ export function ReviewListMini() {
     );
   };
 
+  // 프로필 사진 없는 사람들
+  const defaultProfileImage = "/user.png";
+
   return (
     <Row className="justify-content-center mt-4">
       <Col xs={12} md={10} lg={8} style={{ maxWidth: "900px" }}>
@@ -85,10 +88,18 @@ export function ReviewListMini() {
             // TODO 날짜(몇시간전 그런식으로 바꾸기)
 
             const isExpanded = expandedIds.includes(r.id);
-            // 이미지 파일만 필터링, 첫번째 이미지만 가져옴
-            const imageFiles = r.files ? r.files.filter(isImageFile) : [];
+            // Card 내부
+            const rawFiles = r.files;
+
+            // 문자열이면 쉼표 기준으로 나누기
+            const fileList =
+              typeof rawFiles === "string" ? rawFiles.split(",") : rawFiles;
+
+            // 이미지 파일만 필터링
+            const imageFiles = fileList ? fileList.filter(isImageFile) : [];
+
             const firstImage = imageFiles.length > 0 ? imageFiles[0] : null;
-            const hasImages = !!firstImage; // 첫 번째 이미지가 존재하는지 여부
+            const hasImages = !!firstImage;
 
             return (
               <Card
@@ -99,7 +110,7 @@ export function ReviewListMini() {
                 {/* 상단: 시설명 + 별점 */}
                 <div className="d-flex justify-content-between align-items-center mb-2">
                   <div
-                    className="fw-semibold"
+                    className="fw-semibold hover-underline-on-hover"
                     style={{ cursor: "pointer", color: "#8B4513" }}
                     onClick={() => handleFacilityButton(r.facilityName)}
                   >
@@ -133,7 +144,7 @@ export function ReviewListMini() {
                           variant="link"
                           size="sm"
                           onClick={() => toggleExpand(r.id)}
-                          className="p-0 text-secondary"
+                          className="p-0 text-secondary hover-underline-on-hover"
                           style={{
                             textDecoration: "none",
                             fontSize: "0.85rem",
@@ -168,7 +179,20 @@ export function ReviewListMini() {
 
                 {/* 작성자 & 날짜 (하단 작게) */}
                 <div className="text-muted mt-3" style={{ fontSize: "0.8rem" }}>
-                  <FiUser className="me-1" />
+                  {/*<FiUser className="me-1" size="1.2em" />*/}
+                  <Image
+                    roundedCircle
+                    className="me-1"
+                    // src={defaultProfileImage}
+                    // 바꿔야함
+                    src={r.files || defaultProfileImage}
+                    alt={`${r.memberEmailNickName ?? "익명"} 프로필`}
+                    style={{
+                      width: "15px",
+                      height: "15px",
+                      objectFit: "cover",
+                    }}
+                  />
                   {r.memberEmailNickName ?? "익명 사용자"} ·{" "}
                   {r.insertedAt?.split("T")[0]}
                 </div>
@@ -185,6 +209,10 @@ export function ReviewListMini() {
           -webkit-line-clamp: 3;
           -webkit-box-orient: vertical;
           overflow: hidden;
+        }
+        
+        .hover-underline-on-hover:hover {
+          text-decoration: underline !important;
         }
       `}</style>
     </Row>
