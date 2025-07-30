@@ -33,8 +33,9 @@ export function ChatButton() {
         style={{
           position: "fixed",
           top: "80px",
-          right: open ? "0" : "-320px", // 창 너비만큼 숨기기
-          width: "320px",
+          right: open ? "0" : "-420px",
+          width: "420px",
+
           height: "calc(100vh - 100px)",
           backgroundColor: "#fff",
           boxShadow: "-2px 0 10px rgba(0,0,0,0.1)",

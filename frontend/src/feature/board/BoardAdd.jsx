@@ -192,18 +192,6 @@ export function BoardAdd() {
               </Col>
             </Row>
 
-            {/* Private/Public Checkbox */}
-            <FormGroup className="mb-3">
-              <Form.Check
-                type="checkbox"
-                id="isPrivateCheckbox"
-                label="비공개 게시물"
-                checked={isPrivate}
-                onChange={(e) => setIsPrivate(e.target.checked)}
-                disabled={isProcessing}
-              />
-            </FormGroup>
-
             {/* 저장/취소 버튼 */}
             <div className="d-flex justify-content-end gap-2">
               <Button

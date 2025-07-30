@@ -10,8 +10,9 @@ export function MainLayout() {
       <div className="mb-3">
         <AppNavBar />
       </div>
-      <Container className="flex-grow-1" style={{ paddingTop: "80px" }}>
+      <Container fluid className="flex-grow-1" style={{ paddingTop: "80px" }}>
         <Outlet />
+      <Outlet />
       </Container>
       <br />
       <br />

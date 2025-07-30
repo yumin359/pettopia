@@ -94,6 +94,21 @@ export function BoardList() {
 
   return (
     <>
+      <div
+        className="text-center py-4"
+        style={{
+          fontSize: "2rem",
+          fontWeight: "bold",
+          borderRadius: "1px",
+          margin: "1px auto",
+          width: "fit-content",
+          paddingLeft: "10px",
+          paddingRight: "10px",
+          boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+        }}
+      >
+        EVENT
+      </div>
       <Row className="justify-content-center">
         <Col xs={12} md={10} lg={8} style={{ maxWidth: "900px", margin: "0 auto" }}>
           <br className="mb-4 h2" />
@@ -200,7 +215,7 @@ export function BoardList() {
                   className="mb-2"
                   onClick={() => navigate("/board/add")}
                 >
-                  ✏️ 글쓰기
+                  공지 작성
                 </Button>
               </div>
 
