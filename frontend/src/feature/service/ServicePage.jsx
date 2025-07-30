@@ -22,10 +22,25 @@ export default function ServicePage() {
     setErrorMsg("");
 
     try {
-      // 서버에 실제로 보내지 않고, 테스트용으로 성공만 처리
-      await new Promise((resolve) => setTimeout(resolve, 500)); // 0.5초 대기 (선택사항)
+      const response = await fetch("/api/support", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: form.email,
+          subject: form.subject,
+          message: form.message,
+        }),
+      });
 
-      setSuccessMsg("문의가 성공적으로 접수되었습니다. 빠른 시일 내에 답변 드리겠습니다.");
+      if (!response.ok) {
+        throw new Error("서버 오류");
+      }
+
+      const data = await response.text();
+
+      setSuccessMsg(data);
       setForm({ email: "", subject: "", message: "" });
     } catch (err) {
       setErrorMsg("문의 접수 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
