@@ -1,5 +1,12 @@
 import React, { useEffect } from "react";
-import { ListGroup, ListGroupItem, Button, Image } from "react-bootstrap";
+import {
+  ListGroup,
+  ListGroupItem,
+  Button,
+  Image,
+  Row,
+  Col,
+} from "react-bootstrap";
 import { FaDownload } from "react-icons/fa";
 
 function ReviewPreview({ review }) {
@@ -52,14 +59,11 @@ function ReviewPreview({ review }) {
       </div>
 
       {/* 별점 */}
-      <div>{renderStars(review.rating)}</div>
-      <p style={{ margin: "0.5rem 0", whiteSpace: "pre-wrap" }}>
-        {review.review}
-      </p>
+      <div className="mb-2">{renderStars(review.rating)}</div>
 
       {/* 첨부 파일 처리 */}
       {Array.isArray(review.files) && review.files.length > 0 && (
-        <div className="mb-4">
+        <div className="mb-3">
           {/* 이미지 미리보기 */}
           {review.files.filter(isImageFile).length > 0 && (
             <div className="flex flex-row flex-wrap gap-3 mb-3">
@@ -76,7 +80,12 @@ function ReviewPreview({ review }) {
           )}
         </div>
       )}
-      
+
+      {/*리뷰 본문*/}
+      <p style={{ margin: "0.5rem 0", whiteSpace: "pre-wrap" }}>
+        {review.review}
+      </p>
+
       {/*/!* 더보기 버튼 *!/*/}
       {/*{clampedIds.includes(r.id) && (*/}
       {/*  <div className="mt-2">*/}
