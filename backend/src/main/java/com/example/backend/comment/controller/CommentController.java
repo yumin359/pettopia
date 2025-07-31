@@ -3,7 +3,7 @@ package com.example.backend.comment.controller;
 import com.example.backend.comment.dto.CommentForm;
 import com.example.backend.comment.entity.Comment;
 import com.example.backend.comment.service.CommentService;
-import com.example.backend.member.dto.CommentDto;
+import com.example.backend.comment.dto.CommentDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -43,13 +43,9 @@ public class CommentController {
     // 목록
     @GetMapping("/list")
     public ResponseEntity<?> list(@RequestParam Integer boardId) {
-        List<Comment> comments = commentService.findByBoardId(boardId);
+        List<CommentDto> commentDto = commentService.findByBoardId(boardId);
 
-        List<CommentDto> commentDtos = comments.stream()
-                .map(CommentDto::new)  // Comment → CommentDto 변환 (authorEmail 포함)
-                .toList();
-
-        return ResponseEntity.ok(Map.of("comments", commentDtos));
+        return ResponseEntity.ok(Map.of("comments", commentDto));
     }
 
 

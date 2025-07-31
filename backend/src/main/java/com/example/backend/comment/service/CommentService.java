@@ -5,15 +5,21 @@ import com.example.backend.board.repository.BoardRepository;
 import com.example.backend.comment.dto.CommentForm;
 import com.example.backend.comment.entity.Comment;
 import com.example.backend.comment.repository.CommentRepository;
-import com.example.backend.member.dto.CommentDto;
+import com.example.backend.comment.dto.CommentDto;
 import com.example.backend.member.entity.Member;
+import com.example.backend.member.entity.MemberFile;
 import com.example.backend.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Transactional
 @Service
@@ -23,6 +29,9 @@ public class CommentService {
     private final BoardRepository boardRepository;
     private final MemberRepository memberRepository;
     private final CommentRepository commentRepository;
+
+    @Value("${image.prefix}")
+    private String imagePrefix;
 
     public void add(CommentForm commentForm, Authentication authentication) {
         if (authentication == null) {
@@ -43,8 +52,31 @@ public class CommentService {
         commentRepository.save(comment);
     }
 
-    public List<Comment> findByBoardId(Integer boardId) {
-        return commentRepository.findByBoardId(boardId);
+    public List<CommentDto> findByBoardId(Integer boardId) {
+        return commentRepository.findByBoardId(boardId).stream().map(comment -> {
+            CommentDto dto = new CommentDto();
+            dto.setId(comment.getId());
+            dto.setComment(comment.getComment());
+            dto.setAuthorNickName(comment.getAuthor().getNickName());
+            dto.setAuthorEmail(comment.getAuthor().getEmail());
+
+            if (comment.getInsertedAt() != null) {
+                ZonedDateTime seoulTime = comment.getInsertedAt()
+                        .atZone(ZoneId.systemDefault()) // 또는 UTC
+                        .withZoneSameInstant(ZoneId.of("Asia/Seoul"));
+                dto.setInsertedAt(seoulTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+            }
+
+            // ✅ DTO 생성 후 profileImageUrl을 채워주는 로직
+            List<MemberFile> memberFiles = comment.getAuthor().getFiles();
+            if (memberFiles != null && !memberFiles.isEmpty()) {
+                MemberFile profileFile = memberFiles.get(0);
+                dto.setProfileImageUrl(imagePrefix + "prj3/member/" + comment.getAuthor().getId() + "/" + profileFile.getId().getName());
+            } else {
+                dto.setProfileImageUrl(null); // 또는 기본 이미지 URL
+            }
+            return dto;
+        }).collect(Collectors.toList());
     }
 
     public boolean validate(CommentDto dto) {
