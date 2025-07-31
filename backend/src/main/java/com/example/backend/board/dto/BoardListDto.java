@@ -20,6 +20,8 @@ public class BoardListDto {
     private Long countComment;
     private Long countLike;
     private Long countFile;
+    private String profileImageUrl; // 프로필 이미지 한개만, url을 담아야함
+    private Long memberId; //
 
     // 안쓰는게 아니라 프론트에서 사용하면 IJ 가 인식을 못할 뿐.
     public String getTimesAgo() {

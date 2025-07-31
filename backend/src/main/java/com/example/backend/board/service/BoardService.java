@@ -11,6 +11,8 @@ import com.example.backend.board.repository.BoardRepository;
 import com.example.backend.comment.repository.CommentRepository;
 import com.example.backend.like.repository.BoardLikeRepository;
 import com.example.backend.member.entity.Member;
+import com.example.backend.member.entity.MemberFile;
+import com.example.backend.member.repository.MemberFileRepository;
 import com.example.backend.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,6 +44,7 @@ public class BoardService {
     private final BoardLikeRepository boardLikeRepository;
     private final CommentRepository commentRepository;
     private final S3Client s3Client;
+    private final MemberFileRepository memberFileRepository;
 
     @Value("${image.prefix}")
     private String imagePrefix;
@@ -193,6 +196,42 @@ public class BoardService {
     // 게시글 리스트 조회 + 페이징
     public Map<String, Object> list(String keyword, Integer pageNumber) {
         Page<BoardListDto> boardListDtoPage = boardRepository.findAllBy(keyword, PageRequest.of(pageNumber - 1, 10));
+
+        // N+1 문제 해결을 위한 최적화
+        List<Long> memberIds = boardListDtoPage.getContent().stream()
+                .map(BoardListDto::getMemberId)
+                .distinct() // 중복 제거
+                .collect(Collectors.toList());
+
+        // 한 쿼리로 모든 memberfile 조회
+        List<MemberFile> memberFiles = memberFileRepository.findByMemberIdIn(memberIds);
+
+        // 멤버 ID별 첫 번째 프로필 이미지 URL 맵 생성
+        Map<Long, String> memberProfileImageMap = memberFiles.stream()
+                .collect(Collectors.groupingBy(mf -> mf.getMember().getId())) // 멤버 ID로 그룹화
+                .entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> {
+                            // 각 멤버의 파일 중 첫 번째 파일만 선택하여 URL 조합
+                            MemberFile firstFile = entry.getValue().stream()
+                                    .sorted((f1, f2) -> f1.getId().getName().compareTo(f2.getId().getName())) // 파일명 기준 정렬, 필요에 따라 다른 기준 사용
+                                    .findFirst()
+                                    .orElse(null);
+                            if (firstFile != null) {
+                                return imagePrefix + "prj3/member/" + entry.getKey() + "/" + firstFile.getId().getName();
+                            }
+                            return null; // 이미지가 없는 경우
+                        }
+                ));
+
+
+        // boardListDtoPage의 각 DTO에 프로필 이미지 URL 설정
+        boardListDtoPage.getContent().forEach(boardDto -> {
+            String profileImageUrl = memberProfileImageMap.get(boardDto.getMemberId());
+            boardDto.setProfileImageUrl(profileImageUrl);
+        });
+
 
         int totalPages = boardListDtoPage.getTotalPages();
         int rightPageNumber = ((pageNumber - 1) / 10 + 1) * 10;

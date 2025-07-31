@@ -22,7 +22,10 @@ public interface BoardRepository extends JpaRepository<Board, Integer> {
             
                         COUNT(DISTINCT c),
                         COUNT(DISTINCT l),
-                        COUNT(DISTINCT f))
+                        COUNT(DISTINCT f),
+            
+                        null,
+                        m.id)
             FROM Board b JOIN Member m
                         ON b.author.email = m.email
                         LEFT JOIN Comment c
@@ -34,7 +37,7 @@ public interface BoardRepository extends JpaRepository<Board, Integer> {
             WHERE b.title LIKE %:keyword%
                OR b.content LIKE %:keyword%
                OR m.nickName LIKE %:keyword%
-            GROUP BY b.id
+            GROUP BY b.id, m.nickName, b.insertedAt, m.id
             ORDER BY b.id DESC
             """)
     Page<BoardListDto> findAllBy(String keyword, Pageable pageable); // ✅ 이렇게 수정

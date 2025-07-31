@@ -5,6 +5,7 @@ import {
   Col,
   Form,
   FormControl,
+  Image,
   InputGroup,
   Pagination,
   Row,
@@ -15,6 +16,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate, useSearchParams } from "react-router";
 import { FaRegComments, FaRegImages, FaThumbsUp } from "react-icons/fa";
+import { FiUser } from "react-icons/fi";
 
 export function BoardList() {
   const [boardList, setBoardList] = useState(null);
@@ -91,6 +93,9 @@ export function BoardList() {
       </Row>
     );
   }
+
+  // 프로필 사진 없는 사람들
+  const defaultProfileImage = "/user.png";
 
   return (
     <>
@@ -183,6 +188,16 @@ export function BoardList() {
                       }}
                       title={board.nickName}
                     >
+                      <Image
+                        roundedCircle
+                        className="me-2"
+                        src={board.profileImageUrl || defaultProfileImage}
+                        alt={`${board.nickName ?? "익명"} 프로필`}
+                        style={{
+                          width: "20px",
+                          height: "20px",
+                        }}
+                      />
                       {board.nickName}
                     </td>
                     <td className="text-muted" style={{ fontSize: "0.85rem" }}>
