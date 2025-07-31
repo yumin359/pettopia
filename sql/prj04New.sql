@@ -225,3 +225,11 @@ CREATE TABLE `support`
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 # ---------------------------------------------------------------------------------
+CREATE TABLE favorite
+(
+    member_id   BIGINT(20) NOT NULL,
+    facility_id BIGINT(20) NOT NULL,
+    PRIMARY KEY (member_id, facility_id),
+    FOREIGN KEY (member_id) REFERENCES member (id) ON DELETE CASCADE,
+    FOREIGN KEY (facility_id) REFERENCES pet_facility (id) ON DELETE CASCADE
+);

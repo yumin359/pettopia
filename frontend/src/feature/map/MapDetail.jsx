@@ -1,8 +1,9 @@
-import { useParams, useNavigate } from "react-router-dom";
-import { useEffect, useState, useContext } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { useContext, useEffect, useState } from "react";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
 import ReviewPreview from "../map/ReviewPreview.jsx"; // ReviewPreview 컴포넌트 import
 import axios from "axios";
+import { FavoriteContainer } from "./FavoriteContainer.jsx";
 
 export function MapDetail() {
   const { name } = useParams();
@@ -73,7 +74,10 @@ export function MapDetail() {
 
   return (
     <div style={{ padding: "2rem", maxWidth: "700px", margin: "0 auto" }}>
-      <h2>시설명: {decodedName}</h2>
+      <div>
+        <h2>시설명: {decodedName}</h2>
+        <FavoriteContainer facilityName={decodedName} />
+      </div>
 
       {user ? (
         <button
