@@ -188,7 +188,13 @@ export function BoardList() {
           </Table>
 
           {/* 공지 버튼 하단 배치 */}
-          {isAdmin && (
+          {isAdmin && typeof isAdmin === "function" ? isAdmin() && (
+            <div className="d-flex justify-content-end my-3">
+              <Button variant="warning" onClick={handleNoticeAdd}>
+                공지 작성
+              </Button>
+            </div>
+          ) : isAdmin && (
             <div className="d-flex justify-content-end my-3">
               <Button variant="warning" onClick={handleNoticeAdd}>
                 공지 작성
