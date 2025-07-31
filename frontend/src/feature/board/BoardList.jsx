@@ -12,11 +12,12 @@ import {
   Spinner,
   Table,
 } from "react-bootstrap";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import { useNavigate, useSearchParams } from "react-router";
 import { FaRegComments, FaRegImages, FaThumbsUp } from "react-icons/fa";
 import { FiUser } from "react-icons/fi";
+import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
 
 export function BoardList() {
   const [boardList, setBoardList] = useState(null);
@@ -24,8 +25,9 @@ export function BoardList() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [pageInfo, setPageInfo] = useState(null);
   const keyword = searchParams.get("q") ?? "";
-  const navigate = useNavigate();
   const [keywords, setKeywords] = useState("");
+  const navigate = useNavigate();
+  const { isAdmin } = useContext(AuthenticationContext);
 
   useEffect(() => {
     setKeywords(searchParams.get("q") ?? "");
@@ -120,33 +122,33 @@ export function BoardList() {
               className="align-middle"
             >
               <thead>
-                <tr style={{ fontSize: "0.85rem", color: "#6c757d" }}>
-                  <th style={{ width: "45px" }}>#</th>
-                  <th style={{ width: "45px" }}>
-                    <FaThumbsUp size={14} className="text-secondary" />
-                  </th>
-                  <th style={{ width: "100%" }}>제목</th>
-                  <th style={{ width: "35%" }}>작성자</th>
-                  <th style={{ width: "50%" }}>작성일시</th>
-                </tr>
+              <tr style={{ fontSize: "0.85rem", color: "#6c757d" }}>
+                <th style={{ width: "45px" }}>#</th>
+                <th style={{ width: "45px" }}>
+                  <FaThumbsUp size={14} className="text-secondary" />
+                </th>
+                <th style={{ width: "100%" }}>제목</th>
+                <th style={{ width: "35%" }}>작성자</th>
+                <th style={{ width: "50%" }}>작성일시</th>
+              </tr>
               </thead>
               <tbody>
-                {boardList.map((board) => (
-                  <tr
-                    key={board.id}
-                    style={{
-                      cursor: "pointer",
-                      fontSize: "0.95rem",
-                      verticalAlign: "middle",
-                    }}
-                    onClick={() => handleTableRowClick(board.id)}
-                  >
-                    <td className="text-muted">{board.id}</td>
-                    <td className="text-muted" style={{ fontSize: "0.85em" }}>
-                      {board.countLike}
-                    </td>
-                    <td>
-                      <div className="d-flex gap-2 align-items-center">
+              {boardList.map((board) => (
+                <tr
+                  key={board.id}
+                  style={{
+                    cursor: "pointer",
+                    fontSize: "0.95rem",
+                    verticalAlign: "middle",
+                  }}
+                  onClick={() => handleTableRowClick(board.id)}
+                >
+                  <td className="text-muted">{board.id}</td>
+                  <td className="text-muted" style={{ fontSize: "0.85em" }}>
+                    {board.countLike}
+                  </td>
+                  <td>
+                    <div className="d-flex gap-2 align-items-center">
                         <span
                           className="fw-semibold text-dark"
                           style={{
@@ -159,15 +161,14 @@ export function BoardList() {
                           {board.title}
                         </span>
 
-                        {board.countComment > 0 && (
-                          <Badge bg="light" text="dark">
-                            <div className="d-flex gap-1">
-                              <FaRegComments />
-                              <span>{board.countComment}</span>
-                            </div>
-                          </Badge>
-                        )}
-
+                      {board.countComment > 0 && (
+                        <Badge bg="light" text="dark">
+                          <div className="d-flex gap-1">
+                            <FaRegComments />
+                            <span>{board.countComment}</span>
+                          </div>
+                        </Badge>
+                      )}
                         {board.countFile > 0 && (
                           <Badge bg="info">
                             <div className="d-flex gap-1">
@@ -205,6 +206,33 @@ export function BoardList() {
                     </td>
                   </tr>
                 ))}
+                      {board.countFile > 0 && (
+                        <Badge bg="warning" text="dark">
+                          <div className="d-flex gap-1">
+                            <FaRegImages />
+                            <span>{board.countFile}</span>
+                          </div>
+                        </Badge>
+                      )}
+                    </div>
+                  </td>
+                  <td
+                    className="text-muted"
+                    style={{
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      fontSize: "0.85rem",
+                    }}
+                    title={board.nickName}
+                  >
+                    {board.nickName}
+                  </td>
+                  <td className="text-muted" style={{ fontSize: "0.85rem" }}>
+                    {board.timesAgo}
+                  </td>
+                </tr>
+              ))}
               </tbody>
             </Table>
           ) : (
@@ -224,19 +252,21 @@ export function BoardList() {
             style={{ maxWidth: "900px", margin: "0 auto", paddingRight: 0 }}
           >
             <div className="d-flex flex-column gap-3 align-items-center">
+              {/* 관리자만 버튼 보임 */}
               <div className="d-flex justify-content-end w-100">
-                <Button
-                  variant="primary"
-                  size="sm"
-                  className="mb-2"
-                  onClick={() => navigate("/board/add")}
-                  style={{ minWidth: "100px" }}
-                >
-                  공지 작성
-                </Button>
+                {isAdmin() && (
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    className="mb-2"
+                    onClick={() => navigate("/board/add")}
+                    style={{ minWidth: "100px" }}
+                  >
+                    공지 작성
+                  </Button>
+                )}
               </div>
 
-              {/* 🔵 Pagination 버튼 */}
               <Pagination className="mb-2" size="sm">
                 <Pagination.First
                   disabled={pageInfo.currentPageNumber === 1}
@@ -258,8 +288,8 @@ export function BoardList() {
                     className="rounded"
                     variant={
                       pageInfo.currentPageNumber === num
-                        ? "primary"
-                        : "outline-secondary"
+                        ? "warning"
+                        : "outline-warning"
                     }
                   >
                     {num}
@@ -279,7 +309,6 @@ export function BoardList() {
                 />
               </Pagination>
 
-              {/* 🔍 검색창 */}
               <Form onSubmit={handleSearchFormSubmit} style={{ width: "100%" }}>
                 <InputGroup size="sm">
                   <FormControl
@@ -288,7 +317,7 @@ export function BoardList() {
                     onChange={(e) => setKeywords(e.target.value)}
                     className="rounded-start"
                   />
-                  <Button type="submit" className="rounded-end">
+                  <Button type="submit" variant="warning" className="rounded-end text-dark">
                     검색
                   </Button>
                 </InputGroup>

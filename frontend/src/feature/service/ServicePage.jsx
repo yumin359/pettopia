@@ -90,7 +90,7 @@ export default function ServicePage() {
           />
         </Form.Group>
 
-        <Button type="submit" disabled={loading}>
+        <Button type="submit" disabled={loading} variant="warning">
           {loading ? "전송 중..." : "문의 보내기"}
         </Button>
       </Form>

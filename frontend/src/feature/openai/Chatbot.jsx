@@ -116,7 +116,7 @@ export function Chatbot() {
           placeholder="메시지를 입력하세요..."
           style={{ resize: "none" }}
         />
-        <Button onClick={handleSend} variant="primary" disabled={loading}>
+        <Button onClick={handleSend} variant="primary" disabled={loading} variant="warning">
           전송
         </Button>
       </InputGroup>
