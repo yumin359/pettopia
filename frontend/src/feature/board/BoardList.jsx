@@ -5,6 +5,7 @@ import {
   Col,
   Form,
   FormControl,
+  Image,
   InputGroup,
   Pagination,
   Row,
@@ -15,6 +16,7 @@ import { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import { useNavigate, useSearchParams } from "react-router";
 import { FaRegComments, FaRegImages, FaThumbsUp } from "react-icons/fa";
+import { FiUser } from "react-icons/fi";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
 
 export function BoardList() {
@@ -94,6 +96,9 @@ export function BoardList() {
     );
   }
 
+  // 프로필 사진 없는 사람들
+  const defaultProfileImage = "/user.png";
+
   return (
     <>
       <Row className="justify-content-center">
@@ -164,7 +169,43 @@ export function BoardList() {
                           </div>
                         </Badge>
                       )}
-
+                        {board.countFile > 0 && (
+                          <Badge bg="info">
+                            <div className="d-flex gap-1">
+                              <FaRegImages />
+                              <span>{board.countFile}</span>
+                            </div>
+                          </Badge>
+                        )}
+                      </div>
+                    </td>
+                    <td
+                      className="text-muted"
+                      style={{
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        fontSize: "0.85rem",
+                      }}
+                      title={board.nickName}
+                    >
+                      <Image
+                        roundedCircle
+                        className="me-2"
+                        src={board.profileImageUrl || defaultProfileImage}
+                        alt={`${board.nickName ?? "익명"} 프로필`}
+                        style={{
+                          width: "20px",
+                          height: "20px",
+                        }}
+                      />
+                      {board.nickName}
+                    </td>
+                    <td className="text-muted" style={{ fontSize: "0.85rem" }}>
+                      {board.timesAgo}
+                    </td>
+                  </tr>
+                ))}
                       {board.countFile > 0 && (
                         <Badge bg="warning" text="dark">
                           <div className="d-flex gap-1">
