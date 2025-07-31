@@ -1,10 +1,18 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { Table, Alert, Spinner } from "react-bootstrap";
+import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx"; // 경로 맞게 수정
+import { Navigate } from "react-router-dom";
 
 export default function ServiceListPage() {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const { isAdmin } = useContext(AuthenticationContext);
+
+  // 관리자 아니면 접근 제한
+  if (!(typeof isAdmin === "function" ? isAdmin() : isAdmin)) {
+    return <Navigate to="/login" replace />; // 로그인 페이지나 권한없음 페이지로 리다이렉트
+  }
 
   useEffect(() => {
     async function fetchServices() {

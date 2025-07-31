@@ -1,5 +1,5 @@
 import { useContext, useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, Navigate } from "react-router";
 import axios from "axios";
 import { toast } from "react-toastify";
 import {
@@ -12,7 +12,6 @@ import {
   Modal,
   Row,
   Spinner,
-  Form, // Import Form component from react-bootstrap
 } from "react-bootstrap";
 import { FaFileAlt, FaSave, FaTimes, FaTrashAlt } from "react-icons/fa";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
@@ -21,19 +20,28 @@ export function BoardAdd() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [files, setFiles] = useState([]);
-  const [isPrivate, setIsPrivate] = useState(false); // New state for private checkbox
+  const [isPrivate, setIsPrivate] = useState(false); // private 체크박스 상태
   const [modalShow, setModalShow] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const { user } = useContext(AuthenticationContext);
+  const { user, isAdmin } = useContext(AuthenticationContext);
   const navigate = useNavigate();
 
-  if (!user) return null;
+  // 로그인 여부 체크
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // 관리자 권한 체크
+  const adminCheck = typeof isAdmin === "function" ? isAdmin() : isAdmin;
+  if (!adminCheck) {
+    return <Navigate to="/unauthorized" replace />; // 권한없음 페이지 없으면 "/login" 등으로 변경
+  }
 
   const isValid =
     title.trim() !== "" && (content.trim() !== "" || files.length > 0);
 
-  // 파일 첨부 시 처리하는 함수
+  // 파일 첨부 시 처리 함수
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
     setFiles((prevFiles) => {
@@ -41,17 +49,18 @@ export function BoardAdd() {
         file,
         previewUrl: file.type.startsWith("image/")
           ? URL.createObjectURL(file)
-          : null, // 이미지 파일일 경우 미리보기 URL 생성
+          : null,
       }));
       return [...prevFiles, ...newFiles];
     });
   };
 
-  // 파일 삭제 시 처리하는 함수
+  // 파일 삭제 시 처리 함수
   const handleFileRemove = (idx) => {
     setFiles(files.filter((_, i) => i !== idx));
   };
 
+  // 저장 버튼 클릭 시 처리
   const handleSaveButtonClick = () => {
     if (!isValid) {
       toast.warning(
@@ -65,7 +74,7 @@ export function BoardAdd() {
     const formData = new FormData();
     formData.append("title", title);
     formData.append("content", content);
-    formData.append("isPrivate", isPrivate); // Append isPrivate state to formData
+    formData.append("isPrivate", isPrivate);
     files.forEach((fileObj) => formData.append("files", fileObj.file));
 
     axios
@@ -128,7 +137,7 @@ export function BoardAdd() {
               />
             </FormGroup>
 
-            {/* 파일 첨부된 목록 먼저 보여줌 */}
+            {/* 파일 첨부 목록 */}
             {files.length > 0 && (
               <div className="mb-4">
                 <ListGroup>
@@ -137,7 +146,6 @@ export function BoardAdd() {
                       key={idx}
                       className="d-flex justify-content-between align-items-center"
                     >
-                      {/* 미리보기 이미지 왼쪽에 배치 */}
                       {fileObj.previewUrl && (
                         <img
                           src={fileObj.previewUrl}
@@ -146,12 +154,11 @@ export function BoardAdd() {
                             width: "50px",
                             height: "50px",
                             objectFit: "cover",
-                            marginRight: "10px", // 이미지와 파일명 간의 간격 조정
+                            marginRight: "10px",
                           }}
                         />
                       )}
 
-                      {/* 파일명과 삭제 버튼 오른쪽에 배치 */}
                       <div className="d-flex justify-content-between align-items-center w-100">
                         <span className="text-truncate d-flex align-items-center gap-2">
                           <FaFileAlt /> {fileObj.file.name}
@@ -172,7 +179,6 @@ export function BoardAdd() {
               </div>
             )}
 
-            {/* 그리고 나서 파일 선택 input */}
             <FormGroup className="mb-4">
               <FormControl
                 type="file"
@@ -181,6 +187,20 @@ export function BoardAdd() {
                 disabled={isProcessing}
               />
             </FormGroup>
+
+            {/* private 체크박스 */}
+            <Form.Group
+              controlId="formPrivate"
+              className="mb-3"
+            >
+              <Form.Check
+                type="checkbox"
+                label="비공개 게시물"
+                checked={isPrivate}
+                onChange={(e) => setIsPrivate(e.target.checked)}
+                disabled={isProcessing}
+              />
+            </Form.Group>
 
             {/* 작성자 표시 */}
             <Row className="text-muted mb-3" style={{ fontSize: "0.9rem" }}>
