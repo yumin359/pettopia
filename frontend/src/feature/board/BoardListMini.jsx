@@ -95,17 +95,9 @@ export function BoardListMini() {
               {board.title}
             </span>
 
-              {board.countComment > 0 && (
-                <Badge bg="light" text="dark">
-                  <div className="d-flex align-items-center gap-1">
-                    <FaRegComments />
-                    <span>{board.countComment}</span>
-                  </div>
-                </Badge>
-              )}
               {board.countFile > 0 && (
-                <Badge bg="info">
-                  <div className="d-flex align-items-center gap-1">
+                <Badge bg="warning" text="dark">
+                  <div className="d-flex gap-1">
                     <FaRegImages />
                     <span>{board.countFile}</span>
                   </div>
