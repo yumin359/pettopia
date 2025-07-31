@@ -112,7 +112,11 @@ export function BoardDetail() {
                         src={file}
                         alt={`첨부 이미지 ${idx + 1}`}
                         className="shadow rounded"
-                        style={{ maxWidth: "100%", objectFit: "contain" }}
+                        style={{
+                          width: "500px",
+                          height: "500px",
+                          objectFit: "cover",
+                        }}
                       />
                     ))}
                 </div>
