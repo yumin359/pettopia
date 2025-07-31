@@ -268,6 +268,14 @@ public class BoardService {
                     .collect(Collectors.toList());
             dto.setFiles(fileUrls);
 
+            List<MemberFile> memberFiles = b.getAuthor().getFiles();
+            String profileImageUrl = "";
+            if (memberFiles != null && !memberFiles.isEmpty()) {
+                MemberFile profileFile = memberFiles.get(0);
+                profileImageUrl = imagePrefix + "prj3/member/" + b.getAuthor().getId() + "/" + profileFile.getId().getName();
+            }
+            dto.setProfileImageUrl(profileImageUrl);
+
             return dto;
         });
     }

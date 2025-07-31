@@ -6,6 +6,7 @@ import {
   Button,
   Card,
   Col,
+  Image,
   ListGroup,
   ListGroupItem,
   Modal,
@@ -18,6 +19,7 @@ import { AuthenticationContext } from "../../common/AuthenticationContextProvide
 import { CommentContainer } from "../comment/CommentContainer.jsx";
 import { LikeContainer } from "../like/LikeContainer.jsx";
 import { FaDownload, FaEdit, FaTrashAlt } from "react-icons/fa";
+import { FiUser } from "react-icons/fi";
 
 export function BoardDetail() {
   const [board, setBoard] = useState(null);
@@ -68,6 +70,9 @@ export function BoardDetail() {
   const formattedInsertedAt = board.insertedAt
     ? board.insertedAt.substring(0, 16)
     : "";
+
+  // 프로필 사진 없는 사람들
+  const defaultProfileImage = "/user.png";
 
   return (
     <Row className="justify-content-center my-4">
@@ -163,6 +168,16 @@ export function BoardDetail() {
             <Row className="text-muted mb-3" style={{ fontSize: "0.9rem" }}>
               <Col xs={6}>
                 <div>
+                  <Image
+                    roundedCircle
+                    className="me-2"
+                    src={board.profileImageUrl || defaultProfileImage}
+                    alt={`${board.authorNickName ?? "익명"} 프로필`}
+                    style={{
+                      width: "20px",
+                      height: "20px",
+                    }}
+                  />
                   <strong>작성자</strong>
                   <div>{board.authorNickName}</div>
                 </div>

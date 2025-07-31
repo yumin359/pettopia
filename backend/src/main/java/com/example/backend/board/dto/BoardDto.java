@@ -19,4 +19,5 @@ public class BoardDto {
     private LocalDateTime insertedAt;
 
     private List<String> files;
+    private String profileImageUrl;
 }
