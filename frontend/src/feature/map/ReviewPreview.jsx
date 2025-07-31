@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ListGroup,
   ListGroupItem,
@@ -6,10 +6,13 @@ import {
   Image,
   Row,
   Col,
+  Modal,
 } from "react-bootstrap";
-import { FaDownload } from "react-icons/fa";
 
 function ReviewPreview({ review }) {
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [modalImageUrl, setModalImageUrl] = useState("");
+
   const renderStars = (rating) =>
     [...Array(5)].map((_, i) => (
       <span
@@ -34,6 +37,15 @@ function ReviewPreview({ review }) {
 
   const isImageFile = (fileUrl) => {
     return /\.(jpg|jpeg|png|gif|webp)$/i.test(fileUrl.split("?")[0]);
+  };
+
+  const handleImageClick = (imageUrl) => {
+    setModalImageUrl(imageUrl);
+    setShowImageModal(true);
+  };
+  const handleCloseImageModal = () => {
+    setShowImageModal(false);
+    setModalImageUrl("");
   };
 
   // 프로필 사진 없는 사람들
@@ -63,17 +75,27 @@ function ReviewPreview({ review }) {
 
       {/* 첨부 파일 처리 */}
       {Array.isArray(review.files) && review.files.length > 0 && (
-        <div className="mb-3">
+        <div
+          className="mb-3"
+          style={{ overflowX: "auto", whiteSpace: "nowrap" }}
+        >
           {/* 이미지 미리보기 */}
           {review.files.filter(isImageFile).length > 0 && (
-            <div className="flex flex-row flex-wrap gap-3 mb-3">
+            <div className="d-flex gap-3 mb-3">
               {review.files.filter(isImageFile).map((fileUrl, idx) => (
                 <Image
                   key={idx}
                   src={fileUrl}
                   alt={`첨부 이미지 ${idx + 1}`}
                   className="shadow rounded"
-                  style={{ maxWidth: "100px", objectFit: "contain" }}
+                  style={{
+                    width: "150px",
+                    height: "150px",
+                    objectFit: "cover",
+                    display: "inline-block",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => handleImageClick(fileUrl)}
                 />
               ))}
             </div>
@@ -85,6 +107,35 @@ function ReviewPreview({ review }) {
       <p style={{ margin: "0.5rem 0", whiteSpace: "pre-wrap" }}>
         {review.review}
       </p>
+
+      {/* ✅ 이미지 모달 컴포넌트 */}
+      <Modal
+        show={showImageModal}
+        onHide={handleCloseImageModal} // 배경 클릭 또는 Esc 키로 닫기
+        dialogClassName="fullscreen-modal" // ✅ 풀스크린 모달을 위한 클래스 추가
+        backdropClassName="slightly-dark-backdrop" // ✅ 검은색 배경을 위한 클래스 추가
+        centered // 중앙 정렬 (fullscreen에서는 큰 의미 없지만 유지)
+        fullscreen // ✅ 화면 전체를 차지하도록 설정
+      >
+        <Modal.Body
+          className="d-flex justify-content-center align-items-center bg-black" // ✅ 배경 검은색, 이미지 중앙 정렬
+          onClick={handleCloseImageModal} // ✅ 이미지 클릭 시 모달 닫기 기능 추가
+          style={{ cursor: "zoom-out" }} // ✅ 닫을 수 있음을 시각적으로 알림
+        >
+          {/* 이미지가 모달 너비/높이에 맞춰지고, 비율 유지하며 채움 */}
+          <Image
+            src={modalImageUrl}
+            fluid
+            alt="확대 이미지"
+            style={{
+              maxHeight: "70%", // 모달 바디 높이에 맞춤
+              maxWidth: "70%", // 모달 바디 너비에 맞춤
+              objectFit: "contain", // 이미지가 잘리지 않고 전체 보이도록
+            }}
+          />
+        </Modal.Body>
+        {/* Modal.Footer 제거 */}
+      </Modal>
 
       {/*/!* 더보기 버튼 *!/*/}
       {/*{clampedIds.includes(r.id) && (*/}
