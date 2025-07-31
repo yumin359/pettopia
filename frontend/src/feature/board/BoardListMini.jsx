@@ -96,7 +96,7 @@ export function BoardListMini() {
             </span>
 
               {board.countFile > 0 && (
-                <Badge bg="warning" text="dark">
+                <Badge bg="warning" text="white">
                   <div className="d-flex gap-1">
                     <FaRegImages />
                     <span>{board.countFile}</span>

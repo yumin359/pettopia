@@ -162,7 +162,7 @@ export function BoardList() {
                         </span>
 
                         {board.countComment > 0 && (
-                          <Badge bg="light" text="dark">
+                          <Badge bg="light" text="dark" >
                             <div className="d-flex gap-1">
                               <FaRegComments />
                               <span>{board.countComment}</span>
@@ -171,7 +171,7 @@ export function BoardList() {
                         )}
                         {/* ✅ 여기만 남기고 중복된 board.countFile Badge는 제거했습니다. */}
                         {board.countFile > 0 && (
-                          <Badge bg="info">
+                          <Badge bg="warning">
                             <div className="d-flex gap-1">
                               <FaRegImages />
                               <span>{board.countFile}</span>
