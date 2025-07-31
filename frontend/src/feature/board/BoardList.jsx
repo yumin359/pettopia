@@ -67,8 +67,9 @@ export function BoardList() {
   }
 
   function handleNoticeAdd() {
-    navigate("/notice/add");
+    navigate("/board/add");
   }
+
 
   const pageNumbers = [];
   if (pageInfo) {
