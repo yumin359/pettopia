@@ -202,7 +202,7 @@ const SearchResultList = ({
             <p className="small mb-0">로딩 중...</p>
           </div>
         </div>
-      ) : favoriteMarkers.length === 0 ? (
+      ) : favoriteMarkers.length === 0 && isShowingFavorites ? (
         <div className="text-center text-muted py-3 flex-grow-1 d-flex align-items-center justify-content-center">
           <div>
             <div className="mb-2">😴</div>
