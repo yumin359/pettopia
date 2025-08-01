@@ -1,5 +1,6 @@
-package com.example.backend.petFacility;
+package com.example.backend.petFacility.repository;
 
+import com.example.backend.petFacility.entity.PetFacility;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

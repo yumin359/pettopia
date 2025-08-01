@@ -1,7 +1,7 @@
 package com.example.backend.favorite.entity;
 
 import com.example.backend.member.entity.Member;
-import com.example.backend.petFacility.PetFacility;
+import com.example.backend.petFacility.entity.PetFacility;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

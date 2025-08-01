@@ -12,6 +12,8 @@ const KakaoMapComponent = ({
   facilities,
   categoryColors,
   handleListItemClick,
+  favoriteMarkers,
+  isShowingFavorites,
 }) => {
   const mapContainer = useRef(null);
   const mapInstance = useRef(null);
@@ -90,15 +92,19 @@ const KakaoMapComponent = ({
     initializeMap();
   }, [setIsMapReady, setError]);
 
+  // 기본 필터 마커 처리
   useEffect(() => {
     if (!mapInstance.current || !isMapReady) return;
 
     markersRef.current.forEach((marker) => marker.setMap(null));
     markersRef.current = [];
 
-    if (!facilities || facilities.length === 0) return;
+    // const allFacilities = [...facilities, ...favoriteMarkers];
+    const markersToShow = isShowingFavorites ? favoriteMarkers : facilities;
 
-    const newMarkers = facilities
+    if (!markersToShow || markersToShow.length === 0) return;
+
+    const newMarkers = markersToShow
       .map((facility) => {
         if (
           typeof facility.latitude !== "number" ||
@@ -182,6 +188,7 @@ const KakaoMapComponent = ({
     createCustomMarker,
     createStyledInfoWindow,
     categoryColors,
+    favoriteMarkers,
   ]);
 
   return (

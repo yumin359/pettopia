@@ -10,6 +10,8 @@ import {
   fallbackCategories2,
   fallbackRegions,
 } from "./data/fallbackSigunguData.jsx";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const ITEMS_PER_PAGE = 15;
 
@@ -22,6 +24,7 @@ const FullFilterKakaoMap = () => {
   const [totalElements, setTotalElements] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
   const [hasSearched, setHasSearched] = useState(false); // 검색 여부 상태 추가
+  const [isShowingFavorites, setIsShowingFavorites] = useState(false); // 찜 목록 표시 전용 상태
 
   // 기본 필터 상태들
   const [selectedRegion, setSelectedRegion] = useState("전체");
@@ -37,6 +40,9 @@ const FullFilterKakaoMap = () => {
   const [regions, setRegions] = useState([]);
   const [sigungus, setSigungus] = useState([]);
   const [categories2, setCategories2] = useState([]);
+
+  // 찜(저장) 목록 가져오는
+  const [favoriteMarkers, setFavoriteMarkers] = useState([]);
 
   // ⚠️ 반려동물 크기 옵션 (정리가 안되었어..)
   const petSizeOptions = [
@@ -235,6 +241,7 @@ const FullFilterKakaoMap = () => {
   // 검색 실행 함수
   const handleSearch = () => {
     setHasSearched(true);
+    setIsShowingFavorites(false); // 검색하기로 전환
     setCurrentPage(0);
     console.log("검색 실행 - 필터 상태:", {
       selectedRegion,
@@ -297,6 +304,27 @@ const FullFilterKakaoMap = () => {
     setFunction(newSet);
   };
 
+  // 찜 목록 불러오기 함수
+  async function loadFavoriteMarkers() {
+    try {
+      const response = await axios.get("/api/favorite/mine", {
+        withCredentials: true,
+      });
+      const data = response.data;
+      if (!data || data.length === 0) {
+        toast.info("저장된 시설이 없습니다.");
+        setFavoriteMarkers([]);
+        return;
+      }
+      console.log(data);
+      setFavoriteMarkers(data);
+      setIsShowingFavorites(true); // 찜 목록 모드로 전환
+    } catch (error) {
+      console.error("찜 목록 불러오기 실패", error);
+      toast.error("찜 목록을 불러오지 못했습니다.");
+    }
+  }
+
   if (error) {
     return (
       <div
@@ -345,6 +373,7 @@ const FullFilterKakaoMap = () => {
           setFacilityType={setFacilityType}
           categoryColors={categoryColors}
           onSearch={handleSearch}
+          onLoadFavorites={loadFavoriteMarkers} // 찜 목록 불러오기 함수 전달
         />
 
         <SearchResultList
@@ -358,6 +387,8 @@ const FullFilterKakaoMap = () => {
           categoryColors={categoryColors}
           ITEMS_PER_PAGE={ITEMS_PER_PAGE}
           hasSearched={hasSearched}
+          isShowingFavorites={isShowingFavorites} // 찜 활성화 상태
+          favoriteMarkers={favoriteMarkers} // 찜 목록 데이터 전달
         />
 
         <KakaoMapComponent
@@ -366,8 +397,10 @@ const FullFilterKakaoMap = () => {
           isDataLoading={isDataLoading}
           setError={setError}
           facilities={hasSearched ? facilities : []} // 검색 전에는 빈 배열
+          isShowingFavorites={isShowingFavorites} // 찜 활성화 상태
           categoryColors={categoryColors}
           handleListItemClick={handleListItemClick}
+          favoriteMarkers={favoriteMarkers} // 찜 목록 데이터 전달
         />
       </div>
     </div>
