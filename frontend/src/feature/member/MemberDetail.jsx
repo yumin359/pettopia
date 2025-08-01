@@ -225,14 +225,6 @@ export function MemberDetail() {
                 >
                   로그아웃
                 </Button>
-                <Button
-                  variant="info"
-                  onClick={handleFavoriteListClick}
-                  className="d-flex align-items-center "
-                >
-                  <GrFavorite />찜 보러가기
-                  {/* 위치 옮기기, 색깔, 아이콘 또 써야지 */}
-                </Button>
               </div>
             )}
           </Card.Body>
