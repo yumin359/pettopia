@@ -13,6 +13,7 @@ const KakaoMapComponent = ({
   categoryColors,
   handleListItemClick,
   favoriteMarkers,
+  isShowingFavorites,
 }) => {
   const mapContainer = useRef(null);
   const mapInstance = useRef(null);
@@ -98,11 +99,12 @@ const KakaoMapComponent = ({
     markersRef.current.forEach((marker) => marker.setMap(null));
     markersRef.current = [];
 
-    const allFacilities = [...facilities, ...favoriteMarkers];
+    // const allFacilities = [...facilities, ...favoriteMarkers];
+    const markersToShow = isShowingFavorites ? favoriteMarkers : facilities;
 
-    if (!facilities || facilities.length === 0) return;
+    if (!markersToShow || markersToShow.length === 0) return;
 
-    const newMarkers = allFacilities
+    const newMarkers = markersToShow
       .map((facility) => {
         if (
           typeof facility.latitude !== "number" ||

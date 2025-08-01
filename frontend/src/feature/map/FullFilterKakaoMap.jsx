@@ -24,6 +24,7 @@ const FullFilterKakaoMap = () => {
   const [totalElements, setTotalElements] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
   const [hasSearched, setHasSearched] = useState(false); // 검색 여부 상태 추가
+  const [isShowingFavorites, setIsShowingFavorites] = useState(false); // 찜 목록 표시 전용 상태
 
   // 기본 필터 상태들
   const [selectedRegion, setSelectedRegion] = useState("전체");
@@ -240,6 +241,7 @@ const FullFilterKakaoMap = () => {
   // 검색 실행 함수
   const handleSearch = () => {
     setHasSearched(true);
+    setIsShowingFavorites(false); // 검색하기로 전환
     setCurrentPage(0);
     console.log("검색 실행 - 필터 상태:", {
       selectedRegion,
@@ -316,6 +318,7 @@ const FullFilterKakaoMap = () => {
       }
       console.log(data);
       setFavoriteMarkers(data);
+      setIsShowingFavorites(true); // 찜 목록 모드로 전환
     } catch (error) {
       console.error("찜 목록 불러오기 실패", error);
       toast.error("찜 목록을 불러오지 못했습니다.");
@@ -392,6 +395,7 @@ const FullFilterKakaoMap = () => {
           isDataLoading={isDataLoading}
           setError={setError}
           facilities={hasSearched ? facilities : []} // 검색 전에는 빈 배열
+          isShowingFavorites={isShowingFavorites} // 찜 활성화 상태
           categoryColors={categoryColors}
           handleListItemClick={handleListItemClick}
           favoriteMarkers={favoriteMarkers} // 찜 목록 데이터 전달
