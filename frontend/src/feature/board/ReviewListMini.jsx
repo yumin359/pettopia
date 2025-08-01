@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { Button, Card, Col, Image, Row, Spinner } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { ReviewLikeContainer } from "../like/ReviewLikeContainer"; // ✅ 추가된 import
+import { ReviewLikeContainer } from "../like/ReviewLikeContainer";
 
 export function ReviewListMini() {
   const [reviews, setReviews] = useState(null);
@@ -53,7 +53,8 @@ export function ReviewListMini() {
     );
   }
 
-  const isImageFile = (fileUrl) => /\.(jpg|jpeg|png|gif|webp)$/i.test(fileUrl.split("?")[0]);
+  const isImageFile = (fileUrl) =>
+    /\.(jpg|jpeg|png|gif|webp)$/i.test(fileUrl.split("?")[0]);
 
   function handleFacilityButton(facilityName) {
     navigate(`/facility/${encodeURIComponent(facilityName)}`);
@@ -86,7 +87,7 @@ export function ReviewListMini() {
                 className="shadow-sm border-0 p-3"
                 style={{ backgroundColor: "#fdfaf4" }}
               >
-                {/* 상단: 시설명 + 별점 */}
+                {/* 상단: 시설명 + 별점 + 평점 숫자 */}
                 <div className="d-flex justify-content-between align-items-center mb-2">
                   <div
                     className="fw-semibold hover-underline-on-hover"
@@ -95,7 +96,17 @@ export function ReviewListMini() {
                   >
                     {r.facilityName}
                   </div>
-                  <div className="text-warning small">{"★".repeat(r.rating)}</div>
+                  <div
+                    className="small"
+                    style={{ fontWeight: "bold", display: "flex", alignItems: "center" }}
+                  >
+                    <span style={{ color: "#f0ad4e", fontSize: "1.1rem" }}>
+                      {"★".repeat(r.rating)}
+                    </span>
+                    <span style={{ color: "#212529", marginLeft: "6px", fontSize: "1rem" }}>
+                      {r.rating}
+                    </span>
+                  </div>
                 </div>
                 <hr className="mt-1 border-gray-300" />
 
@@ -145,7 +156,7 @@ export function ReviewListMini() {
 
                 {/* 좋아요 버튼 */}
                 <div className="mt-3 d-flex align-items-center gap-2">
-                  <ReviewLikeContainer reviewId={r.id} /> {/* ✅ 여기만 바뀜 */}
+                  <ReviewLikeContainer reviewId={r.id} />
                 </div>
 
                 {/* 작성자 & 날짜 */}

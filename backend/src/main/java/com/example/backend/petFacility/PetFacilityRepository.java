@@ -69,6 +69,6 @@ public interface PetFacilityRepository extends JpaRepository<PetFacility, Long> 
     @Query("SELECT DISTINCT pf.allowedPetSize FROM PetFacility pf WHERE pf.allowedPetSize IS NOT NULL AND pf.allowedPetSize != '' ORDER BY pf.allowedPetSize")
     List<String> findDistinctAllowedPetSize();
 
-    // 찜 사용
+    // 단일 시설명으로 조회 (추가)
     Optional<PetFacility> findByName(String facilityName);
 }
