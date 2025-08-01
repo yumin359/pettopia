@@ -10,6 +10,8 @@ import {
   fallbackCategories2,
   fallbackRegions,
 } from "./data/fallbackSigunguData.jsx";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const ITEMS_PER_PAGE = 15;
 
@@ -37,6 +39,9 @@ const FullFilterKakaoMap = () => {
   const [regions, setRegions] = useState([]);
   const [sigungus, setSigungus] = useState([]);
   const [categories2, setCategories2] = useState([]);
+
+  // 찜(저장) 목록 가져오는
+  const [favoriteMarkers, setFavoriteMarkers] = useState([]);
 
   // ⚠️ 반려동물 크기 옵션 (정리가 안되었어..)
   const petSizeOptions = [
@@ -297,6 +302,26 @@ const FullFilterKakaoMap = () => {
     setFunction(newSet);
   };
 
+  // 찜 목록 불러오기 함수
+  async function loadFavoriteMarkers() {
+    try {
+      const response = await axios.get("/api/favorite/mine", {
+        withCredentials: true,
+      });
+      const data = response.data;
+      if (!data || data.length === 0) {
+        toast.info("저장된 시설이 없습니다.");
+        setFavoriteMarkers([]);
+        return;
+      }
+      console.log(data);
+      setFavoriteMarkers(data);
+    } catch (error) {
+      console.error("찜 목록 불러오기 실패", error);
+      toast.error("찜 목록을 불러오지 못했습니다.");
+    }
+  }
+
   if (error) {
     return (
       <div
@@ -345,6 +370,7 @@ const FullFilterKakaoMap = () => {
           setFacilityType={setFacilityType}
           categoryColors={categoryColors}
           onSearch={handleSearch}
+          onLoadFavorites={loadFavoriteMarkers} // 찜 목록 불러오기 함수 전달
         />
 
         <SearchResultList
@@ -368,6 +394,7 @@ const FullFilterKakaoMap = () => {
           facilities={hasSearched ? facilities : []} // 검색 전에는 빈 배열
           categoryColors={categoryColors}
           handleListItemClick={handleListItemClick}
+          favoriteMarkers={favoriteMarkers} // 찜 목록 데이터 전달
         />
       </div>
     </div>

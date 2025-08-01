@@ -5,12 +5,18 @@ import com.example.backend.favorite.dto.FavoriteForm;
 import com.example.backend.favorite.entity.Favorite;
 import com.example.backend.favorite.entity.FavoriteId;
 import com.example.backend.favorite.repository.FavoriteRepository;
+import com.example.backend.member.entity.Member;
 import com.example.backend.member.repository.MemberRepository;
-import com.example.backend.petFacility.PetFacilityRepository;
+import com.example.backend.petFacility.dto.FavoriteFacilityDto;
+import com.example.backend.petFacility.entity.PetFacility;
+import com.example.backend.petFacility.repository.PetFacilityRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -67,5 +73,37 @@ public class FavoriteService {
         FavoriteDto favoriteDto = new FavoriteDto();
         favoriteDto.setIsFavorite(isFavorite);
         return favoriteDto;
+    }
+
+    public List<FavoriteFacilityDto> getMyFavorite(Authentication authentication) {
+        if (authentication == null) {
+            throw new RuntimeException("로그인 하세요");
+        }
+        // 사용자 이메일 가져와서
+        String email = authentication.getName();
+        // 사용자 있는지 확인
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("사용자 없음"));
+
+        // 그 사용자의 저장 목록이 가져오기
+        List<Favorite> favoriteList = favoriteRepository.findByMember(member);
+
+        // 없으면
+        if (favoriteList.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // 있으면 각 시설들의 정보(FFD)들을 가져와서 Map으로 보냄 -> 여러개 표시하기 위해서.
+        return favoriteList.stream()
+                .map(fav -> {
+                    PetFacility facility = fav.getFacility(); // Favorite에서 연관된 시설 가져오기
+                    return FavoriteFacilityDto.builder()
+                            .facilityId(facility.getId())
+                            .name(facility.getName())
+                            .latitude(facility.getLatitude())
+                            .longitude(facility.getLongitude())
+                            .build();
+                })
+                .collect(Collectors.toList());
     }
 }
