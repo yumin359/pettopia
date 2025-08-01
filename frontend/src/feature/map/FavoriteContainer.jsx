@@ -50,6 +50,12 @@ export function FavoriteContainer({ facilityName }) {
     );
   }
 
+  const heartStyle = {
+    fontSize: "2rem", // Adjust size as needed
+    cursor: "pointer",
+    color: favoriteInfo.isFavorite ? "red" : "#ccc", // Match button colors
+  };
+
   return (
     <OverlayTrigger
       placement="top"
@@ -63,24 +69,19 @@ export function FavoriteContainer({ facilityName }) {
         )
       }
     >
-      <Button
-        variant={favoriteInfo.isFavorite ? "primary" : "outline-secondary"}
-        size="sm"
+      <div
         onClick={user && !isProcessing ? handleFavoriteClick : undefined}
-        disabled={isProcessing || !user}
-        className="d-flex align-items-center gap-1"
+        style={{ display: "flex", alignItems: "center" }}
       >
         {isProcessing ? (
           <Spinner animation="border" size="sm" />
         ) : favoriteInfo.isFavorite ? (
-          // <FaThumbsUp />
-          <MdFavorite />
+          <MdFavorite style={heartStyle} />
         ) : (
-          // <FaRegThumbsUp />
-          <MdFavoriteBorder />
+          <MdFavoriteBorder style={heartStyle} />
         )}
-        {/*<span>{favoriteInfo.count}</span>*/}
-      </Button>
+      </div>
+      {/*</Button>*/}
     </OverlayTrigger>
   );
 }

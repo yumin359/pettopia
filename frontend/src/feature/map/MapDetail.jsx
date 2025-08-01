@@ -74,7 +74,7 @@ export function MapDetail() {
 
   return (
     <div style={{ padding: "2rem", maxWidth: "700px", margin: "0 auto" }}>
-      <div>
+      <div style={{ display: "flex", justifyContent: "space-between" }}>
         <h2>시설명: {decodedName}</h2>
         <FavoriteContainer facilityName={decodedName} />
       </div>
