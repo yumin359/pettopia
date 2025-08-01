@@ -387,6 +387,8 @@ const FullFilterKakaoMap = () => {
           categoryColors={categoryColors}
           ITEMS_PER_PAGE={ITEMS_PER_PAGE}
           hasSearched={hasSearched}
+          isShowingFavorites={isShowingFavorites} // 찜 활성화 상태
+          favoriteMarkers={favoriteMarkers} // 찜 목록 데이터 전달
         />
 
         <KakaoMapComponent
