@@ -58,13 +58,13 @@ export function FavoriteContainer({ facilityName }) {
           <Tooltip id="tooltip-login">로그인 하세요</Tooltip>
         ) : (
           <Tooltip id="tooltip-like">
-            {favoriteInfo.favorite ? "찜 취소" : "찜"}
+            {favoriteInfo.isFavorite ? "찜 취소" : "찜"}
           </Tooltip>
         )
       }
     >
       <Button
-        variant={favoriteInfo.favorite ? "primary" : "outline-secondary"}
+        variant={favoriteInfo.isFavorite ? "primary" : "outline-secondary"}
         size="sm"
         onClick={user && !isProcessing ? handleFavoriteClick : undefined}
         disabled={isProcessing || !user}
@@ -72,7 +72,7 @@ export function FavoriteContainer({ facilityName }) {
       >
         {isProcessing ? (
           <Spinner animation="border" size="sm" />
-        ) : favoriteInfo.favorite ? (
+        ) : favoriteInfo.isFavorite ? (
           // <FaThumbsUp />
           <MdFavorite />
         ) : (

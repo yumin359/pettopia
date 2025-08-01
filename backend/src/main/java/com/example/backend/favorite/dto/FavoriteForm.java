@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class FavoriteForm {
-    private Long favoriteId;
+    private String facilityName;
 //    private Long memberId; // 이건 안 받아도 되난?
 }

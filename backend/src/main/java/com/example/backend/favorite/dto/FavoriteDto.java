@@ -4,5 +4,5 @@ import lombok.Data;
 
 @Data
 public class FavoriteDto {
-    private Boolean favorite;
+    private Boolean isFavorite;
 }
