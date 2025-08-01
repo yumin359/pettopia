@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Repository
@@ -67,4 +68,7 @@ public interface PetFacilityRepository extends JpaRepository<PetFacility, Long> 
 
     @Query("SELECT DISTINCT pf.allowedPetSize FROM PetFacility pf WHERE pf.allowedPetSize IS NOT NULL AND pf.allowedPetSize != '' ORDER BY pf.allowedPetSize")
     List<String> findDistinctAllowedPetSize();
+
+    // 찜 사용
+    Optional<PetFacility> findByName(String facilityName);
 }

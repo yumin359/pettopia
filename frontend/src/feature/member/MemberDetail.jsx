@@ -18,6 +18,7 @@ import { toast } from "react-toastify";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
 import { FaDownload, FaUserCircle } from "react-icons/fa";
 import { FiUser } from "react-icons/fi";
+import { GrFavorite } from "react-icons/gr";
 
 export function MemberDetail() {
   const [member, setMember] = useState(null);
@@ -68,6 +69,12 @@ export function MemberDetail() {
         <Spinner animation="border" role="status" />
       </div>
     );
+  }
+
+  function handleFavoriteListClick() {
+    toast("작업중");
+    // 이거 누르면 찜한 목록들 왈랄라 나오도록
+    // 일단 리스트로 나오게 할건데, 나중에 지도에 표시되도록 하는 거 할 수 있나
   }
 
   // 가입일시 포맷 통일
@@ -217,6 +224,14 @@ export function MemberDetail() {
                   className="d-flex align-items-center gap-1"
                 >
                   로그아웃
+                </Button>
+                <Button
+                  variant="info"
+                  onClick={handleFavoriteListClick}
+                  className="d-flex align-items-center "
+                >
+                  <GrFavorite />찜 보러가기
+                  {/* 위치 옮기기, 색깔, 아이콘 또 써야지 */}
                 </Button>
               </div>
             )}
