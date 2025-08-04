@@ -103,6 +103,7 @@ public class FavoriteService {
                             .latitude(facility.getLatitude())
                             .longitude(facility.getLongitude())
                             .category2(facility.getCategory2())
+                            .category3(facility.getCategory3())
                             .roadAddress(facility.getRoadAddress())   // DB에 저장된 도로명 주소를 그대로 사용
                             .jibunAddress(facility.getJibunAddress()) // DB에 저장된 지번 주소를 그대로 사용
                             .phoneNumber(facility.getPhoneNumber())
@@ -112,6 +113,8 @@ public class FavoriteService {
                             .petFriendlyInfo(facility.getPetFriendlyInfo())
                             .indoorFacility(facility.getIndoorFacility())
                             .outdoorFacility(facility.getOutdoorFacility())
+                            .allowedPetSize(facility.getAllowedPetSize())
+                            .petRestrictions(facility.getPetRestrictions())
                             .build();
                 })
                 .collect(Collectors.toList());
