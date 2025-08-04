@@ -6,6 +6,7 @@ import {
   Button,
   Card,
   Col,
+  Form,
   FormControl,
   FormGroup,
   ListGroup,
@@ -189,10 +190,7 @@ export function BoardAdd() {
             </FormGroup>
 
             {/* private 체크박스 */}
-            <Form.Group
-              controlId="formPrivate"
-              className="mb-3"
-            >
+            <Form.Group controlId="formPrivate" className="mb-3">
               <Form.Check
                 type="checkbox"
                 label="비공개 게시물"

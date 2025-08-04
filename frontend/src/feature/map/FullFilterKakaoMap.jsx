@@ -13,59 +13,6 @@ import { toast } from "react-toastify";
 
 const ITEMS_PER_PAGE = 15;
 
-// 🎨 스타일 객체들을 하나로 그룹화하여 관리합니다.
-// 🎨 스타일 객체들을 하나로 그룹화하여 관리합니다.
-const styles = {
-  container: {
-    display: "grid",
-    gridTemplateAreas: `
-      "map map"
-      "filter list"
-    `,
-    // ✅ 이 부분을 수정하여 너비 비율을 조정합니다.
-    gridTemplateColumns: "300px 1fr",
-    gridTemplateRows: "45vh 1fr",
-    height: "100vh",
-    gap: "12px",
-    padding: "12px",
-    boxSizing: "border-box",
-    backgroundColor: "#f4f6f8",
-  },
-  mapArea: {
-    gridArea: "map",
-    minHeight: 0,
-    borderRadius: "8px",
-    overflow: "hidden",
-    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-  },
-  filterArea: {
-    gridArea: "filter",
-    minHeight: 0,
-    overflowY: "auto",
-    backgroundColor: "white",
-    borderRadius: "8px",
-    padding: "16px",
-    boxSizing: "border-box",
-    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-  },
-  listArea: {
-    gridArea: "list",
-    minHeight: 0,
-    overflowY: "auto",
-    backgroundColor: "white",
-    borderRadius: "8px",
-    padding: "8px 16px",
-    boxSizing: "border-box",
-    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-  },
-  errorContainer: {
-    height: "100vh",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-};
-
 const FullFilterKakaoMap = () => {
   const [error, setError] = useState(null);
   const [isMapReady, setIsMapReady] = useState(false);
@@ -96,15 +43,7 @@ const FullFilterKakaoMap = () => {
   const [favoriteMarkers, setFavoriteMarkers] = useState([]);
 
   // ⚠️ 반려동물 크기 옵션 (정리가 안되었어..)
-  const petSizeOptions = [
-    "전체",
-    "개",
-    "고양이",
-    "기타동물",
-    "소형",
-    "중형",
-    "대형",
-  ];
+  const petSizeOptions = ["전체", "개", "고양이", "기타동물"];
 
   // 카테고리별 색상 매핑 (소분류 기준)
   const categoryColors = {
