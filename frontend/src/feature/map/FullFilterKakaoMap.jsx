@@ -379,10 +379,8 @@ const FullFilterKakaoMap = () => {
   // --- 렌더링 ---
   if (error) {
     return (
-      <div
-        className="container-fluid d-flex align-items-center justify-content-center"
-        style={{ height: "80vh" }}
-      >
+      <div className="container-fluid vh-100 d-flex align-items-center justify-content-center">
+        {/* ... 에러 화면 ... */}
         <div className="alert alert-danger text-center">
           <h5>오류 발생</h5>
           <p>{error}</p>
@@ -397,70 +395,110 @@ const FullFilterKakaoMap = () => {
     );
   }
 
+  const responsiveStyles = `
+  .map-row-container {
+    flex: 0 0 30vh; /* 모바일 지도 높이 */
+  }
+  .list-column-container {
+    /* 모바일에서는 높이를 자동으로 설정 */
+  }
+
+  @media (min-width: 768px) {
+    .map-row-container {
+      flex: 0 0 40vh; /* 데스크톱 지도 높이 */
+    }
+    .list-column-container {
+      height: 100%; /* 데스크톱에서만 높이 100% 적용 */
+    }
+  }
+`;
+
   return (
-    <div style={styles.container}>
-      <div style={styles.mapArea}>
-        <KakaoMapComponent
-          isMapReady={isMapReady}
-          setIsMapReady={setIsMapReady}
-          isDataLoading={isDataLoading}
-          setError={setError}
-          facilities={hasSearched ? facilities : []}
-          isShowingFavorites={isShowingFavorites}
-          categoryColors={categoryColors}
-          favoriteMarkers={favoriteMarkers}
-        />
+    <>
+      <style>{responsiveStyles}</style>
+      <div className="container-fluid vh-100 d-flex flex-column p-3 bg-light-subtle">
+        {/* --- 1. 지도 Row --- */}
+        <div className="row map-row-container">
+          <div className="col-12 h-100 p-0">
+            <div className="w-100 h-100 rounded shadow-sm overflow-hidden">
+              <KakaoMapComponent
+                isMapReady={isMapReady}
+                setIsMapReady={setIsMapReady}
+                isDataLoading={isDataLoading}
+                setError={setError}
+                facilities={hasSearched ? facilities : []}
+                isShowingFavorites={isShowingFavorites}
+                categoryColors={categoryColors}
+                favoriteMarkers={favoriteMarkers}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* --- 세로 간격 Spacer --- */}
+        <div style={{ height: "1rem" }}></div>
+
+        {/* --- 2. 컨텐츠 Row (필터 + 리스트) --- */}
+        <div
+          className="row flex-grow-1 overflow-y-auto"
+          style={{ minHeight: "0" }}
+        >
+          {/* 필터 Column */}
+          <div className="col-12 col-md-4 align-self-md-start mb-3 mb-md-0">
+            <FilterPanel
+              selectedRegion={selectedRegion}
+              setSelectedRegion={setSelectedRegion}
+              regions={regions}
+              selectedSigungu={selectedSigungu}
+              setSelectedSigungu={setSelectedSigungu}
+              sigungus={sigungus}
+              selectedCategories2={selectedCategories2}
+              setSelectedCategories2={handleSetFilter(
+                selectedCategories2,
+                setSelectedCategories2,
+              )}
+              categories2={categories2}
+              selectedPetSizes={selectedPetSizes}
+              setSelectedPetSizes={handleSetFilter(
+                selectedPetSizes,
+                setSelectedPetSizes,
+              )}
+              petSizes={petSizeOptions}
+              parkingFilter={parkingFilter}
+              setParkingFilter={setParkingFilter}
+              facilityType={facilityType}
+              setFacilityType={setFacilityType}
+              categoryColors={categoryColors}
+              onSearch={handleSearch}
+              onLoadFavorites={loadFavoriteMarkers}
+            />
+          </div>
+
+          {/* 리스트 Column */}
+          {/* 이 컬럼은 부모의 기본 stretch 동작에 따라 높이가 꽉 찹니다. */}
+          <div className="col-12 col-md-8 list-column-container">
+            <SearchResultList
+              facilities={isShowingFavorites ? favoriteMarkers : facilities}
+              totalElements={
+                isShowingFavorites ? favoriteMarkers.length : totalElements
+              }
+              isDataLoading={isDataLoading}
+              currentPage={currentPage}
+              totalPages={Math.ceil(
+                (isShowingFavorites ? favoriteMarkers.length : totalElements) /
+                  ITEMS_PER_PAGE,
+              )}
+              handlePageChange={setCurrentPage}
+              categoryColors={categoryColors}
+              ITEMS_PER_PAGE={ITEMS_PER_PAGE}
+              hasSearched={hasSearched || isShowingFavorites}
+              isShowingFavorites={isShowingFavorites}
+              favoriteMarkers={favoriteMarkers}
+            />
+          </div>
+        </div>
       </div>
-      <div style={styles.filterArea}>
-        <FilterPanel
-          selectedRegion={selectedRegion}
-          setSelectedRegion={setSelectedRegion}
-          regions={regions}
-          selectedSigungu={selectedSigungu}
-          setSelectedSigungu={setSelectedSigungu}
-          sigungus={sigungus}
-          selectedCategories2={selectedCategories2}
-          setSelectedCategories2={handleSetFilter(
-            selectedCategories2,
-            setSelectedCategories2,
-          )}
-          categories2={categories2}
-          selectedPetSizes={selectedPetSizes}
-          setSelectedPetSizes={handleSetFilter(
-            selectedPetSizes,
-            setSelectedPetSizes,
-          )}
-          petSizes={petSizeOptions}
-          parkingFilter={parkingFilter}
-          setParkingFilter={setParkingFilter}
-          facilityType={facilityType}
-          setFacilityType={setFacilityType}
-          categoryColors={categoryColors}
-          onSearch={handleSearch}
-          onLoadFavorites={loadFavoriteMarkers}
-        />
-      </div>
-      <div style={styles.listArea}>
-        <SearchResultList
-          facilities={isShowingFavorites ? favoriteMarkers : facilities}
-          totalElements={
-            isShowingFavorites ? favoriteMarkers.length : totalElements
-          }
-          isDataLoading={isDataLoading}
-          currentPage={currentPage}
-          totalPages={Math.ceil(
-            (isShowingFavorites ? favoriteMarkers.length : totalElements) /
-              ITEMS_PER_PAGE,
-          )}
-          handlePageChange={setCurrentPage}
-          categoryColors={categoryColors}
-          ITEMS_PER_PAGE={ITEMS_PER_PAGE}
-          hasSearched={hasSearched || isShowingFavorites}
-          isShowingFavorites={isShowingFavorites}
-          favoriteMarkers={favoriteMarkers}
-        />
-      </div>
-    </div>
+    </>
   );
 };
 

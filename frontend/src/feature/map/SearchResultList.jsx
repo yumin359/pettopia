@@ -157,7 +157,10 @@ const SearchResultList = ({
   };
 
   return (
-    <div className="w-100 h-100 d-flex flex-column" style={{ height: "100%" }}>
+    <div
+      className="h-100 d-flex flex-column bg-white rounded shadow-sm"
+      style={{ height: "100%" }}
+    >
       <div className="d-flex justify-content-between align-items-center mb-2 flex-shrink-0">
         {isShowingFavorites ? (
           <>
@@ -168,7 +171,6 @@ const SearchResultList = ({
           </>
         ) : (
           <>
-            <h6 className="mb-0 small">검색 결과</h6>
             {hasSearched && (
               <span className="badge bg-primary small">{totalElements}개</span>
             )}
