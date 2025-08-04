@@ -11,7 +11,7 @@ const api = axios.create({
 // localStorage에 저장된 토큰을 Authorization 헤더에 담아줍니다.
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("token"); // localStorage에서 토큰을 가져옵니다.
+    const token = localStorage.getItem("token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -37,6 +37,18 @@ const get = async (endpoint, params) => {
     throw error;
   }
 };
+
+const del = async (endpoint, params) => {
+  try {
+    const response = await api.delete(endpoint, { params });
+    return response.data;
+  } catch (error) {
+    console.error(`API Error DELETE ${endpoint}:`, error);
+    throw error;
+  }
+};
+
+export { get, del };
 
 // 지역 목록 조회
 export const fetchRegions = () => get("/pet_facilities/regions");

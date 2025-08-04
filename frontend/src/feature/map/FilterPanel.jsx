@@ -198,7 +198,7 @@ const FilterPanel = ({
           disabled={!user} // 👈 user가 없으면(비로그인 상태) 버튼 비활성화
           style={{ fontSize: "12px" }}
         >
-          ❤ 저장 목록
+          즐겨찾기
         </button>
         {/* 👈 비로그인 사용자에게 안내 메시지 표시 */}
         {!user && (
@@ -209,13 +209,13 @@ const FilterPanel = ({
       </div>
 
       {/* 검색 버튼 */}
-      <div className="flex-shrink-0 mt-2">
+      <div className="flex-shrink-0 mt-1">
         <button
           className="btn btn-primary w-100 btn-sm"
           onClick={onSearch}
           style={{ fontSize: "12px" }}
         >
-          🔍 검색하기
+          검색하기
         </button>
       </div>
     </div>

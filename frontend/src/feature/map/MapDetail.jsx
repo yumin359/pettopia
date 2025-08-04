@@ -3,8 +3,8 @@ import { useContext, useEffect, useState } from "react";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
 import ReviewPreview from "../map/ReviewPreview.jsx";
 import { ReviewLikeContainer } from "../like/ReviewLikeContainer.jsx";
-import axios from "axios";
 import { FavoriteContainer } from "./FavoriteContainer.jsx";
+import { del, get } from "./data/api.jsx";
 
 export function MapDetail() {
   const { name } = useParams();
@@ -17,15 +17,14 @@ export function MapDetail() {
   const [loadingFacility, setLoadingFacility] = useState(true);
   const [loadingReviews, setLoadingReviews] = useState(true);
 
-  const [sortBy, setSortBy] = useState("latest"); // ✅ 정렬 기준 상태 추가
+  const [sortBy, setSortBy] = useState("latest");
 
   const fetchFacility = async () => {
     setLoadingFacility(true);
     try {
-      const res = await axios.get("/api/pet_facilities/detail", {
-        params: { name: decodedName },
-      });
-      setFacility(res.data);
+      // 💡 axios.get 대신 get 함수 사용
+      const res = await get("/pet_facilities/detail", { name: decodedName });
+      setFacility(res);
     } catch (err) {
       console.error("시설 정보 조회 실패:", err);
       setFacility(null);
@@ -37,10 +36,9 @@ export function MapDetail() {
   const fetchReviews = async () => {
     setLoadingReviews(true);
     try {
-      const res = await axios.get("/api/review/list", {
-        params: { facilityName: decodedName },
-      });
-      setReviews(res.data || []);
+      // 💡 axios.get 대신 get 함수 사용
+      const res = await get("/review/list", { facilityName: decodedName });
+      setReviews(res || []);
     } catch (err) {
       console.error("리뷰 목록 조회 실패:", err);
       setReviews([]);
@@ -72,9 +70,8 @@ export function MapDetail() {
     if (!window.confirm("정말 삭제하시겠습니까?")) return;
 
     try {
-      await axios.delete(`/api/review/delete/${id}`, {
-        params: { email: user.email },
-      });
+      // 💡 axios.delete 대신 del 함수 사용
+      await del(`/review/delete/${id}`, { email: user.email });
       alert("삭제 완료");
       fetchReviews();
     } catch (err) {
@@ -82,14 +79,12 @@ export function MapDetail() {
     }
   };
 
-  // 평균 평점 계산
   const getAverageRating = () => {
     if (reviews.length === 0) return null;
     const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
     return (sum / reviews.length).toFixed(1);
   };
 
-  // ✅ 정렬된 리뷰 목록 만들기
   const sortedReviews = [...reviews].sort((a, b) => {
     if (sortBy === "likes") {
       return (b.likeCount || 0) - (a.likeCount || 0);
@@ -116,8 +111,14 @@ export function MapDetail() {
             color: "#444",
           }}
         >
-          <div><strong>도로명 주소:</strong> {facility.roadAddress || "정보 없음"}</div>
-          <div><strong>전화번호:</strong> {facility.phoneNumber || "정보 없음"}</div>
+          <div>
+            <strong>도로명 주소:</strong>
+            {facility.roadAddress || "정보 없음"}
+          </div>
+          <div>
+            <strong>전화번호:</strong>
+            {facility.phoneNumber || "정보 없음"}
+          </div>
           <div>
             <strong>홈페이지:</strong>{" "}
             {(() => {
@@ -141,8 +142,14 @@ export function MapDetail() {
               }
             })()}
           </div>
-          <div><strong>휴무일:</strong> {facility.holiday || "정보 없음"}</div>
-          <div><strong>운영시간:</strong> {facility.operatingHours || "정보 없음"}</div>
+          <div>
+            <strong>휴무일:</strong>
+            {facility.holiday || "정보 없음"}
+          </div>
+          <div>
+            <strong>운영시간:</strong>
+            {facility.operatingHours || "정보 없음"}
+          </div>
         </div>
       ) : (
         <p style={{ color: "red" }}>시설 정보를 찾을 수 없습니다.</p>
@@ -171,15 +178,33 @@ export function MapDetail() {
       )}
 
       {reviews.length > 0 && (
-        <div style={{ marginTop: "1rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+        <div
+          style={{
+            marginTop: "1rem",
+            display: "flex",
+            alignItems: "center",
+            gap: "0.5rem",
+          }}
+        >
           <strong>평균 평점:</strong>
-          <span style={{ fontSize: "1.1rem", color: "#f0ad4e", userSelect: "none" }} title={`평점: ${getAverageRating()} / 5`}>
+          <span
+            style={{ fontSize: "1.1rem", color: "#f0ad4e", userSelect: "none" }}
+            title={`평점: ${getAverageRating()} / 5`}
+          >
             ★
           </span>
-          <span style={{ fontSize: "1.1rem", color: "#212529", marginLeft: "0.25rem" }}>
+          <span
+            style={{
+              fontSize: "1.1rem",
+              color: "#212529",
+              marginLeft: "0.25rem",
+            }}
+          >
             {getAverageRating()} / 5
           </span>
-          <span style={{ fontSize: "0.9rem", color: "gray" }}>({reviews.length}명)</span>
+          <span style={{ fontSize: "0.9rem", color: "gray" }}>
+            ({reviews.length}명)
+          </span>
         </div>
       )}
 
@@ -191,9 +216,11 @@ export function MapDetail() {
           </span>
         </h4>
 
-        {/* ✅ 정렬 옵션 버튼 UI */}
         <div style={{ marginBottom: "1rem" }}>
-          <label htmlFor="sortSelect" style={{ marginRight: "0.5rem", fontWeight: "bold" }}>
+          <label
+            htmlFor="sortSelect"
+            style={{ marginRight: "0.5rem", fontWeight: "bold" }}
+          >
             정렬:
           </label>
           <select
@@ -213,7 +240,6 @@ export function MapDetail() {
             <option value="likes">좋아요순</option>
           </select>
         </div>
-
 
         {loadingReviews ? (
           <p>불러오는 중...</p>
@@ -250,7 +276,8 @@ export function MapDetail() {
                   }}
                   title={`평점: ${r.rating} / 5`}
                 >
-                  {"★".repeat(r.rating)} <span style={{ color: "#212529" }}>{r.rating}</span>
+                  {"★".repeat(r.rating)}
+                  <span style={{ color: "#212529" }}>{r.rating}</span>
                 </div>
 
                 <ReviewPreview review={r} />
