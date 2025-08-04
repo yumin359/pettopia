@@ -102,6 +102,18 @@ public class FavoriteService {
                             .name(facility.getName())
                             .latitude(facility.getLatitude())
                             .longitude(facility.getLongitude())
+                            .category2(facility.getCategory2())
+                            .sidoName(facility.getSidoName())
+                            .sigunguName(facility.getSigunguName())
+                            .roadName(facility.getRoadName())
+                            .bunji(facility.getBunji())
+                            .phoneNumber(facility.getPhoneNumber())
+                            .holiday(facility.getHoliday())
+                            .operatingHours(facility.getOperatingHours())
+                            .parkingAvailable(facility.getParkingAvailable())
+                            .petFriendlyInfo(facility.getPetFriendlyInfo())
+                            .indoorFacility(facility.getIndoorFacility())
+                            .outdoorFacility(facility.getOutdoorFacility())
                             .build();
                 })
                 .collect(Collectors.toList());
