@@ -312,8 +312,8 @@ const FullFilterKakaoMap = () => {
       });
       const data = response.data;
       if (!data || data.length === 0) {
-        toast.info("저장된 시설이 없습니다.");
         setFavoriteMarkers([]);
+        setIsShowingFavorites(true);
         return;
       }
       console.log(data);
