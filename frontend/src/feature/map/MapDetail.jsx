@@ -193,35 +193,27 @@ export function MapDetail() {
 
         {/* ✅ 정렬 옵션 버튼 UI */}
         <div style={{ marginBottom: "1rem" }}>
-          <label style={{ marginRight: "0.5rem", fontWeight: "bold" }}>정렬:</label>
-          <button
-            onClick={() => setSortBy("latest")}
+          <label htmlFor="sortSelect" style={{ marginRight: "0.5rem", fontWeight: "bold" }}>
+            정렬:
+          </label>
+          <select
+            id="sortSelect"
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
             style={{
-              marginRight: "0.5rem",
-              padding: "0.3rem 0.8rem",
-              backgroundColor: sortBy === "latest" ? "#007bff" : "#e0e0e0",
-              color: sortBy === "latest" ? "white" : "black",
-              border: "none",
-              borderRadius: "4px",
+              padding: "0.5rem 1rem",
+              fontSize: "1rem",
+              borderRadius: "6px",
+              border: "1px solid #ccc",
+              backgroundColor: "#fff",
               cursor: "pointer",
             }}
           >
-            최신순
-          </button>
-          <button
-            onClick={() => setSortBy("likes")}
-            style={{
-              padding: "0.3rem 0.8rem",
-              backgroundColor: sortBy === "likes" ? "#007bff" : "#e0e0e0",
-              color: sortBy === "likes" ? "white" : "black",
-              border: "none",
-              borderRadius: "4px",
-              cursor: "pointer",
-            }}
-          >
-            좋아요순
-          </button>
+            <option value="latest">최신순</option>
+            <option value="likes">좋아요순</option>
+          </select>
         </div>
+
 
         {loadingReviews ? (
           <p>불러오는 중...</p>
