@@ -1,7 +1,8 @@
 import { useState } from "react";
 import CommentEdit from "./CommentEdit";
-import { Button, Modal, OverlayTrigger, Tooltip } from "react-bootstrap";
+import { Button, Image, Modal, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
+import { FiUser } from "react-icons/fi";
 
 function CommentList({ comments = [], onDelete, onUpdate, currentUserEmail }) {
   const [editingId, setEditingId] = useState(null);
@@ -19,6 +20,9 @@ function CommentList({ comments = [], onDelete, onUpdate, currentUserEmail }) {
   if (!Array.isArray(comments) || comments.length === 0) {
     return <div className="mt-3 text-muted">아직 댓글이 없습니다.</div>;
   }
+
+  // 프로필 사진 없는 사람들
+  const defaultProfileImage = "/user.png";
 
   return (
     <div className="mt-3">
@@ -45,6 +49,16 @@ function CommentList({ comments = [], onDelete, onUpdate, currentUserEmail }) {
             <>
               <div className="d-flex justify-content-between align-items-center">
                 <div>
+                  <Image
+                    roundedCircle
+                    className="me-2"
+                    src={comment.profileImageUrl || defaultProfileImage}
+                    alt={`${comment.authorNickName ?? "익명"} 프로필`}
+                    style={{
+                      width: "20px",
+                      height: "20px",
+                    }}
+                  />
                   <strong style={{ fontSize: "0.9rem" }}>
                     {comment.authorNickName}
                   </strong>{" "}

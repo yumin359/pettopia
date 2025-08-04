@@ -72,19 +72,22 @@ export function Chatbot() {
   };
 
   return (
-    <div style={{ padding: "2rem", maxWidth: "700px", margin: "0 auto" }}>
-      <h2 className="mb-4">펫토피아 챗봇</h2>
+    <div style={{ padding: "2rem", width: "90%", maxWidth: "1200px", margin: "0 auto" }}>
+
+    <h2 className="mb-4">펫토피아 챗봇</h2>
 
       <div
         style={{
+          width: "100%",
           border: "1px solid #ccc",
           borderRadius: "8px",
           padding: "1rem",
-          height: "400px",
+          height: "500px",
           overflowY: "auto",
           marginBottom: "1rem",
           backgroundColor: "#f8f9fa",
         }}
+
       >
         {messages.map((msg, idx) => (
           <Card
@@ -111,8 +114,9 @@ export function Chatbot() {
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="메시지를 입력하세요..."
+          style={{ resize: "none" }}
         />
-        <Button onClick={handleSend} variant="primary" disabled={loading}>
+        <Button onClick={handleSend} variant="primary" disabled={loading} variant="warning">
           전송
         </Button>
       </InputGroup>

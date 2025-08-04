@@ -3,8 +3,68 @@ import React, { useEffect, useState, useCallback } from "react";
 import FilterPanel from "./FilterPanel.jsx";
 import SearchResultList from "./SearchResultList";
 import KakaoMapComponent from "./KakaoMapComponent";
+import {
+  fallbackSigunguData,
+  fallbackCategories2,
+  fallbackRegions,
+} from "./data/fallbackSigunguData.jsx";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const ITEMS_PER_PAGE = 15;
+
+// 🎨 스타일 객체들을 하나로 그룹화하여 관리합니다.
+// 🎨 스타일 객체들을 하나로 그룹화하여 관리합니다.
+const styles = {
+  container: {
+    display: "grid",
+    gridTemplateAreas: `
+      "map map"
+      "filter list"
+    `,
+    // ✅ 이 부분을 수정하여 너비 비율을 조정합니다.
+    gridTemplateColumns: "300px 1fr",
+    gridTemplateRows: "45vh 1fr",
+    height: "100vh",
+    gap: "12px",
+    padding: "12px",
+    boxSizing: "border-box",
+    backgroundColor: "#f4f6f8",
+  },
+  mapArea: {
+    gridArea: "map",
+    minHeight: 0,
+    borderRadius: "8px",
+    overflow: "hidden",
+    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+  },
+  filterArea: {
+    gridArea: "filter",
+    minHeight: 0,
+    overflowY: "auto",
+    backgroundColor: "white",
+    borderRadius: "8px",
+    padding: "16px",
+    boxSizing: "border-box",
+    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+  },
+  listArea: {
+    gridArea: "list",
+    minHeight: 0,
+    overflowY: "auto",
+    backgroundColor: "white",
+    borderRadius: "8px",
+    padding: "8px 16px",
+    boxSizing: "border-box",
+    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+  },
+  errorContainer: {
+    height: "100vh",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+};
 
 const FullFilterKakaoMap = () => {
   const [error, setError] = useState(null);
@@ -15,6 +75,7 @@ const FullFilterKakaoMap = () => {
   const [totalElements, setTotalElements] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
   const [hasSearched, setHasSearched] = useState(false); // 검색 여부 상태 추가
+  const [isShowingFavorites, setIsShowingFavorites] = useState(false); // 찜 목록 표시 전용 상태
 
   // 기본 필터 상태들
   const [selectedRegion, setSelectedRegion] = useState("전체");
@@ -30,6 +91,9 @@ const FullFilterKakaoMap = () => {
   const [regions, setRegions] = useState([]);
   const [sigungus, setSigungus] = useState([]);
   const [categories2, setCategories2] = useState([]);
+
+  // 찜(저장) 목록 가져오는
+  const [favoriteMarkers, setFavoriteMarkers] = useState([]);
 
   // ⚠️ 반려동물 크기 옵션 (정리가 안되었어..)
   const petSizeOptions = [
@@ -70,7 +134,7 @@ const FullFilterKakaoMap = () => {
     기타: "#DDA0DD",
   };
 
-  // 필터 옵션들 로드 (개선된 버전)
+  // 필터 옵션들 로드 (지역과 카테고리2)
   useEffect(() => {
     const loadFilterOptions = async () => {
       try {
@@ -99,48 +163,9 @@ const FullFilterKakaoMap = () => {
         setSigungus(["전체"]);
       } catch (err) {
         console.error("필터 옵션 로드 오류:", err);
-        // 확장된 Fallback options - 모든 광역시도 포함
-        setRegions([
-          "전체",
-          "서울특별시",
-          "부산광역시",
-          "대구광역시",
-          "인천광역시",
-          "광주광역시",
-          "대전광역시",
-          "울산광역시",
-          "세종특별자치시",
-          "경기도",
-          "강원특별자치도",
-          "충청북도",
-          "충청남도",
-          "전북특별자치도",
-          "전라남도",
-          "경상북도",
-          "경상남도",
-          "제주특별자치도",
-        ]);
-        setCategories2([
-          "전체",
-          "펜션",
-          "호텔",
-          "모텔",
-          "게스트하우스",
-          "카페",
-          "레스토랑",
-          "베이커리",
-          "박물관",
-          "미술관",
-          "도서관",
-          "문화센터",
-          "반려동물용품점",
-          "펫샵",
-          "동물병원",
-          "동물약국",
-          "체험활동",
-          "펜션체험",
-          "기타",
-        ]);
+        // API 호출 실패 시, 분리된 폴백 데이터 사용
+        setRegions(fallbackRegions);
+        setCategories2(fallbackCategories2);
         setSigungus(["전체"]);
       }
     };
@@ -180,252 +205,10 @@ const FullFilterKakaoMap = () => {
     loadSigungus();
   }, [selectedRegion]);
 
-  // Fallback 시군구 데이터 함수
-  const getFallbackSigungus = (region) => {
-    const fallbackData = {
-      서울특별시: [
-        "강남구",
-        "강동구",
-        "강북구",
-        "강서구",
-        "관악구",
-        "광진구",
-        "구로구",
-        "금천구",
-        "노원구",
-        "도봉구",
-        "동대문구",
-        "동작구",
-        "마포구",
-        "서대문구",
-        "서초구",
-        "성동구",
-        "성북구",
-        "송파구",
-        "양천구",
-        "영등포구",
-        "용산구",
-        "은평구",
-        "종로구",
-        "중구",
-        "중랑구",
-      ],
-      경기도: [
-        "수원시",
-        "성남시",
-        "안양시",
-        "안산시",
-        "용인시",
-        "부천시",
-        "광명시",
-        "평택시",
-        "과천시",
-        "오산시",
-        "시흥시",
-        "군포시",
-        "의왕시",
-        "하남시",
-        "이천시",
-        "안성시",
-        "김포시",
-        "화성시",
-        "광주시",
-        "양주시",
-        "포천시",
-        "여주시",
-        "연천군",
-        "가평군",
-        "양평군",
-        "고양시",
-        "파주시",
-        "남양주시",
-        "구리시",
-        "의정부시",
-        "동두천시",
-      ],
-      부산광역시: [
-        "중구",
-        "서구",
-        "동구",
-        "영도구",
-        "부산진구",
-        "동래구",
-        "남구",
-        "북구",
-        "해운대구",
-        "사하구",
-        "금정구",
-        "강서구",
-        "연제구",
-        "수영구",
-        "사상구",
-        "기장군",
-      ],
-      대구광역시: [
-        "중구",
-        "동구",
-        "서구",
-        "남구",
-        "북구",
-        "수성구",
-        "달서구",
-        "달성군",
-      ],
-      인천광역시: [
-        "중구",
-        "동구",
-        "미추홀구",
-        "연수구",
-        "남동구",
-        "부평구",
-        "계양구",
-        "서구",
-        "강화군",
-        "옹진군",
-      ],
-      광주광역시: ["동구", "서구", "남구", "북구", "광산구"],
-      대전광역시: ["동구", "중구", "서구", "유성구", "대덕구"],
-      울산광역시: ["중구", "남구", "동구", "북구", "울주군"],
-      세종특별자치시: ["세종시"],
-      강원특별자치도: [
-        "춘천시",
-        "원주시",
-        "강릉시",
-        "동해시",
-        "태백시",
-        "속초시",
-        "삼척시",
-        "홍천군",
-        "횡성군",
-        "영월군",
-        "평창군",
-        "정선군",
-        "철원군",
-        "화천군",
-        "양구군",
-        "인제군",
-        "고성군",
-        "양양군",
-      ],
-      충청북도: [
-        "청주시",
-        "충주시",
-        "제천시",
-        "보은군",
-        "옥천군",
-        "영동군",
-        "증평군",
-        "진천군",
-        "괴산군",
-        "음성군",
-        "단양군",
-      ],
-      충청남도: [
-        "천안시",
-        "공주시",
-        "보령시",
-        "아산시",
-        "서산시",
-        "논산시",
-        "계룡시",
-        "당진시",
-        "금산군",
-        "부여군",
-        "서천군",
-        "청양군",
-        "홍성군",
-        "예산군",
-        "태안군",
-      ],
-      전북특별자치도: [
-        "전주시",
-        "군산시",
-        "익산시",
-        "정읍시",
-        "남원시",
-        "김제시",
-        "완주군",
-        "진안군",
-        "무주군",
-        "장수군",
-        "임실군",
-        "순창군",
-        "고창군",
-        "부안군",
-      ],
-      전라남도: [
-        "목포시",
-        "여수시",
-        "순천시",
-        "나주시",
-        "광양시",
-        "담양군",
-        "곡성군",
-        "구례군",
-        "고흥군",
-        "보성군",
-        "화순군",
-        "장흥군",
-        "강진군",
-        "해남군",
-        "영암군",
-        "무안군",
-        "함평군",
-        "영광군",
-        "장성군",
-        "완도군",
-        "진도군",
-        "신안군",
-      ],
-      경상북도: [
-        "포항시",
-        "경주시",
-        "김천시",
-        "안동시",
-        "구미시",
-        "영주시",
-        "영천시",
-        "상주시",
-        "문경시",
-        "경산시",
-        "군위군",
-        "의성군",
-        "청송군",
-        "영양군",
-        "영덕군",
-        "청도군",
-        "고령군",
-        "성주군",
-        "칠곡군",
-        "예천군",
-        "봉화군",
-        "울진군",
-        "울릉군",
-      ],
-      경상남도: [
-        "창원시",
-        "진주시",
-        "통영시",
-        "사천시",
-        "김해시",
-        "밀양시",
-        "거제시",
-        "양산시",
-        "의령군",
-        "함안군",
-        "창녕군",
-        "고성군",
-        "남해군",
-        "하동군",
-        "산청군",
-        "함양군",
-        "거창군",
-        "합천군",
-      ],
-      제주특별자치도: ["제주시", "서귀포시"],
-    };
-    return fallbackData[region] || [];
-  };
+  // Fallback 시군구 데이터 함수 (분리된 파일에서 가져옴)
+  const getFallbackSigungus = useCallback((region) => {
+    return fallbackSigunguData[region] || [];
+  }, []);
 
   // 쿼리 파라미터 빌드 (수정된 버전 - Set 객체 처리 개선)
   const buildFilterQuery = useCallback(() => {
@@ -509,6 +292,7 @@ const FullFilterKakaoMap = () => {
   // 검색 실행 함수
   const handleSearch = () => {
     setHasSearched(true);
+    setIsShowingFavorites(false); // 검색하기로 전환
     setCurrentPage(0);
     console.log("검색 실행 - 필터 상태:", {
       selectedRegion,
@@ -571,6 +355,28 @@ const FullFilterKakaoMap = () => {
     setFunction(newSet);
   };
 
+  // 찜 목록 불러오기 함수
+  async function loadFavoriteMarkers() {
+    try {
+      const response = await axios.get("/api/favorite/mine", {
+        withCredentials: true,
+      });
+      const data = response.data;
+      if (!data || data.length === 0) {
+        setFavoriteMarkers([]);
+        setIsShowingFavorites(true);
+        return;
+      }
+      console.log(data);
+      setFavoriteMarkers(data);
+      setIsShowingFavorites(true); // 찜 목록 모드로 전환
+    } catch (error) {
+      console.error("찜 목록 불러오기 실패", error);
+      toast.error("찜 목록을 불러오지 못했습니다.");
+    }
+  }
+
+  // --- 렌더링 ---
   if (error) {
     return (
       <div
@@ -592,8 +398,20 @@ const FullFilterKakaoMap = () => {
   }
 
   return (
-    <div className="container-fluid p-1" style={{ height: "80vh" }}>
-      <div className="row h-100 g-1">
+    <div style={styles.container}>
+      <div style={styles.mapArea}>
+        <KakaoMapComponent
+          isMapReady={isMapReady}
+          setIsMapReady={setIsMapReady}
+          isDataLoading={isDataLoading}
+          setError={setError}
+          facilities={hasSearched ? facilities : []}
+          isShowingFavorites={isShowingFavorites}
+          categoryColors={categoryColors}
+          favoriteMarkers={favoriteMarkers}
+        />
+      </div>
+      <div style={styles.filterArea}>
         <FilterPanel
           selectedRegion={selectedRegion}
           setSelectedRegion={setSelectedRegion}
@@ -619,29 +437,27 @@ const FullFilterKakaoMap = () => {
           setFacilityType={setFacilityType}
           categoryColors={categoryColors}
           onSearch={handleSearch}
+          onLoadFavorites={loadFavoriteMarkers}
         />
-
+      </div>
+      <div style={styles.listArea}>
         <SearchResultList
-          facilities={facilities}
-          totalElements={totalElements}
+          facilities={isShowingFavorites ? favoriteMarkers : facilities}
+          totalElements={
+            isShowingFavorites ? favoriteMarkers.length : totalElements
+          }
           isDataLoading={isDataLoading}
           currentPage={currentPage}
-          totalPages={totalPages}
+          totalPages={Math.ceil(
+            (isShowingFavorites ? favoriteMarkers.length : totalElements) /
+              ITEMS_PER_PAGE,
+          )}
           handlePageChange={setCurrentPage}
-          handleListItemClick={handleListItemClick}
           categoryColors={categoryColors}
           ITEMS_PER_PAGE={ITEMS_PER_PAGE}
-          hasSearched={hasSearched}
-        />
-
-        <KakaoMapComponent
-          isMapReady={isMapReady}
-          setIsMapReady={setIsMapReady}
-          isDataLoading={isDataLoading}
-          setError={setError}
-          facilities={hasSearched ? facilities : []} // 검색 전에는 빈 배열
-          categoryColors={categoryColors}
-          handleListItemClick={handleListItemClick}
+          hasSearched={hasSearched || isShowingFavorites}
+          isShowingFavorites={isShowingFavorites}
+          favoriteMarkers={favoriteMarkers}
         />
       </div>
     </div>

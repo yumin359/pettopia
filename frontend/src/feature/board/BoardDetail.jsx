@@ -6,6 +6,7 @@ import {
   Button,
   Card,
   Col,
+  Image,
   ListGroup,
   ListGroupItem,
   Modal,
@@ -69,9 +70,12 @@ export function BoardDetail() {
     ? board.insertedAt.substring(0, 16)
     : "";
 
+  // 프로필 사진 없는 사람들
+  const defaultProfileImage = "/user.png";
+
   return (
     <Row className="justify-content-center my-4">
-      <Col xs={12} md={8} lg={6}>
+      <Col xs={12} md={10} lg={8}>
         <div className="d-flex justify-content-between align-items-center mb-3">
           <h3 className="fw-bold mb-0 text-dark">{board.title}</h3>
           <small className="text-muted" style={{ fontSize: "0.85rem" }}>
@@ -107,7 +111,11 @@ export function BoardDetail() {
                         src={file}
                         alt={`첨부 이미지 ${idx + 1}`}
                         className="shadow rounded"
-                        style={{ maxWidth: "100%", objectFit: "contain" }}
+                        style={{
+                          width: "500px",
+                          height: "500px",
+                          objectFit: "cover",
+                        }}
                       />
                     ))}
                 </div>
@@ -163,6 +171,16 @@ export function BoardDetail() {
             <Row className="text-muted mb-3" style={{ fontSize: "0.9rem" }}>
               <Col xs={6}>
                 <div>
+                  <Image
+                    roundedCircle
+                    className="me-2"
+                    src={board.profileImageUrl || defaultProfileImage}
+                    alt={`${board.authorNickName ?? "익명"} 프로필`}
+                    style={{
+                      width: "20px",
+                      height: "20px",
+                    }}
+                  />
                   <strong>작성자</strong>
                   <div>{board.authorNickName}</div>
                 </div>

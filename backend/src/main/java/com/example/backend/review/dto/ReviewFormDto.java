@@ -3,13 +3,15 @@ package com.example.backend.review.dto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Instant;
+import java.util.List;
 
 @Getter
 @Setter
 @Builder
-public class ReviewDto {
+public class ReviewFormDto {
     private Integer id;
     private String facilityName;
     private String memberEmail;            // 작성자 이메일
@@ -17,4 +19,5 @@ public class ReviewDto {
     private String review;
     private Integer rating;
     private Instant insertedAt;
+    private List<MultipartFile> files;
 }

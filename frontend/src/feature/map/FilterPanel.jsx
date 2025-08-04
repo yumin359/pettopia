@@ -1,5 +1,7 @@
 // src/feature/map/FilterPanel.js
-import React from "react";
+import React, { useState } from "react";
+import { toast } from "react-toastify";
+import axios from "axios";
 
 const CheckboxGroup = ({
   title,
@@ -67,11 +69,12 @@ const FilterPanel = ({
   setFacilityType,
   categoryColors,
   onSearch,
+  onLoadFavorites, // 찜 목록 불러오기 함수
 }) => {
   return (
     <div
-      className="col-2 bg-white border rounded p-2 d-flex flex-column"
-      style={{ height: "100%", fontSize: "12px" }}
+      className="w-100 h-100 d-flex flex-column"
+      style={{ fontSize: "12px" }}
     >
       <h6 className="text-dark mb-2 flex-shrink-0">🐾 필터</h6>
 
@@ -185,6 +188,17 @@ const FilterPanel = ({
             ))}
           </div>
         </div>
+      </div>
+
+      {/* 찜 목록 버튼 */}
+      <div className="mb-1">
+        <button
+          className="btn btn-danger w-100 btn-sm"
+          onClick={onLoadFavorites}
+          style={{ fontSize: "12px" }}
+        >
+          ❤ 저장 목록
+        </button>
       </div>
 
       {/* 검색 버튼 */}

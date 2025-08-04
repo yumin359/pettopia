@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { createInfoWindowContent } from "./mapUtils";
+import { createInfoWindowContent } from "./MapUtils.jsx";
 
 const SearchResultList = ({
   facilities,
@@ -12,6 +12,8 @@ const SearchResultList = ({
   categoryColors,
   ITEMS_PER_PAGE,
   hasSearched,
+  isShowingFavorites,
+  favoriteMarkers,
 }) => {
   const navigate = useNavigate();
 
@@ -155,18 +157,26 @@ const SearchResultList = ({
   };
 
   return (
-    <div
-      className="col-3 bg-white border rounded p-2 d-flex flex-column"
-      style={{ height: "100%" }}
-    >
+    <div className="w-100 h-100 d-flex flex-column" style={{ height: "100%" }}>
       <div className="d-flex justify-content-between align-items-center mb-2 flex-shrink-0">
-        <h6 className="mb-0 small">검색 결과</h6>
-        {hasSearched && (
-          <span className="badge bg-primary small">{totalElements}개</span>
+        {isShowingFavorites ? (
+          <>
+            <h6 className="mb-0 small">찜 목록</h6>
+            <span className="badge bg-primary small">
+              {favoriteMarkers.length}개
+            </span>
+          </>
+        ) : (
+          <>
+            <h6 className="mb-0 small">검색 결과</h6>
+            {hasSearched && (
+              <span className="badge bg-primary small">{totalElements}개</span>
+            )}
+          </>
         )}
       </div>
 
-      {!hasSearched ? (
+      {!hasSearched && !isShowingFavorites ? (
         <div className="text-center text-muted py-3 flex-grow-1 d-flex align-items-center justify-content-center">
           <div>
             <div className="mb-2">🔍</div>
@@ -189,6 +199,19 @@ const SearchResultList = ({
             <p className="small mb-0">로딩 중...</p>
           </div>
         </div>
+      ) : favoriteMarkers.length === 0 && isShowingFavorites ? (
+        <div className="text-center text-muted py-3 flex-grow-1 d-flex align-items-center justify-content-center">
+          <div>
+            <div className="mb-2">😴</div>
+            <p className="small mb-0">찜 목록이 비어있습니다.</p>
+          </div>
+        </div>
+      ) : isShowingFavorites ? (
+        <>
+          <div className="flex-grow-1 overflow-auto" style={{ minHeight: 0 }}>
+            {favoriteMarkers.map(renderFacilityCard)}
+          </div>
+        </>
       ) : facilities.length === 0 ? (
         <div className="text-center text-muted py-3 flex-grow-1 d-flex align-items-center justify-content-center">
           <div>

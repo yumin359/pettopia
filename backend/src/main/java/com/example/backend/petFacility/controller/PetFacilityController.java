@@ -1,9 +1,12 @@
-package com.example.backend.petFacility;
+package com.example.backend.petFacility.controller;
 
+import com.example.backend.petFacility.repository.PetFacilityRepository;
+import com.example.backend.petFacility.entity.PetFacility;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -97,4 +100,12 @@ public class PetFacilityController {
     public List<String> getDistinctPetSizes() {
         return petFacilityRepository.findDistinctAllowedPetSize();
     }
+
+    @GetMapping("/detail")
+    public ResponseEntity<PetFacility> getFacilityByName(@RequestParam String name) {
+        return petFacilityRepository.findByName(name)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
 }

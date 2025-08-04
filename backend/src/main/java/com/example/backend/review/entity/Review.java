@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Setter
@@ -30,6 +32,9 @@ public class Review {
 
     @Column(nullable = false)
     private Integer rating;
+
+    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL)
+    private List<ReviewFile> files = new ArrayList<>();
 
     @Column(nullable = false)
     private Instant insertedAt;

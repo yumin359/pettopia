@@ -1,34 +1,193 @@
-// src/feature/board/ReviewListMini.jsx
-import { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
-import { ListGroup, Spinner } from "react-bootstrap";
+import { Button, Card, Col, Image, Row, Spinner } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
+import { ReviewLikeContainer } from "../like/ReviewLikeContainer";
 
 export function ReviewListMini() {
   const [reviews, setReviews] = useState(null);
+  const [expandedIds, setExpandedIds] = useState([]);
+  const [clampedIds, setClampedIds] = useState([]);
+  const reviewRefs = useRef({});
+
+  const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get("/api/review/latest") // ⭐ 최신 리뷰 목록 API
+    axios
+      .get("/api/review/latest")
       .then((res) => setReviews(res.data))
       .catch(() => setReviews([]));
   }, []);
 
+  useEffect(() => {
+    if (!reviews) return;
+    const newClampedIds = [];
+    reviews.forEach((r) => {
+      const el = reviewRefs.current[r.id];
+      if (!el) return;
+      const isClamped = el.scrollHeight > el.clientHeight + 1;
+      if (isClamped) {
+        newClampedIds.push(r.id);
+      }
+    });
+    setClampedIds(newClampedIds);
+  }, [reviews]);
+
   if (!reviews) {
-    return <Spinner animation="border" />;
+    return (
+      <Row className="justify-content-center mt-4">
+        <Col xs={12} md={10} lg={8} style={{ maxWidth: "900px" }}>
+          <Spinner animation="border" />
+        </Col>
+      </Row>
+    );
   }
 
   if (reviews.length === 0) {
-    return <p>아직 작성된 리뷰가 없습니다.</p>;
+    return (
+      <Row className="justify-content-center mt-4">
+        <Col xs={12} md={10} lg={8} style={{ maxWidth: "900px" }}>
+          <p className="text-muted text-center">아직 작성된 리뷰가 없습니다.</p>
+        </Col>
+      </Row>
+    );
   }
 
+  const isImageFile = (fileUrl) =>
+    /\.(jpg|jpeg|png|gif|webp)$/i.test(fileUrl.split("?")[0]);
+
+  function handleFacilityButton(facilityName) {
+    navigate(`/facility/${encodeURIComponent(facilityName)}`);
+  }
+
+  const toggleExpand = (id) => {
+    setExpandedIds((prev) =>
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+    );
+  };
+
+  const defaultProfileImage = "/user.png";
+
   return (
-    <ListGroup>
-      {reviews.map((r) => (
-        <ListGroup.Item key={r.id}>
-          <strong>{r.facilityName}</strong> - {r.review.slice(0, 50)}...
-          <br />
-          <small>{r.insertedAt?.split("T")[0]}</small>
-        </ListGroup.Item>
-      ))}
-    </ListGroup>
+    <Row className="justify-content-center mt-4">
+      <Col xs={12} md={10} lg={8} style={{ maxWidth: "900px" }}>
+        <h3 className="mb-4 fw-bold text-center" style={{ color: "#8B4513" }}>
+          최신 리뷰
+        </h3>
+        <div className="d-flex flex-column gap-3">
+          {reviews.map((r) => {
+            const isExpanded = expandedIds.includes(r.id);
+            const imageFiles = r.files?.filter(isImageFile) || [];
+            const firstImage = imageFiles[0] || null;
+            const hasImages = !!firstImage;
+
+            return (
+              <Card
+                key={r.id}
+                className="shadow-sm border-0 p-3"
+                style={{ backgroundColor: "#fdfaf4" }}
+              >
+                {/* 상단: 시설명 + 별점 + 평점 숫자 */}
+                <div className="d-flex justify-content-between align-items-center mb-2">
+                  <div
+                    className="fw-semibold hover-underline-on-hover"
+                    style={{ cursor: "pointer", color: "#8B4513" }}
+                    onClick={() => handleFacilityButton(r.facilityName)}
+                  >
+                    {r.facilityName}
+                  </div>
+                  <div
+                    className="small"
+                    style={{ fontWeight: "bold", display: "flex", alignItems: "center" }}
+                  >
+                    <span style={{ color: "#f0ad4e", fontSize: "1.1rem" }}>
+                      {"★".repeat(r.rating)}
+                    </span>
+                    <span style={{ color: "#212529", marginLeft: "6px", fontSize: "1rem" }}>
+                      {r.rating}
+                    </span>
+                  </div>
+                </div>
+                <hr className="mt-1 border-gray-300" />
+
+                {/* 리뷰 본문과 이미지 */}
+                <Row className="align-items-start">
+                  <Col xs={12} md={hasImages ? 8 : 12}>
+                    <div
+                      ref={(el) => (reviewRefs.current[r.id] = el)}
+                      className={`${!isExpanded ? "line-clamp" : ""}`}
+                      style={{ whiteSpace: "pre-wrap" }}
+                    >
+                      {r.review}
+                    </div>
+                    {clampedIds.includes(r.id) && (
+                      <div className="mt-2">
+                        <Button
+                          variant="link"
+                          size="sm"
+                          onClick={() => toggleExpand(r.id)}
+                          className="p-0 text-secondary hover-underline-on-hover"
+                          style={{ textDecoration: "none", fontSize: "0.85rem" }}
+                        >
+                          {isExpanded ? "간략히 보기" : "더보기"}
+                        </Button>
+                      </div>
+                    )}
+                  </Col>
+                  {hasImages && (
+                    <Col
+                      xs={12}
+                      md={4}
+                      className="mt-3 mt-md-0 d-flex justify-content-md-end"
+                    >
+                      <Image
+                        src={firstImage}
+                        alt={`리뷰 이미지`}
+                        className="shadow rounded"
+                        style={{
+                          width: "100px",
+                          height: "100px",
+                          objectFit: "cover",
+                        }}
+                      />
+                    </Col>
+                  )}
+                </Row>
+
+                {/* 좋아요 버튼 */}
+                <div className="mt-3 d-flex align-items-center gap-2">
+                  <ReviewLikeContainer reviewId={r.id} />
+                </div>
+
+                {/* 작성자 & 날짜 */}
+                <div className="text-muted mt-3" style={{ fontSize: "0.8rem" }}>
+                  <Image
+                    roundedCircle
+                    className="me-2"
+                    src={r.profileImageUrl || defaultProfileImage}
+                    alt={`${r.memberEmailNickName ?? "익명"} 프로필`}
+                    style={{ width: "23px", height: "23px", objectFit: "cover" }}
+                  />
+                  {r.memberEmailNickName ?? "익명 사용자"} · {r.insertedAt?.split("T")[0]}
+                </div>
+              </Card>
+            );
+          })}
+        </div>
+      </Col>
+
+      {/* line-clamp 스타일 */}
+      <style>{`
+        .line-clamp {
+          display: -webkit-box;
+          -webkit-line-clamp: 3;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+        .hover-underline-on-hover:hover {
+          text-decoration: underline !important;
+        }
+      `}</style>
+    </Row>
   );
 }
