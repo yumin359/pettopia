@@ -71,9 +71,6 @@ export function ReviewListMini() {
   return (
     <Row className="justify-content-center mt-4">
       <Col xs={12} md={10} lg={8} style={{ maxWidth: "900px" }}>
-        <h3 className="mb-4 fw-bold text-center" style={{ color: "#8B4513" }}>
-          최신 리뷰
-        </h3>
         <div className="d-flex flex-column gap-3">
           {reviews.map((r) => {
             const isExpanded = expandedIds.includes(r.id);

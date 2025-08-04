@@ -17,6 +17,8 @@ export function MapDetail() {
   const [loadingFacility, setLoadingFacility] = useState(true);
   const [loadingReviews, setLoadingReviews] = useState(true);
 
+  const [sortBy, setSortBy] = useState("latest"); // ✅ 정렬 기준 상태 추가
+
   const fetchFacility = async () => {
     setLoadingFacility(true);
     try {
@@ -56,7 +58,6 @@ export function MapDetail() {
     fetchReviews();
   }, [decodedName]);
 
-
   const handleGoToWrite = () => {
     navigate(`/facility/${encodeURIComponent(decodedName)}/review/add`);
   };
@@ -88,6 +89,15 @@ export function MapDetail() {
     return (sum / reviews.length).toFixed(1);
   };
 
+  // ✅ 정렬된 리뷰 목록 만들기
+  const sortedReviews = [...reviews].sort((a, b) => {
+    if (sortBy === "likes") {
+      return (b.likeCount || 0) - (a.likeCount || 0);
+    } else {
+      return new Date(b.insertedAt) - new Date(a.insertedAt);
+    }
+  });
+
   return (
     <div style={{ padding: "2rem", maxWidth: "700px", margin: "0 auto" }}>
       <div style={{ display: "flex", justifyContent: "space-between" }}>
@@ -106,19 +116,13 @@ export function MapDetail() {
             color: "#444",
           }}
         >
-          <div>
-            <strong>도로명 주소:</strong> {facility.roadAddress || "정보 없음"}
-          </div>
-          <div>
-            <strong>전화번호:</strong> {facility.phoneNumber || "정보 없음"}
-          </div>
+          <div><strong>도로명 주소:</strong> {facility.roadAddress || "정보 없음"}</div>
+          <div><strong>전화번호:</strong> {facility.phoneNumber || "정보 없음"}</div>
           <div>
             <strong>홈페이지:</strong>{" "}
             {(() => {
               const homepageRaw = facility?.homepage ?? "";
               const homepage = homepageRaw.trim().toLowerCase();
-
-              // homepage가 의미 있는 값인지 체크
               const isValidHomepage =
                 homepage !== "" &&
                 homepage !== "정보없음" &&
@@ -127,7 +131,6 @@ export function MapDetail() {
                 homepage !== "null";
 
               if (isValidHomepage) {
-                // 원본값을 그대로 쓰고 싶으면 homepageRaw 대신 facility.homepage 그대로 써도 됨
                 return (
                   <a href={facility.homepage} target="_blank" rel="noreferrer">
                     {facility.homepage}
@@ -138,12 +141,8 @@ export function MapDetail() {
               }
             })()}
           </div>
-          <div>
-            <strong>휴무일:</strong> {facility.holiday || "정보 없음"}
-          </div>
-          <div>
-            <strong>운영시간:</strong> {facility.operatingHours || "정보 없음"}
-          </div>
+          <div><strong>휴무일:</strong> {facility.holiday || "정보 없음"}</div>
+          <div><strong>운영시간:</strong> {facility.operatingHours || "정보 없음"}</div>
         </div>
       ) : (
         <p style={{ color: "red" }}>시설 정보를 찾을 수 없습니다.</p>
@@ -170,32 +169,17 @@ export function MapDetail() {
           ✨ 로그인한 사용자만 리뷰를 작성할 수 있습니다.
         </p>
       )}
+
       {reviews.length > 0 && (
-        <div
-          style={{
-            marginTop: "1rem",
-            display: "flex",
-            alignItems: "center",
-            gap: "0.5rem",
-          }}
-        >
+        <div style={{ marginTop: "1rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
           <strong>평균 평점:</strong>
-          <span
-            style={{
-              fontSize: "1.1rem",
-              color: "#f0ad4e", // 노란색 별
-              userSelect: "none",
-            }}
-            title={`평점: ${getAverageRating()} / 5`}
-          >
-      ★
-    </span>
+          <span style={{ fontSize: "1.1rem", color: "#f0ad4e", userSelect: "none" }} title={`평점: ${getAverageRating()} / 5`}>
+            ★
+          </span>
           <span style={{ fontSize: "1.1rem", color: "#212529", marginLeft: "0.25rem" }}>
-      {getAverageRating()} / 5
-    </span>
-          <span style={{ fontSize: "0.9rem", color: "gray" }}>
-      ({reviews.length}명)
-    </span>
+            {getAverageRating()} / 5
+          </span>
+          <span style={{ fontSize: "0.9rem", color: "gray" }}>({reviews.length}명)</span>
         </div>
       )}
 
@@ -206,17 +190,50 @@ export function MapDetail() {
             ({reviews.length}개)
           </span>
         </h4>
+
+        {/* ✅ 정렬 옵션 버튼 UI */}
+        <div style={{ marginBottom: "1rem" }}>
+          <label style={{ marginRight: "0.5rem", fontWeight: "bold" }}>정렬:</label>
+          <button
+            onClick={() => setSortBy("latest")}
+            style={{
+              marginRight: "0.5rem",
+              padding: "0.3rem 0.8rem",
+              backgroundColor: sortBy === "latest" ? "#007bff" : "#e0e0e0",
+              color: sortBy === "latest" ? "white" : "black",
+              border: "none",
+              borderRadius: "4px",
+              cursor: "pointer",
+            }}
+          >
+            최신순
+          </button>
+          <button
+            onClick={() => setSortBy("likes")}
+            style={{
+              padding: "0.3rem 0.8rem",
+              backgroundColor: sortBy === "likes" ? "#007bff" : "#e0e0e0",
+              color: sortBy === "likes" ? "white" : "black",
+              border: "none",
+              borderRadius: "4px",
+              cursor: "pointer",
+            }}
+          >
+            좋아요순
+          </button>
+        </div>
+
         {loadingReviews ? (
           <p>불러오는 중...</p>
-        ) : reviews.length === 0 ? (
+        ) : sortedReviews.length === 0 ? (
           <p>아직 리뷰가 없습니다.</p>
         ) : (
           <ul style={{ paddingLeft: 0, listStyle: "none" }}>
-            {reviews.map((r) => (
+            {sortedReviews.map((r) => (
               <li
                 key={r.id}
                 style={{
-                  position: "relative", // 평점 숫자 위치 위해 필요
+                  position: "relative",
                   padding: "1rem",
                   marginBottom: "1rem",
                   border: "1px solid #ccc",
@@ -224,7 +241,6 @@ export function MapDetail() {
                   backgroundColor: "#f9f9f9",
                 }}
               >
-                {/* 리뷰 평점 숫자 오른쪽 상단 표시 */}
                 <div
                   style={{
                     position: "absolute",
@@ -232,7 +248,7 @@ export function MapDetail() {
                     right: "10px",
                     fontWeight: "bold",
                     fontSize: "1rem",
-                    color: "#f0ad4e",  // 노란색 (Bootstrap warning색상 느낌)
+                    color: "#f0ad4e",
                     padding: "2px 6px",
                     borderRadius: "12px",
                     userSelect: "none",

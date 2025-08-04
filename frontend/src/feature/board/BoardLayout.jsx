@@ -1,12 +1,12 @@
 import { useNavigate } from "react-router-dom";
 import { Carousel, Col, Row, Button } from "react-bootstrap";
-import { BoardListMini } from "./BoardListMini.jsx";
 import { useContext } from "react";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
 
 import img1 from "../../assets/event1.jpg";
 import img2 from "../../assets/event2.jpg";
 import img3 from "../../assets/event3.jpg";
+import {BoardListMini} from "./BoardListMini.jsx";
 
 export function BoardLayout() {
   const navigate = useNavigate();
@@ -21,11 +21,12 @@ export function BoardLayout() {
   return (
     <div className="container mt-5">
       <Row className="align-items-center">
-        <Col xs={12} md={7}>
+        {/* 슬라이드 영역 넓게 */}
+        <Col xs={12} md={12}>
           <Carousel
             style={{ maxHeight: "360px", overflow: "hidden", position: "relative" }}
           >
-            {slides.map(({ id, img, title, desc }, idx) => (
+            {slides.map(({ id, img, title }, idx) => (
               <Carousel.Item
                 key={id}
                 onClick={() => {
@@ -42,7 +43,12 @@ export function BoardLayout() {
                   src={img}
                   alt={`${idx + 1}번째 슬라이드`}
                   loading="lazy"
-                  style={{ height: "360px", objectFit: "cover" }}
+                  style={{
+                    width: "100%",
+                    height: "360px",
+                    objectFit: "cover",
+                    objectPosition: "center center",
+                  }}
                 />
                 <div
                   style={{
@@ -70,38 +76,11 @@ export function BoardLayout() {
                   >
                     {title}
                   </h6>
-                  <p style={{ margin: 0, fontSize: "1rem" }}>{desc}</p>
+                  {/* desc 필드가 없으므로 제거하거나 슬라이드 데이터에 추가 */}
                 </div>
               </Carousel.Item>
             ))}
           </Carousel>
-        </Col>
-
-        <Col xs={12} md={5} className="mt-4 mt-md-0">
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: "20px",
-            }}
-          >
-            {[
-              { text: "지도", path: "/KakaoMap" },
-              { text: "최신 리뷰", path: "/review/latest" },
-              { text: "문의하기", path: "/service" },
-            ].map(({ text, path }) => (
-              <Button
-                key={text}
-                variant="outline-dark"
-                size="lg"
-                onClick={() => navigate(path)}
-                style={{ width: "80%", height: "100px", fontSize: "1.5rem" }}
-              >
-                {text}
-              </Button>
-            ))}
-          </div>
         </Col>
       </Row>
 
@@ -114,7 +93,7 @@ export function BoardLayout() {
         </Col>
       </Row>
 
-      {/* 관리자 전용 하단 버튼 영역 */}
+      {/* 관리자 버튼 영역 (필요 시 유지) */}
       {isAdmin() && (
         <Row className="mt-4">
           <Col className="d-flex justify-content-center gap-3">

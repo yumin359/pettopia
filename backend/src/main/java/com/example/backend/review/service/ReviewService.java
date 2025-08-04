@@ -1,5 +1,6 @@
 package com.example.backend.review.service;
 
+import com.example.backend.board.dto.BoardListDto;
 import com.example.backend.member.entity.Member;
 import com.example.backend.member.entity.MemberFile;
 import com.example.backend.member.entity.MemberFileId;
@@ -13,6 +14,7 @@ import com.example.backend.review.repository.ReviewFileRepository;
 import com.example.backend.review.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
