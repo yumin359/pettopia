@@ -233,3 +233,6 @@ CREATE TABLE favorite
     FOREIGN KEY (member_id) REFERENCES member (id) ON DELETE CASCADE,
     FOREIGN KEY (facility_id) REFERENCES pet_facility (id) ON DELETE CASCADE
 );
+# ---------------------------------------------------------------------------------
+SELECT DISTINCT category2
+FROM pet_facility;
