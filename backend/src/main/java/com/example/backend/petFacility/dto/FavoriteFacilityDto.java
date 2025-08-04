@@ -11,6 +11,18 @@ public class FavoriteFacilityDto {
     private Double latitude;
     private Double longitude;
     // 일단 지도에 표시하기 위한 것. 나중에 더 추가하기
-//    private String sidoName;
-//    private String sigunguName;
+    private String category2;
+    private String sidoName;
+    private String sigunguName;
+    private String roadName;
+    private String bunji;
+
+    private String phoneNumber;
+    private String holiday;
+    private String operatingHours;
+    private String parkingAvailable;
+    private String petFriendlyInfo;
+
+    private String indoorFacility;
+    private String outdoorFacility;
 }
