@@ -89,7 +89,7 @@ export function BoardLayout() {
         </Col>
 
         <Col md={6} style={{ overflowY: "auto" }}>
-          <h5 style={{ fontSize: "1.5rem", fontWeight: "600" }}>리뷰 미리보기</h5>
+          <h5 style={{ fontSize: "1.5rem", fontWeight: "600" }}>최신 리뷰</h5>
           <ReviewList />
         </Col>
       </Row>

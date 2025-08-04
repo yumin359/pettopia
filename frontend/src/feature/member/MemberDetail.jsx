@@ -225,6 +225,13 @@ export function MemberDetail() {
                 >
                   로그아웃
                 </Button>
+                <Button
+                  variant="outline-success"
+                  onClick={() => navigate("/review/my")}
+                  className="d-flex align-items-center gap-1"
+                >
+                  내가 쓴 리뷰
+                </Button>
               </div>
             )}
           </Card.Body>

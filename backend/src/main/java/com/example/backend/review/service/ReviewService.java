@@ -302,4 +302,16 @@ public class ReviewService {
                 })
                 .collect(Collectors.toList());
     }
+
+
+    public List<ReviewListDto> findReviewsByEmail(String email) {
+        // Member 객체의 email 필드와 비교하도록 리포지토리 메서드 이름에 _Email 붙이기
+        List<Review> reviews = reviewRepository.findAllByMemberEmail_Email(email);
+
+        // 엔티티 -> DTO 변환
+        return reviews.stream()
+                .map(review -> ReviewListDto.fromEntity(review))
+                .collect(Collectors.toList());
+    }
+
 }
