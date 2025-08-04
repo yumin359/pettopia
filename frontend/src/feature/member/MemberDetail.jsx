@@ -71,12 +71,6 @@ export function MemberDetail() {
     );
   }
 
-  function handleFavoriteListClick() {
-    toast("작업중");
-    // 이거 누르면 찜한 목록들 왈랄라 나오도록
-    // 일단 리스트로 나오게 할건데, 나중에 지도에 표시되도록 하는 거 할 수 있나
-  }
-
   // 가입일시 포맷 통일
   const formattedInsertedAt = member.insertedAt
     ? member.insertedAt.replace("T", " ").substring(0, 16)
@@ -88,13 +82,16 @@ export function MemberDetail() {
     /\.(jpg|jpeg|png|gif|webp)$/i.test(file),
   );
 
+  // member.authNames 배열에 admin 확인
+  const isAdmin = member.authNames?.includes("admin");
+
   return (
     <Row className="justify-content-center my-4">
       <Col xs={12} md={8} lg={6}>
         <div className="d-flex justify-content-between align-items-center mb-3">
           <h3 className="fw-bold mb-0 text-dark">회원 정보</h3>
           <small className="text-muted" style={{ fontSize: "0.85rem" }}>
-            {member.email === "admin@email.com" ? (
+            {isAdmin ? (
               <span className="badge bg-danger">관리자</span>
             ) : (
               <span className="badge bg-secondary">일반 사용자</span>
