@@ -67,4 +67,10 @@ public class ReviewController {
         List<ReviewListDto> latestReviews = reviewService.getLatestReviews();
         return ResponseEntity.ok(latestReviews);
     }
+
+    @GetMapping("/latest3")
+    public ResponseEntity<List<ReviewListDto>> getLatest3Reviews() {
+        List<ReviewListDto> latest3 = reviewService.getLatest3Reviews();
+        return ResponseEntity.ok(latest3);
+    }
 }
