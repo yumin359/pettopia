@@ -6,6 +6,22 @@ const api = axios.create({
   withCredentials: true,
 });
 
+// ✨✨✨ 요청 인터셉터 추가 (가장 중요한 부분) ✨✨✨
+// 이 코드는 API 요청을 보내기 직전에 가로채서,
+// localStorage에 저장된 토큰을 Authorization 헤더에 담아줍니다.
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token"); // localStorage에서 토큰을 가져옵니다.
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  },
+);
+
 /**
  * API GET 요청을 처리하는 범용 함수
  * @param {string} endpoint - API 엔드포인트

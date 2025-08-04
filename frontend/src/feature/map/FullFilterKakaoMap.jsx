@@ -147,10 +147,14 @@ const FullFilterKakaoMap = () => {
         <div className="row map-row-container">
           <div className="col-12 h-100 p-0">
             <KakaoMapComponent
+              isMapReady={isMapReady}
               setIsMapReady={setIsMapReady}
               isDataLoading={isDataLoading}
-              facilities={displayData}
+              facilities={facilities} // 👈 검색 결과 전달
+              favoriteMarkers={favoriteMarkers} // 👈 찜 목록 전달
+              isShowingFavorites={isShowingFavorites} // 👈 현재 모드 전달
               categoryColors={CATEGORY_COLORS}
+              setError={setError}
             />
           </div>
         </div>
@@ -178,7 +182,8 @@ const FullFilterKakaoMap = () => {
           {/* 리스트 Column */}
           <div className="col-12 col-md-8 list-column-container">
             <SearchResultList
-              facilities={displayData}
+              facilities={facilities} // 👈 검색 결과는 facilities로 전달
+              favoriteMarkers={favoriteMarkers} // 👈 찜 목록은 favoriteMarkers로 별도 전달 (이것이 누락되었음)
               totalElements={totalDataCount}
               isDataLoading={isDataLoading}
               currentPage={currentPage}
