@@ -1,5 +1,6 @@
 package com.example.backend.review.controller;
 
+import com.example.backend.board.dto.BoardListDto;
 import com.example.backend.review.dto.ReviewFormDto;
 import com.example.backend.review.dto.ReviewListDto;
 import com.example.backend.review.service.ReviewService;

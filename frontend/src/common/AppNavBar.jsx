@@ -1,5 +1,3 @@
-// AppNavBar.jsx
-
 import { Link, NavLink } from "react-router-dom";
 import { Navbar, Nav, Container, Button } from "react-bootstrap";
 import { useContext } from "react";
@@ -7,25 +5,24 @@ import { AuthenticationContext } from "./AuthenticationContextProvider.jsx";
 import { FaUserCircle } from "react-icons/fa";
 
 export function AppNavBar() {
-  const { user, isAdmin } = useContext(AuthenticationContext);
+  const { user } = useContext(AuthenticationContext);
 
-  // NavLink가 활성화되었을 때 적용할 스타일
+  // 활성화된 NavLink 스타일
   const activeLinkStyle = {
     fontWeight: "bold",
-    color: "black", // 활성화 시 색상 고정
+    color: "black",
   };
 
   const navLinkStyle = {
-    color: "#333", // 비활성화 시 색상
+    color: "#333",
     textDecoration: "none",
-    margin: "0 1.5rem", // 메뉴 간 간격
+    margin: "0 1.5rem",
     fontSize: "1.1rem",
   };
 
   return (
-    // ✅ fixed-top 제거하고 카드 내부에서 작동하도록 수정
     <div style={{ position: "sticky", top: 0, zIndex: 1000 }}>
-      {/* 1. 상단 바 (로고, 로그인) */}
+      {/* 상단 로고 + 로그인 */}
       <Navbar
         style={{
           backgroundColor: "#FF9D00",
@@ -33,12 +30,30 @@ export function AppNavBar() {
           minHeight: "280px",
         }}
       >
-        <Container className="d-flex flex-column justify-content-center align-items-center">
-          {/* 로고 */}
+        <Container className="position-relative">
+          {/* 로그인 버튼 - 오른쪽 상단 */}
+          <div style={{ position: "absolute", top: 10, right: 20 }}>
+            {!user ? (
+              <Button as={Link} to="/login" variant="light" size="sm">
+                LOGIN
+              </Button>
+            ) : (
+              <Nav.Link
+                as={NavLink}
+                to={`/member?email=${user.email}`}
+                className="d-flex align-items-center text-white"
+              >
+                <FaUserCircle size={22} className="me-2" />
+                {user.nickName}
+              </Nav.Link>
+            )}
+          </div>
+
+          {/* 로고와 문구 - 가운데 정렬 */}
           <Navbar.Brand
             as={Link}
             to="/"
-            className="d-flex flex-column align-items-center"
+            className="d-flex flex-column align-items-center w-100"
             style={{ textDecoration: "none" }}
           >
             <img
@@ -53,12 +68,11 @@ export function AppNavBar() {
             >
               지금, 펫프렌들리 스팟을 발견하세요!
             </h6>
-            <br />
           </Navbar.Brand>
         </Container>
       </Navbar>
 
-      {/* 2. 하단 바 (메인 메뉴) */}
+      {/* 하단 메뉴 바 */}
       <Navbar
         style={{
           backgroundColor: "#FF9D00",
@@ -70,9 +84,7 @@ export function AppNavBar() {
             <NavLink
               to="/"
               style={({ isActive }) =>
-                isActive
-                  ? { ...navLinkStyle, ...activeLinkStyle }
-                  : navLinkStyle
+                isActive ? { ...navLinkStyle, ...activeLinkStyle } : navLinkStyle
               }
             >
               HOME
@@ -80,51 +92,36 @@ export function AppNavBar() {
             <NavLink
               to="/kakaoMap"
               style={({ isActive }) =>
-                isActive
-                  ? { ...navLinkStyle, ...activeLinkStyle }
-                  : navLinkStyle
+                isActive ? { ...navLinkStyle, ...activeLinkStyle } : navLinkStyle
               }
             >
               MAP
             </NavLink>
             <NavLink
+              to="review/latest"
+              style={({ isActive }) =>
+                isActive ? { ...navLinkStyle, ...activeLinkStyle } : navLinkStyle
+              }
+            >
+              REVIEWS
+            </NavLink>
+            <NavLink
               to="/board/list"
               style={({ isActive }) =>
-                isActive
-                  ? { ...navLinkStyle, ...activeLinkStyle }
-                  : navLinkStyle
+                isActive ? { ...navLinkStyle, ...activeLinkStyle } : navLinkStyle
               }
             >
               NEWS
             </NavLink>
+
             <NavLink
               to="/service"
               style={({ isActive }) =>
-                isActive
-                  ? { ...navLinkStyle, ...activeLinkStyle }
-                  : navLinkStyle
+                isActive ? { ...navLinkStyle, ...activeLinkStyle } : navLinkStyle
               }
             >
               SUPPORT
             </NavLink>
-          </Nav>
-          {/* 로그인/사용자 정보 - 우측으로 이동 */}
-          <Nav>
-            {!user ? (
-              <Button as={Link} to="/login" variant="light" size="sm">
-                LOGIN
-              </Button>
-            ) : (
-              <Nav.Link
-                as={NavLink}
-                to={`/member?email=${user.email}`}
-                className="d-flex align-items-center"
-                style={{ color: "white" }}
-              >
-                <FaUserCircle size={22} className="me-2" />
-                {user.nickName}
-              </Nav.Link>
-            )}
           </Nav>
         </Container>
       </Navbar>
