@@ -192,7 +192,10 @@ const KakaoMapComponent = ({
   ]);
 
   return (
-    <div className="col-7 position-relative p-0">
+    <div
+      ref={mapContainer}
+      className="w-100 h-100 position-relative" // `position-relative`은 로딩 스피너를 위함
+    >
       {(!isMapReady || isDataLoading) && (
         <div
           className="position-absolute top-0 start-0 w-100 h-100 bg-light bg-opacity-75 d-flex justify-content-center align-items-center rounded"
@@ -208,11 +211,6 @@ const KakaoMapComponent = ({
           </div>
         </div>
       )}
-      <div
-        ref={mapContainer}
-        className="w-100 h-100 rounded"
-        style={{ minHeight: "100%" }}
-      />
     </div>
   );
 };

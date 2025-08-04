@@ -3,8 +3,6 @@ import React, { useEffect, useState, useCallback } from "react";
 import FilterPanel from "./FilterPanel.jsx";
 import SearchResultList from "./SearchResultList";
 import KakaoMapComponent from "./KakaoMapComponent";
-
-// 새로 분리한 폴백 데이터 임포트
 import {
   fallbackSigunguData,
   fallbackCategories2,
@@ -14,6 +12,59 @@ import axios from "axios";
 import { toast } from "react-toastify";
 
 const ITEMS_PER_PAGE = 15;
+
+// 🎨 스타일 객체들을 하나로 그룹화하여 관리합니다.
+// 🎨 스타일 객체들을 하나로 그룹화하여 관리합니다.
+const styles = {
+  container: {
+    display: "grid",
+    gridTemplateAreas: `
+      "map map"
+      "filter list"
+    `,
+    // ✅ 이 부분을 수정하여 너비 비율을 조정합니다.
+    gridTemplateColumns: "300px 1fr",
+    gridTemplateRows: "45vh 1fr",
+    height: "100vh",
+    gap: "12px",
+    padding: "12px",
+    boxSizing: "border-box",
+    backgroundColor: "#f4f6f8",
+  },
+  mapArea: {
+    gridArea: "map",
+    minHeight: 0,
+    borderRadius: "8px",
+    overflow: "hidden",
+    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+  },
+  filterArea: {
+    gridArea: "filter",
+    minHeight: 0,
+    overflowY: "auto",
+    backgroundColor: "white",
+    borderRadius: "8px",
+    padding: "16px",
+    boxSizing: "border-box",
+    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+  },
+  listArea: {
+    gridArea: "list",
+    minHeight: 0,
+    overflowY: "auto",
+    backgroundColor: "white",
+    borderRadius: "8px",
+    padding: "8px 16px",
+    boxSizing: "border-box",
+    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+  },
+  errorContainer: {
+    height: "100vh",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+};
 
 const FullFilterKakaoMap = () => {
   const [error, setError] = useState(null);
@@ -325,6 +376,7 @@ const FullFilterKakaoMap = () => {
     }
   }
 
+  // --- 렌더링 ---
   if (error) {
     return (
       <div
@@ -346,8 +398,20 @@ const FullFilterKakaoMap = () => {
   }
 
   return (
-    <div className="container-fluid p-1" style={{ height: "80vh" }}>
-      <div className="row h-100 g-1">
+    <div style={styles.container}>
+      <div style={styles.mapArea}>
+        <KakaoMapComponent
+          isMapReady={isMapReady}
+          setIsMapReady={setIsMapReady}
+          isDataLoading={isDataLoading}
+          setError={setError}
+          facilities={hasSearched ? facilities : []}
+          isShowingFavorites={isShowingFavorites}
+          categoryColors={categoryColors}
+          favoriteMarkers={favoriteMarkers}
+        />
+      </div>
+      <div style={styles.filterArea}>
         <FilterPanel
           selectedRegion={selectedRegion}
           setSelectedRegion={setSelectedRegion}
@@ -373,34 +437,27 @@ const FullFilterKakaoMap = () => {
           setFacilityType={setFacilityType}
           categoryColors={categoryColors}
           onSearch={handleSearch}
-          onLoadFavorites={loadFavoriteMarkers} // 찜 목록 불러오기 함수 전달
+          onLoadFavorites={loadFavoriteMarkers}
         />
-
+      </div>
+      <div style={styles.listArea}>
         <SearchResultList
-          facilities={facilities}
-          totalElements={totalElements}
+          facilities={isShowingFavorites ? favoriteMarkers : facilities}
+          totalElements={
+            isShowingFavorites ? favoriteMarkers.length : totalElements
+          }
           isDataLoading={isDataLoading}
           currentPage={currentPage}
-          totalPages={totalPages}
+          totalPages={Math.ceil(
+            (isShowingFavorites ? favoriteMarkers.length : totalElements) /
+              ITEMS_PER_PAGE,
+          )}
           handlePageChange={setCurrentPage}
-          handleListItemClick={handleListItemClick}
           categoryColors={categoryColors}
           ITEMS_PER_PAGE={ITEMS_PER_PAGE}
-          hasSearched={hasSearched}
-          isShowingFavorites={isShowingFavorites} // 찜 활성화 상태
-          favoriteMarkers={favoriteMarkers} // 찜 목록 데이터 전달
-        />
-
-        <KakaoMapComponent
-          isMapReady={isMapReady}
-          setIsMapReady={setIsMapReady}
-          isDataLoading={isDataLoading}
-          setError={setError}
-          facilities={hasSearched ? facilities : []} // 검색 전에는 빈 배열
-          isShowingFavorites={isShowingFavorites} // 찜 활성화 상태
-          categoryColors={categoryColors}
-          handleListItemClick={handleListItemClick}
-          favoriteMarkers={favoriteMarkers} // 찜 목록 데이터 전달
+          hasSearched={hasSearched || isShowingFavorites}
+          isShowingFavorites={isShowingFavorites}
+          favoriteMarkers={favoriteMarkers}
         />
       </div>
     </div>

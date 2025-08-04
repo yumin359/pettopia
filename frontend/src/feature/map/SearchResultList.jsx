@@ -157,10 +157,7 @@ const SearchResultList = ({
   };
 
   return (
-    <div
-      className="col-3 bg-white border rounded p-2 d-flex flex-column"
-      style={{ height: "100%" }}
-    >
+    <div className="w-100 h-100 d-flex flex-column" style={{ height: "100%" }}>
       <div className="d-flex justify-content-between align-items-center mb-2 flex-shrink-0">
         {isShowingFavorites ? (
           <>

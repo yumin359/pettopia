@@ -73,8 +73,8 @@ const FilterPanel = ({
 }) => {
   return (
     <div
-      className="col-2 bg-white border rounded p-2 d-flex flex-column"
-      style={{ height: "100%", fontSize: "12px" }}
+      className="w-100 h-100 d-flex flex-column"
+      style={{ fontSize: "12px" }}
     >
       <h6 className="text-dark mb-2 flex-shrink-0">🐾 필터</h6>
 
