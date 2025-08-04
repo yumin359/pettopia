@@ -1,12 +1,12 @@
 // src/map/FullFilterKakaoMap.js
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import FilterPanel from "./FilterPanel.jsx";
 import SearchResultList from "./SearchResultList";
 import KakaoMapComponent from "./KakaoMapComponent";
 import {
-  fallbackSigunguData,
   fallbackCategories2,
   fallbackRegions,
+  fallbackSigunguData,
 } from "./data/fallbackSigunguData.jsx";
 import axios from "axios";
 import { toast } from "react-toastify";

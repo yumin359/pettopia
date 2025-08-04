@@ -1,7 +1,5 @@
 // src/feature/map/FilterPanel.js
-import React, { useState } from "react";
-import { toast } from "react-toastify";
-import axios from "axios";
+import React from "react";
 
 const CheckboxGroup = ({
   title,
@@ -76,8 +74,6 @@ const FilterPanel = ({
       className="h-100 d-flex flex-column bg-white rounded shadow-sm p-3"
       style={{ fontSize: "12px" }}
     >
-      <h6 className="text-dark mb-2 flex-shrink-0">🐾 필터</h6>
-
       <div className="flex-grow-1 overflow-auto" style={{ minHeight: 0 }}>
         <div className="mb-2">
           <label className="form-label small fw-bold mb-1">📍 지역</label>
