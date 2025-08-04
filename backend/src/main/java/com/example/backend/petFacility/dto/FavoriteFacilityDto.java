@@ -17,6 +17,9 @@ public class FavoriteFacilityDto {
     private String roadName;
     private String bunji;
 
+    private String roadAddress;
+    private String jibunAddress;
+
     private String phoneNumber;
     private String holiday;
     private String operatingHours;
