@@ -13,16 +13,27 @@ export function ReviewLikeContainer({ reviewId }) {
     return axios
       .get(`/api/reviewlike/review/${reviewId}`)
       .then((res) => setLikeInfo(res.data)) // { liked: true/false, likeCount: number }
-      .catch((err) => console.error("리뷰 좋아요 정보 로딩 실패:", err));
+      .catch((err) => {
+        console.error("리뷰 좋아요 정보 로딩 실패:", err);
+        // 에러 발생 시에도 기본값 세팅해서 무한로딩 방지
+        setLikeInfo({ liked: false, likeCount: 0 });
+      });
   }
 
   useEffect(() => {
+    if (!user) {
+      // 로그인 안 했으면 API 호출하지 말고 기본값 세팅
+      setLikeInfo({ liked: false, likeCount: 0 });
+      setIsProcessing(false);
+      return;
+    }
+
     setIsProcessing(true);
     fetchLikeInfo().finally(() => setIsProcessing(false));
-  }, [reviewId]);
+  }, [reviewId, user]);
 
   function handleThumbsClick() {
-    if (isProcessing) return;
+    if (isProcessing || !user) return;
 
     setIsProcessing(true);
     axios
