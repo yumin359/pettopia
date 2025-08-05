@@ -171,13 +171,9 @@ export function MemberLogin() {
             variant="outline-dark"
           >
             <img
-              src="https://placehold.co/22x22/ffffff/000000?text=G"
+              src="/img_1.png"
               alt="google"
               style={{ width: "22px", marginRight: "10px" }}
-              onError={(e) => {
-                e.target.onerror = null;
-                e.target.src = "/img_1.png";
-              }}
             />
             <span>구글로 로그인</span>
           </Button>
