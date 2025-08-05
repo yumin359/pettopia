@@ -4,6 +4,8 @@ import { useContext, useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { AuthenticationContext } from "./AuthenticationContextProvider.jsx";
 import { FaUserCircle } from "react-icons/fa";
+import { useNavigate } from "react-router";
+import { toast } from "react-toastify";
 
 export function AppNavBar() {
   const { user, logout } = useContext(AuthenticationContext);
@@ -13,6 +15,7 @@ export function AppNavBar() {
     right: 0,
   });
   const dropdownRef = useRef(null);
+  const navigate = useNavigate();
 
   // 드롭다운 위치 계산
   const handleDropdownToggle = (event) => {
@@ -123,6 +126,8 @@ export function AppNavBar() {
           onMouseLeave={(e) => (e.target.style.backgroundColor = "transparent")}
           onClick={() => {
             logout();
+            navigate("/login");
+            toast("로그아웃되었습니다.");
             setShowDropdown(false);
           }}
         >
