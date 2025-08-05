@@ -18,6 +18,12 @@ export function ReviewListMini() {
   const [clampedIds, setClampedIds] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
 
+  // 신고 관련 상태들
+  const [reportModalOpen, setReportModalOpen] = useState(false);
+  const [reportReason, setReportReason] = useState("");
+  const [reportingReviewId, setReportingReviewId] = useState(null);
+  const [reportLoading, setReportLoading] = useState(false);
+
   const reviewsPerPage = 5;
   const reviewRefs = useRef({});
   const navigate = useNavigate();
@@ -72,6 +78,47 @@ export function ReviewListMini() {
     setExpandedIds((prev) =>
       prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id],
     );
+  };
+
+  // 신고 모달 열기
+  const openReportModal = (reviewId) => {
+    setReportingReviewId(reviewId);
+    setReportReason("");
+    setReportModalOpen(true);
+  };
+
+  // 신고 모달 닫기
+  const closeReportModal = () => {
+    setReportModalOpen(false);
+    setReportingReviewId(null);
+    setReportReason("");
+  };
+
+  // 신고 제출
+  const submitReport = async () => {
+    if (!reportReason.trim()) {
+      alert("신고 사유를 입력해주세요.");
+      return;
+    }
+    setReportLoading(true);
+    try {
+      await fetch("/api/review/report", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          reviewId: reportingReviewId,
+          reason: reportReason.trim(),
+        }),
+      });
+      alert("신고가 접수되었습니다.");
+      closeReportModal();
+    } catch (error) {
+      alert("신고 실패: " + error.message);
+    } finally {
+      setReportLoading(false);
+    }
   };
 
   const defaultProfileImage = "/user.png";
@@ -168,9 +215,30 @@ export function ReviewListMini() {
 
                 <div className="mt-3 d-flex align-items-center gap-2">
                   <ReviewLikeContainer reviewId={r.id} />
+                  {/* 신고 버튼 */}
+                  <button
+                    onClick={() => openReportModal(r.id)}
+                    title="리뷰 신고하기"
+                    style={{
+                      background: "none",
+                      border: "none",
+                      padding: 0,
+                      margin: 0,
+                      cursor: "pointer",
+                      fontSize: "1.2rem",
+                      lineHeight: 1,
+                      color: "#dc3545",
+                      userSelect: "none",
+                    }}
+                  >
+                    🚨
+                  </button>
                 </div>
 
-                <div className="text-muted mt-3" style={{ fontSize: "0.8rem" }}>
+                <div
+                  className="text-muted mt-3"
+                  style={{ fontSize: "0.8rem" }}
+                >
                   <Image
                     roundedCircle
                     className="me-2"
@@ -190,7 +258,7 @@ export function ReviewListMini() {
           })}
         </div>
 
-        {/* ✅ 페이징 컨트롤 */}
+        {/* 페이징 컨트롤 */}
         {totalPages > 1 && (
           <Pagination className="justify-content-center mt-4">
             <Pagination.Prev
@@ -215,6 +283,83 @@ export function ReviewListMini() {
           </Pagination>
         )}
       </Col>
+
+      {/* 신고 모달 */}
+      {reportModalOpen && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            backgroundColor: "rgba(0,0,0,0.5)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000,
+          }}
+          onClick={closeReportModal}
+        >
+          <div
+            style={{
+              backgroundColor: "white",
+              padding: "1.5rem",
+              borderRadius: "8px",
+              width: "90%",
+              maxWidth: "400px",
+              position: "relative",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3>리뷰 신고하기</h3>
+            <textarea
+              rows={5}
+              placeholder="신고 사유를 작성해주세요."
+              value={reportReason}
+              onChange={(e) => setReportReason(e.target.value)}
+              style={{ width: "100%", marginTop: "0.5rem", resize: "vertical" }}
+            />
+            <div
+              style={{
+                marginTop: "1rem",
+                display: "flex",
+                justifyContent: "flex-end",
+                gap: "0.5rem",
+              }}
+            >
+              <button
+                onClick={closeReportModal}
+                disabled={reportLoading}
+                style={{
+                  padding: "0.4rem 1rem",
+                  backgroundColor: "#6c757d",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                }}
+              >
+                취소
+              </button>
+              <button
+                onClick={submitReport}
+                disabled={reportLoading}
+                style={{
+                  padding: "0.4rem 1rem",
+                  backgroundColor: "#ffc107",
+                  color: "#212529",
+                  border: "none",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                }}
+              >
+                {reportLoading ? "신고중..." : "신고하기"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <style>{`
         .line-clamp {

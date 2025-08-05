@@ -94,6 +94,7 @@ export function ReviewPreview() {
           </td>
           <td className="text-truncate text-muted">{review.nickName}</td>
           <td className="text-muted">{review.timesAgo}</td>
+
         </tr>
       ))}
       </tbody>
