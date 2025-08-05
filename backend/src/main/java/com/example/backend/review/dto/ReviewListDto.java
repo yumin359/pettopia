@@ -36,7 +36,7 @@ public class ReviewListDto {
         this.insertedAt = review.getInsertedAt();
 
         // 리뷰 첨부파일 URL 생성
-        String baseUrl = "https://yourserver.com/files/";  // 실제 파일 저장 URL로 변경하세요
+        String baseUrl = "https://prj3/";  // 실제 파일 저장 URL로 변경하세요
         this.files = review.getFiles().stream()
                 .map(file -> baseUrl + file.getId().getName())  // ReviewFileId.name 사용
                 .collect(Collectors.toList());
