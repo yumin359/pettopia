@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Card, Col, Image, Row, Spinner } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
@@ -52,7 +52,7 @@ export function MyReview() {
                 {/* 상단: 시설명 + 별점 */}
                 <div className="d-flex justify-content-between align-items-center mb-2">
                   <div
-                    className="fw-semibold"
+                    className="fw-semibold hover-underline-on-hover"
                     style={{ color: "#5a3600", cursor: "pointer" }}
                     onClick={() =>
                       navigate(
@@ -118,6 +118,18 @@ export function MyReview() {
           })}
         </div>
       </Col>
+
+      <style>{`
+        .line-clamp {
+          display: -webkit-box;
+          -webkit-line-clamp: 3;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+        .hover-underline-on-hover:hover {
+          text-decoration: underline !important;
+        }
+      `}</style>
     </Row>
   );
 }
