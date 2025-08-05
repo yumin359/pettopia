@@ -72,6 +72,7 @@ public class AppConfiguration {
                 .requestMatchers(
                         "/api/member/signup",
                         "/api/member/login",
+                        "/api/member/add",
                         "/api/member/login/kakao",
                         "/api/pet_facilities/**",
                         "/api/board/latest",     // 여기 추가
