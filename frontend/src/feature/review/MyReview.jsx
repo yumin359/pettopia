@@ -9,7 +9,7 @@ export function MyReview() {
 
   useEffect(() => {
     axios
-      .get("/api/review/myreview")
+      .get("/api/review/myReview")
       .then((res) => setReviews(res.data))
       .catch((err) => {
         console.error("리뷰 불러오기 실패", err);
@@ -17,7 +17,8 @@ export function MyReview() {
       });
   }, []);
 
-  const isImageFile = (url) => /\.(jpg|jpeg|png|gif|webp)$/i.test(url?.split("?")[0]);
+  const isImageFile = (url) =>
+    /\.(jpg|jpeg|png|gif|webp)$/i.test(url?.split("?")[0]);
   const defaultProfileImage = "/user.png";
 
   if (!reviews) {
@@ -30,9 +31,7 @@ export function MyReview() {
 
   if (reviews.length === 0) {
     return (
-      <div className="text-center mt-5 text-muted">
-        작성한 리뷰가 없습니다.
-      </div>
+      <div className="text-center mt-5 text-muted">작성한 리뷰가 없습니다.</div>
     );
   }
 
@@ -56,7 +55,9 @@ export function MyReview() {
                     className="fw-semibold"
                     style={{ color: "#5a3600", cursor: "pointer" }}
                     onClick={() =>
-                      navigate(`/facility/${encodeURIComponent(r.facilityName)}`)
+                      navigate(
+                        `/facility/${encodeURIComponent(r.facilityName)}`,
+                      )
                     }
                   >
                     {r.facilityName}
@@ -65,7 +66,9 @@ export function MyReview() {
                     <span style={{ color: "#f0ad4e", fontSize: "1.1rem" }}>
                       {"★".repeat(r.rating)}
                     </span>
-                    <span className="ms-2 text-dark fw-semibold">{r.rating}</span>
+                    <span className="ms-2 text-dark fw-semibold">
+                      {r.rating}
+                    </span>
                   </div>
                 </div>
 
@@ -82,20 +85,31 @@ export function MyReview() {
                         src={firstImage}
                         alt="리뷰 이미지"
                         className="rounded shadow"
-                        style={{ width: "100px", height: "100px", objectFit: "cover" }}
+                        style={{
+                          width: "100px",
+                          height: "100px",
+                          objectFit: "cover",
+                        }}
                       />
                     </Col>
                   )}
                 </Row>
 
                 {/* 하단: 날짜 + 프로필 */}
-                <div className="text-muted mt-3" style={{ fontSize: "0.85rem" }}>
+                <div
+                  className="text-muted mt-3"
+                  style={{ fontSize: "0.85rem" }}
+                >
                   <Image
                     roundedCircle
                     className="me-2"
                     src={r.profileImageUrl || defaultProfileImage}
                     alt={`${r.memberEmailNickName ?? "익명"} 프로필`}
-                    style={{ width: "24px", height: "24px", objectFit: "cover" }}
+                    style={{
+                      width: "24px",
+                      height: "24px",
+                      objectFit: "cover",
+                    }}
                   />
                   {r.insertedAt?.split("T")[0]}
                 </div>

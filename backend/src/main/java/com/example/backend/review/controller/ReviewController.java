@@ -76,7 +76,7 @@ public class ReviewController {
         return ResponseEntity.ok(latest3);
     }
 
-    @GetMapping("/myreview")
+    @GetMapping("/myReview")
     public ResponseEntity<List<ReviewListDto>> getMyReviews(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
