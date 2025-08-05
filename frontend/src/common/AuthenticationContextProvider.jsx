@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useCallback, useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 
@@ -29,6 +29,17 @@ const AuthenticationContext = createContext(null);
 
 export function AuthenticationContextProvider({ children }) {
   const [user, setUser] = useState(null);
+
+  const updateUser = useCallback((newUserInfo) => {
+    // 현재 user 상태를 기반으로 새로운 정보를 덮어씁니다.
+    setUser((currentUser) => {
+      if (!currentUser) return null; // 혹시 로그아웃된 상태면 아무것도 안 함
+      return {
+        ...currentUser, // email, scope 등 기존 정보는 그대로 유지
+        ...newUserInfo, // nickName 등 새로 들어온 정보만 변경
+      };
+    });
+  }, []);
 
   // ✅ login 함수를 하나로 통합하고 정리합니다.
   // 이 함수는 토큰을 받아 저장하고, 사용자 정보를 가져와 상태를 업데이트합니다.
@@ -80,6 +91,7 @@ export function AuthenticationContextProvider({ children }) {
         logout,
         hasAccess,
         isAdmin,
+        updateUser,
       }}
     >
       {children}

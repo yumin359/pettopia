@@ -31,7 +31,7 @@ export function MemberEdit() {
   // 라우팅 및 인증 관련 훅
   const [params] = useSearchParams();
   const navigate = useNavigate();
-  const { hasAccess } = useContext(AuthenticationContext);
+  const { hasAccess, updateUser } = useContext(AuthenticationContext);
   const isSelf = member ? hasAccess(member.email) : false;
 
   // 📝 프로필 이미지 관련 상태 변경:
@@ -210,6 +210,7 @@ export function MemberEdit() {
       .then((res) => {
         const message = res.data.message;
         if (message) toast(message.text, { type: message.type });
+        updateUser({ nickName: member.nickName });
         navigate(`/member?email=${member.email}`);
       })
       .catch((err) => {
@@ -221,7 +222,6 @@ export function MemberEdit() {
         setPassword("");
       });
   };
-
 
   // 비밀번호 변경 요청
   const handleChangePasswordButtonClick = () => {
