@@ -187,17 +187,11 @@ export function AppNavBar() {
         <Container fluid>
           {/* 로고와 브랜드 이름 */}
           <Navbar.Brand as={Link} to="/" className="d-flex align-items-center">
-            {/*<img*/}
-            {/*  src="/PETOPIA-Photoroom.png"*/}
-            {/*  alt="로고"*/}
-            {/*  height="50"*/}
-            {/*  className="d-inline-block align-top"*/}
-            {/*/>*/}
             <span
-              className="ms-3"
+              className="ms-2 ms-md-3" // 모바일에서는 ms-2, 중간 화면 이상에서는 ms-3
               style={{
                 fontFamily: "'Fredoka One', cursive",
-                fontSize: "1.8rem",
+                fontSize: "clamp(1.2rem, 4vw, 1.8rem)", // 반응형 폰트 크기
                 color: "white",
                 textShadow: "1px 1px 3px rgba(0,0,0,0.2)",
               }}
