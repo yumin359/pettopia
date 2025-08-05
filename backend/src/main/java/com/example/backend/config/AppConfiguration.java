@@ -72,6 +72,7 @@ public class AppConfiguration {
                 .requestMatchers(
                         "/api/member/signup",
                         "/api/member/login",
+                        "/api/member/login/kakao",
                         "/api/pet_facilities/**",
                         "/api/board/latest",     // 여기 추가
                         "/api/board/list",       // 공지사항 목록도 공개한다면 추가
@@ -94,7 +95,7 @@ public class AppConfiguration {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:5173"));
+        config.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:5173"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true); // 👈 인증 정보 허용

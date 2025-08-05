@@ -13,12 +13,19 @@ import com.example.backend.member.repository.MemberFileRepository;
 import com.example.backend.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -28,6 +35,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Pattern;
@@ -47,6 +55,8 @@ public class MemberService {
     private final BoardRepository boardRepository;
     private final BoardLikeRepository boardLikeRepository;
     private final S3Client s3Client;
+
+    private final RestTemplate restTemplate = new RestTemplate(); // API 호출을 위해 추가
 
     @Value("${image.prefix}")
     private String imagePrefix;
@@ -337,7 +347,6 @@ public class MemberService {
         return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
     }
 
-
     public void changePassword(ChangePasswordForm form) {
         Member member = memberRepository.findByEmail(form.getEmail())
                 .orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
@@ -352,4 +361,174 @@ public class MemberService {
         memberRepository.save(member);
     }
 
+    // -------------------카카오 로그인------------------------------
+    // application.yml 또는 properties에 설정한 값을 주입받습니다.
+    @Value("${kakao.client.id}")
+    private String KAKAO_CLIENT_ID;
+
+    @Value("${kakao.redirect.uri}")
+    private String KAKAO_REDIRECT_URI;
+
+    // ... 기존 MemberService 코드 ...
+
+    public String processKakaoLogin(String code) {
+        // 1. 인가 코드로 액세스 토큰 받기
+        String accessToken = getAccessToken(code);
+
+        // 2. 액세스 토큰으로 사용자 정보 받기
+        KakaoUserInfoResponse userInfo = getUserInfo(accessToken);
+
+        // 3. 사용자 정보로 회원가입 또는 로그인 처리
+        Member member = registerOrLoginUser(userInfo);
+
+        // 4. 우리 서비스의 JWT 토큰 발급
+        List<String> authList = authRepository.findAuthNamesByMemberId(member.getId());
+
+        JwtClaimsSet claims = JwtClaimsSet.builder()
+                .issuer("self")
+                .issuedAt(Instant.now())
+                .expiresAt(Instant.now().plusSeconds(60 * 60 * 24 * 365)) // 유효 기간
+                .subject(member.getEmail())
+                .claim("scp", String.join(" ", authList))
+                .build();
+
+        return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
+    }
+
+    private String getAccessToken(String code) {
+        // 요청 URL
+        String tokenUrl = "https://kauth.kakao.com/oauth/token";
+
+        // HTTP 헤더 설정
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
+
+        // HTTP 바디 설정
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("grant_type", "authorization_code");
+        params.add("client_id", KAKAO_CLIENT_ID);
+        params.add("redirect_uri", KAKAO_REDIRECT_URI);
+        params.add("code", code);
+        // client_secret을 사용하는 경우 params.add("client_secret", KAKAO_CLIENT_SECRET); 추가
+
+        // HTTP 요청 엔티티 생성
+        HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest = new HttpEntity<>(params, headers);
+
+        // POST 요청 보내기
+        ResponseEntity<Map> response = restTemplate.exchange(
+                tokenUrl,
+                HttpMethod.POST,
+                kakaoTokenRequest,
+                Map.class
+        );
+
+        // 응답에서 액세스 토큰 추출
+        return (String) response.getBody().get("access_token");
+    }
+
+    private KakaoUserInfoResponse getUserInfo(String accessToken) {
+        // 요청 URL
+        String userInfoUrl = "https://kapi.kakao.com/v2/user/me";
+
+        // HTTP 헤더 설정
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + accessToken);
+        headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
+
+        // HTTP 요청 엔티티 생성
+        HttpEntity<MultiValueMap<String, String>> kakaoProfileRequest = new HttpEntity<>(headers);
+
+        // POST 요청 보내기
+        ResponseEntity<KakaoUserInfoResponse> response = restTemplate.exchange(
+                userInfoUrl,
+                HttpMethod.POST,
+                kakaoProfileRequest,
+                KakaoUserInfoResponse.class // 응답을 DTO로 바로 매핑
+        );
+
+        return response.getBody();
+    }
+
+    private Member registerOrLoginUser(KakaoUserInfoResponse userInfo) {
+        Long kakaoId = userInfo.getId();
+
+        if (kakaoId == null) {
+            throw new RuntimeException("카카오 사용자 ID를 가져올 수 없습니다.");
+        }
+
+        Optional<Member> optionalMember = memberRepository.findByKakaoId(kakaoId);
+        if (optionalMember.isPresent()) {
+            return optionalMember.get();
+        }
+
+        // --- 신규 회원 가입 로직 ---
+        String baseNickname = "사용자" + kakaoId;
+        String email = kakaoId + "@kakao.social";
+
+        Map<String, Object> kakaoAccount = userInfo.getKakao_account();
+        if (kakaoAccount != null) {
+            Map<String, String> profile = (Map<String, String>) kakaoAccount.get("profile");
+            if (profile != null && profile.get("nickname") != null) {
+                baseNickname = profile.get("nickname");
+            }
+
+            String kakaoEmail = (String) kakaoAccount.get("email");
+            if (kakaoEmail != null && !kakaoEmail.isEmpty()) {
+                email = kakaoEmail;
+            }
+        }
+
+        if (("사용자" + kakaoId).equals(baseNickname) && userInfo.getProperties() != null) {
+            Map<String, Object> properties = userInfo.getProperties();
+            String propertiesNickname = (String) properties.get("nickname");
+            if (propertiesNickname != null && !propertiesNickname.isEmpty()) {
+                baseNickname = propertiesNickname;
+            }
+        }
+
+        // 🔥 닉네임 중복 해결 로직
+        String uniqueNickname = generateUniqueNickname(baseNickname);
+
+        Optional<Member> existingEmailMember = memberRepository.findByEmail(email);
+        Member member;
+
+        if (existingEmailMember.isPresent()) {
+            member = existingEmailMember.get();
+            member.setKakaoId(kakaoId);
+            member.setProvider("kakao");
+            member.setProviderId(String.valueOf(kakaoId));
+        } else {
+            member = Member.builder()
+                    .email(email)
+                    .nickName(uniqueNickname)  // 중복되지 않는 닉네임 사용
+                    .password(bCryptPasswordEncoder.encode(UUID.randomUUID().toString()))
+                    .kakaoId(kakaoId)
+                    .provider("kakao")
+                    .providerId(String.valueOf(kakaoId))
+                    .role(Member.Role.USER)
+                    .build();
+        }
+
+        return memberRepository.save(member);
+    }
+
+    // 🔥 중복되지 않는 닉네임을 생성하는 헬퍼 메서드 추가
+    private String generateUniqueNickname(String baseNickname) {
+        String nickname = baseNickname;
+        int counter = 1;
+
+        // 닉네임이 중복될 때까지 숫자를 붙여서 시도
+        while (memberRepository.findByNickName(nickname).isPresent()) {
+            nickname = baseNickname + "_" + counter;
+            counter++;
+
+            // 무한 루프 방지 (최대 1000번 시도)
+            if (counter > 1000) {
+                nickname = baseNickname + "_" + UUID.randomUUID().toString().substring(0, 8);
+                break;
+            }
+        }
+
+        return nickname;
+    }
 }
