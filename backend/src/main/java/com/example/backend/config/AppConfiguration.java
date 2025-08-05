@@ -75,8 +75,12 @@ public class AppConfiguration {
                         "/api/pet_facilities/**",
                         "/api/board/latest",     // 여기 추가
                         "/api/board/list",       // 공지사항 목록도 공개한다면 추가
+                        "/api/board/*",
                         "/api/board/{id}",
-                        "/api/review/latest"// 특정 글 상세도 공개한다면 추가 (패턴 주의)
+                        "/api/review/latest",// 특정 글 상세도 공개한다면 추가 (패턴 주의)
+                        "/api/chatbot",
+                        "/api/comment/list",
+                        "/api/like/board/**"
                 ).permitAll()
                 .anyRequest().authenticated()
         );
