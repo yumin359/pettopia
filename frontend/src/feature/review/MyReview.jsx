@@ -94,7 +94,7 @@ export function MyReview() {
                     roundedCircle
                     className="me-2"
                     src={r.profileImageUrl || defaultProfileImage}
-                    alt="프로필"
+                    alt={`${r.memberEmailNickName ?? "익명"} 프로필`}
                     style={{ width: "24px", height: "24px", objectFit: "cover" }}
                   />
                   {r.insertedAt?.split("T")[0]}
