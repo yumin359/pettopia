@@ -35,7 +35,7 @@ export function MainLayout() {
         <div
           style={{
             borderRadius: "0 0 12px 12px", // 하단만 둥글게
-            overflow: "hidden",
+            overflow: "visible", // 드롭다운이 보이도록 변경
             boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)", // 네비바에 그림자 추가
           }}
         >
@@ -44,7 +44,7 @@ export function MainLayout() {
       </div>
 
       {/* 네비바 높이만큼 상단 여백 추가 */}
-      <div style={{ paddingTop: "100px", padding: "20px 0 20px 0" }}>
+      <div style={{ padding: "100px 0 20px 0" }}>
         {/* 전체를 감싸는 카드 */}
         <Container className="h-100">
           <Card
