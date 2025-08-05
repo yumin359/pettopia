@@ -31,7 +31,10 @@ export function MemberDetail() {
   useEffect(() => {
     axios
       .get(`/api/member?email=${params.get("email")}`)
-      .then((res) => setMember(res.data))
+      .then((res) => {
+        setMember(res.data);
+        console.log(res.data); // 없앨것
+      })
       .catch((err) => {
         console.error(err);
         toast.error("회원 정보를 불러오는 중 오류가 발생했습니다.");
@@ -84,6 +87,8 @@ export function MemberDetail() {
 
   // member.authNames 배열에 admin 확인
   const isAdmin = member.authNames?.includes("admin");
+
+  const isKakao = member.provider?.includes("kakao");
 
   return (
     <Row className="justify-content-center my-4">
@@ -237,16 +242,24 @@ export function MemberDetail() {
         {/* 탈퇴 확인 모달 */}
         <Modal show={modalShow} onHide={() => setModalShow(false)} centered>
           <Modal.Header closeButton>
-            <Modal.Title>회원 탈퇴 확인</Modal.Title>
+            <Modal.Title>
+              {isKakao ? "카카오 회원 탈퇴" : "회원 탈퇴 확인"}
+            </Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <FormGroup controlId="password1">
-              <FormLabel>암호</FormLabel>
+              <FormLabel>
+                {isKakao
+                  ? `${member.tempCode}를 아래에 작성하세요.`
+                  : "암호를 입력하세요"}
+              </FormLabel>
               <FormControl
-                type="password"
+                type={isKakao ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="비밀번호를 입력하세요"
+                placeholder={
+                  isKakao ? "코드를 작성하세요." : "비밀번호를 입력하세요"
+                }
                 autoFocus
               />
             </FormGroup>

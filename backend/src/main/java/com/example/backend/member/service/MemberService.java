@@ -18,6 +18,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
@@ -38,6 +39,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -55,6 +60,11 @@ public class MemberService {
     private final BoardRepository boardRepository;
     private final BoardLikeRepository boardLikeRepository;
     private final S3Client s3Client;
+
+    // 외부 로그인 사용자 탈퇴시 임시코드를 위해 -> 나중에 db에 저장하기
+    private final Map<String, String> withdrawalCodes = new ConcurrentHashMap<>();
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+    private final PasswordEncoder passwordEncoder;
 
     private final RestTemplate restTemplate = new RestTemplate(); // API 호출을 위해 추가
 
@@ -183,6 +193,21 @@ public class MemberService {
         return memberRepository.findAllBy();
     }
 
+    // 임시 탈퇴 코드 생성
+    public String generateWithdrawalCode(String email) {
+        // 이미 생성된 거 있으명 삭제
+        withdrawalCodes.remove(email);
+
+        // 임시 코드 생성
+        String tempCode = UUID.randomUUID().toString().substring(0, 8);
+        withdrawalCodes.put(email, tempCode);
+
+        // 5분 후 코드 삭제 예약
+        scheduler.schedule(() -> withdrawalCodes.remove(email), 5, TimeUnit.MINUTES);
+
+        return tempCode;
+    }
+
     public MemberDto get(String email) {
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("해당 이메일의 회원이 존재하지 않습니다."));
@@ -194,11 +219,18 @@ public class MemberService {
         // 회원 권한 이름 가져오기
         List<String> authNames = authRepository.findAuthNamesByMemberId(member.getId());
 
+        String tempCode = null;
+        if (member.getProvider().equals("kakao")) {
+            tempCode = generateWithdrawalCode(email);
+        }
+
         return MemberDto.builder()
                 .email(member.getEmail())
                 .nickName(member.getNickName())
                 .info(member.getInfo())
                 .insertedAt(member.getInsertedAt())
+                .provider(member.getProvider())
+                .tempCode(tempCode)
                 .files(fileUrls)
                 .authNames(authNames)
                 .build();
@@ -208,9 +240,26 @@ public class MemberService {
         Member member = memberRepository.findByEmail(memberForm.getEmail())
                 .orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
 
-        if (!bCryptPasswordEncoder.matches(memberForm.getPassword(), member.getPassword())) {
-            throw new RuntimeException("암호가 일치하지 않습니다.");
+        // 카카오 회원인지 확인
+        if ("kakao".equals(member.getProvider())) {
+            String withdrawalCode = memberForm.getPassword();
+            String storedCode = withdrawalCodes.get(memberForm.getEmail());
+            System.out.println(storedCode);
+            System.out.println(memberForm.getPassword());
+
+            if (storedCode == null || !storedCode.equals(withdrawalCode)) {
+                throw new RuntimeException("유효하지 않거나 만료된 코드입니다.");
+            }
+            withdrawalCodes.remove(memberForm.getEmail()); // 사용된 코드 삭제
+        } else {
+            // 일반 회원 탈퇴 로직
+            if (!passwordEncoder.matches(memberForm.getPassword(), member.getPassword())) {
+                throw new RuntimeException("비밀번호가 일치하지 않습니다.");
+            }
         }
+//        if (!bCryptPasswordEncoder.matches(memberForm.getPassword(), member.getPassword())) {
+//            throw new RuntimeException("암호가 일치하지 않습니다.");
+//        }
 
         // 댓글 삭제
         commentRepository.deleteByAuthor(member);
