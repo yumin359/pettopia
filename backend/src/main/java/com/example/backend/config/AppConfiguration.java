@@ -80,7 +80,8 @@ public class AppConfiguration {
                         "/api/review/latest",// 특정 글 상세도 공개한다면 추가 (패턴 주의)
                         "/api/chatbot",
                         "/api/comment/list",
-                        "/api/like/board/**"
+                        "/api/like/board/**",
+                        "/api/review/list"
                 ).permitAll()
                 .anyRequest().authenticated()
         );
