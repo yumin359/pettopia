@@ -277,7 +277,7 @@ export function MapDetail() {
                   title={`평점: ${r.rating} / 5`}
                 >
                   {"★".repeat(r.rating)}
-                  <span style={{ color: "#212529" }}>{r.rating}</span>
+                  <span className="ms-2 text-dark fw-semibold">{r.rating}</span>
                 </div>
 
                 <ReviewPreview review={r} />
