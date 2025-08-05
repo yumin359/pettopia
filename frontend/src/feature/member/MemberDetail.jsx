@@ -24,6 +24,7 @@ export function MemberDetail() {
   const [member, setMember] = useState(null);
   const [modalShow, setModalShow] = useState(false);
   const [password, setPassword] = useState("");
+  const [tempCode, setTempCode] = useState("");
   const { logout, hasAccess } = useContext(AuthenticationContext);
   const [params] = useSearchParams();
   const navigate = useNavigate();
@@ -31,7 +32,9 @@ export function MemberDetail() {
   useEffect(() => {
     axios
       .get(`/api/member?email=${params.get("email")}`)
-      .then((res) => setMember(res.data))
+      .then((res) => {
+        setMember(res.data);
+      })
       .catch((err) => {
         console.error(err);
         toast.error("회원 정보를 불러오는 중 오류가 발생했습니다.");
@@ -55,6 +58,26 @@ export function MemberDetail() {
         setModalShow(false);
         setPassword("");
       });
+  }
+
+  function handleModalButtonClick() {
+    // 카카오 사용자 일 때만 임시코드 요청
+    if (isKakao) {
+      axios
+        .post("/api/member/withdrawalCode", { email: member.email })
+        .then((res) => {
+          // 임시코드 받고 모달 열리게
+          setTempCode(res.data.tempCode);
+          setModalShow(true);
+        })
+        .catch((err) => {
+          console.error(err);
+          console.log("임시 코드 못 받음");
+        });
+    } else {
+      // 일반 회원은 바로 모달 열기
+      setModalShow(true);
+    }
   }
 
   function handleLogoutClick() {
@@ -84,6 +107,8 @@ export function MemberDetail() {
 
   // member.authNames 배열에 admin 확인
   const isAdmin = member.authNames?.includes("admin");
+
+  const isKakao = member.provider?.includes("kakao");
 
   return (
     <Row className="justify-content-center my-4">
@@ -203,7 +228,7 @@ export function MemberDetail() {
               <div className="d-flex justify-content-start gap-2">
                 <Button
                   variant="outline-danger"
-                  onClick={() => setModalShow(true)}
+                  onClick={handleModalButtonClick}
                   className="d-flex align-items-center gap-1"
                 >
                   탈퇴
@@ -237,16 +262,24 @@ export function MemberDetail() {
         {/* 탈퇴 확인 모달 */}
         <Modal show={modalShow} onHide={() => setModalShow(false)} centered>
           <Modal.Header closeButton>
-            <Modal.Title>회원 탈퇴 확인</Modal.Title>
+            <Modal.Title>
+              {isKakao ? "카카오 회원 탈퇴" : "회원 탈퇴 확인"}
+            </Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <FormGroup controlId="password1">
-              <FormLabel>암호</FormLabel>
+              <FormLabel>
+                {isKakao
+                  ? `${tempCode}를 아래에 작성하세요.`
+                  : "암호를 입력하세요"}
+              </FormLabel>
               <FormControl
-                type="password"
+                type={isKakao ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="비밀번호를 입력하세요"
+                placeholder={
+                  isKakao ? "코드를 작성하세요." : "비밀번호를 입력하세요"
+                }
                 autoFocus
               />
             </FormGroup>
