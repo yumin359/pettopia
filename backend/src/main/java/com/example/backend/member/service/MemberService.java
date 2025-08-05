@@ -61,7 +61,7 @@ public class MemberService {
     private final BoardLikeRepository boardLikeRepository;
     private final S3Client s3Client;
 
-    // 외부 로그인 사용자 탈퇴시 임시코드를 위해 -> 나중에 db에 저장하기
+    // 외부 로그인 사용자 탈퇴시 임시코드를 위해
     private final Map<String, String> withdrawalCodes = new ConcurrentHashMap<>();
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private final PasswordEncoder passwordEncoder;
@@ -102,9 +102,6 @@ public class MemberService {
 
     public void add(MemberForm memberForm) {
         this.validate(memberForm);
-        // TODO 구글 로그인(패스워스 없을 때)
-//        if (memberForm.getPassword().isBlank()) {
-//        }
 
         Member member = new Member();
         member.setEmail(memberForm.getEmail().trim());
@@ -193,21 +190,6 @@ public class MemberService {
         return memberRepository.findAllBy();
     }
 
-    // 임시 탈퇴 코드 생성
-    public String generateWithdrawalCode(String email) {
-        // 이미 생성된 거 있으명 삭제
-        withdrawalCodes.remove(email);
-
-        // 임시 코드 생성
-        String tempCode = UUID.randomUUID().toString().substring(0, 8);
-        withdrawalCodes.put(email, tempCode);
-
-        // 5분 후 코드 삭제 예약
-        scheduler.schedule(() -> withdrawalCodes.remove(email), 5, TimeUnit.MINUTES);
-
-        return tempCode;
-    }
-
     public MemberDto get(String email) {
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("해당 이메일의 회원이 존재하지 않습니다."));
@@ -219,21 +201,31 @@ public class MemberService {
         // 회원 권한 이름 가져오기
         List<String> authNames = authRepository.findAuthNamesByMemberId(member.getId());
 
-        String tempCode = null;
-        if (member.getProvider().equals("kakao")) {
-            tempCode = generateWithdrawalCode(email);
-        }
-
         return MemberDto.builder()
                 .email(member.getEmail())
                 .nickName(member.getNickName())
                 .info(member.getInfo())
                 .insertedAt(member.getInsertedAt())
                 .provider(member.getProvider())
-                .tempCode(tempCode)
                 .files(fileUrls)
                 .authNames(authNames)
                 .build();
+    }
+
+    // 임시 탈퇴 코드 생성
+    // -> 모달 열릴 때 실행되도록(유효성 때문에, 페이지 새로고침하면 바뀌기때문, db 만드는 거 별로라)
+    public String generateWithdrawalCode(String email) {
+        // 이미 생성된 거 있으명 삭제
+        withdrawalCodes.remove(email);
+
+        // 임시 코드 생성
+        String tempCode = UUID.randomUUID().toString().substring(0, 8);
+        withdrawalCodes.put(email, tempCode);
+
+        // 2분 후 코드 삭제 예약
+        scheduler.schedule(() -> withdrawalCodes.remove(email), 2, TimeUnit.MINUTES);
+
+        return tempCode;
     }
 
     public void delete(MemberForm memberForm) {
@@ -257,9 +249,6 @@ public class MemberService {
                 throw new RuntimeException("비밀번호가 일치하지 않습니다.");
             }
         }
-//        if (!bCryptPasswordEncoder.matches(memberForm.getPassword(), member.getPassword())) {
-//            throw new RuntimeException("암호가 일치하지 않습니다.");
-//        }
 
         // 댓글 삭제
         commentRepository.deleteByAuthor(member);

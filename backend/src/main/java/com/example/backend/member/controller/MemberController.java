@@ -162,6 +162,18 @@ public class MemberController {
         );
     }
 
+    // 카카오 사용자 임시 코드 요청
+    @PostMapping("/withdrawalCode")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> withdrawalCode(@RequestBody MemberForm memberForm, Authentication authentication) {
+        if (authentication.getName().equals(memberForm.getEmail())) {
+            String tempCode = memberService.generateWithdrawalCode(memberForm.getEmail());
+            return ResponseEntity.ok(Map.of("tempCode", tempCode));
+        } else {
+            return ResponseEntity.status(403).build();
+        }
+    }
+
     //    -----------------------------카카오-----------------------------------------
     // 프론트엔드(KakaoCallback 컴포넌트)로부터 인증 코드를 받는 엔드포인트
     @PostMapping("/login/kakao")
