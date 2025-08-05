@@ -22,7 +22,9 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     Optional<Member> findByEmail(String email);
 
-//    String id(Long id);
+    //    String id(Long id);
 //
 //    Long id(Long id);
+    Optional<Member> findByKakaoId(Long kakaoId);
+
 }

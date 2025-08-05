@@ -1,96 +1,90 @@
-  import { createContext, useEffect, useState } from "react";
-  import { jwtDecode } from "jwt-decode";
-  import axios from "axios";
+import { createContext, useEffect, useState } from "react";
+import { jwtDecode } from "jwt-decode";
+import axios from "axios";
 
-  // 유효기간을 넘긴 토큰 삭제
+// 유효기간을 넘긴 토큰 삭제
+const token = localStorage.getItem("token");
+if (token) {
+  const decoded = jwtDecode(token);
+  const exp = decoded.exp;
+  if (exp * 1000 < Date.now()) {
+    localStorage.removeItem("token");
+  }
+}
+
+// axios interceptor
+// token 이 있으면 Authorization 헤더에 'Bearer token' 붙이기
+axios.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
+
   if (token) {
-    const decoded = jwtDecode(token);
-    const exp = decoded.exp;
-    if (exp * 1000 < Date.now()) {
-      localStorage.removeItem("token");
-    }
+    config.headers.Authorization = `Bearer ${token}`;
   }
 
-  // axios interceptor
-  // token 이 있으면 Authorization 헤더에 'Bearer token' 붙이기
-  axios.interceptors.request.use((config) => {
-    const token = localStorage.getItem("token");
+  return config;
+});
 
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
+// step1. create context
+const AuthenticationContext = createContext(null);
 
-    return config;
-  });
+export function AuthenticationContextProvider({ children }) {
+  const [user, setUser] = useState(null);
 
-  // step1. create context
-  const AuthenticationContext = createContext(null);
-
-  export function AuthenticationContextProvider({ children }) {
-    const [user, setUser] = useState(null);
-
-    useEffect(() => {
-      const token = localStorage.getItem("token");
-      if (token) {
-        const payload = jwtDecode(token);
-        axios.get("/api/member?email=" + payload.sub).then((res) => {
-          // email
-          // nickName
-          setUser({
-            email: res.data.email,
-            nickName: res.data.nickName,
-            scope: payload.scp.split(" "),
-          });
-        });
-      }
-    }, []);
-
-    // login
-    function login(token) {
-      localStorage.setItem("token", token);
-      const payload = jwtDecode(token);
-      axios.get("/api/member?email=" + payload.sub).then((res) => {
-        // email
-        // nickName
+  // ✅ login 함수를 하나로 통합하고 정리합니다.
+  // 이 함수는 토큰을 받아 저장하고, 사용자 정보를 가져와 상태를 업데이트합니다.
+  const login = (token) => {
+    localStorage.setItem("token", token);
+    const payload = jwtDecode(token);
+    axios
+      .get("/api/member?email=" + payload.sub)
+      .then((res) => {
         setUser({
           email: res.data.email,
           nickName: res.data.nickName,
           scope: payload.scp.split(" "),
         });
+      })
+      .catch((err) => {
+        console.error("사용자 정보 로딩 실패:", err);
+        // 토큰은 유효하지만 사용자 정보를 가져오지 못한 경우 로그아웃 처리
+        logout();
       });
-    }
+  };
 
-    // logout
-    function logout() {
-      localStorage.removeItem("token");
-      setUser(null);
-    }
+  const logout = () => {
+    localStorage.removeItem("token");
+    setUser(null);
+  };
 
-    // hasAccess
-    function hasAccess(email) {
-      return user && user.email === email;
+  // ✅ 페이지가 처음 로드될 때 토큰이 있으면 로그인 상태를 복원합니다.
+  useEffect(() => {
+    const tokenInStorage = localStorage.getItem("token");
+    if (tokenInStorage) {
+      login(tokenInStorage); // 기존 login 함수를 재활용
     }
+  }, []); // []를 사용하여 처음 한 번만 실행되도록 합니다.
 
-    // isAdmin
-    function isAdmin() {
-      return user && user.scope && user.scope.includes("admin");
-    }
-
-    // step3. provide context
-    return (
-      <AuthenticationContext
-        value={{
-          user: user,
-          login: login,
-          logout: logout,
-          hasAccess: hasAccess,
-          isAdmin: isAdmin,
-        }}
-      >
-        {children}
-      </AuthenticationContext>
-    );
+  function hasAccess(email) {
+    return user && user.email === email;
   }
 
-  export { AuthenticationContext };
+  function isAdmin() {
+    return user && user.scope && user.scope.includes("admin");
+  }
+
+  return (
+    <AuthenticationContext.Provider
+      value={{
+        user,
+        login, // 정리된 login 함수 제공
+        logout,
+        hasAccess,
+        isAdmin,
+      }}
+    >
+      {children}
+    </AuthenticationContext.Provider>
+  );
+}
+
+export { AuthenticationContext };

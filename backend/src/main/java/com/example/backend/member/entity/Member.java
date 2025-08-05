@@ -28,6 +28,9 @@ public class Member {
     private String provider;
     private String providerId;
 
+    @Column(unique = true) // 카카오 ID는 유일해야 합니다.
+    private Long kakaoId;
+
     // 흠
     @Enumerated(EnumType.STRING)
     private Role role;
