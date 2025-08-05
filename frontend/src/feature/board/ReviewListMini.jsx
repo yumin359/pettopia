@@ -1,6 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
-import { Button, Card, Col, Image, Row, Spinner, Pagination } from "react-bootstrap";
+import {
+  Button,
+  Card,
+  Col,
+  Image,
+  Row,
+  Spinner,
+  Pagination,
+} from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { ReviewLikeContainer } from "../like/ReviewLikeContainer";
 
@@ -62,7 +70,7 @@ export function ReviewListMini() {
 
   const toggleExpand = (id) => {
     setExpandedIds((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id],
     );
   };
 
@@ -85,7 +93,11 @@ export function ReviewListMini() {
             const hasImages = !!firstImage;
 
             return (
-              <Card key={r.id} className="shadow-sm border-0 p-3" style={{ backgroundColor: "#fdfaf4" }}>
+              <Card
+                key={r.id}
+                className="shadow-sm border-0 p-3"
+                style={{ backgroundColor: "#fdfaf4" }}
+              >
                 <div className="d-flex justify-content-between align-items-center mb-2">
                   <div
                     className="fw-semibold hover-underline-on-hover"
@@ -96,13 +108,14 @@ export function ReviewListMini() {
                   </div>
                   <div
                     className="small"
-                    style={{ fontWeight: "bold", display: "flex", alignItems: "center" }}
+                    style={{
+                      fontWeight: "bold",
+                      display: "flex",
+                      alignItems: "center",
+                    }}
                   >
                     <span style={{ color: "#f0ad4e", fontSize: "1.1rem" }}>
                       {"★".repeat(r.rating)}
-                    </span>
-                    <span style={{ color: "#212529", marginLeft: "6px", fontSize: "1rem" }}>
-                      {r.rating}
                     </span>
                   </div>
                 </div>
@@ -123,7 +136,10 @@ export function ReviewListMini() {
                           size="sm"
                           onClick={() => toggleExpand(r.id)}
                           className="p-0 text-secondary hover-underline-on-hover"
-                          style={{ textDecoration: "none", fontSize: "0.85rem" }}
+                          style={{
+                            textDecoration: "none",
+                            fontSize: "0.85rem",
+                          }}
                         >
                           {isExpanded ? "간략히 보기" : "더보기"}
                         </Button>
@@ -131,7 +147,11 @@ export function ReviewListMini() {
                     )}
                   </Col>
                   {hasImages && (
-                    <Col xs={12} md={4} className="mt-3 mt-md-0 d-flex justify-content-md-end">
+                    <Col
+                      xs={12}
+                      md={4}
+                      className="mt-3 mt-md-0 d-flex justify-content-md-end"
+                    >
                       <Image
                         src={firstImage}
                         alt="리뷰 이미지"
@@ -156,9 +176,14 @@ export function ReviewListMini() {
                     className="me-2"
                     src={r.profileImageUrl || defaultProfileImage}
                     alt={`${r.memberEmailNickName ?? "익명"} 프로필`}
-                    style={{ width: "23px", height: "23px", objectFit: "cover" }}
+                    style={{
+                      width: "23px",
+                      height: "23px",
+                      objectFit: "cover",
+                    }}
                   />
-                  {r.memberEmailNickName ?? "익명 사용자"} · {r.insertedAt?.split("T")[0]}
+                  {r.memberEmailNickName ?? "익명 사용자"} ·{" "}
+                  {r.insertedAt?.split("T")[0]}
                 </div>
               </Card>
             );
@@ -182,7 +207,9 @@ export function ReviewListMini() {
               </Pagination.Item>
             ))}
             <Pagination.Next
-              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              }
               disabled={currentPage === totalPages}
             />
           </Pagination>
