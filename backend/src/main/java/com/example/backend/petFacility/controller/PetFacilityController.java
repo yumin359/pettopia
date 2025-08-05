@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors; // 이 import는 사용되지 않을 수 있지만, 안전하게 유지합니다.
 
 @RestController
 @RequestMapping("/api/pet_facilities")
@@ -34,6 +33,11 @@ public class PetFacilityController {
     // 개 카테고리에 해당하는 모든 키워드
     private static final Set<String> DOG_KEYWORDS = Set.of(
             "개", "kg", "소형", "중형", "대형", "특수견"
+    );
+
+    // 모두가능 카테고리에 해당하는 키워드
+    private static final Set<String> ALL_AVAILABLE_KEYWORDS = Set.of(
+            "해당없음", "모두 가능"
     );
 
     public PetFacilityController(PetFacilityRepository petFacilityRepository) {
@@ -134,44 +138,68 @@ public class PetFacilityController {
         List<String> allDbSizes = petFacilityRepository.findDistinctAllowedPetSize();
 
         for (String dbSize : allDbSizes) {
-            String category = classifyPetSize(dbSize);
+            Set<String> categories = classifyPetSizeToMultipleCategories(dbSize);
 
-            // 💡 category가 null이 아니고, 분류된 카테고리가 사용자의 검색 조건에 포함될 때만 추가
-            if (category != null && simplifiedSizes.contains(category)) {
-                originalSizes.add(dbSize);
+            // 분류된 카테고리들 중 사용자가 선택한 조건과 일치하는 것이 하나라도 있다면 추가
+            for (String category : categories) {
+                if (simplifiedSizes.contains(category)) {
+                    originalSizes.add(dbSize);
+                    break; // 하나라도 일치하면 추가하고 다음 dbSize로
+                }
             }
         }
         return originalSizes;
     }
 
-    private String classifyPetSize(String dbSize) {
-        // 1. "해당없음"은 어떤 카테고리에도 속하지 않음
-        if (dbSize.contains("해당없음")) {
-            return null;
+    // 하나의 DB 사이즈를 여러 카테고리로 분류할 수 있도록 수정
+    private Set<String> classifyPetSizeToMultipleCategories(String dbSize) {
+        Set<String> categories = new HashSet<>();
+
+        // 1. 모두가능 카테고리 체크
+        if (ALL_AVAILABLE_KEYWORDS.stream().anyMatch(dbSize::contains)) {
+            categories.add("모두가능");
         }
 
-        // 2. 우선순위: 모두 가능
-        if (dbSize.contains("모두 가능")) {
-            return "모두가능";
-        }
-
-        // 3. 고양이 (다른 키워드와 함께 있어도 고양이가 있으면 고양이로 분류)
+        // 2. 고양이 카테고리 체크
         if (dbSize.contains("고양이")) {
-            return "고양이";
+            categories.add("고양이");
         }
 
-        // 4. 개 (다른 키워드와 함께 있어도 개 관련 키워드가 있으면 개로 분류)
+        // 3. 개 카테고리 체크
         if (DOG_KEYWORDS.stream().anyMatch(dbSize::contains)) {
-            return "개";
+            categories.add("개");
         }
 
-        // 5. 기타 (명시된 기타 동물 키워드가 있는 경우만)
-        if (OTHER_PET_KEYWORDS.stream().anyMatch(dbSize::contains)) {
-            return "기타";
+        // 4. 기타 카테고리 체크 (정확한 단어 매칭)
+        if (containsExactOtherPetKeyword(dbSize)) {
+            categories.add("기타");
         }
 
-        // 6. 위 어떤 명시적인 카테고리에도 속하지 않는 경우 (예: "주말, 공휴일 15kg 이하" 등)
-        // 이 경우, 어떤 간소화된 필터에도 포함되지 않도록 null을 반환합니다.
-        return null;
+        return categories;
+    }
+
+    // 기타 동물 키워드를 정확하게 매칭하는 메서드
+    private boolean containsExactOtherPetKeyword(String dbSize) {
+        for (String keyword : OTHER_PET_KEYWORDS) {
+            // "소"의 경우 단독으로 나타나거나 특정 패턴으로 나타날 때만 매칭
+            if (keyword.equals("소")) {
+                // "소"가 단독으로 있거나, "소," "소 " ",소" 형태로 구분되어 있을 때만 매칭
+                if (dbSize.matches(".*[^가-힣]소[^가-힣].*") ||
+                        dbSize.matches(".*[,\\s]소[,\\s].*") ||
+                        dbSize.startsWith("소,") ||
+                        dbSize.startsWith("소 ") ||
+                        dbSize.endsWith(",소") ||
+                        dbSize.endsWith(" 소") ||
+                        dbSize.equals("소")) {
+                    return true;
+                }
+            } else {
+                // 다른 키워드들은 기존 방식대로 contains 사용
+                if (dbSize.contains(keyword)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
