@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
-import { Button, Card, Col, Image, Row, Spinner } from "react-bootstrap";
+import { Button, Card, Col, Image, Row, Spinner, Pagination } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { ReviewLikeContainer } from "../like/ReviewLikeContainer";
 
@@ -8,8 +8,10 @@ export function ReviewListMini() {
   const [reviews, setReviews] = useState(null);
   const [expandedIds, setExpandedIds] = useState([]);
   const [clampedIds, setClampedIds] = useState([]);
-  const reviewRefs = useRef({});
+  const [currentPage, setCurrentPage] = useState(1);
 
+  const reviewsPerPage = 5;
+  const reviewRefs = useRef({});
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -26,12 +28,10 @@ export function ReviewListMini() {
       const el = reviewRefs.current[r.id];
       if (!el) return;
       const isClamped = el.scrollHeight > el.clientHeight + 1;
-      if (isClamped) {
-        newClampedIds.push(r.id);
-      }
+      if (isClamped) newClampedIds.push(r.id);
     });
     setClampedIds(newClampedIds);
-  }, [reviews]);
+  }, [reviews, currentPage]);
 
   if (!reviews) {
     return (
@@ -68,23 +68,24 @@ export function ReviewListMini() {
 
   const defaultProfileImage = "/user.png";
 
+  // 페이징 계산
+  const indexOfLast = currentPage * reviewsPerPage;
+  const indexOfFirst = indexOfLast - reviewsPerPage;
+  const currentReviews = reviews.slice(indexOfFirst, indexOfLast);
+  const totalPages = Math.ceil(reviews.length / reviewsPerPage);
+
   return (
     <Row className="justify-content-center mt-4">
       <Col xs={12} md={10} lg={8} style={{ maxWidth: "900px" }}>
         <div className="d-flex flex-column gap-3">
-          {reviews.map((r) => {
+          {currentReviews.map((r) => {
             const isExpanded = expandedIds.includes(r.id);
             const imageFiles = r.files?.filter(isImageFile) || [];
             const firstImage = imageFiles[0] || null;
             const hasImages = !!firstImage;
 
             return (
-              <Card
-                key={r.id}
-                className="shadow-sm border-0 p-3"
-                style={{ backgroundColor: "#fdfaf4" }}
-              >
-                {/* 상단: 시설명 + 별점 + 평점 숫자 */}
+              <Card key={r.id} className="shadow-sm border-0 p-3" style={{ backgroundColor: "#fdfaf4" }}>
                 <div className="d-flex justify-content-between align-items-center mb-2">
                   <div
                     className="fw-semibold hover-underline-on-hover"
@@ -106,8 +107,6 @@ export function ReviewListMini() {
                   </div>
                 </div>
                 <hr className="mt-1 border-gray-300" />
-
-                {/* 리뷰 본문과 이미지 */}
                 <Row className="align-items-start">
                   <Col xs={12} md={hasImages ? 8 : 12}>
                     <div
@@ -132,14 +131,10 @@ export function ReviewListMini() {
                     )}
                   </Col>
                   {hasImages && (
-                    <Col
-                      xs={12}
-                      md={4}
-                      className="mt-3 mt-md-0 d-flex justify-content-md-end"
-                    >
+                    <Col xs={12} md={4} className="mt-3 mt-md-0 d-flex justify-content-md-end">
                       <Image
                         src={firstImage}
-                        alt={`리뷰 이미지`}
+                        alt="리뷰 이미지"
                         className="shadow rounded"
                         style={{
                           width: "100px",
@@ -151,12 +146,10 @@ export function ReviewListMini() {
                   )}
                 </Row>
 
-                {/* 좋아요 버튼 */}
                 <div className="mt-3 d-flex align-items-center gap-2">
                   <ReviewLikeContainer reviewId={r.id} />
                 </div>
 
-                {/* 작성자 & 날짜 */}
                 <div className="text-muted mt-3" style={{ fontSize: "0.8rem" }}>
                   <Image
                     roundedCircle
@@ -171,9 +164,31 @@ export function ReviewListMini() {
             );
           })}
         </div>
+
+        {/* ✅ 페이징 컨트롤 */}
+        {totalPages > 1 && (
+          <Pagination className="justify-content-center mt-4">
+            <Pagination.Prev
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+            />
+            {[...Array(totalPages)].map((_, idx) => (
+              <Pagination.Item
+                key={idx + 1}
+                active={idx + 1 === currentPage}
+                onClick={() => setCurrentPage(idx + 1)}
+              >
+                {idx + 1}
+              </Pagination.Item>
+            ))}
+            <Pagination.Next
+              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+            />
+          </Pagination>
+        )}
       </Col>
 
-      {/* line-clamp 스타일 */}
       <style>{`
         .line-clamp {
           display: -webkit-box;

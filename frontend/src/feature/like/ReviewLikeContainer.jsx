@@ -17,18 +17,13 @@ export function ReviewLikeContainer({ reviewId }) {
     };
   };
 
+  // 로그인 여부와 관계없이 항상 좋아요 수 조회
   function fetchLikeInfo() {
-    if (!user) {
-      // 비로그인 상태일 때 기본값 세팅
-      setLikeInfo({ liked: false, likeCount: 0 });
-      return Promise.resolve();
-    }
-
     return axios
       .get(`/api/reviewlike/review/${reviewId}`, {
-        headers: getAuthHeaders(),
+        headers: getAuthHeaders(), // 비로그인 시 빈 객체 전달됨
       })
-      .then((res) => setLikeInfo(res.data)) // { liked: true/false, likeCount: number }
+      .then((res) => setLikeInfo(res.data))
       .catch((err) => {
         console.error("리뷰 좋아요 정보 로딩 실패:", err);
         setLikeInfo({ liked: false, likeCount: 0 });

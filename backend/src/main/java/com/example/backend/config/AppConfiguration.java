@@ -81,7 +81,8 @@ public class AppConfiguration {
                         "/api/chatbot",
                         "/api/comment/list",
                         "/api/like/board/**",
-                        "/api/review/list"
+                        "/api/review/list",
+                        "/api/reviewlike/review/**"
                 ).permitAll()
                 .anyRequest().authenticated()
         );
