@@ -234,49 +234,50 @@ public class MemberService {
 
     // 회원 정보 수정
     public void update(MemberForm memberForm,
-                       List<MultipartFile> profileFiles, // 새로 업로드할 파일들
-                       List<String> deleteProfileFileNames) { // 삭제할 기존 파일 이름들
+                       List<MultipartFile> profileFiles,
+                       List<String> deleteProfileFileNames) {
 
         Member member = memberRepository.findByEmail(memberForm.getEmail())
                 .orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
 
-        // 비밀번호 확인 (프론트에서 `password` 필드로 현재 비밀번호를 보냈을 경우)
-        // password 필드가 비어있지 않다면(즉, 모달을 통해 입력받았다면) 검증
-        if (memberForm.getPassword() != null && !memberForm.getPassword().isBlank() &&
-                !bCryptPasswordEncoder.matches(memberForm.getPassword(), member.getPassword())) {
-            throw new RuntimeException("암호가 일치하지 않습니다.");
+        // 비밀번호 변경 관련 처리
+        String rawPassword = memberForm.getPassword();
+        if (rawPassword != null && !rawPassword.trim().isEmpty()) {
+            // 현재 비밀번호 일치 여부 확인
+            if (!bCryptPasswordEncoder.matches(rawPassword, member.getPassword())) {
+                throw new RuntimeException("암호가 일치하지 않습니다.");
+            }
+            // 비밀번호 변경
+            member.setPassword(bCryptPasswordEncoder.encode(rawPassword.trim()));
         }
 
-        // 텍스트 정보 업데이트 (닉네임, 자기소개)
+        // 닉네임 및 자기소개 수정
         member.setNickName(memberForm.getNickName().trim());
         member.setInfo(memberForm.getInfo());
-        memberRepository.save(member); // 변경된 회원 정보 저장
+
+        memberRepository.save(member);
 
         // 1. 삭제할 프로필 파일 처리
         if (deleteProfileFileNames != null && !deleteProfileFileNames.isEmpty()) {
-            deleteProfileFiles(member, deleteProfileFileNames); // 분리된 삭제 헬퍼 메서드 호출
+            deleteProfileFiles(member, deleteProfileFileNames);
         }
 
-        // 2. 새로운 프로필 파일 처리
+        // 2. 새 프로필 파일 저장
         if (profileFiles != null && !profileFiles.isEmpty()) {
-            // 프로필 이미지는 단 하나만 허용되는 경우,
-            // 새 파일이 들어오면 기존에 남아있는 모든 프로필 이미지를 삭제하고 새로운 이미지를 저장
-            // deleteProfileFileNames에 이미 추가된 것 외에, 남아있는 기존 프로필 이미지가 있다면 추가 삭제
             List<String> currentImageFileNames = member.getFiles().stream()
                     .filter(mf -> mf.getId().getName().matches(".*\\.(jpg|jpeg|png|gif|webp)$"))
                     .map(mf -> mf.getId().getName())
                     .collect(Collectors.toList());
 
-            // deleteProfileFileNames에 이미 있는 파일은 중복 삭제 방지
             List<String> filesToActuallyDelete = currentImageFileNames.stream()
                     .filter(fileName -> !deleteProfileFileNames.contains(fileName))
                     .collect(Collectors.toList());
 
             if (!filesToActuallyDelete.isEmpty()) {
-                deleteProfileFiles(member, filesToActuallyDelete); // 추가 삭제할 파일이 있다면 삭제 헬퍼 메서드 호출
+                deleteProfileFiles(member, filesToActuallyDelete);
             }
 
-            saveNewProfileFiles(member, profileFiles); // 분리된 저장 헬퍼 메서드 호출
+            saveNewProfileFiles(member, profileFiles);
         }
     }
 
