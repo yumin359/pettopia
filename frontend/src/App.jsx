@@ -46,8 +46,8 @@ function App() {
             <Route path="/review/my" element={<MyReview/>} />
             <Route path="/review/edit/:id" element={<ReviewEdit />} />
             <Route path="/review/latest" element={<ReviewListMini />} />
-            <Route path="/service" element={<ServicePage />} />
-            <Route path="/service/list" element={<ServiceListPage />} /> {/* 관리자 전용 문의내역 리스트 */}
+            <Route path="/support" element={<ServicePage />} />
+            <Route path="/support/list" element={<ServiceListPage />} /> {/* 관리자 전용 문의내역 리스트 */}
           </Route>
         </Routes>
       </BrowserRouter>

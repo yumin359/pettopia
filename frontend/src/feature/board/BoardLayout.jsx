@@ -109,7 +109,7 @@ export function BoardLayout() {
             <Button
               variant="outline-danger"
               size="sm"
-              onClick={() => navigate("/service/list")}
+              onClick={() => navigate("/support/list")}
               style={{ minWidth: "120px" }}
             >
               문의내역보기 (관리자)

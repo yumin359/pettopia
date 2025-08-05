@@ -115,7 +115,7 @@ export function AppNavBar() {
             </NavLink>
 
             <NavLink
-              to="/service"
+              to="/support"
               style={({ isActive }) =>
                 isActive ? { ...navLinkStyle, ...activeLinkStyle } : navLinkStyle
               }
