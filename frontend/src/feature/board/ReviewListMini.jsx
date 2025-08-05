@@ -117,6 +117,9 @@ export function ReviewListMini() {
                     <span style={{ color: "#f0ad4e", fontSize: "1.1rem" }}>
                       {"★".repeat(r.rating)}
                     </span>
+                    <span className="ms-2 text-dark fw-semibold">
+                      {r.rating}
+                    </span>
                   </div>
                 </div>
                 <hr className="mt-1 border-gray-300" />
