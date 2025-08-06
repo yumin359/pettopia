@@ -8,7 +8,7 @@ import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
 
 export function AppNavBar() {
-  const { user, logout } = useContext(AuthenticationContext);
+  const { user, logout, isAdmin } = useContext(AuthenticationContext);
   const [showDropdown, setShowDropdown] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState({
     top: 0,
@@ -59,9 +59,9 @@ export function AppNavBar() {
 
   // 활성화된 NavLink 스타일
   const activeLinkStyle = {
-    color: "#FF9D00", // 포인트 색상으로 변경
+    color: "#ffffff", // 포인트 색상으로 변경
     fontWeight: 700,
-    borderBottom: "2px solid #FF9D00", // 하단에 라인 추가
+    borderBottom: "2px solid #ffffff", // 하단에 라인 추가
   };
 
   // 로그인 시 드롭다운 메뉴에 표시될 타이틀입니다.
@@ -297,6 +297,18 @@ export function AppNavBar() {
               >
                 SUPPORT
               </NavLink>
+              {isAdmin() && (
+                <NavLink
+                  to="/admin"
+                  style={({ isActive }) =>
+                    isActive
+                      ? { ...navLinkStyle, ...activeLinkStyle }
+                      : navLinkStyle
+                  }
+                >
+                  관리자
+                </NavLink>
+              )}
             </Nav>
           </Navbar.Collapse>
         </Container>
