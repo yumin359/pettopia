@@ -73,7 +73,8 @@ export function MemberDetail() {
         .catch((err) => {
           console.error(err);
           console.log("임시 코드 못 받음");
-        });
+        })
+        .finally(() => setPassword(""));
     } else {
       // 일반 회원은 바로 모달 열기
       setModalShow(true);
@@ -270,15 +271,17 @@ export function MemberDetail() {
             <FormGroup controlId="password1">
               <FormLabel>
                 {isKakao
-                  ? `${tempCode}를 아래에 작성하세요.`
-                  : "암호를 입력하세요"}
+                  ? `탈퇴를 원하시면 ${tempCode}를 아래에 작성하세요.`
+                  : "탈퇴를 원하시면 암호를 입력하세요"}
               </FormLabel>
               <FormControl
                 type={isKakao ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder={
-                  isKakao ? "코드를 작성하세요." : "비밀번호를 입력하세요"
+                  isKakao
+                    ? "탈퇴를 원하시면 위의 코드를 작성하세요."
+                    : "탈퇴를 원하시면 비밀번호를 입력하세요"
                 }
                 autoFocus
               />

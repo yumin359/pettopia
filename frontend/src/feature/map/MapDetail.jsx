@@ -248,8 +248,34 @@ export function MapDetail() {
         </div>
       )}
 
-      <div style={{ marginTop: "2rem" }}>
+      {/* 사진, 동영상 목록 */}
+      <div style={{ marginTop: "1.5rem" }}>
+        <h4 className="mb-3">🎞 사진•영상 📸</h4>
+        {loadingReviews ? (
+          <p>불러오는 중...</p>
+        ) : sortedReviews.length === 0 ? (
+          <p>아직 사진•영상이 없습니다.</p>
+        ) : (
+          <ul
+            style={{
+              paddingLeft: 0,
+              listStyle: "none",
+              display: "flex",
+              flexWrap: "wrap",
+              gap: "1rem",
+            }}
+          >
+            {sortedReviews.map((r) => (
+              // 리뷰의 파일들을 보여주기 위해 ReviewPreview 컴포넌트의 기능을 활용
+              <ReviewPreview key={r.id} review={r} showOnlyImages={true} />
+            ))}
+          </ul>
+        )}
+      </div>
+
+      <div style={{ marginTop: "1.5rem" }}>
         <h4 className="mb-3">
+          {/* 얘도 더보기로 더 볼 수 있게 ? */}
           📝 리뷰 목록{" "}
           <span style={{ color: "#aaa", fontWeight: "normal" }}>
             ({reviews.length}개)
@@ -331,27 +357,33 @@ export function MapDetail() {
                   }}
                 >
                   <ReviewLikeContainer reviewId={r.id} />
-                  <button
-                    onClick={() => openReportModal(r.id)}
-                    title="리뷰 신고하기"
-                    style={{
-                      background: "none",
-                      border: "none",
-                      padding: 0,
-                      margin: 0,
-                      cursor: "pointer",
-                      fontSize: "1.2rem",
-                      lineHeight: 1,
-                      color: "#dc3545",
-                      userSelect: "none",
-                    }}
-                  >
-                    🚨
-                  </button>
+                  {user !== null && user !== undefined && (
+                    <button
+                      onClick={() => openReportModal(r.id)}
+                      title="리뷰 신고하기"
+                      style={{
+                        background: "none",
+                        border: "none",
+                        padding: 0,
+                        margin: 0,
+                        cursor: "pointer",
+                        fontSize: "1.2rem",
+                        lineHeight: 1,
+                        color: "#dc3545",
+                        userSelect: "none",
+                      }}
+                    >
+                      🚨
+                    </button>
+                  )}
                 </div>
 
                 <div
-                  style={{ marginTop: "0.5rem", display: "flex", gap: "0.5rem" }}
+                  style={{
+                    marginTop: "0.5rem",
+                    display: "flex",
+                    gap: "0.5rem",
+                  }}
                 >
                   {user?.email === r.memberEmail && (
                     <>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Image, Modal } from "react-bootstrap";
 
-function ReviewPreview({ review }) {
+function ReviewPreview({ review, showOnlyImages = false }) {
   const [showImageModal, setShowImageModal] = useState(false);
   const [modalImageUrl, setModalImageUrl] = useState("");
 
@@ -27,6 +27,58 @@ function ReviewPreview({ review }) {
   };
 
   const defaultProfileImage = "/user.png";
+
+  // showOnlyImages prop이 true일 경우, 이미지 파일만 렌더링
+  if (showOnlyImages) {
+    return (
+      <>
+        {Array.isArray(review.files) &&
+          review.files.length > 0 &&
+          review.files.filter(isImageFile).map((fileUrl, idx) => (
+            <Image
+              key={idx}
+              src={fileUrl}
+              alt={`첨부 이미지 ${idx + 1}`}
+              className="shadow rounded"
+              style={{
+                width: "150px",
+                height: "150px",
+                objectFit: "cover",
+                display: "inline-block",
+                cursor: "pointer",
+              }}
+              onClick={() => handleImageClick(fileUrl)}
+            />
+          ))}
+
+        <Modal
+          show={showImageModal}
+          onHide={handleCloseImageModal}
+          dialogClassName="fullscreen-modal"
+          backdropClassName="slightly-dark-backdrop"
+          centered
+          fullscreen
+        >
+          <Modal.Body
+            className="d-flex justify-content-center align-items-center bg-black"
+            onClick={handleCloseImageModal}
+            style={{ cursor: "zoom-out" }}
+          >
+            <Image
+              src={modalImageUrl}
+              fluid
+              alt="확대 이미지"
+              style={{
+                maxHeight: "70%",
+                maxWidth: "70%",
+                objectFit: "contain",
+              }}
+            />
+          </Modal.Body>
+        </Modal>
+      </>
+    );
+  }
 
   return (
     <div style={{ marginBottom: "1.5rem", fontSize: "0.95rem" }}>
@@ -62,34 +114,37 @@ function ReviewPreview({ review }) {
 
       {/* 첨부 파일 처리 */}
       {Array.isArray(review.files) && review.files.length > 0 && (
-        <div className="mb-3" style={{ overflowX: "auto", whiteSpace: "nowrap" }}>
+        <div
+          className="mb-3"
+          style={{ overflowX: "auto", whiteSpace: "nowrap" }}
+        >
           {review.files.filter(isImageFile).length > 0 && (
             <div className="d-flex gap-3 mb-3">
-              {review.files
-                .filter(isImageFile)
-                .map((fileUrl, idx) => (
-                  <Image
-                    key={idx}
-                    src={fileUrl}
-                    alt={`첨부 이미지 ${idx + 1}`}
-                    className="shadow rounded"
-                    style={{
-                      width: "150px",
-                      height: "150px",
-                      objectFit: "cover",
-                      display: "inline-block",
-                      cursor: "pointer",
-                    }}
-                    onClick={() => handleImageClick(fileUrl)}
-                  />
-                ))}
+              {review.files.filter(isImageFile).map((fileUrl, idx) => (
+                <Image
+                  key={idx}
+                  src={fileUrl}
+                  alt={`첨부 이미지 ${idx + 1}`}
+                  className="shadow rounded"
+                  style={{
+                    width: "150px",
+                    height: "150px",
+                    objectFit: "cover",
+                    display: "inline-block",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => handleImageClick(fileUrl)}
+                />
+              ))}
             </div>
           )}
         </div>
       )}
 
       {/* 리뷰 본문 */}
-      <p style={{ margin: "0.5rem 0", whiteSpace: "pre-wrap" }}>{review.review}</p>
+      <p style={{ margin: "0.5rem 0", whiteSpace: "pre-wrap" }}>
+        {review.review}
+      </p>
 
       {/* 이미지 모달 컴포넌트 */}
       <Modal
