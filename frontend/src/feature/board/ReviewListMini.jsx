@@ -219,29 +219,28 @@ export function ReviewListMini() {
                 <div className="mt-3 d-flex align-items-center gap-2">
                   <ReviewLikeContainer reviewId={r.id} />
                   {/* 신고 버튼 */}
-                  <button
-                    onClick={() => openReportModal(r.id)}
-                    title="리뷰 신고하기"
-                    style={{
-                      background: "none",
-                      border: "none",
-                      padding: 0,
-                      margin: 0,
-                      cursor: "pointer",
-                      fontSize: "1.2rem",
-                      lineHeight: 1,
-                      color: "#dc3545",
-                      userSelect: "none",
-                    }}
-                  >
-                    🚨
-                  </button>
+                  {r.email !== null && r.email !== undefined && (
+                    <button
+                      onClick={() => openReportModal(r.id)}
+                      title="리뷰 신고하기"
+                      style={{
+                        background: "none",
+                        border: "none",
+                        padding: 0,
+                        margin: 0,
+                        cursor: "pointer",
+                        fontSize: "1.2rem",
+                        lineHeight: 1,
+                        color: "#dc3545",
+                        userSelect: "none",
+                      }}
+                    >
+                      🚨
+                    </button>
+                  )}
                 </div>
 
-                <div
-                  className="text-muted mt-3"
-                  style={{ fontSize: "0.8rem" }}
-                >
+                <div className="text-muted mt-3" style={{ fontSize: "0.8rem" }}>
                   <Image
                     roundedCircle
                     className="me-2"

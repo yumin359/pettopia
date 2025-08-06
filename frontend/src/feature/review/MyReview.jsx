@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Card, Col, Image, Row, Spinner } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import { LikeContainer } from "../like/LikeContainer.jsx";
+import { ReviewLikeContainer } from "../like/ReviewLikeContainer.jsx";
 
 export function MyReview() {
   const [reviews, setReviews] = useState(null);
@@ -97,9 +99,11 @@ export function MyReview() {
 
                 {/* 하단: 날짜 + 프로필 */}
                 <div
-                  className="text-muted mt-3"
+                  className="text-muted mt-2"
                   style={{ fontSize: "0.85rem" }}
                 >
+                  {/* 리뷰 좋아요 */}
+                  {/*<ReviewLikeContainer reviewId={r.id} />*/}
                   <Image
                     roundedCircle
                     className="me-2"
