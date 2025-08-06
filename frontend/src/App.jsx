@@ -13,14 +13,11 @@ import { MemberLogin } from "./feature/member/MemberLogin.jsx";
 import { AuthenticationContextProvider } from "./common/AuthenticationContextProvider.jsx";
 import { MapDetail } from "./feature/map/MapDetail.jsx";
 import FullFilterKakaoMap from "./feature/map/FullFilterKakaoMap";
-import { ReviewAdd } from "./feature/review/ReviewAdd.jsx";
 import { Chatbot } from "./feature/openai/Chatbot";
-import { ReviewEdit } from "./feature/review/ReviewEdit.jsx";
 import { LatestReviewsList } from "./feature/review/LatestReviewsList.jsx";
 import ServicePage from "./feature/service/ServicePage.jsx";
 import ServiceListPage from "./feature/service/ServiceListPage.jsx";
 import { MyReview } from "./feature/review/MyReview.jsx";
-// import { MemberLogout } from "./feature/member/MemberLogout.jsx";
 import { KakaoCallback } from "./feature/member/KakaoCallback.jsx";
 
 function App() {
@@ -47,10 +44,8 @@ function App() {
             <Route path="/KakaoMap" element={<FullFilterKakaoMap />} />
 
             <Route path="/facility/:name" element={<MapDetail />} />
-            <Route path="/facility/:name/review/add" element={<ReviewAdd />} />
 
             <Route path="/review/my" element={<MyReview />} />
-            <Route path="/review/edit/:id" element={<ReviewEdit />} />
             <Route path="/review/latest" element={<LatestReviewsList />} />
 
             <Route path="/chatbot" element={<Chatbot />} />

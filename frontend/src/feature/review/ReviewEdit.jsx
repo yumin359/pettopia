@@ -1,30 +1,16 @@
-import { useLocation, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
-import {
-  Button,
-  Form,
-  FormControl,
-  FormGroup,
-  Image,
-  ListGroup,
-  Spinner,
-  Badge,
-} from "react-bootstrap";
-import axios from "axios";
-import { FaTrashAlt } from "react-icons/fa";
-import { toast } from "react-toastify";
+import React, { useState, useEffect } from "react";
+import { Button, Form, ListGroup, Spinner } from "react-bootstrap";
+import { FaSave, FaTimes, FaTrashAlt } from "react-icons/fa";
 import Select from "react-select/creatable";
+import axios from "axios";
+import { toast } from "react-toastify";
 
-export function ReviewEdit() {
-  const { state } = useLocation();
-  const navigate = useNavigate();
-  const { review } = state;
-
+function ReviewEdit({ review, onSave, onCancel }) {
   const [content, setContent] = useState(review.review);
   const [rating, setRating] = useState(review.rating);
   const [existingFiles, setExistingFiles] = useState(review.files || []);
   const [newFiles, setNewFiles] = useState([]);
-  const [deletefileNames, setDeletefileNames] = useState([]);
+  const [deleteFileNames, setDeleteFileNames] = useState([]);
   const [isProcessing, setIsProcessing] = useState(false);
 
   // 태그 관련 상태
@@ -33,21 +19,24 @@ export function ReviewEdit() {
     (review.tags || []).map((tag) => ({ value: tag.name, label: tag.name })),
   );
 
-  // 모든 태그 목록을 불러와서 react-select 옵션으로 설정
+  // 태그 옵션 로드
   useEffect(() => {
-    axios
-      .get("/api/tags")
-      .then((res) => {
-        const options = res.data.map((tag) => ({
+    const loadTags = async () => {
+      try {
+        const response = await axios.get("/api/tags");
+        const options = response.data.map((tag) => ({
           value: tag.name,
           label: tag.name,
         }));
         setTagOptions(options);
-      })
-      .catch((err) => console.error("태그 목록 로딩 실패:", err));
+      } catch (error) {
+        console.error("태그 목록 로딩 실패:", error);
+      }
+    };
+    loadTags();
   }, []);
 
-  // 새로 추가된 파일의 미리보기 URL 정리 (메모리 누수 방지)
+  // 메모리 누수 방지
   useEffect(() => {
     return () => {
       newFiles.forEach((fileObj) => {
@@ -58,91 +47,107 @@ export function ReviewEdit() {
     };
   }, [newFiles]);
 
-  // 수정 내용 서버로 전송
-  const handleUpdate = async () => {
+  const handleSave = async () => {
+    if (!content.trim()) {
+      toast.warning("내용을 입력하세요.");
+      return;
+    }
+
     setIsProcessing(true);
 
-    const formData = new FormData();
-    formData.append("review", content.trim());
-    formData.append("rating", rating);
-    formData.append("facilityName", review.facilityName);
-    formData.append("memberEmail", review.memberEmail);
-    formData.append("id", review.id); // 이거 없어도 되는디 (지원 : 네?)
-
-    // 삭제할 기존 파일 목록을 FormData에 추가
-    deletefileNames.forEach((name) => formData.append("deleteFileNames", name));
-    newFiles.forEach((fileObj) => formData.append("files", fileObj.file));
-
-    // 태그 정보 (이름으로 전송)
-    selectedTags.forEach((tag) => {
-      formData.append("tagNames", tag.value);
-    });
-
     try {
+      const formData = new FormData();
+      formData.append("review", content.trim());
+      formData.append("rating", rating);
+      formData.append("facilityName", review.facilityName);
+      formData.append("memberEmail", review.memberEmail);
+
+      // 삭제할 파일들
+      deleteFileNames.forEach((name) =>
+        formData.append("deleteFileNames", name),
+      );
+
+      // 새 파일들
+      newFiles.forEach((fileObj) => formData.append("files", fileObj.file));
+
+      // 태그들
+      selectedTags.forEach((tag) => {
+        formData.append("tagNames", tag.value);
+      });
+
       await axios.put(`/api/review/update/${review.id}`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      toast("수정 완료!");
-      // navigate(`/facility/${encodeURIComponent(review.facilityName)}`);
-      navigate(
-        `/facility/${encodeURIComponent(review.facilityName)}?focusReviewId=${review.id}`,
+
+      toast.success("수정 완료!");
+
+      // 부모 컴포넌트에 저장 알림
+      if (onSave) {
+        onSave();
+      }
+    } catch (error) {
+      console.error("수정 실패:", error);
+      toast.error(
+        "수정 실패: " + (error.response?.data?.message || error.message),
       );
-    } catch (e) {
-      toast("수정 실패: " + e.message);
     } finally {
       setIsProcessing(false);
     }
   };
 
-  const renderRatingStars = () => {
-    return (
-      <div style={{ fontSize: "1.5rem", cursor: "pointer" }}>
-        {[1, 2, 3, 4, 5].map((n) => (
-          <span
-            key={n}
-            onClick={() => setRating(n)}
-            style={{
-              color: n <= rating ? "#ffc107" : "#e4e5e9",
-              marginRight: "4px",
-            }}
-          >
-            ★
-          </span>
-        ))}
-        <span style={{ marginLeft: "8px", fontSize: "1rem" }}>{rating}점</span>
-      </div>
-    );
+  const handleFileChange = (e) => {
+    const selectedFiles = Array.from(e.target.files);
+
+    const validFiles = selectedFiles.filter((file) => {
+      const isValidType =
+        file.type.startsWith("image/") || file.type === "application/pdf";
+      const isValidSize = file.size <= 10 * 1024 * 1024;
+
+      if (!isValidType) {
+        toast.warning(`${file.name}은(는) 지원하지 않는 파일 형식입니다.`);
+        return false;
+      }
+      if (!isValidSize) {
+        toast.warning(`${file.name}은(는) 파일 크기가 10MB를 초과합니다.`);
+        return false;
+      }
+      return true;
+    });
+
+    const filesWithPreview = validFiles.map((file) => ({
+      file,
+      previewUrl: file.type.startsWith("image/")
+        ? URL.createObjectURL(file)
+        : null,
+    }));
+
+    setNewFiles((prev) => [...prev, ...filesWithPreview]);
+    e.target.value = null;
   };
 
-  // 기존 파일 삭제 처리 (filesToDelete 목록에 추가하고 UI 에서 제거)
   const handleRemoveExistingFile = (fileUrlToRemove) => {
-    setDeletefileNames((prev) => [...prev, fileUrlToRemove]);
+    setDeleteFileNames((prev) => [...prev, fileUrlToRemove]);
     setExistingFiles((prev) => prev.filter((url) => url !== fileUrlToRemove));
   };
 
-  // 새로 추가한 파일 삭제 처리 (newFiles 목록에서 제거 및 미리보기 URL 해제)
   const handleRemoveNewFile = (indexToRemove) => {
     setNewFiles((prev) => {
       const fileToRemove = prev[indexToRemove];
-      if (fileToRemove && fileToRemove.previewUrl) {
-        URL.revokeObjectURL(fileToRemove.previewUrl); // 미리보기 URL 해제
+      if (fileToRemove?.previewUrl) {
+        URL.revokeObjectURL(fileToRemove.previewUrl);
       }
       return prev.filter((_, idx) => idx !== indexToRemove);
     });
   };
 
-  // 파일 선택 시 처리
-  const handleFileChange = (e) => {
-    const selectedFiles = Array.from(e.target.files);
-    const filesWithPreview = selectedFiles.map((file) => ({
-      file, // 실제 File 객체
-      previewUrl: file.type.startsWith("image/")
-        ? URL.createObjectURL(file)
-        : null, // 이미지 미리보기 URL
-    }));
-    setNewFiles((prev) => [...prev, ...filesWithPreview]);
-    // 파일 입력 필드 초기화 (동일한 파일을 다시 선택할 수 있도록)
-    e.target.value = null;
+  const handleCancel = () => {
+    // 새 파일들의 미리보기 URL 정리
+    newFiles.forEach((fileObj) => {
+      if (fileObj.previewUrl) {
+        URL.revokeObjectURL(fileObj.previewUrl);
+      }
+    });
+    onCancel();
   };
 
   const getFileNameFromUrl = (fileUrl) => {
@@ -162,149 +167,192 @@ export function ReviewEdit() {
   };
 
   return (
-    <div className="container mt-4">
-      <h3>✏️ 리뷰 수정</h3>
+    <div className="border rounded p-3" style={{ backgroundColor: "#f8f9fa" }}>
+      <h5 className="mb-3">📝 리뷰 수정</h5>
 
-      {/* 태그 */}
-      <FormGroup className="mb-3">
-        <Form.Label>태그 (입력 후 Enter)</Form.Label>
+      {/* 태그 편집 */}
+      <Form.Group className="mb-3">
+        <Form.Label>태그</Form.Label>
         <Select
           isMulti
           isClearable
           options={tagOptions}
           value={selectedTags}
-          onChange={(newValue) => setSelectedTags(newValue)}
+          onChange={(newValue) => setSelectedTags(newValue || [])}
           placeholder="태그를 입력하거나 선택하세요..."
           formatCreateLabel={(inputValue) => `"${inputValue}" 태그 추가`}
+          noOptionsMessage={() => "태그가 없습니다"}
           isDisabled={isProcessing}
+          className="react-select-container"
+          classNamePrefix="react-select"
         />
-      </FormGroup>
+      </Form.Group>
 
-      {/* 내용 */}
+      {/* 내용 편집 */}
       <Form.Group className="mb-3">
-        <Form.Label>내용</Form.Label>
+        <Form.Label>내용 *</Form.Label>
         <Form.Control
           as="textarea"
-          rows={5}
+          rows={4}
           value={content}
           onChange={(e) => setContent(e.target.value)}
           disabled={isProcessing}
+          maxLength={1000}
+          placeholder="리뷰 내용을 입력하세요"
         />
+        <Form.Text className="text-muted">{content.length}/1000자</Form.Text>
       </Form.Group>
 
-      {/* 기존 첨부 파일 목록 */}
+      {/* 별점 편집 */}
+      <Form.Group className="mb-3">
+        <Form.Label>별점</Form.Label>
+        <div className="d-flex align-items-center">
+          {[1, 2, 3, 4, 5].map((star) => (
+            <span
+              key={star}
+              style={{
+                fontSize: "1.8rem",
+                color: star <= rating ? "#ffc107" : "#e4e5e9",
+                cursor: isProcessing ? "default" : "pointer",
+                marginRight: "4px",
+              }}
+              onClick={() => !isProcessing && setRating(star)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if ((e.key === "Enter" || e.key === " ") && !isProcessing) {
+                  setRating(star);
+                }
+              }}
+            >
+              ★
+            </span>
+          ))}
+          <span className="ms-2 text-muted">({rating}점)</span>
+        </div>
+      </Form.Group>
+
+      {/* 기존 파일 관리 */}
       {existingFiles.length > 0 && (
-        <ListGroup className="mb-3">
+        <Form.Group className="mb-3">
           <Form.Label>기존 첨부 파일</Form.Label>
-          {existingFiles.map((fileUrl, idx) => (
-            <ListGroup.Item
-              key={`existing-${idx}`}
-              className="d-flex justify-content-between align-items-center"
-            >
-              {isImageFile(fileUrl) && (
-                <img
-                  src={fileUrl}
-                  alt="preview"
-                  style={{
-                    width: 40,
-                    height: 40,
-                    objectFit: "cover",
-                    marginRight: "10px",
-                  }}
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = `https://placehold.co/40x40/CCCCCC/333333?text=Err`;
-                  }}
-                />
-              )}
-              {/*이거 이름 없애도 되지 않나*/}
-              <span className="text-truncate flex-grow-1">
-                {getFileNameFromUrl(fileUrl)}
-              </span>
-              <Button
-                size="sm"
-                variant="outline-danger"
-                onClick={() => handleRemoveExistingFile(fileUrl)}
-                disabled={isProcessing}
+          <ListGroup>
+            {existingFiles.map((fileUrl, idx) => (
+              <ListGroup.Item
+                key={`existing-${idx}`}
+                className="d-flex justify-content-between align-items-center"
               >
-                <FaTrashAlt />
-              </Button>
-            </ListGroup.Item>
-          ))}
-        </ListGroup>
+                <div className="d-flex align-items-center">
+                  {isImageFile(fileUrl) && (
+                    <img
+                      src={fileUrl}
+                      alt="미리보기"
+                      style={{
+                        width: 40,
+                        height: 40,
+                        objectFit: "cover",
+                        marginRight: "10px",
+                        borderRadius: "4px",
+                      }}
+                    />
+                  )}
+                  <span className="text-truncate">
+                    {getFileNameFromUrl(fileUrl)}
+                  </span>
+                </div>
+                <Button
+                  size="sm"
+                  variant="outline-danger"
+                  onClick={() => handleRemoveExistingFile(fileUrl)}
+                  disabled={isProcessing}
+                  aria-label={`${getFileNameFromUrl(fileUrl)} 삭제`}
+                >
+                  <FaTrashAlt />
+                </Button>
+              </ListGroup.Item>
+            ))}
+          </ListGroup>
+        </Form.Group>
       )}
 
-      {/* 새로 추가할 파일 목록 */}
+      {/* 새 파일 관리 */}
       {newFiles.length > 0 && (
-        <ListGroup className="mb-3">
+        <Form.Group className="mb-3">
           <Form.Label>새로 추가할 파일</Form.Label>
-          {newFiles.map((fileObj, idx) => (
-            <ListGroup.Item
-              key={`new-${idx}`}
-              className="d-flex justify-content-between align-items-center"
-            >
-              {fileObj.previewUrl && ( // 새로 추가하는 파일은 previewUrl이 이미지일 때만 존재
-                <img
-                  src={fileObj.previewUrl}
-                  alt="preview"
-                  style={{
-                    width: 40,
-                    height: 40,
-                    objectFit: "cover",
-                    marginRight: "10px",
-                  }}
-                />
-              )}
-              <span className="text-truncate flex-grow-1">
-                {fileObj.file.name}
-              </span>
-              <Button
-                size="sm"
-                variant="outline-danger"
-                onClick={() => handleRemoveNewFile(idx)}
-                disabled={isProcessing}
+          <ListGroup>
+            {newFiles.map((fileObj, idx) => (
+              <ListGroup.Item
+                key={`new-${idx}`}
+                className="d-flex justify-content-between align-items-center"
               >
-                <FaTrashAlt />
-              </Button>
-            </ListGroup.Item>
-          ))}
-        </ListGroup>
+                <div className="d-flex align-items-center">
+                  {fileObj.previewUrl && (
+                    <img
+                      src={fileObj.previewUrl}
+                      alt="미리보기"
+                      style={{
+                        width: 40,
+                        height: 40,
+                        objectFit: "cover",
+                        marginRight: "10px",
+                        borderRadius: "4px",
+                      }}
+                    />
+                  )}
+                  <span className="text-truncate">{fileObj.file.name}</span>
+                </div>
+                <Button
+                  size="sm"
+                  variant="outline-danger"
+                  onClick={() => handleRemoveNewFile(idx)}
+                  disabled={isProcessing}
+                  aria-label={`${fileObj.file.name} 삭제`}
+                >
+                  <FaTrashAlt />
+                </Button>
+              </ListGroup.Item>
+            ))}
+          </ListGroup>
+        </Form.Group>
       )}
 
-      {/* 파일 첨부 입력 */}
-      <FormGroup className="mb-3">
+      {/* 파일 추가 */}
+      <Form.Group className="mb-3">
         <Form.Label>파일 추가</Form.Label>
-        <FormControl
+        <Form.Control
           type="file"
           multiple
+          accept="image/*,.pdf"
           onChange={handleFileChange}
           disabled={isProcessing}
         />
-      </FormGroup>
-
-      {/* 별점 */}
-      <Form.Group className="mb-3">
-        <Form.Label>별점</Form.Label>
-        {renderRatingStars()}
+        <Form.Text className="text-muted">
+          이미지 파일 또는 PDF 파일만 업로드 가능 (최대 10MB)
+        </Form.Text>
       </Form.Group>
 
-      {/* 버튼 */}
-      <div className="d-flex gap-2">
+      {/* 편집 버튼들 */}
+      <div className="d-flex justify-content-end gap-2">
         <Button
-          variant="secondary"
-          onClick={() => navigate(-1)}
+          variant="outline-secondary"
+          onClick={handleCancel}
           disabled={isProcessing}
         >
-          취소
+          <FaTimes /> 취소
         </Button>
         <Button
           variant="primary"
-          onClick={handleUpdate}
-          disabled={isProcessing}
+          onClick={handleSave}
+          disabled={isProcessing || !content.trim()}
         >
-          {isProcessing ? <Spinner size="sm" animation="border" /> : "수정"}
+          {isProcessing && (
+            <Spinner animation="border" size="sm" className="me-2" />
+          )}
+          <FaSave /> 저장
         </Button>
       </div>
     </div>
   );
 }
+
+export default ReviewEdit;

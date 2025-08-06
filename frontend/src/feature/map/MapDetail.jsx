@@ -1,19 +1,19 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
 import { ReviewLikeContainer } from "../like/ReviewLikeContainer.jsx";
 import { FavoriteContainer } from "./FavoriteContainer.jsx";
 import { get } from "./data/api.jsx";
-import axios from "axios"; // axios import 추가
-import { Button } from "react-bootstrap";
+import axios from "axios";
 import ReviewCard from "../review/ReviewCard.jsx";
+import ReviewAdd from "../review/ReviewAdd.jsx";
 
 export function MapDetail() {
   const { name } = useParams();
   const decodedName = decodeURIComponent(name);
-  const navigate = useNavigate();
   const { user } = useContext(AuthenticationContext);
 
+  const [isWriting, setIsWriting] = useState(false);
   const [facility, setFacility] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [loadingFacility, setLoadingFacility] = useState(true);
@@ -43,11 +43,10 @@ export function MapDetail() {
     }
   };
 
-  // 리뷰 목록 조회 - axios로 직접 호출하도록 수정
+  // 리뷰 목록 조회
   const fetchReviews = async () => {
     setLoadingReviews(true);
     try {
-      // ReviewAdd와 동일한 방식으로 axios 직접 사용
       const response = await axios.get(
         `/api/review/facility/${encodeURIComponent(decodedName)}`,
       );
@@ -60,12 +59,43 @@ export function MapDetail() {
     }
   };
 
+  // 리뷰 삭제
+  const handleDelete = async (id) => {
+    if (!window.confirm("정말 삭제하시겠습니까?")) return;
+    try {
+      await axios.delete(`/api/review/delete/${id}`, {
+        data: { email: user.email },
+      });
+      alert("삭제 완료");
+      fetchReviews(); // 리뷰 목록 새로고침
+    } catch (err) {
+      console.error("리뷰 삭제 실패:", err);
+      alert("삭제 실패: " + (err.response?.data?.message || err.message));
+    }
+  };
+
+  // 리뷰 작성 버튼 핸들러
+  const handleGoToWrite = () => {
+    setIsWriting(true);
+  };
+
+  // 리뷰 저장 완료 핸들러
+  const handleReviewSaved = () => {
+    setIsWriting(false);
+    fetchReviews(); // 리뷰 목록 새로고침
+  };
+
+  // 리뷰 작성 취소 핸들러
+  const handleReviewCancel = () => {
+    setIsWriting(false);
+  };
+
   useEffect(() => {
     fetchFacility();
     fetchReviews();
   }, [decodedName]);
 
-  // 자동 스크롤 및 하이라이트 로직 추가
+  // 자동 스크롤 및 하이라이트 로직
   useEffect(() => {
     const focusReviewId = searchParams.get("focusReviewId");
     if (focusReviewId && reviews.length > 0) {
@@ -81,31 +111,6 @@ export function MapDetail() {
     }
   }, [reviews, searchParams]);
 
-  // 리뷰 작성 페이지 이동
-  const handleGoToWrite = () => {
-    navigate(`/facility/${encodeURIComponent(decodedName)}/review/add`);
-  };
-
-  // 리뷰 수정 페이지 이동
-  const handleEdit = (review) => {
-    navigate(`/review/edit/${review.id}`, { state: { review } });
-  };
-
-  // 리뷰 삭제 - axios로 수정
-  const handleDelete = async (id) => {
-    if (!window.confirm("정말 삭제하시겠습니까?")) return;
-    try {
-      await axios.delete(`/api/review/delete/${id}`, {
-        data: { email: user.email },
-      });
-      alert("삭제 완료");
-      fetchReviews(); // 리뷰 목록 새로고침
-    } catch (err) {
-      console.error("리뷰 삭제 실패:", err);
-      alert("삭제 실패: " + (err.response?.data?.message || err.message));
-    }
-  };
-
   // 신고 모달 열기
   const openReportModal = (reviewId) => {
     setReportingReviewId(reviewId);
@@ -120,7 +125,7 @@ export function MapDetail() {
     setReportReason("");
   };
 
-  // 신고 제출 - axios로 수정
+  // 신고 제출
   const submitReport = async () => {
     if (!reportReason.trim()) {
       alert("신고 사유를 입력해주세요.");
@@ -160,32 +165,42 @@ export function MapDetail() {
 
   return (
     <div style={{ padding: "2rem", maxWidth: "1200px", margin: "0 auto" }}>
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
-        <h2>{facility ? facility.name : decodedName}</h2>
+      {/* 헤더 영역 */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "1.5rem",
+        }}
+      >
+        <h2 style={{ margin: 0 }}>{facility ? facility.name : decodedName}</h2>
         <FavoriteContainer facilityName={decodedName} />
       </div>
 
+      {/* 시설 정보 섹션 */}
       {loadingFacility ? (
         <p>시설 정보 불러오는 중...</p>
       ) : facility ? (
         <div
           style={{
-            marginTop: "0.5rem",
-            marginBottom: "1.5rem",
-            fontSize: "0.9rem",
-            color: "#444",
+            marginBottom: "2rem",
+            padding: "1.5rem",
+            backgroundColor: "#f8f9fa",
+            borderRadius: "8px",
+            border: "1px solid #e9ecef",
           }}
         >
-          <div>
-            <strong>📍도로명 주소:</strong>
-            {facility.roadAddress || "정보 없음"}
+          <div style={{ marginBottom: "0.8rem" }}>
+            <strong>📍 도로명 주소:</strong>{" "}
+            <span>{facility.roadAddress || "정보 없음"}</span>
           </div>
-          <div>
-            <strong>📞전화번호:</strong>
-            {facility.phoneNumber || "정보 없음"}
+          <div style={{ marginBottom: "0.8rem" }}>
+            <strong>📞 전화번호:</strong>{" "}
+            <span>{facility.phoneNumber || "정보 없음"}</span>
           </div>
-          <div>
-            <strong>🌐홈페이지:</strong>{" "}
+          <div style={{ marginBottom: "0.8rem" }}>
+            <strong>🌐 홈페이지:</strong>{" "}
             {(() => {
               const homepageRaw = facility?.homepage ?? "";
               const homepage = homepageRaw.trim().toLowerCase();
@@ -198,211 +213,289 @@ export function MapDetail() {
 
               if (isValidHomepage) {
                 return (
-                  <a href={facility.homepage} target="_blank" rel="noreferrer">
+                  <a
+                    href={facility.homepage}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{ color: "#007bff", textDecoration: "none" }}
+                  >
                     {facility.homepage}
                   </a>
                 );
               } else {
-                return <span>⚠️정보 없음</span>;
+                return <span>정보 없음</span>;
               }
             })()}
           </div>
-          <div>
-            <strong>🏖️휴무일:</strong>
-            {facility.holiday || "정보 없음"}
+          <div style={{ marginBottom: "0.8rem" }}>
+            <strong>🏖️ 휴무일:</strong>{" "}
+            <span>{facility.holiday || "정보 없음"}</span>
           </div>
           <div>
-            <strong>⏲️운영시간:</strong>
-            {facility.operatingHours || "정보 없음"}
+            <strong>⏰ 운영시간:</strong>{" "}
+            <span>{facility.operatingHours || "정보 없음"}</span>
           </div>
         </div>
       ) : (
-        <p style={{ color: "red" }}>시설 정보를 찾을 수 없습니다.</p>
-      )}
-
-      {user ? (
-        <button
-          onClick={handleGoToWrite}
+        <div
           style={{
-            marginTop: "1rem",
-            padding: "0.5rem 1.2rem",
-            fontSize: "1rem",
-            backgroundColor: "#ffc107",
-            color: "#212529",
-            border: "none",
-            borderRadius: "4px",
-            cursor: "pointer",
+            padding: "1rem",
+            backgroundColor: "#f8d7da",
+            color: "#721c24",
+            borderRadius: "8px",
+            marginBottom: "2rem",
           }}
         >
-          리뷰 작성
-        </button>
-      ) : (
-        <p style={{ marginTop: "1rem", color: "gray" }}>
-          ✨ 로그인한 사용자만 리뷰를 작성할 수 있습니다.
-        </p>
+          시설 정보를 찾을 수 없습니다.
+        </div>
       )}
 
+      {/* 리뷰 작성 섹션 */}
+      {!isWriting && (
+        <div style={{ marginBottom: "2rem" }}>
+          {user ? (
+            <button
+              onClick={handleGoToWrite}
+              style={{
+                padding: "0.75rem 1.5rem",
+                fontSize: "1rem",
+                backgroundColor: "#ffc107",
+                color: "#212529",
+                border: "none",
+                borderRadius: "6px",
+                cursor: "pointer",
+                fontWeight: "500",
+                transition: "background-color 0.2s",
+              }}
+              onMouseOver={(e) => (e.target.style.backgroundColor = "#ffb300")}
+              onMouseOut={(e) => (e.target.style.backgroundColor = "#ffc107")}
+            >
+              ✍️ 리뷰 작성하기
+            </button>
+          ) : (
+            <div
+              style={{
+                padding: "1rem",
+                backgroundColor: "#e7f3ff",
+                borderRadius: "6px",
+                color: "#004085",
+              }}
+            >
+              💡 로그인한 사용자만 리뷰를 작성할 수 있습니다.
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* 리뷰 작성 폼 */}
+      {isWriting && (
+        <div style={{ marginBottom: "2rem" }}>
+          <ReviewAdd
+            facilityName={decodedName}
+            onSave={handleReviewSaved}
+            onCancel={handleReviewCancel}
+          />
+        </div>
+      )}
+
+      {/* 평균 평점 표시 */}
       {reviews.length > 0 && (
         <div
           style={{
-            marginTop: "1rem",
+            marginBottom: "1.5rem",
+            padding: "1rem",
+            backgroundColor: "#fff3cd",
+            borderRadius: "6px",
             display: "flex",
             alignItems: "center",
             gap: "0.5rem",
           }}
         >
           <strong>평균 평점:</strong>
-          <span
-            style={{ fontSize: "1.1rem", color: "#f0ad4e", userSelect: "none" }}
-            title={`평점: ${getAverageRating()} / 5`}
-          >
-            ★
+          <span style={{ fontSize: "1.2rem", color: "#f0ad4e" }}>
+            {"★".repeat(Math.round(getAverageRating()))}
           </span>
-          <span
-            style={{
-              fontSize: "1.1rem",
-              color: "#212529",
-              marginLeft: "0.25rem",
-            }}
-          >
+          <span style={{ fontSize: "1.1rem", fontWeight: "600" }}>
             {getAverageRating()} / 5
           </span>
-          <span style={{ fontSize: "0.9rem", color: "gray" }}>
-            ({reviews.length}명)
+          <span style={{ fontSize: "0.9rem", color: "#666" }}>
+            ({reviews.length}개의 리뷰)
           </span>
         </div>
       )}
 
-      <div style={{ marginTop: "2rem" }}>
-        <h4 className="mb-3">
-          📝 리뷰 목록{" "}
-          <span style={{ color: "#aaa", fontWeight: "normal" }}>
-            ({reviews.length}개)
-          </span>
-        </h4>
+      {/* 리뷰 목록 섹션 */}
+      <div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "1.5rem",
+          }}
+        >
+          <h3 style={{ margin: 0 }}>
+            📝 리뷰 목록{" "}
+            <span
+              style={{
+                color: "#6c757d",
+                fontWeight: "normal",
+                fontSize: "1rem",
+              }}
+            >
+              ({reviews.length}개)
+            </span>
+          </h3>
 
-        <div style={{ marginBottom: "1rem" }}>
-          <label
-            htmlFor="sortSelect"
-            style={{ marginRight: "0.5rem", fontWeight: "bold" }}
-          >
-            정렬:
-          </label>
-          <select
-            id="sortSelect"
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            style={{
-              padding: "0.5rem 1rem",
-              fontSize: "1rem",
-              borderRadius: "6px",
-              border: "1px solid #ccc",
-              backgroundColor: "#fff",
-              cursor: "pointer",
-            }}
-          >
-            <option value="latest">최신순</option>
-            <option value="likes">좋아요순</option>
-          </select>
-        </div>
-
-        {loadingReviews ? (
-          <p>불러오는 중...</p>
-        ) : sortedReviews.length === 0 ? (
-          <p>아직 리뷰가 없습니다.</p>
-        ) : (
-          <ul style={{ paddingLeft: 0, listStyle: "none" }}>
-            {sortedReviews.map((r) => (
-              <li
-                key={r.id}
-                ref={(el) => (reviewRefs.current[r.id] = el)}
+          {reviews.length > 0 && (
+            <div
+              style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
+            >
+              <label
+                htmlFor="sortSelect"
+                style={{ fontWeight: "500", margin: 0 }}
+              >
+                정렬:
+              </label>
+              <select
+                id="sortSelect"
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
                 style={{
-                  position: "relative",
-                  padding: "1.5rem",
-                  marginBottom: "1rem",
-                  border: "1px solid #ddd",
-                  borderRadius: "8px",
+                  padding: "0.5rem 1rem",
+                  fontSize: "1rem",
+                  borderRadius: "6px",
+                  border: "1px solid #ced4da",
                   backgroundColor: "#fff",
-                  transition:
-                    "background-color 0.5s ease-out, border-color 0.5s ease-out",
+                  cursor: "pointer",
+                  minWidth: "120px",
                 }}
               >
+                <option value="latest">최신순</option>
+                <option value="likes">좋아요순</option>
+              </select>
+            </div>
+          )}
+        </div>
+
+        {/* 리뷰 리스트 */}
+        {loadingReviews ? (
+          <div style={{ textAlign: "center", padding: "2rem" }}>
+            <p>리뷰를 불러오는 중...</p>
+          </div>
+        ) : sortedReviews.length === 0 ? (
+          <div
+            style={{
+              textAlign: "center",
+              padding: "3rem",
+              backgroundColor: "#f8f9fa",
+              borderRadius: "8px",
+              color: "#6c757d",
+            }}
+          >
+            <p style={{ fontSize: "1.1rem", margin: 0 }}>
+              아직 작성된 리뷰가 없습니다.
+            </p>
+            {user && (
+              <p style={{ marginTop: "0.5rem", fontSize: "0.95rem" }}>
+                첫 번째 리뷰를 작성해보세요!
+              </p>
+            )}
+          </div>
+        ) : (
+          <ul style={{ paddingLeft: 0, listStyle: "none" }}>
+            {sortedReviews.map((review) => (
+              <li
+                key={review.id}
+                ref={(el) => (reviewRefs.current[review.id] = el)}
+                style={{
+                  padding: "1.5rem",
+                  marginBottom: "1rem",
+                  border: "1px solid #dee2e6",
+                  borderRadius: "8px",
+                  backgroundColor: "#fff",
+                  transition: "all 0.3s ease",
+                  boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
+                }}
+              >
+                {/* 평점 표시 - 상단에 별도 영역으로 배치 */}
                 <div
                   style={{
-                    position: "absolute",
-                    top: "10px",
-                    right: "10px",
-                    fontWeight: "bold",
-                    fontSize: "1rem",
-                    color: "#f0ad4e",
-                    padding: "2px 6px",
-                    borderRadius: "12px",
-                    userSelect: "none",
-                    pointerEvents: "none",
-                    whiteSpace: "nowrap",
-                    letterSpacing: "2px",
-                  }}
-                  title={`평점: ${r.rating} / 5`}
-                >
-                  {"★".repeat(r.rating)}
-                  <span className="ms-2 text-dark fw-semibold">{r.rating}</span>
-                </div>
-
-                <ReviewCard review={r} />
-
-                <div
-                  style={{
-                    marginTop: "0.5rem",
                     display: "flex",
                     alignItems: "center",
                     gap: "0.5rem",
+                    marginBottom: "1rem",
+                    paddingBottom: "1rem",
+                    borderBottom: "1px solid #e9ecef",
                   }}
                 >
-                  <ReviewLikeContainer reviewId={r.id} />
+                  <span
+                    style={{
+                      color: "#f0ad4e",
+                      fontSize: "1.2rem",
+                    }}
+                  >
+                    {"★".repeat(review.rating)}
+                    {"☆".repeat(5 - review.rating)}
+                  </span>
+                  <span
+                    style={{
+                      fontWeight: "600",
+                      color: "#495057",
+                      fontSize: "1rem",
+                    }}
+                  >
+                    {review.rating}.0 / 5.0
+                  </span>
+                </div>
+
+                {/* 리뷰 카드 컴포넌트 */}
+                <ReviewCard
+                  review={review}
+                  onUpdate={fetchReviews}
+                  onDelete={handleDelete}
+                />
+
+                {/* 액션 버튼들 */}
+                <div
+                  style={{
+                    marginTop: "1rem",
+                    paddingTop: "1rem",
+                    borderTop: "1px solid #e9ecef",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "1rem",
+                  }}
+                >
+                  <ReviewLikeContainer reviewId={review.id} />
+
                   <button
-                    onClick={() => openReportModal(r.id)}
+                    onClick={() => openReportModal(review.id)}
                     title="리뷰 신고하기"
                     style={{
                       background: "none",
-                      border: "none",
-                      padding: 0,
-                      margin: 0,
+                      border: "1px solid #dc3545",
+                      borderRadius: "4px",
+                      padding: "0.25rem 0.5rem",
                       cursor: "pointer",
-                      fontSize: "1.2rem",
-                      lineHeight: 1,
+                      fontSize: "0.9rem",
                       color: "#dc3545",
-                      userSelect: "none",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.25rem",
+                      transition: "background-color 0.2s",
+                    }}
+                    onMouseOver={(e) => {
+                      e.currentTarget.style.backgroundColor = "#dc3545";
+                      e.currentTarget.style.color = "#fff";
+                    }}
+                    onMouseOut={(e) => {
+                      e.currentTarget.style.backgroundColor = "transparent";
+                      e.currentTarget.style.color = "#dc3545";
                     }}
                   >
-                    🚨
+                    🚨 신고
                   </button>
-                </div>
-
-                <div
-                  style={{
-                    marginTop: "0.5rem",
-                    display: "flex",
-                    gap: "0.5rem",
-                  }}
-                >
-                  {user?.email === r.memberEmail && (
-                    <div className="mt-2 d-flex gap-2">
-                      <Button
-                        variant="outline-secondary"
-                        size="sm"
-                        onClick={() => handleEdit(r)}
-                      >
-                        수정
-                      </Button>
-                      <Button
-                        variant="outline-danger"
-                        size="sm"
-                        onClick={() => handleDelete(r.id)}
-                      >
-                        삭제
-                      </Button>
-                    </div>
-                  )}
                 </div>
               </li>
             ))}
@@ -419,79 +512,137 @@ export function MapDetail() {
             left: 0,
             width: "100vw",
             height: "100vh",
-            backgroundColor: "rgba(0,0,0,0.5)",
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            zIndex: 1000,
+            zIndex: 9999,
           }}
           onClick={closeReportModal}
         >
           <div
             style={{
               backgroundColor: "white",
-              padding: "1.5rem",
-              borderRadius: "8px",
+              padding: "2rem",
+              borderRadius: "12px",
               width: "90%",
-              maxWidth: "400px",
-              position: "relative",
+              maxWidth: "500px",
+              boxShadow: "0 10px 40px rgba(0, 0, 0, 0.2)",
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <h3>리뷰 신고하기</h3>
-            <textarea
-              rows={5}
-              placeholder="신고 사유를 작성해주세요."
-              value={reportReason}
-              onChange={(e) => setReportReason(e.target.value)}
-              style={{ width: "100%", marginTop: "0.5rem", resize: "vertical" }}
-            />
+            <h3 style={{ marginBottom: "1.5rem", color: "#212529" }}>
+              🚨 리뷰 신고하기
+            </h3>
+
+            <div style={{ marginBottom: "1.5rem" }}>
+              <label
+                htmlFor="reportReason"
+                style={{
+                  display: "block",
+                  marginBottom: "0.5rem",
+                  fontWeight: "500",
+                }}
+              >
+                신고 사유
+              </label>
+              <textarea
+                id="reportReason"
+                rows={5}
+                placeholder="신고 사유를 구체적으로 작성해주세요."
+                value={reportReason}
+                onChange={(e) => setReportReason(e.target.value)}
+                style={{
+                  width: "100%",
+                  padding: "0.75rem",
+                  border: "1px solid #ced4da",
+                  borderRadius: "6px",
+                  fontSize: "1rem",
+                  resize: "vertical",
+                  minHeight: "120px",
+                }}
+              />
+              <small
+                style={{
+                  color: "#6c757d",
+                  marginTop: "0.25rem",
+                  display: "block",
+                }}
+              >
+                허위 신고는 제재 대상이 될 수 있습니다.
+              </small>
+            </div>
+
             <div
               style={{
-                marginTop: "1rem",
                 display: "flex",
                 justifyContent: "flex-end",
-                gap: "0.5rem",
+                gap: "0.75rem",
               }}
             >
               <button
                 onClick={closeReportModal}
                 disabled={reportLoading}
                 style={{
-                  padding: "0.4rem 1rem",
+                  padding: "0.6rem 1.5rem",
                   backgroundColor: "#6c757d",
                   color: "white",
                   border: "none",
-                  borderRadius: "4px",
-                  cursor: "pointer",
+                  borderRadius: "6px",
+                  cursor: reportLoading ? "not-allowed" : "pointer",
+                  fontSize: "1rem",
+                  fontWeight: "500",
+                  opacity: reportLoading ? 0.6 : 1,
                 }}
               >
                 취소
               </button>
               <button
                 onClick={submitReport}
-                disabled={reportLoading}
+                disabled={reportLoading || !reportReason.trim()}
                 style={{
-                  padding: "0.4rem 1rem",
-                  backgroundColor: "#ffc107",
-                  color: "#212529",
+                  padding: "0.6rem 1.5rem",
+                  backgroundColor: "#dc3545",
+                  color: "white",
                   border: "none",
-                  borderRadius: "4px",
-                  cursor: "pointer",
+                  borderRadius: "6px",
+                  cursor:
+                    reportLoading || !reportReason.trim()
+                      ? "not-allowed"
+                      : "pointer",
+                  fontSize: "1rem",
+                  fontWeight: "500",
+                  opacity: reportLoading || !reportReason.trim() ? 0.6 : 1,
                 }}
               >
-                {reportLoading ? "신고중..." : "신고하기"}
+                {reportLoading ? "신고 중..." : "신고하기"}
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* 하이라이트 효과를 위한 CSS 추가 */}
+      {/* 스타일 정의 */}
       <style>{`
         .review-highlight {
           background-color: #fffbe5 !important;
           border-color: #ffc107 !important;
+          box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.25) !important;
+          animation: highlight-fade 2.5s ease-out;
+        }
+        
+        @keyframes highlight-fade {
+          0% {
+            background-color: #fff3cd;
+            transform: scale(1.02);
+          }
+          50% {
+            background-color: #fffbe5;
+            transform: scale(1);
+          }
+          100% {
+            background-color: #fffbe5;
+          }
         }
       `}</style>
     </div>
