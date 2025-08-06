@@ -1,15 +1,12 @@
 package com.example.backend.review.dto;
 
-import com.example.backend.review.entity.Review;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Getter
@@ -26,4 +23,5 @@ public class ReviewListDto {
     private List<String> files; // 리뷰 첨부 이미지 여러개
     private String profileImageUrl; // 프로필 이미지 한개만
 
+    private List<TagDto> tags;
 }

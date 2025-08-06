@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Image, Modal } from "react-bootstrap";
+import React, { useState } from "react";
+import { Badge, Image, Modal } from "react-bootstrap";
 
 function ReviewPreview({ review }) {
   const [showImageModal, setShowImageModal] = useState(false);
@@ -21,6 +21,7 @@ function ReviewPreview({ review }) {
     setModalImageUrl(imageUrl);
     setShowImageModal(true);
   };
+
   const handleCloseImageModal = () => {
     setShowImageModal(false);
     setModalImageUrl("");
@@ -60,36 +61,50 @@ function ReviewPreview({ review }) {
 
       {/* 별점 별 갯수 표시 부분 제거 */}
 
+      {/* 리뷰 본문 */}
+      <p style={{ margin: "0.5rem 0", whiteSpace: "pre-wrap" }}>
+        {review.review}
+      </p>
+
+      {/* 태그 (있을때만 표시)*/}
+      {Array.isArray(review.tags) && review.tags.length > 0 && (
+        <div className="d-flex flex-wrap gap-2 my-2">
+          {review.tags.map((tag) => (
+            <Badge key={tag.id} bg="secondary" className="fw-normal">
+              # {tag.name}
+            </Badge>
+          ))}
+        </div>
+      )}
+
       {/* 첨부 파일 처리 */}
       {Array.isArray(review.files) && review.files.length > 0 && (
-        <div className="mb-3" style={{ overflowX: "auto", whiteSpace: "nowrap" }}>
+        <div
+          className="mb-3"
+          style={{ overflowX: "auto", whiteSpace: "nowrap" }}
+        >
           {review.files.filter(isImageFile).length > 0 && (
             <div className="d-flex gap-3 mb-3">
-              {review.files
-                .filter(isImageFile)
-                .map((fileUrl, idx) => (
-                  <Image
-                    key={idx}
-                    src={fileUrl}
-                    alt={`첨부 이미지 ${idx + 1}`}
-                    className="shadow rounded"
-                    style={{
-                      width: "150px",
-                      height: "150px",
-                      objectFit: "cover",
-                      display: "inline-block",
-                      cursor: "pointer",
-                    }}
-                    onClick={() => handleImageClick(fileUrl)}
-                  />
-                ))}
+              {review.files.filter(isImageFile).map((fileUrl, idx) => (
+                <Image
+                  key={idx}
+                  src={fileUrl}
+                  alt={`첨부 이미지 ${idx + 1}`}
+                  className="shadow rounded"
+                  style={{
+                    width: "150px",
+                    height: "150px",
+                    objectFit: "cover",
+                    display: "inline-block",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => handleImageClick(fileUrl)}
+                />
+              ))}
             </div>
           )}
         </div>
       )}
-
-      {/* 리뷰 본문 */}
-      <p style={{ margin: "0.5rem 0", whiteSpace: "pre-wrap" }}>{review.review}</p>
 
       {/* 이미지 모달 컴포넌트 */}
       <Modal

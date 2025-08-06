@@ -1,6 +1,9 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
+import { FaSave, FaTimes, FaTrashAlt } from "react-icons/fa";
+import { toast } from "react-toastify";
+import axios from "axios";
 import {
   Button,
   Card,
@@ -13,9 +16,6 @@ import {
   Spinner,
   Form,
 } from "react-bootstrap";
-import { FaSave, FaTimes, FaTrashAlt } from "react-icons/fa";
-import { toast } from "react-toastify";
-import axios from "axios";
 
 export function ReviewAdd() {
   const { name } = useParams();
@@ -29,27 +29,25 @@ export function ReviewAdd() {
   const [modalShow, setModalShow] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
 
+  const [tagOptions, setTagOptions] = useState([]);
+  const [selectedTags, setSelectedTags] = useState([]);
+
+  useEffect(() => {
+    axios
+      .get("/api/tags")
+      .then((res) => {
+        const options = res.data.map((tag) => ({
+          value: tag.name,
+          label: tag.name,
+        }));
+        setTagOptions(options);
+      })
+      .catch((err) => console.error("태그 목록 로딩 실패:", err));
+  }, []);
+
   if (!user) return <p className="text-center mt-4">로그인이 필요합니다.</p>;
 
   const isValid = content.trim() !== "";
-
-  const handleFileChange = (e) => {
-    const selectedFiles = Array.from(e.target.files);
-    setFiles((prev) =>
-      prev.concat(
-        selectedFiles.map((file) => ({
-          file,
-          previewUrl: file.type.startsWith("image/")
-            ? URL.createObjectURL(file)
-            : null,
-        })),
-      ),
-    );
-  };
-
-  const handleFileRemove = (idx) => {
-    setFiles(files.filter((_, i) => i !== idx));
-  };
 
   const handleSave = async () => {
     if (!isValid) {
@@ -75,6 +73,10 @@ export function ReviewAdd() {
         formData.append("files", fileObj.file);
       });
 
+      selectedTags.forEach((tag) => {
+        formData.append("tagNames", tag.value); // 백엔드에서는 List<String> tagNames로 받음
+      });
+
       // 4. 요청
       await axios.post("/api/review/add", formData, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -90,6 +92,32 @@ export function ReviewAdd() {
     }
   };
 
+  const handleFileChange = (e) => {
+    const selectedFiles = Array.from(e.target.files);
+    setFiles((prev) =>
+      prev.concat(
+        selectedFiles.map((file) => ({
+          file,
+          previewUrl: file.type.startsWith("image/")
+            ? URL.createObjectURL(file)
+            : null,
+        })),
+      ),
+    );
+  };
+
+  const handleFileRemove = (idx) => {
+    setFiles(files.filter((_, i) => i !== idx));
+  };
+
+  const handleTagClick = (tag) => {
+    if (selectedTags.find((t) => t.id === tag.id)) {
+      setSelectedTags(selectedTags.filter((t) => t.id !== tag.id));
+    } else {
+      setSelectedTags([...selectedTags, tag]);
+    }
+  };
+
   return (
     <Row className="justify-content-center my-4">
       <Col xs={12} md={8} lg={6}>
@@ -97,6 +125,21 @@ export function ReviewAdd() {
 
         <Card className="shadow-sm rounded-3 border-0">
           <Card.Body>
+            {/* 태그 */}
+            <FormGroup className="mb-3">
+              <Form.Label>태그 (입력 후 Enter)</Form.Label>
+              <Select
+                isMulti // 여러 개 선택 가능
+                isClearable
+                options={tagOptions} // 추천 태그 목록
+                value={selectedTags}
+                onChange={(newValue) => setSelectedTags(newValue)}
+                placeholder="태그를 입력하거나 선택하세요..."
+                formatCreateLabel={(inputValue) => `"${inputValue}" 태그 추가`}
+                isDisabled={isProcessing}
+              />
+            </FormGroup>
+
             {/* 내용 */}
             <FormGroup className="mb-3">
               <Form.Label>내용</Form.Label>
@@ -139,6 +182,7 @@ export function ReviewAdd() {
                     key={idx}
                     className="d-flex justify-content-between"
                   >
+                    .0
                     {f.previewUrl && (
                       <img
                         src={f.previewUrl}
@@ -169,10 +213,12 @@ export function ReviewAdd() {
               />
             </FormGroup>
 
+            {/* 작성자 정보 */}
             <div className="text-muted mb-3">
               작성자: <strong>{user.nickName}</strong>
             </div>
 
+            {/* 버튼 */}
             <div className="d-flex justify-content-end gap-2">
               <Button variant="outline-secondary" onClick={() => navigate(-1)}>
                 <FaTimes /> 취소

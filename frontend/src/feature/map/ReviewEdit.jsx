@@ -8,6 +8,7 @@ import {
   Image,
   ListGroup,
   Spinner,
+  Badge,
 } from "react-bootstrap";
 import axios from "axios";
 import { FaTrashAlt } from "react-icons/fa";
@@ -25,6 +26,24 @@ export function ReviewEdit() {
   const [deletefileNames, setDeletefileNames] = useState([]);
   const [isProcessing, setIsProcessing] = useState(false);
 
+  const [tagOptions, setTagOptions] = useState([]);
+  const [selectedTags, setSelectedTags] = useState(
+    (review.tags || []).map((tag) => ({ value: tag.name, label: tag.name })),
+  );
+
+  useEffect(() => {
+    axios
+      .get("/api/tags")
+      .then((res) => {
+        const options = res.data.map((tag) => ({
+          value: tag.name,
+          label: tag.name,
+        }));
+        setTagOptions(options);
+      })
+      .catch((err) => console.error("태그 목록 로딩 실패:", err));
+  }, []);
+
   // 새로 추가된 파일의 미리보기 URL 정리 (메모리 누수 방지)
   useEffect(() => {
     return () => {
@@ -36,6 +55,14 @@ export function ReviewEdit() {
     };
   }, [newFiles]);
 
+  const handleTagClick = (tag) => {
+    if (selectedTags.find((t) => t.id === tag.id)) {
+      setSelectedTags(selectedTags.filter((t) => t.id !== tag.id));
+    } else {
+      setSelectedTags([...selectedTags, tag]);
+    }
+  };
+
   const handleUpdate = async () => {
     setIsProcessing(true);
 
@@ -44,28 +71,34 @@ export function ReviewEdit() {
     formData.append("rating", rating);
     formData.append("facilityName", review.facilityName);
     formData.append("memberEmail", review.memberEmail);
-    formData.append("id", review.id); // 이거 없어도 되는디
+    formData.append("id", review.id); // 이거 없어도 되는디 (지원 : 네?)
 
     // 삭제할 기존 파일 목록을 FormData에 추가
     deletefileNames.forEach((fileUrl) => {
       const url = new URL(fileUrl);
       const pathSegments = url.pathname.split("/");
       const fileName = pathSegments[pathSegments.length - 1];
-      formData.append("deleteFileNames", fileName); // ✅ 'deleteFileNames' 키로 보내야 backend에서 받음
+      formData.append("deleteFileNames", fileName); // ✅ 'deleteFileNames' 키로 보내야 backend 에서 받음
     });
 
     // 새로 추가할 파일 목록을 FormData에 추가
     newFiles.forEach((fileObj) => {
-      formData.append("newFiles", fileObj.file); // 실제 File 객체를 전송
+      formData.append("newFiles", fileObj.file);
+    });
+
+    selectedTags.forEach((tag) => {
+      formData.append("tagNames", tag.value);
     });
 
     try {
       await axios.put(`/api/review/update/${review.id}`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-
       toast("수정 완료!");
-      navigate(`/facility/${encodeURIComponent(review.facilityName)}`);
+      // navigate(`/facility/${encodeURIComponent(review.facilityName)}`);
+      navigate(
+        `/facility/${encodeURIComponent(review.facilityName)}?focusReviewId=${review.id}`,
+      );
     } catch (e) {
       toast("수정 실패: " + e.message);
     } finally {
@@ -93,7 +126,7 @@ export function ReviewEdit() {
     );
   };
 
-  // 기존 파일 삭제 처리 (filesToDelete 목록에 추가하고 UI에서 제거)
+  // 기존 파일 삭제 처리 (filesToDelete 목록에 추가하고 UI 에서 제거)
   const handleRemoveExistingFile = (fileUrlToRemove) => {
     setDeletefileNames((prev) => [...prev, fileUrlToRemove]);
     setExistingFiles((prev) => prev.filter((url) => url !== fileUrlToRemove));
@@ -144,6 +177,22 @@ export function ReviewEdit() {
     <div className="container mt-4">
       <h3>✏️ 리뷰 수정</h3>
 
+      {/* 태그 */}
+      <FormGroup className="mb-3">
+        <Form.Label>태그 (입력 후 Enter)</Form.Label>
+        <Select
+          isMulti
+          isClearable
+          options={tagOptions}
+          value={selectedTags}
+          onChange={(newValue) => setSelectedTags(newValue)}
+          placeholder="태그를 입력하거나 선택하세요..."
+          formatCreateLabel={(inputValue) => `"${inputValue}" 태그 추가`}
+          isDisabled={isProcessing}
+        />
+      </FormGroup>
+
+      {/* 내용 */}
       <Form.Group className="mb-3">
         <Form.Label>내용</Form.Label>
         <Form.Control
@@ -245,11 +294,13 @@ export function ReviewEdit() {
         />
       </FormGroup>
 
+      {/* 별점 */}
       <Form.Group className="mb-3">
         <Form.Label>별점</Form.Label>
         {renderRatingStars()}
       </Form.Group>
 
+      {/* 버튼 */}
       <div className="d-flex gap-2">
         <Button
           variant="secondary"

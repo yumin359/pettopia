@@ -1,4 +1,4 @@
-import { Alert, Spinner, Table } from "react-bootstrap";
+import { Alert, Badge, Spinner, Table } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router";
@@ -48,9 +48,7 @@ export function ReviewList() {
   const renderStars = (rating) => {
     const stars = [];
     for (let i = 0; i < 5; i++) {
-      stars.push(
-        <FaStar key={i} color={i < rating ? "#ffc107" : "#e4e5e9"} />
-      );
+      stars.push(<FaStar key={i} color={i < rating ? "#ffc107" : "#e4e5e9"} />);
     }
     return stars;
   };
@@ -61,45 +59,75 @@ export function ReviewList() {
       responsive
       size="sm"
       className="align-middle text-secondary"
-      style={{ fontSize: "1rem", tableLayout: "fixed" }} // 글씨 크기 살짝 줄임
+      style={{ fontSize: "1rem", tableLayout: "fixed" }}
     >
       <thead>
-      <tr className="text-muted" style={{ height: "40px", fontSize: "0.9rem" }}>
-        <th style={{ width: "100px" }}>별점</th>
-        <th>리뷰</th>
-        <th style={{ width: "120px" }}>장소</th>
-        <th style={{ width: "100px" }}>작성자</th>
-      </tr>
+        <tr
+          className="text-muted"
+          style={{ height: "40px", fontSize: "0.9rem" }}
+        >
+          <th style={{ width: "100px" }}>별점</th>
+          <th>리뷰</th>
+          <th style={{ width: "120px" }}>장소</th>
+          <th style={{ width: "100px" }}>작성자</th>
+        </tr>
       </thead>
       <tbody>
-      {top3Reviews.map((review) => (
-        <tr
-          key={review.id}
-          onClick={() => navigate(`/facility/${encodeURIComponent(review.facilityName)}`)}
-          style={{ cursor: "pointer", height: "50px" }}
-        >
-          <td className="text-warning fw-bold" style={{ fontSize: "1rem" }}>
-            {renderStars(review.rating)}
-          </td>
-          <td
-            className="text-dark"
-            style={{
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-              fontSize: "0.95rem",
-            }}
+        {top3Reviews.map((review) => (
+          <tr
+            key={review.id}
+            onClick={() =>
+              navigate(
+                `/facility/${encodeURIComponent(
+                  review.facilityName,
+                )}?focusReviewId=${review.id}`,
+              )
+            }
+            style={{ cursor: "pointer", height: "auto", minHeight: "60px" }} // 크기 테스트 해보기
           >
-            {review.review}
-          </td>
-          <td className="text-muted" style={{ fontSize: "0.9rem" }}>
-            {review.facilityName}
-          </td>
-          <td className="text-muted" style={{ fontSize: "0.9rem" }}>
-            {review.memberEmailNickName}
-          </td>
-        </tr>
-      ))}
+            <td className="text-warning fw-bold" style={{ fontSize: "1rem" }}>
+              {renderStars(review.rating)}
+            </td>
+            <td className="text-dark">
+              <div className="d-flex flex-column gap-1 py-2">
+                {/* 리뷰 내용 */}
+                <div
+                  style={{
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                    fontSize: "0.95rem",
+                  }}
+                >
+                  {review.review}
+                </div>
+
+                {/* 태그 목록 (태그가 있을 경우에만 표시) */}
+                {review.tags && review.tags.length > 0 && (
+                  <div className="d-flex flex-wrap gap-1">
+                    {review.tags.map((tag) => (
+                      <Badge
+                        key={tag.id}
+                        bg="light"
+                        text="dark"
+                        className="fw-normal"
+                        style={{ fontSize: "0.75rem" }}
+                      >
+                        # {tag.name}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </td>
+            <td className="text-muted" style={{ fontSize: "0.9rem" }}>
+              {review.facilityName}
+            </td>
+            <td className="text-muted" style={{ fontSize: "0.9rem" }}>
+              {review.memberEmailNickName}
+            </td>
+          </tr>
+        ))}
       </tbody>
     </Table>
   );

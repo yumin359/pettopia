@@ -6,7 +6,9 @@ import lombok.*;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Setter
@@ -38,4 +40,12 @@ public class Review {
 
     @Column(nullable = false)
     private Instant insertedAt;
+
+    @ManyToMany
+    @JoinTable(
+            name = "review_tags",
+            joinColumns = @JoinColumn(name = "review_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
+    private Set<Tag> tags = new HashSet<>();
 }

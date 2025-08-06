@@ -1,8 +1,8 @@
-import { Alert, Spinner, Table, Badge } from "react-bootstrap";
+import { Alert, Badge, Spinner, Table } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { FaRegImages, FaRegComments } from "react-icons/fa";
+import { FaRegImages } from "react-icons/fa";
 
 export function ReviewPreview() {
   const [reviews, setReviews] = useState([]);
@@ -49,54 +49,78 @@ export function ReviewPreview() {
       responsive
       size="sm"
       className="align-middle text-secondary"
-      style={{ fontSize: "1.2rem", tableLayout: "fixed" }}
+      style={{ fontSize: "1rem", tableLayout: "fixed" }}
     >
       <thead>
-      <tr className="text-muted" style={{ height: "45px" }}>
-        <th style={{ width: "50px" }}>#</th>
-        <th>시설명</th>
-        <th>제목</th>
-        <th style={{ width: "100px" }}>작성자</th>
-        <th style={{ width: "120px" }}>작성일</th>
-      </tr>
+        <tr className="text-muted" style={{ height: "45px" }}>
+          <th style={{ width: "50px" }}>#</th>
+          <th>시설명</th>
+          <th>제목</th>
+          <th style={{ width: "100px" }}>작성자</th>
+          <th style={{ width: "120px" }}>작성일</th>
+        </tr>
       </thead>
       <tbody>
-      {reviews.map((review) => (
-        <tr
-          key={review.id}
-          onClick={() => navigate(`/review/${review.id}`)}
-          style={{ cursor: "pointer", height: "55px" }}
-        >
-          <td className="text-muted">{review.id}</td>
-          <td className="text-muted text-truncate">{review.facilityName}</td>
-          <td className="text-dark">
-            <div className="d-flex gap-2 align-items-center">
-                <span
-                  style={{
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
-                    display: "inline-block",
-                    maxWidth: "100%",
-                  }}
-                >
-                  {review.title}
-                </span>
-              {review.fileCount > 0 && (
-                <Badge bg="info" text="white">
-                  <div className="d-flex gap-1">
-                    <FaRegImages />
-                    <span>{review.fileCount}</span>
-                  </div>
-                </Badge>
-              )}
-            </div>
-          </td>
-          <td className="text-truncate text-muted">{review.nickName}</td>
-          <td className="text-muted">{review.timesAgo}</td>
+        {reviews.map((review) => (
+          <tr
+            key={review.id}
+            onClick={() =>
+              navigate(
+                `/facility/${encodeURIComponent(
+                  review.facilityName,
+                )}?focusReviewId=${review.id}`,
+              )
+            }
+            style={{ cursor: "pointer", height: "auto", minHeight: "55px" }}
+          >
+            <td className="text-muted">{review.id}</td>
+            <td className="text-muted text-truncate">{review.facilityName}</td>
+            <td className="text-dark">
+              <div className="d-flex flex-column gap-1 py-1">
+                {/* 제목 + 파일 개수 */}
+                <div className="d-flex gap-2 align-items-center">
+                  <span
+                    style={{
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {/* review.title이 없다면 review.review를 대신 보여줄 수 있습니다. */}
+                    {review.title || review.review}
+                  </span>
+                  {review.fileCount > 0 && (
+                    <Badge bg="info" text="white" className="flex-shrink-0">
+                      <div className="d-flex gap-1 align-items-center">
+                        <FaRegImages />
+                        <span>{review.fileCount}</span>
+                      </div>
+                    </Badge>
+                  )}
+                </div>
 
-        </tr>
-      ))}
+                {/* 태그 */}
+                {review.tags && review.tags.length > 0 && (
+                  <div className="d-flex flex-wrap gap-1">
+                    {review.tags.map((tag) => (
+                      <Badge
+                        key={tag.id}
+                        bg="light"
+                        text="dark"
+                        className="fw-normal"
+                        style={{ fontSize: "0.75rem" }}
+                      >
+                        # {tag.name}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </td>
+            <td className="text-truncate text-muted">{review.nickName}</td>
+            <td className="text-muted">{review.timesAgo}</td>
+          </tr>
+        ))}
       </tbody>
     </Table>
   );

@@ -1,10 +1,11 @@
-import React, { useContext, useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import React, { useContext, useEffect, useState, useRef } from "react";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
 import ReviewPreview from "../map/ReviewPreview.jsx";
 import { ReviewLikeContainer } from "../like/ReviewLikeContainer.jsx";
 import { FavoriteContainer } from "./FavoriteContainer.jsx";
 import { del, get } from "./data/api.jsx";
+import { Button } from "react-bootstrap";
 
 export function MapDetail() {
   const { name } = useParams();
@@ -16,8 +17,10 @@ export function MapDetail() {
   const [reviews, setReviews] = useState([]);
   const [loadingFacility, setLoadingFacility] = useState(true);
   const [loadingReviews, setLoadingReviews] = useState(true);
-
   const [sortBy, setSortBy] = useState("latest");
+
+  const [searchParams] = useSearchParams();
+  const reviewRefs = useRef({});
 
   // 신고 관련 상태들
   const [reportModalOpen, setReportModalOpen] = useState(false);
@@ -43,7 +46,7 @@ export function MapDetail() {
   const fetchReviews = async () => {
     setLoadingReviews(true);
     try {
-      const res = await get("/review/list", { facilityName: decodedName });
+      const res = await get(`/review/facility/${decodedName}`);
       setReviews(res || []);
     } catch (err) {
       console.error("리뷰 목록 조회 실패:", err);
@@ -57,6 +60,22 @@ export function MapDetail() {
     fetchFacility();
     fetchReviews();
   }, [decodedName]);
+
+  // 자동 스크롤 및 하이라이트 로직 추가
+  useEffect(() => {
+    const focusReviewId = searchParams.get("focusReviewId");
+    if (focusReviewId && reviews.length > 0) {
+      const targetElement = reviewRefs.current[focusReviewId];
+      if (targetElement) {
+        targetElement.scrollIntoView({ behavior: "smooth", block: "center" });
+        targetElement.classList.add("review-highlight");
+        const timer = setTimeout(() => {
+          targetElement.classList.remove("review-highlight");
+        }, 2500); // 2.5초간 하이라이트
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [reviews, searchParams]);
 
   // 리뷰 작성 페이지 이동
   const handleGoToWrite = () => {
@@ -138,7 +157,7 @@ export function MapDetail() {
   });
 
   return (
-    <div style={{ padding: "2rem", maxWidth: "700px", margin: "0 auto" }}>
+    <div style={{ padding: "2rem", maxWidth: "1200px", margin: "0 auto" }}>
       <div style={{ display: "flex", justifyContent: "space-between" }}>
         <h2>{facility ? facility.name : decodedName}</h2>
         <FavoriteContainer facilityName={decodedName} />
@@ -156,10 +175,12 @@ export function MapDetail() {
           }}
         >
           <div>
-            <strong>도로명 주소:</strong> {facility.roadAddress || "정보 없음"}
+            <strong>도로명 주소:</strong>
+            {facility.roadAddress || "정보 없음"}
           </div>
           <div>
-            <strong>전화번호:</strong> {facility.phoneNumber || "정보 없음"}
+            <strong>전화번호:</strong>
+            {facility.phoneNumber || "정보 없음"}
           </div>
           <div>
             <strong>홈페이지:</strong>{" "}
@@ -185,10 +206,12 @@ export function MapDetail() {
             })()}
           </div>
           <div>
-            <strong>휴무일:</strong> {facility.holiday || "정보 없음"}
+            <strong>휴무일:</strong>
+            {facility.holiday || "정보 없음"}
           </div>
           <div>
-            <strong>운영시간:</strong> {facility.operatingHours || "정보 없음"}
+            <strong>운영시간:</strong>
+            {facility.operatingHours || "정보 없음"}
           </div>
         </div>
       ) : (
@@ -248,6 +271,7 @@ export function MapDetail() {
         </div>
       )}
 
+      {/* 리뷰 목록 헤더, 정렬 UI 등... */}
       <div style={{ marginTop: "2rem" }}>
         <h4 className="mb-3">
           📝 리뷰 목록{" "}
@@ -281,6 +305,7 @@ export function MapDetail() {
           </select>
         </div>
 
+        {/* 별점, 리뷰 프리뷰, 좋아요, 수정/삭제 버튼 등... */}
         {loadingReviews ? (
           <p>불러오는 중...</p>
         ) : sortedReviews.length === 0 ? (
@@ -290,13 +315,15 @@ export function MapDetail() {
             {sortedReviews.map((r) => (
               <li
                 key={r.id}
+                ref={(el) => (reviewRefs.current[r.id] = el)} // ref 연결
                 style={{
                   position: "relative",
                   padding: "1rem",
                   marginBottom: "1rem",
-                  border: "1px solid #ccc",
-                  borderRadius: "6px",
-                  backgroundColor: "#f9f9f9",
+                  border: "1px solid #ddd",
+                  borderRadius: "8px",
+                  backgroundColor: "#fff",
+                  transition: "background-color 0.5s ease-out",
                 }}
               >
                 <div
@@ -351,39 +378,29 @@ export function MapDetail() {
                 </div>
 
                 <div
-                  style={{ marginTop: "0.5rem", display: "flex", gap: "0.5rem" }}
+                  style={{
+                    marginTop: "0.5rem",
+                    display: "flex",
+                    gap: "0.5rem",
+                  }}
                 >
                   {user?.email === r.memberEmail && (
-                    <>
-                      <button
+                    <div className="mt-2 d-flex gap-2">
+                      <Button
+                        variant="outline-secondary"
+                        size="sm"
                         onClick={() => handleEdit(r)}
-                        style={{
-                          padding: "0.3rem 0.8rem",
-                          fontSize: "0.9rem",
-                          backgroundColor: "#6c757d",
-                          color: "white",
-                          border: "none",
-                          borderRadius: "4px",
-                          cursor: "pointer",
-                        }}
                       >
                         수정
-                      </button>
-                      <button
+                      </Button>
+                      <Button
+                        variant="outline-danger"
+                        size="sm"
                         onClick={() => handleDelete(r.id)}
-                        style={{
-                          padding: "0.3rem 0.8rem",
-                          fontSize: "0.9rem",
-                          backgroundColor: "#dc3545",
-                          color: "white",
-                          border: "none",
-                          borderRadius: "4px",
-                          cursor: "pointer",
-                        }}
                       >
                         삭제
-                      </button>
-                    </>
+                      </Button>
+                    </div>
                   )}
                 </div>
               </li>
@@ -468,6 +485,14 @@ export function MapDetail() {
           </div>
         </div>
       )}
+
+      {/* 하이라이트 효과를 위한 CSS 추가 */}
+      <style>{`
+        .review-highlight {
+          background-color: #fffbe5 !important;
+          border-color: #ffc107 !important;
+        }
+      `}</style>
     </div>
   );
 }
