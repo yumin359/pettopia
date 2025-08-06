@@ -1,8 +1,17 @@
 import { Button, Col, Row } from "react-bootstrap";
 import { Outlet, useNavigate } from "react-router";
+import { Navigate } from "react-router-dom";
+import { useContext } from "react";
+import { AuthenticationContext } from "./common/AuthenticationContextProvider.jsx";
 
 export function AdminPage() {
   const navigate = useNavigate();
+  const { isAdmin } = useContext(AuthenticationContext);
+
+  if (!(typeof isAdmin === "function" ? isAdmin() : isAdmin)) {
+    alert("권한없음");
+    return <Navigate to="/" replace />;
+  }
 
   return (
     <Row className="mt-4">
