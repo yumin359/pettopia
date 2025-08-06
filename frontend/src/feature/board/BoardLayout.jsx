@@ -1,13 +1,12 @@
 import { useNavigate } from "react-router-dom";
-import { Carousel, Col, Row, Button } from "react-bootstrap";
+import { Button, Carousel, Col, Row } from "react-bootstrap";
 import { useContext } from "react";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
 
 import img1 from "../../assets/event1.jpg";
 import img2 from "../../assets/event2.jpg";
 import img3 from "../../assets/event3.jpg";
-import { BoardListMini } from "./BoardListMini.jsx";
-import { ReviewList } from "../review/ReviewList.jsx"; // 리뷰 리스트 임포트 추가
+import { BoardListMini } from "../main/BoardListMini.jsx";
 
 export function BoardLayout() {
   const navigate = useNavigate();
@@ -29,10 +28,7 @@ export function BoardLayout() {
                 key={id}
                 onClick={() => {
                   if (id === 19) {
-                    window.open(
-                      "https://www.youtube.com/watch?v=0dQBxYc_8ZM",
-                      "_blank",
-                    );
+                    window.open("https://www.youtube.com/watch?v=0dQBxYc_8ZM", "_blank");
                   } else {
                     navigate(`/board/${id}`);
                   }
@@ -91,10 +87,10 @@ export function BoardLayout() {
           <BoardListMini fontSize="1.25rem" iconSize={18} />
         </Col>
 
-        <Col md={6} style={{ overflowY: "auto" }}>
-          <h5 style={{ fontSize: "1.5rem", fontWeight: "600" }}>최신 리뷰</h5>
-          <ReviewList />
-        </Col>
+        {/*<Col md={6} style={{ overflowY: "auto" }}>*/}
+        {/*  <h5 style={{ fontSize: "1.5rem", fontWeight: "600" }}>최신 리뷰</h5>*/}
+        {/*  <ReviewListPage />*/}
+        {/*</Col>*/}
       </Row>
 
       {/*/!* 관리자 버튼 영역 *!/*/}

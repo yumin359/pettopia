@@ -50,13 +50,13 @@ export function MainLayout() {
           <Card
             className="shadow-lg mx-auto"
             style={{
-              maxWidth: "1000px", // 카드 최대 너비
-              minHeight: "calc(100vh - 140px)", // 화면 높이에서 패딩과 네비바 높이 제외
-              borderRadius: "12px 12px 12px 12px", // 상단도 둥글게 (네비바와 시각적으로 분리)
-              marginTop: "0", // 네비바와 카드 사이 간격 제거
+              maxWidth: "1000px",
+              minHeight: "calc(100vh - 140px)",
+              borderRadius: "12px 12px 12px 12px",
+              marginTop: "0",
               overflow: "hidden",
-              position: "relative", // 플로팅 버튼 절대 위치 기준
-              border: "none", // 기본 테두리 제거
+              position: "relative",
+              border: "none",
             }}
           >
             {/* 카드 내부 레이아웃 */}

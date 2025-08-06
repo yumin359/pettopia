@@ -75,11 +75,13 @@ CREATE TABLE `member`
     `provider`    varchar(255)          DEFAULT NULL,
     `provider_id` varchar(255)          DEFAULT NULL,
     `role`        varchar(50)  NOT NULL DEFAULT 'USER',
+    `kakao_id`    bigint(20)            DEFAULT NULL,
     PRIMARY KEY (`id`),
     UNIQUE KEY `nick_name` (`nick_name`),
-    UNIQUE KEY `UQ_member_email` (`email`)
+    UNIQUE KEY `UQ_member_email` (`email`),
+    UNIQUE KEY `UKtqi1nx9ul3nx7guxpqycuvgue` (`kakao_id`)
 ) ENGINE = InnoDB
-  AUTO_INCREMENT = 17
+  AUTO_INCREMENT = 32
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 # ---------------------------------------------------------------------------------
@@ -186,7 +188,7 @@ CREATE TABLE `review`
     KEY `member_email` (`member_email`),
     CONSTRAINT `review_ibfk_1` FOREIGN KEY (`member_email`) REFERENCES `member` (`email`) ON DELETE CASCADE
 ) ENGINE = InnoDB
-  AUTO_INCREMENT = 37
+  AUTO_INCREMENT = 51
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 # ---------------------------------------------------------------------------------
@@ -208,6 +210,20 @@ CREATE TABLE `review_like`
     KEY `member_id` (`member_id`),
     CONSTRAINT `review_like_ibfk_1` FOREIGN KEY (`review_id`) REFERENCES `review` (`id`) ON DELETE CASCADE,
     CONSTRAINT `review_like_ibfk_2` FOREIGN KEY (`member_id`) REFERENCES `member` (`id`) ON DELETE CASCADE
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci;
+# ---------------------------------------------------------------------------------
+CREATE TABLE `review_report`
+(
+    `id`             bigint(20)    NOT NULL AUTO_INCREMENT,
+    `review_id`      int(11)       NOT NULL,
+    `reporter_email` varchar(255)  NOT NULL,
+    `reason`         varchar(1000) NOT NULL,
+    `reported_at`    datetime      NOT NULL DEFAULT current_timestamp(),
+    PRIMARY KEY (`id`),
+    KEY `review_id` (`review_id`),
+    CONSTRAINT `review_report_ibfk_1` FOREIGN KEY (`review_id`) REFERENCES `review` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
@@ -234,10 +250,40 @@ CREATE TABLE favorite
     FOREIGN KEY (facility_id) REFERENCES pet_facility (id) ON DELETE CASCADE
 );
 # ---------------------------------------------------------------------------------
+CREATE TABLE `tags`
+(
+    `id`   INT(11)     NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(50) NOT NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uk_tag_name` (`name`) -- 태그 이름은 중복되면 안 됨
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci;
+# ---------------------------------------------------------------------------------
+CREATE TABLE `review_tags`
+(
+    `review_id` INT(11) NOT NULL,
+    `tag_id`    INT(11) NOT NULL,
+    PRIMARY KEY (`review_id`, `tag_id`),
+    KEY `fk_review_tags_tag_id` (`tag_id`),
+    CONSTRAINT `fk_review_tags_review_id` FOREIGN KEY (`review_id`) REFERENCES `review` (`id`) ON DELETE CASCADE,
+    CONSTRAINT `fk_review_tags_tag_id` FOREIGN KEY (`tag_id`) REFERENCES `tags` (`id`) ON DELETE CASCADE
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci;
+# ---------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------
 SELECT DISTINCT category2
 FROM pet_facility;
 
 SELECT DISTINCT pet_facility.allowed_pet_size
 FROM pet_facility;
+
+SHOW CREATE TABLE member;
+SHOW CREATE TABLE review;
+SHOW CREATE TABLE review_file;
+SHOW CREATE TABLE review_like;
+SHOW CREATE TABLE review_report;
 # ---------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------

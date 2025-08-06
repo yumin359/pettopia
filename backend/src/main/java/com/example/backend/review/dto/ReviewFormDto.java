@@ -20,4 +20,7 @@ public class ReviewFormDto {
     private Integer rating;
     private Instant insertedAt;
     private List<MultipartFile> files;
+    private List<String> deleteFileNames;
+
+    private List<String> tagNames;
 }

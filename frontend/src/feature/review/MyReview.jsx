@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Card, Col, Image, Row, Spinner } from "react-bootstrap";
+import { Card, Col, Image, Row, Spinner, Badge } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { LikeContainer } from "../like/LikeContainer.jsx";
 import { ReviewLikeContainer } from "../like/ReviewLikeContainer.jsx";
@@ -49,18 +49,25 @@ export function MyReview() {
               <Card
                 key={r.id}
                 className="shadow-sm border-0 p-3"
-                style={{ backgroundColor: "#fffdf7" }}
+                style={{ backgroundColor: "#fffdf7", cursor: "pointer" }}
+                onClick={() =>
+                  navigate(
+                    `/facility/${encodeURIComponent(
+                      r.facilityName,
+                    )}?focusReviewId=${r.id}`,
+                  )
+                }
               >
                 {/* 상단: 시설명 + 별점 */}
                 <div className="d-flex justify-content-between align-items-center mb-2">
                   <div
                     className="fw-semibold hover-underline-on-hover"
                     style={{ color: "#5a3600", cursor: "pointer" }}
-                    onClick={() =>
-                      navigate(
-                        `/facility/${encodeURIComponent(r.facilityName)}`,
-                      )
-                    }
+                    // onClick={() =>
+                    //   navigate(
+                    //     `/facility/${encodeURIComponent(r.facilityName)}`,
+                    //   )
+                    // }
                   >
                     {r.facilityName}
                   </div>
@@ -96,6 +103,21 @@ export function MyReview() {
                     </Col>
                   )}
                 </Row>
+
+                {/* 태그 */}
+                {Array.isArray(r.tags) && r.tags.length > 0 && (
+                  <div className="d-flex flex-wrap gap-2 mt-3">
+                    {r.tags.map((tag) => (
+                      <Badge
+                        key={tag.id}
+                        bg="info" // 마이페이지에서는 다른 색상으로 구분감을 줄 수도 있습니다.
+                        className="fw-normal"
+                      >
+                        # {tag.name}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
 
                 {/* 하단: 날짜 + 프로필 */}
                 <div
