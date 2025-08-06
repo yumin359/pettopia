@@ -306,7 +306,7 @@ public class ReviewService {
 
     public List<ReviewListDto> findReviewsByEmail(String email) {
         // Member 객체의 email 필드와 비교하도록 리포지토리 메서드 이름에 _Email 붙이기
-        return reviewRepository.findAllByMemberEmail_Email(email)
+        return reviewRepository.findAllByMemberEmail_EmailOrderByInsertedAtDesc(email)
                 .stream()
                 .map(review -> {
                     // 리뷰 첨부 이미지들
