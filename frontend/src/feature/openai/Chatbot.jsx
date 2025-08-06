@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, Form, InputGroup, Card, Spinner } from "react-bootstrap";
+import { Button, Form, InputGroup, Card, Spinner, Stack } from "react-bootstrap";
 
 export function Chatbot() {
   const [messages, setMessages] = useState([
@@ -11,7 +11,14 @@ export function Chatbot() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // ✅ Claude 백엔드 프록시 호출 함수
+  const exampleQuestions = [
+    "강아지 피부 알레르기 관리법은?",
+    "고양이 스트레스 해소 방법 알려주세요.",
+    "반려동물과 여행할 때 준비물은?",
+    "강아지 건강검진 주기는 어떻게 되나요?",
+  ];
+
+
   const callClaudeViaBackend = async (userInput) => {
     const response = await fetch("/api/chatbot", {
       method: "POST",
@@ -41,9 +48,8 @@ export function Chatbot() {
     return data?.content?.[0]?.text || "응답 없음";
   };
 
-  // ✅ 메시지 전송 처리
-  const handleSend = async () => {
-    const trimmed = input.trim();
+  const handleSend = async (customInput) => {
+    const trimmed = (customInput ?? input).trim();
     if (!trimmed) return;
 
     const newMessages = [...messages, { sender: "user", text: trimmed }];
@@ -71,42 +77,78 @@ export function Chatbot() {
     }
   };
 
+  const handleExampleClick = (question) => {
+    handleSend(question);
+  };
+
   return (
-    <div style={{ padding: "2rem", width: "90%", maxWidth: "1200px", margin: "0 auto" }}>
+    <div
+      style={{
+        padding: "1rem",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        width: "90%",
+        maxWidth: "1200px",
+        margin: "0 auto",
+      }}
+    >
+      <h2 className="mb-4">펫토피아 챗봇</h2>
 
-    <h2 className="mb-4">펫토피아 챗봇</h2>
-
+      {/* 대화창 영역 */}
       <div
         style={{
-          width: "100%",
+          flexGrow: 1,
           border: "1px solid #ccc",
           borderRadius: "8px",
           padding: "1rem",
-          height: "500px",
           overflowY: "auto",
           marginBottom: "1rem",
           backgroundColor: "#f8f9fa",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "flex-start",
+          height: "500px", // 대화창 세로 길이 크게 조절
         }}
-
       >
-        {messages.map((msg, idx) => (
-          <Card
-            key={idx}
-            className={`mb-2 p-2 ${
-              msg.sender === "user" ? "text-end bg-light" : "bg-white"
-            }`}
-          >
-            <Card.Text>{msg.text}</Card.Text>
-          </Card>
-        ))}
-        {loading && (
-          <div className="text-center mt-3">
-            <Spinner animation="border" size="sm" />
-          </div>
-        )}
+        <div style={{ flexGrow: 1, overflowY: "auto" }}>
+          {messages.map((msg, idx) => (
+            <Card
+              key={idx}
+              className={`mb-2 p-2 ${
+                msg.sender === "user" ? "text-end bg-light" : "bg-white"
+              }`}
+            >
+              <Card.Text>{msg.text}</Card.Text>
+            </Card>
+          ))}
+
+          {loading && (
+            <div className="text-center mt-3">
+              <Spinner animation="border" size="sm" />
+            </div>
+          )}
+        </div>
+
+        {/* 대화창 하단에 예시 질문 버튼들 추가 */}
+        <Stack direction="horizontal" gap={2} className="mt-3" style={{ flexShrink: 0, flexWrap: "wrap" }}>
+          {exampleQuestions.map((q, i) => (
+            <Button
+              key={i}
+              variant="outline-primary"
+              size="sm"
+              onClick={() => handleExampleClick(q)}
+              disabled={loading}
+              style={{ whiteSpace: "normal" }}
+            >
+              {q}
+            </Button>
+          ))}
+        </Stack>
       </div>
 
-      <InputGroup>
+      {/* 입력창 */}
+      <InputGroup style={{ flexShrink: 0 }}>
         <Form.Control
           as="textarea"
           rows={1}
@@ -115,8 +157,9 @@ export function Chatbot() {
           onKeyDown={handleKeyDown}
           placeholder="메시지를 입력하세요..."
           style={{ resize: "none" }}
+          disabled={loading}
         />
-        <Button onClick={handleSend} variant="primary" disabled={loading} variant="warning">
+        <Button onClick={() => handleSend()} variant="warning" disabled={loading}>
           전송
         </Button>
       </InputGroup>

@@ -24,6 +24,7 @@ export function MemberDetail() {
   const [member, setMember] = useState(null);
   const [modalShow, setModalShow] = useState(false);
   const [password, setPassword] = useState("");
+  const [tempCode, setTempCode] = useState("");
   const { logout, hasAccess } = useContext(AuthenticationContext);
   const [params] = useSearchParams();
   const navigate = useNavigate();
@@ -31,7 +32,9 @@ export function MemberDetail() {
   useEffect(() => {
     axios
       .get(`/api/member?email=${params.get("email")}`)
-      .then((res) => setMember(res.data))
+      .then((res) => {
+        setMember(res.data);
+      })
       .catch((err) => {
         console.error(err);
         toast.error("회원 정보를 불러오는 중 오류가 발생했습니다.");
@@ -57,6 +60,26 @@ export function MemberDetail() {
       });
   }
 
+  function handleModalButtonClick() {
+    // 카카오 사용자 일 때만 임시코드 요청
+    if (isKakao) {
+      axios
+        .post("/api/member/withdrawalCode", { email: member.email })
+        .then((res) => {
+          // 임시코드 받고 모달 열리게
+          setTempCode(res.data.tempCode);
+          setModalShow(true);
+        })
+        .catch((err) => {
+          console.error(err);
+          console.log("임시 코드 못 받음");
+        });
+    } else {
+      // 일반 회원은 바로 모달 열기
+      setModalShow(true);
+    }
+  }
+
   function handleLogoutClick() {
     logout();
     navigate("/login");
@@ -71,12 +94,6 @@ export function MemberDetail() {
     );
   }
 
-  function handleFavoriteListClick() {
-    toast("작업중");
-    // 이거 누르면 찜한 목록들 왈랄라 나오도록
-    // 일단 리스트로 나오게 할건데, 나중에 지도에 표시되도록 하는 거 할 수 있나
-  }
-
   // 가입일시 포맷 통일
   const formattedInsertedAt = member.insertedAt
     ? member.insertedAt.replace("T", " ").substring(0, 16)
@@ -88,13 +105,18 @@ export function MemberDetail() {
     /\.(jpg|jpeg|png|gif|webp)$/i.test(file),
   );
 
+  // member.authNames 배열에 admin 확인
+  const isAdmin = member.authNames?.includes("admin");
+
+  const isKakao = member.provider?.includes("kakao");
+
   return (
     <Row className="justify-content-center my-4">
       <Col xs={12} md={8} lg={6}>
         <div className="d-flex justify-content-between align-items-center mb-3">
           <h3 className="fw-bold mb-0 text-dark">회원 정보</h3>
           <small className="text-muted" style={{ fontSize: "0.85rem" }}>
-            {member.email === "admin@email.com" ? (
+            {isAdmin ? (
               <span className="badge bg-danger">관리자</span>
             ) : (
               <span className="badge bg-secondary">일반 사용자</span>
@@ -206,7 +228,7 @@ export function MemberDetail() {
               <div className="d-flex justify-content-start gap-2">
                 <Button
                   variant="outline-danger"
-                  onClick={() => setModalShow(true)}
+                  onClick={handleModalButtonClick}
                   className="d-flex align-items-center gap-1"
                 >
                   탈퇴
@@ -225,6 +247,13 @@ export function MemberDetail() {
                 >
                   로그아웃
                 </Button>
+                <Button
+                  variant="outline-success"
+                  onClick={() => navigate("/review/my")}
+                  className="d-flex align-items-center gap-1"
+                >
+                  내가 쓴 리뷰
+                </Button>
               </div>
             )}
           </Card.Body>
@@ -233,16 +262,24 @@ export function MemberDetail() {
         {/* 탈퇴 확인 모달 */}
         <Modal show={modalShow} onHide={() => setModalShow(false)} centered>
           <Modal.Header closeButton>
-            <Modal.Title>회원 탈퇴 확인</Modal.Title>
+            <Modal.Title>
+              {isKakao ? "카카오 회원 탈퇴" : "회원 탈퇴 확인"}
+            </Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <FormGroup controlId="password1">
-              <FormLabel>암호</FormLabel>
+              <FormLabel>
+                {isKakao
+                  ? `${tempCode}를 아래에 작성하세요.`
+                  : "암호를 입력하세요"}
+              </FormLabel>
               <FormControl
-                type="password"
+                type={isKakao ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="비밀번호를 입력하세요"
+                placeholder={
+                  isKakao ? "코드를 작성하세요." : "비밀번호를 입력하세요"
+                }
                 autoFocus
               />
             </FormGroup>

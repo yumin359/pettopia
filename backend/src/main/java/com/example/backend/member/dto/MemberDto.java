@@ -13,6 +13,10 @@ public class MemberDto {
     private String nickName;
     private String info;
     private LocalDateTime insertedAt;
+    private String provider;
+    private String tempCode;
 
     private List<String> files;
+
+    private List<String> authNames;
 }

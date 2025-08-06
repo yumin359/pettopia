@@ -31,7 +31,7 @@ export function MemberEdit() {
   // 라우팅 및 인증 관련 훅
   const [params] = useSearchParams();
   const navigate = useNavigate();
-  const { hasAccess } = useContext(AuthenticationContext);
+  const { hasAccess, updateUser } = useContext(AuthenticationContext);
   const isSelf = member ? hasAccess(member.email) : false;
 
   // 📝 프로필 이미지 관련 상태 변경:
@@ -180,22 +180,25 @@ export function MemberEdit() {
 
   // 정보 수정 요청
   const handleSaveButtonClick = () => {
+    if (password.trim() === "") {
+      toast.error("비밀번호를 입력해주세요.");
+      return;
+    }
+
     const formData = new FormData();
     formData.append("email", member.email);
     formData.append("nickName", member.nickName);
-    formData.append("info", member.info || ""); // null일때 빈문자열 전송
+    formData.append("info", member.info || ""); // null일 때 빈문자열 전송
 
     // 현재 비밀번호 확인용 (모달에서 입력받은 경우에만 전송)
-    if (password) {
-      formData.append("password", password);
-    }
+    formData.append("password", password);
 
-    // 📝 새로 추가할 프로필 파일들을 FormData에 추가
+    // 새로 추가할 프로필 파일들을 FormData에 추가
     newProfileFiles.forEach((file) => {
       formData.append("profileFiles", file); // 백엔드에서 List<MultipartFile> profileFiles로 받을 예정
     });
 
-    // 📝 삭제할 프로필 파일 이름들을 FormData에 추가
+    // 삭제할 프로필 파일 이름들을 FormData에 추가
     deleteProfileFileNames.forEach((name) => {
       formData.append("deleteProfileFileNames", name); // 백엔드에서 List<String> deleteProfileFileNames로 받을 예정
     });
@@ -207,6 +210,7 @@ export function MemberEdit() {
       .then((res) => {
         const message = res.data.message;
         if (message) toast(message.text, { type: message.type });
+        updateUser({ nickName: member.nickName });
         navigate(`/member?email=${member.email}`);
       })
       .catch((err) => {
