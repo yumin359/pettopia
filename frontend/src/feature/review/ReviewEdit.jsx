@@ -13,6 +13,7 @@ import {
 import axios from "axios";
 import { FaTrashAlt } from "react-icons/fa";
 import { toast } from "react-toastify";
+import Select from "react-select/creatable";
 
 export function ReviewEdit() {
   const { state } = useLocation();
@@ -26,11 +27,13 @@ export function ReviewEdit() {
   const [deletefileNames, setDeletefileNames] = useState([]);
   const [isProcessing, setIsProcessing] = useState(false);
 
+  // 태그 관련 상태
   const [tagOptions, setTagOptions] = useState([]);
   const [selectedTags, setSelectedTags] = useState(
     (review.tags || []).map((tag) => ({ value: tag.name, label: tag.name })),
   );
 
+  // 모든 태그 목록을 불러와서 react-select 옵션으로 설정
   useEffect(() => {
     axios
       .get("/api/tags")
@@ -55,14 +58,7 @@ export function ReviewEdit() {
     };
   }, [newFiles]);
 
-  const handleTagClick = (tag) => {
-    if (selectedTags.find((t) => t.id === tag.id)) {
-      setSelectedTags(selectedTags.filter((t) => t.id !== tag.id));
-    } else {
-      setSelectedTags([...selectedTags, tag]);
-    }
-  };
-
+  // 수정 내용 서버로 전송
   const handleUpdate = async () => {
     setIsProcessing(true);
 
@@ -74,18 +70,10 @@ export function ReviewEdit() {
     formData.append("id", review.id); // 이거 없어도 되는디 (지원 : 네?)
 
     // 삭제할 기존 파일 목록을 FormData에 추가
-    deletefileNames.forEach((fileUrl) => {
-      const url = new URL(fileUrl);
-      const pathSegments = url.pathname.split("/");
-      const fileName = pathSegments[pathSegments.length - 1];
-      formData.append("deleteFileNames", fileName); // ✅ 'deleteFileNames' 키로 보내야 backend 에서 받음
-    });
+    deletefileNames.forEach((name) => formData.append("deleteFileNames", name));
+    newFiles.forEach((fileObj) => formData.append("files", fileObj.file));
 
-    // 새로 추가할 파일 목록을 FormData에 추가
-    newFiles.forEach((fileObj) => {
-      formData.append("newFiles", fileObj.file);
-    });
-
+    // 태그 정보 (이름으로 전송)
     selectedTags.forEach((tag) => {
       formData.append("tagNames", tag.value);
     });

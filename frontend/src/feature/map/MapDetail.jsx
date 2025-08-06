@@ -1,11 +1,12 @@
-import React, { useContext, useEffect, useState, useRef } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
-import ReviewPreview from "../map/ReviewPreview.jsx";
 import { ReviewLikeContainer } from "../like/ReviewLikeContainer.jsx";
 import { FavoriteContainer } from "./FavoriteContainer.jsx";
-import { del, get } from "./data/api.jsx";
+import { get } from "./data/api.jsx";
+import axios from "axios"; // axios import 추가
 import { Button } from "react-bootstrap";
+import ReviewCard from "../review/ReviewCard.jsx";
 
 export function MapDetail() {
   const { name } = useParams();
@@ -42,12 +43,15 @@ export function MapDetail() {
     }
   };
 
-  // 리뷰 목록 조회
+  // 리뷰 목록 조회 - axios로 직접 호출하도록 수정
   const fetchReviews = async () => {
     setLoadingReviews(true);
     try {
-      const res = await get(`/review/facility/${decodedName}`);
-      setReviews(res || []);
+      // ReviewAdd와 동일한 방식으로 axios 직접 사용
+      const response = await axios.get(
+        `/api/review/facility/${encodeURIComponent(decodedName)}`,
+      );
+      setReviews(response.data || []);
     } catch (err) {
       console.error("리뷰 목록 조회 실패:", err);
       setReviews([]);
@@ -71,7 +75,7 @@ export function MapDetail() {
         targetElement.classList.add("review-highlight");
         const timer = setTimeout(() => {
           targetElement.classList.remove("review-highlight");
-        }, 2500); // 2.5초간 하이라이트
+        }, 2500);
         return () => clearTimeout(timer);
       }
     }
@@ -87,14 +91,17 @@ export function MapDetail() {
     navigate(`/review/edit/${review.id}`, { state: { review } });
   };
 
-  // 리뷰 삭제
+  // 리뷰 삭제 - axios로 수정
   const handleDelete = async (id) => {
     if (!window.confirm("정말 삭제하시겠습니까?")) return;
     try {
-      await del(`/review/delete/${id}`, { email: user.email });
+      await axios.delete(`/api/review/delete/${id}`, {
+        data: { email: user.email },
+      });
       alert("삭제 완료");
-      fetchReviews();
+      fetchReviews(); // 리뷰 목록 새로고침
     } catch (err) {
+      console.error("리뷰 삭제 실패:", err);
       alert("삭제 실패: " + (err.response?.data?.message || err.message));
     }
   };
@@ -113,7 +120,7 @@ export function MapDetail() {
     setReportReason("");
   };
 
-  // 신고 제출
+  // 신고 제출 - axios로 수정
   const submitReport = async () => {
     if (!reportReason.trim()) {
       alert("신고 사유를 입력해주세요.");
@@ -121,20 +128,15 @@ export function MapDetail() {
     }
     setReportLoading(true);
     try {
-      await fetch("/api/review/report", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          reviewId: reportingReviewId,
-          reason: reportReason.trim(),
-        }),
+      await axios.post("/api/review/report", {
+        reviewId: reportingReviewId,
+        reason: reportReason.trim(),
       });
       alert("신고가 접수되었습니다.");
       closeReportModal();
     } catch (error) {
-      alert("신고 실패: " + error.message);
+      console.error("신고 실패:", error);
+      alert("신고 실패: " + (error.response?.data?.message || error.message));
     } finally {
       setReportLoading(false);
     }
@@ -175,15 +177,15 @@ export function MapDetail() {
           }}
         >
           <div>
-            <strong>도로명 주소:</strong>
+            <strong>📍도로명 주소:</strong>
             {facility.roadAddress || "정보 없음"}
           </div>
           <div>
-            <strong>전화번호:</strong>
+            <strong>📞전화번호:</strong>
             {facility.phoneNumber || "정보 없음"}
           </div>
           <div>
-            <strong>홈페이지:</strong>{" "}
+            <strong>🌐홈페이지:</strong>{" "}
             {(() => {
               const homepageRaw = facility?.homepage ?? "";
               const homepage = homepageRaw.trim().toLowerCase();
@@ -201,16 +203,16 @@ export function MapDetail() {
                   </a>
                 );
               } else {
-                return <span>정보 없음</span>;
+                return <span>⚠️정보 없음</span>;
               }
             })()}
           </div>
           <div>
-            <strong>휴무일:</strong>
+            <strong>🏖️휴무일:</strong>
             {facility.holiday || "정보 없음"}
           </div>
           <div>
-            <strong>운영시간:</strong>
+            <strong>⏲️운영시간:</strong>
             {facility.operatingHours || "정보 없음"}
           </div>
         </div>
@@ -271,7 +273,6 @@ export function MapDetail() {
         </div>
       )}
 
-      {/* 리뷰 목록 헤더, 정렬 UI 등... */}
       <div style={{ marginTop: "2rem" }}>
         <h4 className="mb-3">
           📝 리뷰 목록{" "}
@@ -305,7 +306,6 @@ export function MapDetail() {
           </select>
         </div>
 
-        {/* 별점, 리뷰 프리뷰, 좋아요, 수정/삭제 버튼 등... */}
         {loadingReviews ? (
           <p>불러오는 중...</p>
         ) : sortedReviews.length === 0 ? (
@@ -315,15 +315,16 @@ export function MapDetail() {
             {sortedReviews.map((r) => (
               <li
                 key={r.id}
-                ref={(el) => (reviewRefs.current[r.id] = el)} // ref 연결
+                ref={(el) => (reviewRefs.current[r.id] = el)}
                 style={{
                   position: "relative",
-                  padding: "1rem",
+                  padding: "1.5rem",
                   marginBottom: "1rem",
                   border: "1px solid #ddd",
                   borderRadius: "8px",
                   backgroundColor: "#fff",
-                  transition: "background-color 0.5s ease-out",
+                  transition:
+                    "background-color 0.5s ease-out, border-color 0.5s ease-out",
                 }}
               >
                 <div
@@ -347,7 +348,7 @@ export function MapDetail() {
                   <span className="ms-2 text-dark fw-semibold">{r.rating}</span>
                 </div>
 
-                <ReviewPreview review={r} />
+                <ReviewCard review={r} />
 
                 <div
                   style={{

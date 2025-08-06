@@ -1,7 +1,9 @@
+// 이건 리뷰 하나의 카드 안 내용물?
+
 import React, { useState } from "react";
 import { Badge, Image, Modal } from "react-bootstrap";
 
-function ReviewPreview({ review }) {
+function ReviewCard({ review }) {
   const [showImageModal, setShowImageModal] = useState(false);
   const [modalImageUrl, setModalImageUrl] = useState("");
 
@@ -136,4 +138,4 @@ function ReviewPreview({ review }) {
   );
 }
 
-export default ReviewPreview;
+export default ReviewCard;
