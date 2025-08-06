@@ -28,19 +28,17 @@ export function MemberEdit() {
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword1, setNewPassword1] = useState("");
   const [newPassword2, setNewPassword2] = useState("");
+  // 📝 프로필 이미지 관련 상태 변경:
+  const [currentProfileUrls, setCurrentProfileUrls] = useState([]); // 현재 멤버가 가진 프로필 이미지 URL 목록
+  const [newProfileFiles, setNewProfileFiles] = useState([]); // 새로 추가할 프로필 파일 (MultipartFile)
+  const [deleteProfileFileNames, setDeleteProfileFileNames] = useState([]); // 삭제할 프로필 파일 이름 목록
+  // kakao 수정 임시코드
+  const [tempCode, setTempCode] = useState("");
   // 라우팅 및 인증 관련 훅
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const { hasAccess, updateUser } = useContext(AuthenticationContext);
   const isSelf = member ? hasAccess(member.email) : false;
-
-  // 📝 프로필 이미지 관련 상태 변경:
-  //    - 기존 파일 URL 리스트 (board.files와 유사)
-  //    - 새로 추가할 파일 리스트 (newFiles와 유사)
-  //    - 삭제할 파일 이름 리스트 (deleteFileNames와 유사)
-  const [currentProfileUrls, setCurrentProfileUrls] = useState([]); // 현재 멤버가 가진 프로필 이미지 URL 목록
-  const [newProfileFiles, setNewProfileFiles] = useState([]); // 새로 추가할 프로필 파일 (MultipartFile)
-  const [deleteProfileFileNames, setDeleteProfileFileNames] = useState([]); // 삭제할 프로필 파일 이름 목록
 
   const fileInputRef = useRef(null);
 
@@ -253,6 +251,26 @@ export function MemberEdit() {
   const displayProfileImage =
     allProfileImages.length > 0 ? allProfileImages[0] : null; // 단일 프로필 이미지 가정 시
 
+  const isKakao = member.provider?.includes("kakao");
+
+  function handleModalShowClick() {
+    if (isKakao) {
+      axios
+        .post("/api/member/withdrawalCode", { email: member.email })
+        .then((res) => {
+          setTempCode(res.data.tempCode);
+          setModalShow(true);
+        })
+        .catch((err) => {
+          console.error(err);
+          console.log("임시 코드 발급 안 됨");
+        })
+        .finally(() => setPassword(""));
+    } else {
+      setModalShow(true);
+    }
+  }
+
   return (
     <Row className="justify-content-center my-4">
       <Col xs={12} md={8} lg={6}>
@@ -407,18 +425,20 @@ export function MemberEdit() {
                 <Button
                   variant="primary"
                   disabled={isSaveDisabled}
-                  onClick={() => setModalShow(true)}
+                  onClick={handleModalShowClick}
                   className="d-flex align-items-center gap-1"
                 >
                   저장
                 </Button>
-                <Button
-                  variant="outline-info"
-                  onClick={() => setPasswordModalShow(true)}
-                  className="d-flex align-items-center gap-1"
-                >
-                  비밀번호 변경
-                </Button>
+                {!isKakao && (
+                  <Button
+                    variant="outline-info"
+                    onClick={() => setPasswordModalShow(true)}
+                    className="d-flex align-items-center gap-1"
+                  >
+                    비밀번호 변경
+                  </Button>
+                )}
               </div>
             )}
           </Card.Body>
@@ -431,12 +451,20 @@ export function MemberEdit() {
           </Modal.Header>
           <Modal.Body>
             <FormGroup controlId="password1">
-              <FormLabel>암호</FormLabel>
+              <FormLabel>
+                {isKakao
+                  ? `정보 수정을 원하시면 ${tempCode}를 입력하세요.`
+                  : "정보 수정을 원하시면 암호를 입력하세요."}
+              </FormLabel>
               <FormControl
-                type="password"
+                type={isKakao ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="현재 비밀번호를 입력하세요"
+                placeholder={
+                  isKakao
+                    ? "정보 수정을 원하시면 위의 코드를 입력하세요."
+                    : "정보 수정을 원하시면 현재 비밀번호를 입력하세요."
+                }
                 autoFocus
               />
             </FormGroup>

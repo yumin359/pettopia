@@ -278,15 +278,28 @@ public class MemberService {
         Member member = memberRepository.findByEmail(memberForm.getEmail())
                 .orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
 
-        // 비밀번호 변경 관련 처리
-        String rawPassword = memberForm.getPassword();
-        if (rawPassword != null && !rawPassword.trim().isEmpty()) {
-            // 현재 비밀번호 일치 여부 확인
-            if (!bCryptPasswordEncoder.matches(rawPassword, member.getPassword())) {
-                throw new RuntimeException("암호가 일치하지 않습니다.");
+        // 카카오 회원인지 확인
+        if ("kakao".equals(member.getProvider())) {
+            String withdrawalCode = memberForm.getPassword();
+            String storedCode = withdrawalCodes.get(memberForm.getEmail());
+            System.out.println(storedCode);
+            System.out.println(memberForm.getPassword());
+
+            if (storedCode == null || !storedCode.equals(withdrawalCode)) {
+                throw new RuntimeException("유효하지 않거나 만료된 코드입니다.");
             }
-            // 비밀번호 변경
-            member.setPassword(bCryptPasswordEncoder.encode(rawPassword.trim()));
+            withdrawalCodes.remove(memberForm.getEmail()); // 사용된 코드 삭제
+        } else {
+            // 일반 회원 비밀번호 변경 관련 처리
+            String rawPassword = memberForm.getPassword();
+            if (rawPassword != null && !rawPassword.trim().isEmpty()) {
+                // 현재 비밀번호 일치 여부 확인
+                if (!bCryptPasswordEncoder.matches(rawPassword, member.getPassword())) {
+                    throw new RuntimeException("암호가 일치하지 않습니다.");
+                }
+                // 비밀번호 변경
+                member.setPassword(bCryptPasswordEncoder.encode(rawPassword.trim()));
+            }
         }
 
         // 닉네임 및 자기소개 수정
