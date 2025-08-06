@@ -6,12 +6,12 @@ import { AuthenticationContext } from "./common/AuthenticationContextProvider.js
 
 export function AdminPage() {
   const navigate = useNavigate();
-  const { isAdmin } = useContext(AuthenticationContext);
-
-  if (!(typeof isAdmin === "function" ? isAdmin() : isAdmin)) {
-    alert("권한없음");
-    return <Navigate to="/" replace />;
-  }
+  // const { isAdmin } = useContext(AuthenticationContext);
+  //
+  // if (!(typeof isAdmin === "function" ? isAdmin() : isAdmin)) {
+  //   alert("권한없음");
+  //   return <Navigate to="/" replace />;
+  // }
 
   return (
     <Row className="mt-4">
