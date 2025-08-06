@@ -24,6 +24,7 @@ import { MyReview } from "./feature/review/MyReview.jsx";
 
 // ✅ 1. KakaoCallback 컴포넌트를 import 합니다.
 import { KakaoCallback } from "./feature/member/KakaoCallback.jsx";
+import { AdminPage } from "./AdminPage.jsx";
 
 function App() {
   return (
@@ -44,7 +45,6 @@ function App() {
             <Route path="/auth/kakao/callback" element={<KakaoCallback />} />
 
             <Route path="/member" element={<MemberDetail />} />
-            <Route path="/member/list" element={<MemberList />} />
             <Route path="/member/edit" element={<MemberEdit />} />
             <Route path="/facility/:name" element={<MapDetail />} />
             <Route path="/KakaoMap" element={<FullFilterKakaoMap />} />
@@ -54,7 +54,11 @@ function App() {
             <Route path="/review/edit/:id" element={<ReviewEdit />} />
             <Route path="/review/latest" element={<ReviewListMini />} />
             <Route path="/support" element={<ServicePage />} />
-            <Route path="/support/list" element={<ServiceListPage />} />
+
+            <Route path="/admin" element={<AdminPage />}>
+              <Route path="member/list" element={<MemberList />} />
+              <Route path="support/list" element={<ServiceListPage />} />
+            </Route>
           </Route>
         </Routes>
       </BrowserRouter>
