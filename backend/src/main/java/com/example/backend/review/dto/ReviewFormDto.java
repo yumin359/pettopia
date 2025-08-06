@@ -22,5 +22,5 @@ public class ReviewFormDto {
     private List<MultipartFile> files;
     private List<String> deleteFileNames;
 
-    private List<Integer> tagIds;
+    private List<String> tagNames;
 }

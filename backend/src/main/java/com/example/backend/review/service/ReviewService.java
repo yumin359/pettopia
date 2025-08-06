@@ -15,6 +15,10 @@ import com.example.backend.review.repository.ReviewRepository;
 import com.example.backend.review.repository.TagRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -131,11 +135,8 @@ public class ReviewService {
                 .insertedAt(Instant.now())
                 .build();
 
-        List<Integer> tagIds = dto.getTagIds();
-        if (tagIds != null && !tagIds.isEmpty()) {
-            Set<Tag> tags = tagRepository.findAllByIdIn(tagIds);
-            review.setTags(tags);
-        }
+        Set<Tag> tags = processTags(dto.getTagNames());
+        review.setTags(tags);
 
         reviewRepository.save(review);
         saveFiles(review, dto.getFiles());
@@ -150,19 +151,15 @@ public class ReviewService {
             throw new SecurityException("자신이 작성한 리뷰만 수정할 수 있습니다.");
         }
 
-        // 1. 리뷰 기본 정보 업데이트
         review.setReview(dto.getReview());
         review.setRating(dto.getRating());
 
-        // 2. 태그 정보 업데이트 (기존 관계 모두 지우고 새로 설정)
+        // ✅ 태그 처리 수정
         review.getTags().clear();
-        List<Integer> tagIds = dto.getTagIds();
-        if (tagIds != null && !tagIds.isEmpty()) {
-            Set<Tag> tags = tagRepository.findAllByIdIn(tagIds);
-            review.setTags(tags);
-        }
+        Set<Tag> tags = processTags(dto.getTagNames());
+        review.setTags(tags);
 
-        // 3. 파일 정보 업데이트
+        // 파일 처리
         List<String> deleteFileNames = dto.getDeleteFileNames();
         List<MultipartFile> newFiles = dto.getFiles();
 
@@ -201,19 +198,36 @@ public class ReviewService {
                 .collect(Collectors.toList());
     }
 
-    // 최신 리뷰 5개 조회
-    public List<ReviewListDto> getLatestReviews() {
-        return reviewRepository.findTop5ByOrderByInsertedAtDesc()
-                .stream()
-                .map(this::convertToDto) // private 헬퍼 메소드 사용
+    // ✅ 최신 리뷰 N개 조회 (파라미터로 개수 지정)
+    public List<ReviewListDto> getLatestReviews(Integer limit) {
+        // 기본값 설정
+        if (limit == null || limit <= 0) {
+            limit = 5;
+        }
+        // 최대값 제한 (안전을 위해)
+        if (limit > 100) {
+            limit = 100;
+        }
+
+        // Pageable 사용
+        Pageable pageable = PageRequest.of(0, limit, Sort.by(Sort.Direction.DESC, "insertedAt"));
+        Page<Review> reviewPage = reviewRepository.findAll(pageable);
+
+        return reviewPage.getContent().stream()
+                .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
 
-    // 최신 리뷰 3개 조회
+//    // 기존 최신리뷰 5,3개 조회 = 오버로드로 유지
+//    public List<ReviewListDto> getLatestReviews() {
+//        return getLatestReviews(5);  // 기본값 5개
+//    }
+
+    // 최신 리뷰 3개 조회는 그대로 유지
     public List<ReviewListDto> getLatest3Reviews() {
         return reviewRepository.findTop3ByOrderByInsertedAtDesc()
                 .stream()
-                .map(this::convertToDto) // private 헬퍼 메소드 사용
+                .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
 
@@ -257,6 +271,24 @@ public class ReviewService {
                 .files(fileUrls)
                 .tags(tagDtos) // 변환된 태그 DTO 리스트 설정
                 .build();
+    }
+
+    // 태그 저장 헬퍼 메소드 추가
+    private Set<Tag> processTags(List<String> tagNames) {
+        Set<Tag> tags = new HashSet<>();
+        if (tagNames != null && !tagNames.isEmpty()) {
+            for (String tagName : tagNames) {
+                if (tagName != null && !tagName.trim().isEmpty()) {
+                    Tag tag = tagRepository.findByName(tagName.trim())
+                            .orElseGet(() -> {
+                                Tag newTag = new Tag(tagName.trim());
+                                return tagRepository.save(newTag);
+                            });
+                    tags.add(tag);
+                }
+            }
+        }
+        return tags;
     }
 
 }

@@ -122,7 +122,7 @@ export function ReviewAdd({ facilityName, onSave, onCancel }) {
         formData.append("files", fileObj.file);
       });
 
-      // 태그 데이터 추가
+      // 태그 데이터 추가 부분
       selectedTags.forEach((tag) => {
         formData.append("tagNames", tag.value);
       });

@@ -18,8 +18,6 @@ public class ReviewController {
 
     private final ReviewService reviewService;
 
-    // 그리고 이것도 다 Authenticated 해줘야하지 않나
-
     // 리뷰 등록
     @PostMapping("/add")
     @PreAuthorize("isAuthenticated()")
@@ -57,10 +55,11 @@ public class ReviewController {
         return ResponseEntity.ok("리뷰가 삭제되었습니다.");
     }
 
-    // 최신 리뷰 5개 조회
+    // ✅ 최신 리뷰 조회 - 하나의 메소드로 통합
     @GetMapping("/latest")
-    public ResponseEntity<List<ReviewListDto>> getLatestReviews() {
-        List<ReviewListDto> latestReviews = reviewService.getLatestReviews();
+    public ResponseEntity<List<ReviewListDto>> getLatestReviews(
+            @RequestParam(value = "limit", required = false, defaultValue = "5") Integer limit) {
+        List<ReviewListDto> latestReviews = reviewService.getLatestReviews(limit);
         return ResponseEntity.ok(latestReviews);
     }
 
@@ -75,7 +74,6 @@ public class ReviewController {
     @GetMapping("/myReview")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<ReviewListDto>> getMyReviews(Authentication authentication) {
-        // 기존 코드의 null 체크는 @PreAuthorize로 대체 가능합니다.
         String email = authentication.getName();
         List<ReviewListDto> myReviews = reviewService.findReviewsByEmail(email);
         return ResponseEntity.ok(myReviews);

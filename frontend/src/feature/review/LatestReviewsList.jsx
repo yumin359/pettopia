@@ -15,6 +15,7 @@ import { ReviewLikeContainer } from "../like/ReviewLikeContainer.jsx";
 
 export function LatestReviewsList() {
   const [reviews, setReviews] = useState(null);
+  const [displayCount, setDisplayCount] = useState(12); // 처음에 12개 표시
   const [expandedIds, setExpandedIds] = useState([]);
   const [clampedIds, setClampedIds] = useState([]);
 
@@ -28,8 +29,9 @@ export function LatestReviewsList() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // limit 파라미터를 추가하여 50개까지 가져오기
     axios
-      .get("/api/review/latest")
+      .get("/api/review/latest?limit=50")
       .then((res) => setReviews(res.data))
       .catch(() => setReviews([]));
   }, []);
@@ -38,14 +40,15 @@ export function LatestReviewsList() {
   useEffect(() => {
     if (!reviews) return;
     const newClampedIds = [];
-    reviews.forEach((r) => {
+    const visibleReviews = reviews.slice(0, displayCount);
+    visibleReviews.forEach((r) => {
       const el = reviewRefs.current[r.id];
       if (!el) return;
       const isClamped = el.scrollHeight > el.clientHeight + 1;
       if (isClamped) newClampedIds.push(r.id);
     });
     setClampedIds(newClampedIds);
-  }, [reviews]);
+  }, [reviews, displayCount]);
 
   // 로딩, 에러, 빈 배열 처리
   if (!reviews) {
@@ -61,7 +64,10 @@ export function LatestReviewsList() {
   if (reviews.length === 0) {
     return (
       <Container className="my-5">
-        <h3 className="text-center mb-4 fw-bold">최신 리뷰</h3>
+        <h2 className="text-center mb-4 fw-bold">
+          <span style={{ color: "#8B4513" }}>📝</span>
+          최신 리뷰
+        </h2>
         <p className="text-muted text-center">아직 작성된 리뷰가 없습니다.</p>
       </Container>
     );
@@ -105,15 +111,9 @@ export function LatestReviewsList() {
     }
     setReportLoading(true);
     try {
-      await fetch("/api/review/report", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          reviewId: reportingReviewId,
-          reason: reportReason.trim(),
-        }),
+      await axios.post("/api/review/report", {
+        reviewId: reportingReviewId,
+        reason: reportReason.trim(),
       });
       alert("신고가 접수되었습니다.");
       closeReportModal();
@@ -125,190 +125,308 @@ export function LatestReviewsList() {
   };
 
   const defaultProfileImage = "/user.png";
+  const visibleReviews = reviews.slice(0, displayCount);
+  const hasMoreReviews = reviews.length > displayCount;
+
+  const loadMoreReviews = () => {
+    setDisplayCount((prev) => Math.min(prev + 12, reviews.length));
+  };
 
   return (
-    <Container className="my-5">
-      <h3 className="text-center mb-4 fw-bold">최신 리뷰</h3>
+    <Container className="my-4">
+      <h2 className="text-center mb-4 fw-bold">
+        <span style={{ color: "#8B4513" }}>📝</span>
+        최신 리뷰
+        <span className="ms-2 fs-6 text-muted">
+          ({reviews.length}개의 리뷰)
+        </span>
+      </h2>
 
-      <Row className="g-4">
-        {reviews.map((r) => {
+      <Row className="g-3">
+        {visibleReviews.map((r) => {
           const isExpanded = expandedIds.includes(r.id);
           const imageFiles = r.files?.filter(isImageFile) || [];
-          const firstImage = imageFiles[0] || null;
-          const hasImages = !!firstImage;
+          const hasImages = imageFiles.length > 0;
 
           return (
-            <Col key={r.id} xs={12} md={6} lg={4}>
+            <Col key={r.id} xs={12} sm={6} md={4} lg={3}>
               <Card
-                className="shadow-sm border-0 p-3 h-100"
+                className="shadow-sm border-0 h-100"
                 style={{
-                  backgroundColor: "#fdfaf4",
+                  backgroundColor: "#fff",
                   cursor: "pointer",
-                  transition: "transform 0.2s ease-in-out",
+                  transition: "all 0.2s ease",
+                  overflow: "hidden",
                 }}
                 onClick={() =>
                   navigate(
                     `/facility/${encodeURIComponent(r.facilityName)}?focusReviewId=${r.id}`,
                   )
                 }
-                onMouseEnter={(e) =>
-                  (e.target.style.transform = "translateY(-2px)")
-                }
-                onMouseLeave={(e) =>
-                  (e.target.style.transform = "translateY(0)")
-                }
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = "translateY(-3px)";
+                  e.currentTarget.style.boxShadow =
+                    "0 6px 20px rgba(0,0,0,0.15)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow = "";
+                }}
               >
-                <div className="d-flex justify-content-between align-items-center mb-2">
-                  <div
-                    className="fw-semibold hover-underline-on-hover text-truncate"
-                    style={{
-                      cursor: "pointer",
-                      color: "#8B4513",
-                      maxWidth: "60%",
-                    }}
-                    onClick={(e) => handleFacilityButton(r.facilityName, e)}
-                    title={r.facilityName}
-                  >
-                    {r.facilityName}
-                  </div>
-                  {/* 별점 UI */}
-                  <div
-                    className="small"
-                    style={{
-                      fontWeight: "bold",
-                      display: "flex",
-                      alignItems: "center",
-                    }}
-                  >
-                    <span style={{ color: "#f0ad4e", fontSize: "1.1rem" }}>
-                      {"★".repeat(r.rating)}
-                    </span>
-                    <span className="ms-2 text-dark fw-semibold">
-                      {r.rating}
-                    </span>
-                  </div>
-                </div>
-
-                <hr className="mt-1 mb-3 border-gray-300" />
-
-                {/* 이미지가 있는 경우 상단에 표시 */}
+                {/* 이미지 갤러리 - 카드 상단에 표시 */}
                 {hasImages && (
-                  <div className="mb-3 text-center">
-                    <Image
-                      src={firstImage}
-                      alt="리뷰 이미지"
-                      className="shadow rounded"
-                      style={{
-                        width: "100%",
-                        maxWidth: "200px",
-                        height: "150px",
-                        objectFit: "cover",
-                      }}
-                    />
+                  <div
+                    style={{
+                      position: "relative",
+                      backgroundColor: "#f8f9fa",
+                      height: imageFiles.length > 1 ? "120px" : "150px",
+                    }}
+                  >
+                    {imageFiles.length === 1 ? (
+                      // 이미지가 1개일 때
+                      <Image
+                        src={imageFiles[0]}
+                        alt="리뷰 이미지"
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                        }}
+                      />
+                    ) : imageFiles.length === 2 ? (
+                      // 이미지가 2개일 때
+                      <div className="d-flex" style={{ height: "100%" }}>
+                        {imageFiles.slice(0, 2).map((img, idx) => (
+                          <div
+                            key={idx}
+                            style={{ flex: 1, overflow: "hidden" }}
+                          >
+                            <Image
+                              src={img}
+                              alt={`리뷰 이미지 ${idx + 1}`}
+                              style={{
+                                width: "100%",
+                                height: "100%",
+                                objectFit: "cover",
+                              }}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      // 이미지가 3개 이상일 때
+                      <div className="d-flex" style={{ height: "100%" }}>
+                        <div style={{ flex: "2", overflow: "hidden" }}>
+                          <Image
+                            src={imageFiles[0]}
+                            alt="리뷰 이미지 1"
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              objectFit: "cover",
+                            }}
+                          />
+                        </div>
+                        <div
+                          style={{
+                            flex: "1",
+                            display: "flex",
+                            flexDirection: "column",
+                          }}
+                        >
+                          {imageFiles.slice(1, 3).map((img, idx) => (
+                            <div
+                              key={idx}
+                              style={{
+                                flex: 1,
+                                overflow: "hidden",
+                                position: "relative",
+                              }}
+                            >
+                              <Image
+                                src={img}
+                                alt={`리뷰 이미지 ${idx + 2}`}
+                                style={{
+                                  width: "100%",
+                                  height: "100%",
+                                  objectFit: "cover",
+                                }}
+                              />
+                              {idx === 1 && imageFiles.length > 3 && (
+                                <div
+                                  style={{
+                                    position: "absolute",
+                                    top: 0,
+                                    left: 0,
+                                    right: 0,
+                                    bottom: 0,
+                                    backgroundColor: "rgba(0,0,0,0.6)",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    color: "white",
+                                    fontWeight: "bold",
+                                    fontSize: "1.2rem",
+                                  }}
+                                >
+                                  +{imageFiles.length - 3}
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
 
-                {/* 리뷰 내용 */}
-                <div className="flex-grow-1">
+                <Card.Body className="p-3">
+                  {/* 시설명과 별점 */}
+                  <div className="d-flex justify-content-between align-items-start mb-2">
+                    <div
+                      className="fw-semibold text-truncate"
+                      style={{
+                        cursor: "pointer",
+                        color: "#495057",
+                        fontSize: "0.9rem",
+                        maxWidth: "70%",
+                      }}
+                      onClick={(e) => handleFacilityButton(r.facilityName, e)}
+                      title={r.facilityName}
+                    >
+                      📍 {r.facilityName}
+                    </div>
+                    <div className="text-nowrap">
+                      <span style={{ color: "#f0ad4e", fontSize: "0.9rem" }}>
+                        {"★".repeat(r.rating)}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* 리뷰 내용 - 더 컴팩트하게 */}
                   <div
                     ref={(el) => (reviewRefs.current[r.id] = el)}
-                    className={`${!isExpanded ? "line-clamp" : ""} mb-2`}
-                    style={{ whiteSpace: "pre-wrap", fontSize: "0.95rem" }}
+                    className={`${!isExpanded ? "line-clamp-2" : ""} mb-2`}
+                    style={{
+                      fontSize: "0.85rem",
+                      lineHeight: "1.4",
+                      color: "#666",
+                    }}
                   >
                     {r.review}
                   </div>
 
                   {clampedIds.includes(r.id) && (
-                    <div className="mb-2">
-                      <Button
-                        variant="link"
-                        size="sm"
-                        onClick={(e) => toggleExpand(r.id, e)}
-                        className="p-0 text-secondary hover-underline-on-hover"
-                        style={{
-                          textDecoration: "none",
-                          fontSize: "0.85rem",
-                        }}
-                      >
-                        {isExpanded ? "간략히 보기" : "더보기"}
-                      </Button>
-                    </div>
+                    <Button
+                      variant="link"
+                      size="sm"
+                      onClick={(e) => toggleExpand(r.id, e)}
+                      className="p-0 text-primary"
+                      style={{
+                        fontSize: "0.75rem",
+                        textDecoration: "none",
+                      }}
+                    >
+                      {isExpanded ? "접기" : "더보기"}
+                    </Button>
                   )}
 
-                  {/* 태그 */}
+                  {/* 태그 - 최대 3개만 표시 */}
                   {r.tags && r.tags.length > 0 && (
-                    <div className="mb-3 d-flex flex-wrap gap-1">
-                      {r.tags.map((tag) => (
+                    <div className="mb-2 d-flex flex-wrap gap-1">
+                      {r.tags.slice(0, 3).map((tag) => (
                         <Badge
                           key={tag.id}
-                          bg="secondary"
-                          pill
+                          bg="light"
+                          text="dark"
                           className="small"
+                          style={{ fontSize: "0.7rem" }}
                         >
-                          {tag.name}
+                          #{tag.name}
                         </Badge>
                       ))}
+                      {r.tags.length > 3 && (
+                        <Badge
+                          bg="light"
+                          text="dark"
+                          className="small"
+                          style={{ fontSize: "0.7rem" }}
+                        >
+                          +{r.tags.length - 3}
+                        </Badge>
+                      )}
                     </div>
                   )}
-                </div>
 
-                {/* 하단 액션 및 정보 영역 */}
-                <div className="mt-auto">
-                  {/* 좋아요 및 신고 버튼 */}
-                  <div className="d-flex align-items-center justify-content-between mb-2">
-                    <ReviewLikeContainer reviewId={r.id} />
-                    <button
-                      onClick={(e) => openReportModal(r.id, e)}
-                      title="리뷰 신고하기"
-                      style={{
-                        background: "none",
-                        border: "none",
-                        padding: "4px 8px",
-                        cursor: "pointer",
-                        fontSize: "1.1rem",
-                        color: "#dc3545",
-                        borderRadius: "4px",
-                        transition: "background-color 0.2s",
-                      }}
-                      onMouseEnter={(e) =>
-                        (e.target.style.backgroundColor =
-                          "rgba(220, 53, 69, 0.1)")
-                      }
-                      onMouseLeave={(e) =>
-                        (e.target.style.backgroundColor = "transparent")
-                      }
+                  {/* 하단 정보 - 더 컴팩트하게 */}
+                  <div className="d-flex justify-content-between align-items-center mt-auto">
+                    <div className="d-flex align-items-center gap-2">
+                      <ReviewLikeContainer reviewId={r.id} compact={true} />
+                      <button
+                        onClick={(e) => openReportModal(r.id, e)}
+                        title="신고"
+                        style={{
+                          background: "none",
+                          border: "none",
+                          padding: "2px",
+                          cursor: "pointer",
+                          fontSize: "0.9rem",
+                          color: "#dc3545",
+                          opacity: 0.7,
+                        }}
+                        onMouseEnter={(e) => (e.target.style.opacity = "1")}
+                        onMouseLeave={(e) => (e.target.style.opacity = "0.7")}
+                      >
+                        🚨
+                      </button>
+                    </div>
+
+                    <div
+                      className="text-muted d-flex align-items-center"
+                      style={{ fontSize: "0.7rem" }}
                     >
-                      🚨
-                    </button>
+                      <Image
+                        roundedCircle
+                        className="me-1"
+                        src={r.profileImageUrl || defaultProfileImage}
+                        alt="프로필"
+                        style={{
+                          width: "16px",
+                          height: "16px",
+                          objectFit: "cover",
+                        }}
+                      />
+                      <span
+                        className="text-truncate"
+                        style={{ maxWidth: "80px" }}
+                      >
+                        {r.memberEmailNickName ?? "익명"}
+                      </span>
+                    </div>
                   </div>
-
-                  {/* 작성자 정보 */}
-                  <div
-                    className="text-muted d-flex align-items-center"
-                    style={{ fontSize: "0.8rem" }}
-                  >
-                    <Image
-                      roundedCircle
-                      className="me-2"
-                      src={r.profileImageUrl || defaultProfileImage}
-                      alt={`${r.memberEmailNickName ?? "익명"} 프로필`}
-                      style={{
-                        width: "20px",
-                        height: "20px",
-                        objectFit: "cover",
-                      }}
-                    />
-                    <span className="text-truncate">
-                      {r.memberEmailNickName ?? "익명 사용자"} ·{" "}
-                      {r.insertedAt?.split("T")[0]}
-                    </span>
-                  </div>
-                </div>
+                </Card.Body>
               </Card>
             </Col>
           );
         })}
       </Row>
+
+      {/* 더보기 버튼 */}
+      {hasMoreReviews && (
+        <div className="text-center mt-4">
+          <Button
+            variant="outline-primary"
+            onClick={loadMoreReviews}
+            style={{
+              padding: "0.75rem 2rem",
+              fontWeight: "500",
+              borderRadius: "25px",
+            }}
+          >
+            더 많은 리뷰 보기 ({reviews.length - displayCount}개 남음)
+          </Button>
+        </div>
+      )}
 
       {/* 신고 모달 */}
       {reportModalOpen && (
@@ -330,25 +448,29 @@ export function LatestReviewsList() {
           <div
             style={{
               backgroundColor: "white",
-              padding: "1.5rem",
-              borderRadius: "8px",
+              padding: "2rem",
+              borderRadius: "12px",
               width: "90%",
               maxWidth: "400px",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+              boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <h4 className="mb-3">리뷰 신고하기</h4>
+            <h4 className="mb-3">🚨 리뷰 신고하기</h4>
             <textarea
               rows={5}
-              placeholder="신고 사유를 작성해주세요."
+              placeholder="신고 사유를 구체적으로 작성해주세요."
               value={reportReason}
               onChange={(e) => setReportReason(e.target.value)}
               className="form-control mb-3"
               style={{
                 resize: "vertical",
+                fontSize: "0.95rem",
               }}
             />
+            <small className="text-muted d-block mb-3">
+              허위 신고는 제재 대상이 될 수 있습니다.
+            </small>
             <div className="d-flex justify-content-end gap-2">
               <button
                 onClick={closeReportModal}
@@ -359,10 +481,10 @@ export function LatestReviewsList() {
               </button>
               <button
                 onClick={submitReport}
-                disabled={reportLoading}
-                className="btn btn-warning"
+                disabled={reportLoading || !reportReason.trim()}
+                className="btn btn-danger"
               >
-                {reportLoading ? "신고중..." : "신고하기"}
+                {reportLoading ? "신고 중..." : "신고하기"}
               </button>
             </div>
           </div>
@@ -370,14 +492,17 @@ export function LatestReviewsList() {
       )}
 
       <style>{`
-        .line-clamp {
+        .line-clamp-2 {
           display: -webkit-box;
-          -webkit-line-clamp: 4;
+          -webkit-line-clamp: 2;
           -webkit-box-orient: vertical;
           overflow: hidden;
         }
-        .hover-underline-on-hover:hover {
-          text-decoration: underline !important;
+        .line-clamp-3 {
+          display: -webkit-box;
+          -webkit-line-clamp: 3;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
         }
       `}</style>
     </Container>

@@ -15,7 +15,7 @@ import java.util.Set;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Builder // ✅ 이게 꼭 있어야 한다
+@Builder(toBuilder = true)
 public class Review {
 
     @Id
@@ -35,13 +35,15 @@ public class Review {
     @Column(nullable = false)
     private Integer rating;
 
+    @Builder.Default
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL)
     private List<ReviewFile> files = new ArrayList<>();
 
     @Column(nullable = false)
     private Instant insertedAt;
 
-    @ManyToMany
+    @Builder.Default
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "review_tags",
             joinColumns = @JoinColumn(name = "review_id"),
