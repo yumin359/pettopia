@@ -331,27 +331,33 @@ export function MapDetail() {
                   }}
                 >
                   <ReviewLikeContainer reviewId={r.id} />
-                  <button
-                    onClick={() => openReportModal(r.id)}
-                    title="리뷰 신고하기"
-                    style={{
-                      background: "none",
-                      border: "none",
-                      padding: 0,
-                      margin: 0,
-                      cursor: "pointer",
-                      fontSize: "1.2rem",
-                      lineHeight: 1,
-                      color: "#dc3545",
-                      userSelect: "none",
-                    }}
-                  >
-                    🚨
-                  </button>
+                  {user !== null && user !== undefined && (
+                    <button
+                      onClick={() => openReportModal(r.id)}
+                      title="리뷰 신고하기"
+                      style={{
+                        background: "none",
+                        border: "none",
+                        padding: 0,
+                        margin: 0,
+                        cursor: "pointer",
+                        fontSize: "1.2rem",
+                        lineHeight: 1,
+                        color: "#dc3545",
+                        userSelect: "none",
+                      }}
+                    >
+                      🚨
+                    </button>
+                  )}
                 </div>
 
                 <div
-                  style={{ marginTop: "0.5rem", display: "flex", gap: "0.5rem" }}
+                  style={{
+                    marginTop: "0.5rem",
+                    display: "flex",
+                    gap: "0.5rem",
+                  }}
                 >
                   {user?.email === r.memberEmail && (
                     <>
