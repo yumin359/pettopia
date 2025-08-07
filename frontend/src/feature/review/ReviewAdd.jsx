@@ -14,7 +14,6 @@ import {
   Form,
 } from "react-bootstrap";
 
-// 인라인 리뷰 작성 컴포넌트 (더 이상 별도 페이지가 아님)
 export function ReviewAdd({ facility, onSave, onCancel }) {
   const { user } = useContext(AuthenticationContext);
 
@@ -25,15 +24,18 @@ export function ReviewAdd({ facility, onSave, onCancel }) {
   const [tagOptions, setTagOptions] = useState([]);
   const [selectedTags, setSelectedTags] = useState([]);
 
-  // 태그 목록 로드
+  // 태그 목록 로드 (서버에서 # 제거)
   useEffect(() => {
     const loadTags = async () => {
       try {
         const response = await axios.get("/api/tags");
-        const options = response.data.map((tag) => ({
-          value: tag.name,
-          label: tag.name,
-        }));
+        const options = response.data.map((tag) => {
+          const cleanName = tag.name.replace(/^#/, "");
+          return {
+            value: cleanName,
+            label: cleanName,
+          };
+        });
         setTagOptions(options);
       } catch (error) {
         console.error("태그 목록 로딩 실패:", error);
@@ -55,15 +57,13 @@ export function ReviewAdd({ facility, onSave, onCancel }) {
     };
   }, [files]);
 
-  // 파일 변경 핸들러
   const handleFileChange = useCallback((e) => {
     const selectedFiles = Array.from(e.target.files);
 
-    // 파일 타입 및 크기 검증
     const validFiles = selectedFiles.filter((file) => {
       const isValidType =
         file.type.startsWith("image/") || file.type === "application/pdf";
-      const isValidSize = file.size <= 10 * 1024 * 1024; // 10MB 제한
+      const isValidSize = file.size <= 10 * 1024 * 1024;
 
       if (!isValidType) {
         toast.warning(`${file.name}은(는) 지원하지 않는 파일 형식입니다.`);
@@ -78,16 +78,13 @@ export function ReviewAdd({ facility, onSave, onCancel }) {
 
     const newFiles = validFiles.map((file) => ({
       file,
-      previewUrl: file.type.startsWith("image/")
-        ? URL.createObjectURL(file)
-        : null,
+      previewUrl: file.type.startsWith("image/") ? URL.createObjectURL(file) : null,
     }));
 
     setFiles((prev) => [...prev, ...newFiles]);
-    e.target.value = null; // 같은 파일 재선택 가능하도록
+    e.target.value = null;
   }, []);
 
-  // 파일 제거 핸들러
   const handleFileRemove = useCallback((idx) => {
     setFiles((prevFiles) => {
       const fileToRemove = prevFiles[idx];
@@ -115,12 +112,10 @@ export function ReviewAdd({ facility, onSave, onCancel }) {
       formData.append("review", content.trim());
       formData.append("rating", rating.toString());
 
-      // 파일 데이터 추가
       files.forEach((fileObj) => {
         formData.append("files", fileObj.file);
       });
 
-      // 태그 데이터 추가 부분
       selectedTags.forEach((tag) => {
         formData.append("tagNames", tag.value);
       });
@@ -137,18 +132,15 @@ export function ReviewAdd({ facility, onSave, onCancel }) {
 
       toast.success("리뷰가 저장되었습니다.");
 
-      // 폼 초기화
       setContent("");
       setRating(5);
       setFiles([]);
       setSelectedTags([]);
 
-      // 부모 컴포넌트에 저장 완료 알림
       onSave?.();
     } catch (error) {
       console.error("리뷰 저장 실패:", error);
-      const errorMessage =
-        error.response?.data?.message || "리뷰 저장에 실패했습니다.";
+      const errorMessage = error.response?.data?.message || "리뷰 저장에 실패했습니다.";
       toast.error(errorMessage);
     } finally {
       setIsProcessing(false);
@@ -156,19 +148,14 @@ export function ReviewAdd({ facility, onSave, onCancel }) {
   };
 
   const handleCancel = () => {
-    // 작성 중인 내용이 있으면 확인
     if (content.trim() || files.length > 0 || selectedTags.length > 0) {
-      if (
-        window.confirm("작성 중인 내용이 있습니다. 정말로 취소하시겠습니까?")
-      ) {
-        // 파일 미리보기 URL 정리
+      if (window.confirm("작성 중인 내용이 있습니다. 정말로 취소하시겠습니까?")) {
         files.forEach((fileObj) => {
           if (fileObj.previewUrl) {
             URL.revokeObjectURL(fileObj.previewUrl);
           }
         });
 
-        // 폼 초기화
         setContent("");
         setRating(5);
         setFiles([]);
@@ -197,7 +184,7 @@ export function ReviewAdd({ facility, onSave, onCancel }) {
             onChange={(newValue) => {
               if (newValue && newValue.length > 6) {
                 toast.warning("태그는 최대 6개까지만 선택할 수 있습니다.");
-                return; // 상태 변경 막음
+                return;
               }
               setSelectedTags(newValue || []);
             }}
@@ -207,8 +194,13 @@ export function ReviewAdd({ facility, onSave, onCancel }) {
             isDisabled={isProcessing}
             className="react-select-container"
             classNamePrefix="react-select"
-          />
 
+            // 여기서 태그 앞에 # 붙임
+            formatOptionLabel={(option) => <span>#{option.label}</span>}
+            components={{
+              MultiValueLabel: ({ data }) => <span>#{data.label}</span>,
+            }}
+          />
         </FormGroup>
 
         {/* 내용 */}
