@@ -20,7 +20,7 @@ import ServiceListPage from "./feature/service/ServiceListPage.jsx";
 import { MyReview } from "./feature/review/MyReview.jsx";
 import { KakaoCallback } from "./feature/member/KakaoCallback.jsx";
 import { AdminPage } from "./AdminPage.jsx";
-
+import ReviewReportList from "./feature/report/ReviewReportList.jsx";
 function App() {
   return (
     <AuthenticationContextProvider>
@@ -55,6 +55,7 @@ function App() {
             <Route path="/admin" element={<AdminPage />}>
               <Route path="member/list" element={<MemberList />} />
               <Route path="support/list" element={<ServiceListPage />} />
+              <Route path="review/report/list" element={<ReviewReportList />} />
             </Route>
           </Route>
         </Routes>
