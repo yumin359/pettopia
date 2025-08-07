@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Image, Modal } from "react-bootstrap";
 
 function ReviewPreview({ review, showOnlyImages = false }) {

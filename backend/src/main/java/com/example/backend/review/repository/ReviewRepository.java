@@ -1,7 +1,5 @@
 package com.example.backend.review.repository;
 
-import com.example.backend.board.dto.BoardListDto;
-import com.example.backend.review.dto.ReviewListDto;
 import com.example.backend.review.entity.Review;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
