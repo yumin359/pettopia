@@ -17,6 +17,7 @@ export function MyReview() {
       .get(`/api/review/myReview/${memberId}`)
       .then((res) => {
         setReviews(res.data);
+        console.log(res.data);
       })
       .catch((err) => {
         console.error("리뷰 불러오기 실패", err);
@@ -60,9 +61,7 @@ export function MyReview() {
                 style={{ backgroundColor: "#fffdf7", cursor: "pointer" }}
                 onClick={() =>
                   navigate(
-                    `/facility/${encodeURIComponent(
-                      r.facilityName,
-                    )}?focusReviewId=${r.id}`,
+                    `/facility/${r.petFacility.id}?focusReviewId=${r.id}`,
                   )
                 }
               >
