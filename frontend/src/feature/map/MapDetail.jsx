@@ -7,7 +7,6 @@ import { get } from "./data/api.jsx";
 import axios from "axios";
 import ReviewCard from "../review/ReviewCard.jsx";
 import ReviewAdd from "../review/ReviewAdd.jsx";
-import ReviewPreview from "./ReviewPreview.jsx";
 
 export function MapDetail() {
   const { name } = useParams();
