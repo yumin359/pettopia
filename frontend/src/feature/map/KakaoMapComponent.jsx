@@ -143,7 +143,9 @@ const KakaoMapComponent = ({
             facility,
             categoryColors,
             null,
+            facility.id, // ID 추가
           );
+
           const infowindow = new window.kakao.maps.InfoWindow({
             content: createStyledInfoWindow(initialContent),
             removable: true,

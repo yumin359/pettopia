@@ -30,47 +30,77 @@ export function MapDetail() {
   const [reportingReviewId, setReportingReviewId] = useState(null);
   const [reportLoading, setReportLoading] = useState(false);
 
-  // 시설 정보 조회
   const fetchFacility = async () => {
     setLoadingFacility(true);
     try {
-      // 1차 시도: 원본 이름으로
-      const res = await get("/pet_facilities/detail", { name: decodedName });
-      setFacility(res);
-    } catch (err) {
-      if (err.response?.status === 404) {
+      // URL 파라미터에서 추가 정보 가져오기
+      const facilityId = searchParams.get("id");
+      const sido = searchParams.get("sido");
+      const sigungu = searchParams.get("sigungu");
+
+      let facilityData = null;
+
+      // 1차: ID가 있으면 ID로 조회 (가장 정확)
+      if (facilityId) {
         try {
-          // 2차 시도: 검색 API로 정확한 이름 찾기
+          facilityData = await get(`/pet_facilities/${facilityId}`);
+          setFacility(facilityData);
+          return;
+        } catch (err) {
+          console.log("ID 조회 실패, 다른 방법 시도");
+        }
+      }
+
+      // 2차: 이름으로 직접 조회
+      try {
+        const res = await get("/pet_facilities/detail", {
+          name: decodedName,
+          sidoName: sido,
+          sigunguName: sigungu,
+        });
+        setFacility(res);
+        return;
+      } catch (err) {
+        if (err.response?.status === 404) {
+          // 3차: 검색 API 사용
           const searchRes = await get("/pet_facilities/search", {
             keyword: decodedName,
-            limit: 10,
+            sidoName: sido,
+            sigunguName: sigungu,
+            limit: 50,
           });
 
-          // content 배열에서 데이터 추출
           const results = searchRes.content || [];
 
-          // 검색 결과에서 정확히 일치하는 것 찾기
-          const exactMatch = results.find(
-            (item) =>
-              item.name === decodedName ||
-              item.name.trim() === decodedName.trim(),
+          // 정확한 이름 매칭
+          let matches = results.filter(
+            (item) => item.name.trim() === decodedName.trim(),
           );
 
-          if (exactMatch) {
-            setFacility(exactMatch);
-          } else if (results.length > 0) {
-            // 정확한 일치가 없으면 첫 번째 결과 사용
-            setFacility(results[0]);
-          } else {
-            setFacility(null);
+          // 지역 정보로 추가 필터링
+          if (sido && matches.length > 1) {
+            matches = matches.filter((item) => item.sidoName === sido);
           }
-        } catch (searchErr) {
-          console.error("검색도 실패:", searchErr);
-          setFacility(null);
+
+          if (sigungu && matches.length > 1) {
+            matches = matches.filter((item) => item.sigunguName === sigungu);
+          }
+
+          if (matches.length === 1) {
+            setFacility(matches[0]);
+          } else if (matches.length > 1) {
+            // 여러 개면 사용자에게 보여주고 선택하게 함
+            console.warn("중복 시설:", matches);
+            // 일단 첫 번째 사용
+            setFacility(matches[0]);
+          } else {
+            setFacility(results[0] || null);
+          }
         }
-      } else {
-        setFacility(null);
       }
+    } catch (err) {
+      console.error("시설 조회 최종 실패:", err);
+      setFacility(null);
     } finally {
       setLoadingFacility(false);
     }
@@ -321,10 +351,10 @@ export function MapDetail() {
       )}
 
       {/* 리뷰 작성 폼 */}
-      {isWriting && (
+      {isWriting && facility && (
         <div style={{ marginBottom: "2rem" }}>
           <ReviewAdd
-            facilityName={decodedName}
+            facility={facility}
             onSave={handleReviewSaved}
             onCancel={handleReviewCancel}
           />

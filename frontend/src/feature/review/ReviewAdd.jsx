@@ -15,7 +15,7 @@ import {
 } from "react-bootstrap";
 
 // 인라인 리뷰 작성 컴포넌트 (더 이상 별도 페이지가 아님)
-export function ReviewAdd({ facilityName, onSave, onCancel }) {
+export function ReviewAdd({ facility, onSave, onCancel }) {
   const { user } = useContext(AuthenticationContext);
 
   const [content, setContent] = useState("");
@@ -110,9 +110,7 @@ export function ReviewAdd({ facilityName, onSave, onCancel }) {
 
     try {
       const formData = new FormData();
-
-      // 텍스트 데이터 추가
-      formData.append("facilityName", facilityName);
+      formData.append("facilityName", facility.name);
       formData.append("memberEmail", user.email);
       formData.append("review", content.trim());
       formData.append("rating", rating.toString());
@@ -126,6 +124,16 @@ export function ReviewAdd({ facilityName, onSave, onCancel }) {
       selectedTags.forEach((tag) => {
         formData.append("tagNames", tag.value);
       });
+
+      if (facility?.id) {
+        formData.append("facilityId", facility.id);
+      }
+
+      // 시설의 지역 정보도 저장 (중복 구분용)
+      if (facility) {
+        formData.append("facilitySidoName", facility.sidoName || "");
+        formData.append("facilitySigunguName", facility.sigunguName || "");
+      }
 
       await axios.post("/api/review/add", formData, {
         headers: {

@@ -158,11 +158,28 @@ export function LatestReviewsList() {
                   transition: "all 0.2s ease",
                   overflow: "hidden",
                 }}
-                onClick={() =>
-                  navigate(
-                    `/facility/${encodeURIComponent(r.facilityName)}?focusReviewId=${r.id}`,
-                  )
-                }
+                onClick={() => {
+                  // facility ID를 URL에 포함시켜야 함
+                  const url = `/facility/${encodeURIComponent(r.facilityName)}`;
+                  const params = new URLSearchParams();
+
+                  // 리뷰에 facilityId가 있다면 추가
+                  if (r.facilityId) {
+                    params.append("id", r.facilityId);
+                  }
+
+                  // 시도/시군구 정보가 있다면 추가 (중복 구분용)
+                  if (r.facilitySidoName) {
+                    params.append("sido", r.facilitySidoName);
+                  }
+                  if (r.facilitySigunguName) {
+                    params.append("sigungu", r.facilitySigunguName);
+                  }
+
+                  params.append("focusReviewId", r.id);
+
+                  navigate(`${url}?${params.toString()}`);
+                }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.transform = "translateY(-3px)";
                   e.currentTarget.style.boxShadow =

@@ -125,11 +125,32 @@ public class PetFacilityController {
         return SIMPLIFIED_PET_SIZES;
     }
 
-    @GetMapping("/detail")
-    public ResponseEntity<PetFacility> getFacilityByName(@RequestParam String name) {
-        return petFacilityRepository.findByName(name)
+    // ID로 시설 조회
+    @GetMapping("/{id}")
+    public ResponseEntity<PetFacility> getFacilityById(@PathVariable Long id) {
+        return petFacilityRepository.findById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    // 이름과 지역으로 정확한 시설 조회
+    @GetMapping("/detail")
+    public ResponseEntity<PetFacility> getFacilityByNameAndLocation(
+            @RequestParam String name,
+            @RequestParam(required = false) String sidoName,
+            @RequestParam(required = false) String sigunguName
+    ) {
+        List<PetFacility> facilities = petFacilityRepository
+                .findByNameAndSidoNameAndSigunguName(name, sidoName, sigunguName);
+
+        if (facilities.size() == 1) {
+            return ResponseEntity.ok(facilities.get(0));
+        } else if (facilities.size() > 1) {
+            // 여러 개면 첫 번째 반환 (또는 에러)
+            return ResponseEntity.ok(facilities.get(0));
+        }
+
+        return ResponseEntity.notFound().build();
     }
 
     // --- 수정된 펫 사이즈 매핑 로직 ---
