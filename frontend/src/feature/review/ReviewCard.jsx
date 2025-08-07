@@ -3,6 +3,7 @@ import { Badge, Image, Modal, Button } from "react-bootstrap";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
 import ReviewEdit from "./ReviewEdit.jsx";
+import { useNavigate } from "react-router";
 
 function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
   const { user } = useContext(AuthenticationContext);
@@ -12,6 +13,9 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
 
   const [showAllImages, setShowAllImages] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  const [isHoverd, setIsHoverd] = useState(false);
+  const navigate = useNavigate();
 
   const defaultProfileImage = "/user.png";
 
@@ -190,7 +194,17 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
             }}
           />
           <div>
-            <div style={{ fontWeight: "500", color: "#212529" }}>
+            <div
+              style={{
+                fontWeight: "500",
+                color: "#212529",
+                cursor: "pointer",
+                textDecoration: isHoverd ? "underline" : "none",
+              }}
+              onMouseOver={() => setIsHoverd(true)}
+              onMouseOut={() => setIsHoverd(false)}
+              onClick={() => navigate(`/review/my/${review.memberId}`)}
+            >
               {review.memberEmailNickName || "알 수 없음"}
             </div>
             <div style={{ fontSize: "0.85rem", color: "#6c757d" }}>

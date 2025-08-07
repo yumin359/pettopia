@@ -204,7 +204,7 @@ public class ReviewService {
     public List<ReviewListDto> findAllByFacilityId(Long facilityId) {
         return reviewRepository.findAllByPetFacility_IdOrderByInsertedAtDesc(facilityId)
                 .stream()
-                .map(this::convertToDto)
+                .map(this::convertToDto) // private 헬퍼 메소드 사용
                 .collect(Collectors.toList());
     }
 
@@ -242,16 +242,16 @@ public class ReviewService {
     }
 
     // 내가 쓴 리뷰 조회
-    public List<ReviewListDto> findReviewsByEmail(String email) {
+    public List<ReviewListDto> findReviewsByMemberId(Long memberId) {
         // Member 객체의 email 필드와 비교하도록 리포지토리 메서드 이름에 _Email 붙이기
-        return reviewRepository.findAllByMemberEmail_EmailOrderByInsertedAtDesc(email)
+        return reviewRepository.findAllByMemberEmail_IdOrderByInsertedAtDesc(memberId)
 //        return reviewRepository.findAllByMemberEmail_Email(email)
                 .stream()
                 .map(this::convertToDto) // private 헬퍼 메소드 사용
                 .collect(Collectors.toList());
     }
 
-    // Private 헬퍼 메소드 추가 (✨ 가장 중요한 변경)
+    // Private 헬퍼 메소드 추가
     private ReviewListDto convertToDto(Review review) {
         // 리뷰 첨부 이미지들 URL 생성
         List<String> fileUrls = review.getFiles().stream()
@@ -262,6 +262,7 @@ public class ReviewService {
         String profileImageUrl = null;
         if (review.getMemberEmail() != null && review.getMemberEmail().getFiles() != null && !review.getMemberEmail().getFiles().isEmpty()) {
             MemberFile profileFile = review.getMemberEmail().getFiles().get(0);
+            // Member의 ID를 사용해야 합니다.
             profileImageUrl = imagePrefix + "prj3/member/" + review.getMemberEmail().getId() + "/" + profileFile.getId().getName();
         }
 
@@ -290,7 +291,8 @@ public class ReviewService {
                 .insertedAt(review.getInsertedAt())
                 .profileImageUrl(profileImageUrl)
                 .files(fileUrls)
-                .tags(tagDtos)
+                .memberId(review.getMemberEmail().getId())
+                .tags(tagDtos) // 변환된 태그 DTO 리스트 설정
                 .build();
     }
 

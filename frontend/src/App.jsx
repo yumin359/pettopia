@@ -46,7 +46,7 @@ function App() {
 
             <Route path="/facility/:id" element={<MapDetail />} />
 
-            <Route path="/review/my" element={<MyReview />} />
+            <Route path="/review/my/:memberId" element={<MyReview />} />
             <Route path="/review/latest" element={<LatestReviewsList />} />
 
             <Route path="/chatbot" element={<Chatbot />} />

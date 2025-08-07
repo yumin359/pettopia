@@ -13,11 +13,13 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
 
     List<Review> findTop5ByOrderByInsertedAtDesc();
 
-//    List<Review> findAllByFacilityNameOrderByInsertedAtDesc(String facilityName);
+    // 이건 뭐지?
+    List<Review> findAllByFacilityNameOrderByInsertedAtDesc(String facilityName);
 
     List<Review> findTop3ByOrderByInsertedAtDesc();
 
-    List<Review> findAllByMemberEmail_Email(String email);
+    // 왜 살리실걸까
+//    List<Review> findAllByMemberEmail_Email(String email);
 
     // 페이징 지원 메소드 추가
     @Query("SELECT r FROM Review r ORDER BY r.insertedAt DESC")
@@ -26,8 +28,5 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
     // 또는 Pageable 사용
     Page<Review> findAllByOrderByInsertedAtDesc(Pageable pageable);
 
-    List<Review> findAllByMemberEmail_EmailOrderByInsertedAtDesc(String email);
-
-    // ✨ facilityId로 리뷰 목록을 찾는 메소드 추가
-    List<Review> findAllByPetFacility_IdOrderByInsertedAtDesc(Long facilityId);
+    List<Review> findAllByMemberEmail_IdOrderByInsertedAtDesc(Long memberId);
 }
