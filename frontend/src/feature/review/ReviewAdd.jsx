@@ -194,7 +194,13 @@ export function ReviewAdd({ facility, onSave, onCancel }) {
             isClearable
             options={tagOptions}
             value={selectedTags}
-            onChange={(newValue) => setSelectedTags(newValue || [])}
+            onChange={(newValue) => {
+              if (newValue && newValue.length > 6) {
+                toast.warning("태그는 최대 6개까지만 선택할 수 있습니다.");
+                return; // 상태 변경 막음
+              }
+              setSelectedTags(newValue || []);
+            }}
             placeholder="태그를 입력하거나 선택하세요..."
             formatCreateLabel={(inputValue) => `"${inputValue}" 태그 추가`}
             noOptionsMessage={() => "태그가 없습니다"}
@@ -202,6 +208,7 @@ export function ReviewAdd({ facility, onSave, onCancel }) {
             className="react-select-container"
             classNamePrefix="react-select"
           />
+
         </FormGroup>
 
         {/* 내용 */}

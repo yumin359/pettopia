@@ -29,14 +29,12 @@ export function LatestReviewsList() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // limit 파라미터를 추가하여 50개까지 가져오기
     axios
       .get("/api/review/latest?limit=50")
       .then((res) => setReviews(res.data))
       .catch(() => setReviews([]));
   }, []);
 
-  // 더보기 기능
   useEffect(() => {
     if (!reviews) return;
     const newClampedIds = [];
@@ -50,7 +48,6 @@ export function LatestReviewsList() {
     setClampedIds(newClampedIds);
   }, [reviews, displayCount]);
 
-  // 로딩, 에러, 빈 배열 처리
   if (!reviews) {
     return (
       <Container className="my-5">
@@ -88,7 +85,6 @@ export function LatestReviewsList() {
     );
   };
 
-  // 신고 모달 열기
   const openReportModal = (reviewId, event) => {
     event.stopPropagation();
     setReportingReviewId(reviewId);
@@ -96,14 +92,12 @@ export function LatestReviewsList() {
     setReportModalOpen(true);
   };
 
-  // 신고 모달 닫기
   const closeReportModal = () => {
     setReportModalOpen(false);
     setReportingReviewId(null);
     setReportReason("");
   };
 
-  // 신고 제출
   const submitReport = async () => {
     if (!reportReason.trim()) {
       alert("신고 사유를 입력해주세요.");
@@ -133,13 +127,18 @@ export function LatestReviewsList() {
   };
 
   return (
-    <Container className="my-4">
+    <Container
+      className="my-4 p-4"
+      style={{
+        backgroundColor: "#fafafa",
+        borderRadius: "16px",
+        boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
+      }}
+    >
       <h2 className="text-center mb-4 fw-bold">
         <span style={{ color: "#8B4513" }}>📝</span>
         최신 리뷰
-        <span className="ms-2 fs-6 text-muted">
-          ({reviews.length}개의 리뷰)
-        </span>
+        <span className="ms-2 fs-6 text-muted">({reviews.length}개의 리뷰)</span>
       </h2>
 
       <Row className="g-3">
@@ -152,34 +151,34 @@ export function LatestReviewsList() {
           return (
             <Col key={r.id} xs={12} sm={6} md={4} lg={3}>
               <Card
-                className="shadow-sm border-0 h-100"
+                className="h-100"
                 style={{
                   backgroundColor: "#fff",
                   cursor: "pointer",
                   transition: "all 0.2s ease",
                   overflow: "hidden",
+                  borderRadius: "12px",
+                  border: "1px solid #ddd",
+                  boxShadow: "0 4px 10px rgba(0,0,0,0.08)",
                 }}
                 onClick={() => {
-                  if (!facilityInfo || !facilityInfo.id) return; // 방어 코드
+                  if (!facilityInfo || !facilityInfo.id) return;
 
                   const url = `/facility/${facilityInfo.id}`;
-
                   const params = new URLSearchParams();
                   params.append("focusReviewId", r.id);
 
                   navigate(`${url}?${params.toString()}`);
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = "translateY(-3px)";
-                  e.currentTarget.style.boxShadow =
-                    "0 6px 20px rgba(0,0,0,0.15)";
+                  e.currentTarget.style.transform = "translateY(-4px)";
+                  e.currentTarget.style.boxShadow = "0 12px 28px rgba(0,0,0,0.15)";
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.transform = "translateY(0)";
-                  e.currentTarget.style.boxShadow = "";
+                  e.currentTarget.style.boxShadow = "0 4px 10px rgba(0,0,0,0.08)";
                 }}
               >
-                {/* 이미지 갤러리 - 카드 상단에 표시 */}
                 {hasImages && (
                   <div
                     style={{
@@ -189,7 +188,6 @@ export function LatestReviewsList() {
                     }}
                   >
                     {imageFiles.length === 1 ? (
-                      // 이미지가 1개일 때
                       <Image
                         src={imageFiles[0]}
                         alt="리뷰 이미지"
@@ -200,13 +198,9 @@ export function LatestReviewsList() {
                         }}
                       />
                     ) : imageFiles.length === 2 ? (
-                      // 이미지가 2개일 때
                       <div className="d-flex" style={{ height: "100%" }}>
                         {imageFiles.slice(0, 2).map((img, idx) => (
-                          <div
-                            key={idx}
-                            style={{ flex: 1, overflow: "hidden" }}
-                          >
+                          <div key={idx} style={{ flex: 1, overflow: "hidden" }}>
                             <Image
                               src={img}
                               alt={`리뷰 이미지 ${idx + 1}`}
@@ -220,7 +214,6 @@ export function LatestReviewsList() {
                         ))}
                       </div>
                     ) : (
-                      // 이미지가 3개 이상일 때
                       <div className="d-flex" style={{ height: "100%" }}>
                         <div style={{ flex: "2", overflow: "hidden" }}>
                           <Image
@@ -286,8 +279,7 @@ export function LatestReviewsList() {
                   </div>
                 )}
 
-                <Card.Body className="p-3">
-                  {/* 시설명과 별점 */}
+                <Card.Body className="p-3 d-flex flex-column">
                   <div className="d-flex justify-content-between align-items-start mb-2">
                     <div
                       className="fw-semibold text-truncate"
@@ -305,7 +297,6 @@ export function LatestReviewsList() {
                       }}
                       title={facilityInfo?.name || "정보 없음"}
                     >
-                      {/* ✨ facilityInfo 객체에서 이름을 가져와 표시합니다. */}
                       📍 {facilityInfo?.name || "정보 없음"}
                     </div>
                     <div className="text-nowrap">
@@ -315,7 +306,6 @@ export function LatestReviewsList() {
                     </div>
                   </div>
 
-                  {/* 리뷰 내용 - 더 컴팩트하게 */}
                   <div
                     ref={(el) => (reviewRefs.current[r.id] = el)}
                     className={`${!isExpanded ? "line-clamp-2" : ""} mb-2`}
@@ -323,6 +313,11 @@ export function LatestReviewsList() {
                       fontSize: "0.85rem",
                       lineHeight: "1.4",
                       color: "#666",
+                      backgroundColor: "#f9f9f9",
+                      borderRadius: "8px",
+                      padding: "8px 12px",
+                      boxShadow: "inset 0 0 5px rgba(0,0,0,0.05)",
+                      flexGrow: 1,
                     }}
                   >
                     {r.review}
@@ -343,7 +338,6 @@ export function LatestReviewsList() {
                     </Button>
                   )}
 
-                  {/* 태그 - 최대 3개만 표시 */}
                   {r.tags && r.tags.length > 0 && (
                     <div className="mb-2 d-flex flex-wrap gap-1">
                       {r.tags.slice(0, 3).map((tag) => (
@@ -370,9 +364,13 @@ export function LatestReviewsList() {
                     </div>
                   )}
 
-                  {/* 하단 정보 - 더 컴팩트하게 */}
-                  <div className="d-flex justify-content-between align-items-center mt-auto">
-                    <div className="d-flex align-items-center gap-2">
+                  <div
+                    className="d-flex justify-content-between align-items-center mt-auto"
+                  >
+                    <div
+                      className="d-flex align-items-center gap-2"
+                      onClick={(e) => e.stopPropagation()} // ★ 여기에 이벤트 전파 차단 추가
+                    >
                       <ReviewLikeContainer reviewId={r.id} compact={true} />
                       <button
                         onClick={(e) => openReportModal(r.id, e)}
@@ -392,29 +390,6 @@ export function LatestReviewsList() {
                         🚨
                       </button>
                     </div>
-
-                    <div
-                      className="text-muted d-flex align-items-center"
-                      style={{ fontSize: "0.7rem" }}
-                    >
-                      <Image
-                        roundedCircle
-                        className="me-1"
-                        src={r.profileImageUrl || defaultProfileImage}
-                        alt="프로필"
-                        style={{
-                          width: "16px",
-                          height: "16px",
-                          objectFit: "cover",
-                        }}
-                      />
-                      <span
-                        className="text-truncate"
-                        style={{ maxWidth: "80px" }}
-                      >
-                        {r.memberEmailNickName ?? "익명"}
-                      </span>
-                    </div>
                   </div>
                 </Card.Body>
               </Card>
@@ -423,7 +398,6 @@ export function LatestReviewsList() {
         })}
       </Row>
 
-      {/* 더보기 버튼 */}
       {hasMoreReviews && (
         <div className="text-center mt-4">
           <Button
@@ -440,7 +414,6 @@ export function LatestReviewsList() {
         </div>
       )}
 
-      {/* 신고 모달 */}
       {reportModalOpen && (
         <div
           style={{
@@ -507,12 +480,6 @@ export function LatestReviewsList() {
         .line-clamp-2 {
           display: -webkit-box;
           -webkit-line-clamp: 2;
-          -webkit-box-orient: vertical;
-          overflow: hidden;
-        }
-        .line-clamp-3 {
-          display: -webkit-box;
-          -webkit-line-clamp: 3;
           -webkit-box-orient: vertical;
           overflow: hidden;
         }
