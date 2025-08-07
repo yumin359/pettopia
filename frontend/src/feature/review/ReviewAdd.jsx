@@ -24,27 +24,37 @@ export function ReviewAdd({ facility, onSave, onCancel }) {
   const [tagOptions, setTagOptions] = useState([]);
   const [selectedTags, setSelectedTags] = useState([]);
 
-  // 태그 목록 로드 (서버에서 # 제거)
-  useEffect(() => {
-    const loadTags = async () => {
-      try {
-        const response = await axios.get("/api/tags");
-        const options = response.data.map((tag) => {
-          const cleanName = tag.name.replace(/^#/, "");
-          return {
-            value: cleanName,
-            label: cleanName,
-          };
-        });
-        setTagOptions(options);
-      } catch (error) {
-        console.error("태그 목록 로딩 실패:", error);
-        toast.error("태그 목록을 불러오는데 실패했습니다.");
-      }
-    };
+  const [inputValue, setInputValue] = useState("");
 
-    loadTags();
+  // 서버에서 태그 검색
+  const fetchTagOptions = useCallback(async (searchTerm) => {
+    try {
+      const res = await axios.get("/api/tags", {
+        params: { q: searchTerm },
+      });
+      const options = res.data.map((tag) => ({
+        value: tag.name.replace(/^#/, ""),
+        label: tag.name.replace(/^#/, ""),
+      }));
+      setTagOptions(options);
+    } catch (error) {
+      console.error("태그 검색 실패:", error);
+      toast.error("태그 검색 중 오류가 발생했습니다.");
+    }
   }, []);
+
+  // inputValue 변경될 때 서버 검색 실행 (300ms 디바운스)
+  useEffect(() => {
+    if (inputValue.trim() === "") {
+      fetchTagOptions("");
+      return;
+    }
+    const delayDebounce = setTimeout(() => {
+      fetchTagOptions(inputValue);
+    }, 300);
+
+    return () => clearTimeout(delayDebounce);
+  }, [inputValue, fetchTagOptions]);
 
   // 메모리 누수 방지를 위한 cleanup
   useEffect(() => {
@@ -78,7 +88,9 @@ export function ReviewAdd({ facility, onSave, onCancel }) {
 
     const newFiles = validFiles.map((file) => ({
       file,
-      previewUrl: file.type.startsWith("image/") ? URL.createObjectURL(file) : null,
+      previewUrl: file.type.startsWith("image/")
+        ? URL.createObjectURL(file)
+        : null,
     }));
 
     setFiles((prev) => [...prev, ...newFiles]);
@@ -107,7 +119,7 @@ export function ReviewAdd({ facility, onSave, onCancel }) {
 
     try {
       const formData = new FormData();
-      formData.append("facilityId", facility.id.toString());
+      if (facility?.id) formData.append("facilityId", facility.id.toString());
       formData.append("memberEmail", user.email);
       formData.append("review", content.trim());
       formData.append("rating", rating.toString());
@@ -119,10 +131,6 @@ export function ReviewAdd({ facility, onSave, onCancel }) {
       selectedTags.forEach((tag) => {
         formData.append("tagNames", tag.value);
       });
-
-      if (facility?.id) {
-        formData.append("facilityId", facility.id);
-      }
 
       await axios.post("/api/review/add", formData, {
         headers: {
@@ -140,7 +148,8 @@ export function ReviewAdd({ facility, onSave, onCancel }) {
       onSave?.();
     } catch (error) {
       console.error("리뷰 저장 실패:", error);
-      const errorMessage = error.response?.data?.message || "리뷰 저장에 실패했습니다.";
+      const errorMessage =
+        error.response?.data?.message || "리뷰 저장에 실패했습니다.";
       toast.error(errorMessage);
     } finally {
       setIsProcessing(false);
@@ -149,7 +158,9 @@ export function ReviewAdd({ facility, onSave, onCancel }) {
 
   const handleCancel = () => {
     if (content.trim() || files.length > 0 || selectedTags.length > 0) {
-      if (window.confirm("작성 중인 내용이 있습니다. 정말로 취소하시겠습니까?")) {
+      if (
+        window.confirm("작성 중인 내용이 있습니다. 정말로 취소하시겠습니까?")
+      ) {
         files.forEach((fileObj) => {
           if (fileObj.previewUrl) {
             URL.revokeObjectURL(fileObj.previewUrl);
@@ -188,6 +199,7 @@ export function ReviewAdd({ facility, onSave, onCancel }) {
               }
               setSelectedTags(newValue || []);
             }}
+            onInputChange={(value) => setInputValue(value)}
             placeholder="태그를 입력하거나 선택하세요..."
             formatCreateLabel={(inputValue) => `"${inputValue}" 태그 추가`}
             noOptionsMessage={() => "태그가 없습니다"}
@@ -195,10 +207,14 @@ export function ReviewAdd({ facility, onSave, onCancel }) {
             className="react-select-container"
             classNamePrefix="react-select"
 
-            // 여기서 태그 앞에 # 붙임
-            formatOptionLabel={(option) => <span>#{option.label}</span>}
+            // # 붙여서 보여주기
+            formatOptionLabel={(option) => (
+              <span>{option.label.startsWith("#") ? option.label : `#${option.label}`}</span>
+            )}
             components={{
-              MultiValueLabel: ({ data }) => <span>#{data.label}</span>,
+              MultiValueLabel: ({ data }) => (
+                <span>{data.label.startsWith("#") ? data.label : `#${data.label}`}</span>
+              ),
             }}
           />
         </FormGroup>
