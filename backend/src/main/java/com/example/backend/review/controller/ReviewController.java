@@ -71,11 +71,13 @@ public class ReviewController {
     }
 
     // 내가 쓴 리뷰 조회
-    @GetMapping("/myReview")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<List<ReviewListDto>> getMyReviews(Authentication authentication) {
-        String email = authentication.getName();
-        List<ReviewListDto> myReviews = reviewService.findReviewsByEmail(email);
+    @GetMapping("/myReview/{memberId}")
+//    @PreAuthorize("isAuthenticated()")
+//    public ResponseEntity<List<ReviewListDto>> getMyReviews(Authentication authentication) {
+    public ResponseEntity<List<ReviewListDto>> getMyReviews(@PathVariable Long memberId) {
+        // ID 로 받으니까 id 받아서 그거의 email 로 바꿔서 나머지 찾도록 하면 될듯?
+//        String email = authentication.getName();
+        List<ReviewListDto> myReviews = reviewService.findReviewsByMemberId(memberId);
         return ResponseEntity.ok(myReviews);
     }
 }

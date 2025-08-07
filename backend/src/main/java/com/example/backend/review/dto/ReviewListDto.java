@@ -22,6 +22,7 @@ public class ReviewListDto {
     private Instant insertedAt;
     private List<String> files; // 리뷰 첨부 이미지 여러개
     private String profileImageUrl; // 프로필 이미지 한개만
+    private Long memberId;
 
     private List<TagDto> tags;
 }

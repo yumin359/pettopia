@@ -4,20 +4,26 @@ import { Card, Col, Image, Row, Spinner, Badge } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { LikeContainer } from "../like/LikeContainer.jsx";
 import { ReviewLikeContainer } from "../like/ReviewLikeContainer.jsx";
+import { useParams } from "react-router";
 
 export function MyReview() {
   const [reviews, setReviews] = useState(null);
   const navigate = useNavigate();
 
+  const { memberId } = useParams();
+
   useEffect(() => {
     axios
-      .get("/api/review/myReview")
-      .then((res) => setReviews(res.data))
+      .get(`/api/review/myReview/${memberId}`)
+      .then((res) => {
+        setReviews(res.data);
+        console.log(res.data);
+      })
       .catch((err) => {
         console.error("리뷰 불러오기 실패", err);
         setReviews([]);
       });
-  }, []);
+  }, [memberId]);
 
   const isImageFile = (url) =>
     /\.(jpg|jpeg|png|gif|webp)$/i.test(url?.split("?")[0]);
@@ -37,10 +43,13 @@ export function MyReview() {
     );
   }
 
+  // 첫번째 리뷰에서 닉네임 가져와서 제목으로 사용할 때
+  const userNickName = reviews[0].memberEmailNickName;
+
   return (
     <Row className="justify-content-center mt-4">
       <Col xs={12} md={10} lg={8} style={{ maxWidth: "900px" }}>
-        <h2 className="fw-bold mb-4">내가 쓴 리뷰</h2>
+        <h2 className="fw-bold mb-4">{userNickName}님이 쓴 리뷰</h2>
         <div className="d-flex flex-column gap-3">
           {reviews.map((r) => {
             const firstImage = r.files?.find(isImageFile) || null;
@@ -70,6 +79,7 @@ export function MyReview() {
                     // }
                   >
                     {r.facilityName}
+                    {/*{r.memberEmail}*/}
                   </div>
                   <div className="small d-flex align-items-center">
                     <span style={{ color: "#f0ad4e", fontSize: "1.1rem" }}>

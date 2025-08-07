@@ -26,5 +26,5 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
     // 또는 Pageable 사용
     Page<Review> findAllByOrderByInsertedAtDesc(Pageable pageable);
 
-    List<Review> findAllByMemberEmail_EmailOrderByInsertedAtDesc(String email);
+    List<Review> findAllByMemberEmail_IdOrderByInsertedAtDesc(Long memberId);
 }
