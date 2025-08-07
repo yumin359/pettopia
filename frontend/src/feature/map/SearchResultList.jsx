@@ -116,13 +116,15 @@ const Pagination = ({ currentPage, totalPages, handlePageChange }) => {
 // 3. 시설 정보 카드 컴포넌트 (리뷰 데이터 호출 기능 포함)
 const FacilityCard = React.memo(({ facility, categoryColors, onClick }) => {
   const [reviewData, setReviewData] = useState(null);
+  const facilityId = facility.id || facility.facilityId;
 
   useEffect(() => {
+    if (!facilityId) return;
+
     const fetchReviews = async () => {
       try {
-        const res = await axios.get("/api/review/list", {
-          params: { facilityName: facility.name },
-        });
+        const res = await axios.get(`/api/review/facility/${facilityId}`);
+
         const reviews = res.data || [];
         const reviewCount = reviews.length;
         const averageRating =
@@ -133,13 +135,20 @@ const FacilityCard = React.memo(({ facility, categoryColors, onClick }) => {
             : "평가 없음";
         setReviewData({ reviewCount, averageRating });
       } catch (err) {
-        console.error("리뷰 조회 실패:", err);
-        setReviewData({ reviewCount: "조회 실패", averageRating: "-" });
+        if (err.response && err.response.status === 404) {
+          setReviewData({ reviewCount: 0, averageRating: "평가 없음" });
+        } else {
+          console.error("리뷰 조회 실패:", err);
+          setReviewData({ reviewCount: "오류", averageRating: "-" });
+        }
       }
     };
     fetchReviews();
-  }, [facility.name]);
+  }, [facilityId]);
 
+  console.log("시설:", facility.name, "리뷰 데이터:", reviewData);
+
+  // createInfoWindowContent 함수가 reviewData를 올바르게 처리하는지 확인 필요
   const fullInfoWindowHtml = createInfoWindowContent(
     facility,
     categoryColors,
@@ -176,7 +185,15 @@ const SearchResultList = ({
   const navigate = useNavigate();
 
   const handleListItemClick = (facility) => {
-    navigate(`/facility/${encodeURIComponent(facility.name)}`);
+    const id = facility.id || facility.facilityId;
+
+    if (id) {
+      navigate(`/facility/${id}`);
+    } else {
+      console.error("시설 ID를 찾을 수 없습니다.", facility);
+      alert("상세 페이지로 이동할 수 없습니다.");
+    }
+
     if (window.handleMapFacilityClick) {
       window.handleMapFacilityClick(facility);
     }
@@ -202,9 +219,10 @@ const SearchResultList = ({
     return (
       <>
         <div className="flex-grow-1 overflow-auto" style={{ minHeight: 0 }}>
-          {listData.map((facility) => (
+          {listData.map((facility, index) => (
             <FacilityCard
-              key={facility.id || facility.name}
+              // ✨ key를 facility.id 또는 facility.facilityId로 설정
+              key={facility.id || facility.facilityId || index}
               facility={facility}
               categoryColors={categoryColors}
               onClick={handleListItemClick}

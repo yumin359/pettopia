@@ -1,5 +1,6 @@
 package com.example.backend.petFacility.controller;
 
+import com.example.backend.petFacility.dto.PetFacilitySearchDto;
 import com.example.backend.petFacility.repository.PetFacilityRepository;
 import com.example.backend.petFacility.entity.PetFacility;
 import org.springframework.data.domain.Page;
@@ -44,9 +45,9 @@ public class PetFacilityController {
         this.petFacilityRepository = petFacilityRepository;
     }
 
-    // 통합 검색 엔드포인트 (수정 없음)
+    // 통합검색엔드포인트
     @GetMapping("/search")
-    public Page<PetFacility> searchPetFacilities(
+    public Page<PetFacilitySearchDto> searchPetFacilities(
             @RequestParam(required = false) String sidoName,
             @RequestParam(required = false) String sigunguName,
             @RequestParam(required = false) Set<String> category2,
@@ -63,16 +64,41 @@ public class PetFacilityController {
             originalPetSizesToSearch = mapToOriginalPetSizes(allowedPetSize);
         }
 
-        return petFacilityRepository.findFacilitiesByFilters(
+        Page<PetFacility> facilityPage = petFacilityRepository.findFacilitiesByFilters(
                 sidoName,
                 sigunguName,
                 category2,
                 originalPetSizesToSearch,
                 parkingAvailable,
+
                 indoorFacility,
                 outdoorFacility,
                 pageable
         );
+
+        return facilityPage.map(facility -> new PetFacilitySearchDto(
+                facility.getId(),
+                facility.getName(),
+                facility.getLatitude(),
+                facility.getLongitude(),
+                facility.getCategory2(),
+                facility.getRoadAddress(),
+                facility.getCategory3(),
+                facility.getSidoName(),
+                facility.getSigunguName(),
+                facility.getRoadName(),
+                facility.getBunji(),
+                facility.getJibunAddress(),
+                facility.getPhoneNumber(),
+                facility.getHoliday(),
+                facility.getOperatingHours(),
+                facility.getParkingAvailable(),
+                facility.getPetFriendlyInfo(),
+                facility.getAllowedPetSize(),
+                facility.getPetRestrictions(),
+                facility.getIndoorFacility(),
+                facility.getOutdoorFacility()
+        ));
     }
 
     // 기존 단일 조회 엔드포인트들 (유지)
