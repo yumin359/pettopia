@@ -6,7 +6,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/review")
@@ -31,4 +34,13 @@ public class ReviewReportController {
 
         return ResponseEntity.ok("리뷰가 신고되었습니다.");
     }
+    @GetMapping("/report/list")
+    public ResponseEntity<List<ReviewReportDto>> getReportList(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        return ResponseEntity.ok(reviewReportService.getReportList());
+    }
+
 }

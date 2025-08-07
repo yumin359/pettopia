@@ -32,6 +32,13 @@ export function AdminPage() {
           >
             문의 내역
           </Button>
+          <Button
+            variant="outline-primary"
+            size="sm"
+            onClick={() => navigate("/admin/review/report/list")}
+          >
+            리뷰 신고 목록
+          </Button>
         </div>
       </Col>
 
