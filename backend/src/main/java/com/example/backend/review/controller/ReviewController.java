@@ -27,10 +27,22 @@ public class ReviewController {
         return ResponseEntity.ok("리뷰가 등록되었습니다.");
     }
 
-    // ✨ 특정 시설 리뷰 조회 (엔드포인트 및 메소드 시그니처 변경)
+    // 특정 시설 리뷰 조회 - 정렬방식과 페이징 옵션 추가
     @GetMapping("/facility/{facilityId}")
-    public ResponseEntity<List<ReviewListDto>> getReviewsByFacilityId(@PathVariable Long facilityId) {
-        List<ReviewListDto> reviews = reviewService.findAllByFacilityId(facilityId);
+    public ResponseEntity<List<ReviewListDto>> getReviewsByFacilityId(
+            @PathVariable Long facilityId,
+            @RequestParam(defaultValue = "latest") String sort,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        List<ReviewListDto> reviews;
+        if ("likes".equalsIgnoreCase(sort)) {
+            // 좋아요순 정렬 + 페이징
+            reviews = reviewService.findByFacilityIdOrderByLikesDesc(facilityId, page, size);
+        } else {
+            // 기본 최신순 정렬 (모두 조회, 페이징 없는 기존 메서드)
+            reviews = reviewService.findAllByFacilityId(facilityId);
+        }
         return ResponseEntity.ok(reviews);
     }
 
@@ -54,7 +66,7 @@ public class ReviewController {
         return ResponseEntity.ok("리뷰가 삭제되었습니다.");
     }
 
-    // ✅ 최신 리뷰 조회 - 하나의 메소드로 통합
+    // 최신 리뷰 조회 - limit 옵션
     @GetMapping("/latest")
     public ResponseEntity<List<ReviewListDto>> getLatestReviews(
             @RequestParam(value = "limit", required = false, defaultValue = "5") Integer limit) {
@@ -71,11 +83,7 @@ public class ReviewController {
 
     // 내가 쓴 리뷰 조회
     @GetMapping("/myReview/{memberId}")
-//    @PreAuthorize("isAuthenticated()")
-//    public ResponseEntity<List<ReviewListDto>> getMyReviews(Authentication authentication) {
     public ResponseEntity<List<ReviewListDto>> getMyReviews(@PathVariable Long memberId) {
-        // ID 로 받으니까 id 받아서 그거의 email 로 바꿔서 나머지 찾도록 하면 될듯?
-//        String email = authentication.getName();
         List<ReviewListDto> myReviews = reviewService.findReviewsByMemberId(memberId);
         return ResponseEntity.ok(myReviews);
     }
