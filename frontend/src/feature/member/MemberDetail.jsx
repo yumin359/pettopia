@@ -250,7 +250,7 @@ export function MemberDetail() {
                 </Button>
                 <Button
                   variant="outline-success"
-                  onClick={() => navigate("/review/my")}
+                  onClick={() => navigate(`/review/my/${member.id}`)}
                   className="d-flex align-items-center gap-1"
                 >
                   내가 쓴 리뷰

@@ -202,6 +202,7 @@ public class MemberService {
         List<String> authNames = authRepository.findAuthNamesByMemberId(member.getId());
 
         return MemberDto.builder()
+                .id(member.getId())
                 .email(member.getEmail())
                 .nickName(member.getNickName())
                 .info(member.getInfo())

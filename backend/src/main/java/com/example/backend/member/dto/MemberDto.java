@@ -9,6 +9,7 @@ import java.util.List;
 @Data
 @Builder
 public class MemberDto {
+    private Long id;
     private String email;
     private String nickName;
     private String info;
