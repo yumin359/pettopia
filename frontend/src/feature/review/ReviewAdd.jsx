@@ -110,7 +110,7 @@ export function ReviewAdd({ facility, onSave, onCancel }) {
 
     try {
       const formData = new FormData();
-      formData.append("facilityName", facility.name);
+      formData.append("facilityId", facility.id.toString());
       formData.append("memberEmail", user.email);
       formData.append("review", content.trim());
       formData.append("rating", rating.toString());
@@ -127,12 +127,6 @@ export function ReviewAdd({ facility, onSave, onCancel }) {
 
       if (facility?.id) {
         formData.append("facilityId", facility.id);
-      }
-
-      // 시설의 지역 정보도 저장 (중복 구분용)
-      if (facility) {
-        formData.append("facilitySidoName", facility.sidoName || "");
-        formData.append("facilitySigunguName", facility.sigunguName || "");
       }
 
       await axios.post("/api/review/add", formData, {
