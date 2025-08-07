@@ -10,9 +10,10 @@ import ReviewAdd from "../review/ReviewAdd.jsx";
 import ReviewPreview from "./ReviewPreview.jsx";
 
 export function MapDetail() {
-  const { name } = useParams();
-  const decodedName = decodeURIComponent(name);
+  const { id } = useParams();
   const { user } = useContext(AuthenticationContext);
+
+  // const decodedName = decodeURIComponent(name);
 
   const [isWriting, setIsWriting] = useState(false);
   const [facility, setFacility] = useState(null);
@@ -31,88 +32,29 @@ export function MapDetail() {
   const [reportLoading, setReportLoading] = useState(false);
 
   const fetchFacility = async () => {
+    if (!id) return; // id가 없으면 실행하지 않음
+
     setLoadingFacility(true);
     try {
-      // URL 파라미터에서 추가 정보 가져오기
-      const facilityId = searchParams.get("id");
-      const sido = searchParams.get("sido");
-      const sigungu = searchParams.get("sigungu");
-
-      let facilityData = null;
-
-      // 1차: ID가 있으면 ID로 조회 (가장 정확)
-      if (facilityId) {
-        try {
-          facilityData = await get(`/pet_facilities/${facilityId}`);
-          setFacility(facilityData);
-          return;
-        } catch (err) {
-          console.log("ID 조회 실패, 다른 방법 시도");
-        }
-      }
-
-      // 2차: 이름으로 직접 조회
-      try {
-        const res = await get("/pet_facilities/detail", {
-          name: decodedName,
-          sidoName: sido,
-          sigunguName: sigungu,
-        });
-        setFacility(res);
-        return;
-      } catch (err) {
-        if (err.response?.status === 404) {
-          // 3차: 검색 API 사용
-          const searchRes = await get("/pet_facilities/search", {
-            keyword: decodedName,
-            sidoName: sido,
-            sigunguName: sigungu,
-            limit: 50,
-          });
-
-          const results = searchRes.content || [];
-
-          // 정확한 이름 매칭
-          let matches = results.filter(
-            (item) => item.name.trim() === decodedName.trim(),
-          );
-
-          // 지역 정보로 추가 필터링
-          if (sido && matches.length > 1) {
-            matches = matches.filter((item) => item.sidoName === sido);
-          }
-
-          if (sigungu && matches.length > 1) {
-            matches = matches.filter((item) => item.sigunguName === sigungu);
-          }
-
-          if (matches.length === 1) {
-            setFacility(matches[0]);
-          } else if (matches.length > 1) {
-            // 여러 개면 사용자에게 보여주고 선택하게 함
-            console.warn("중복 시설:", matches);
-            // 일단 첫 번째 사용
-            setFacility(matches[0]);
-          } else {
-            setFacility(results[0] || null);
-          }
-        }
-      }
+      // ID로 시설 정보를 직접, 한 번에 조회합니다.
+      const facilityData = await get(`/pet_facilities/${id}`);
+      setFacility(facilityData);
     } catch (err) {
-      console.error("시설 조회 최종 실패:", err);
-      setFacility(null);
+      console.error(`ID(${id})로 시설 조회 실패:`, err);
+      setFacility(null); // 실패 시 null 처리
     } finally {
       setLoadingFacility(false);
     }
   };
 
-  // 리뷰 목록 조회
+  // ✨✨✨ 리뷰 목록 조회도 이제 이름이 아닌 facilityId로 합니다. ✨✨✨
   const fetchReviews = async () => {
+    if (!id) return; // id가 없으면 실행하지 않음
+
     setLoadingReviews(true);
     try {
-      const response = await axios.get(
-        `/api/review/facility/${encodeURIComponent(decodedName)}`,
-      );
+      // 이제 백엔드 API는 facilityId를 받습니다.
+      const response = await axios.get(`/api/review/facility/${id}`);
       setReviews(response.data || []);
     } catch (err) {
       console.error("리뷰 목록 조회 실패:", err);
@@ -153,10 +95,11 @@ export function MapDetail() {
     setIsWriting(false);
   };
 
+  // ✨ useEffect의 의존성 배열
   useEffect(() => {
     fetchFacility();
     fetchReviews();
-  }, [decodedName]);
+  }, [id]);
 
   // 자동 스크롤 및 하이라이트 로직
   useEffect(() => {
@@ -237,8 +180,14 @@ export function MapDetail() {
           marginBottom: "1.5rem",
         }}
       >
-        <h2 style={{ margin: 0 }}>{facility ? facility.name : decodedName}</h2>
-        <FavoriteContainer facilityName={decodedName} />
+        <h2 style={{ margin: 0 }}>
+          {loadingFacility
+            ? "불러오는 중..."
+            : facility
+              ? facility.name
+              : "시설 정보 없음"}
+        </h2>
+        <FavoriteContainer facilityName={facility ? facility.name : ""} />
       </div>
 
       {/* 시설 정보 섹션 */}

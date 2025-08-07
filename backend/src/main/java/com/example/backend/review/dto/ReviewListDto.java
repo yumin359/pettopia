@@ -1,5 +1,6 @@
 package com.example.backend.review.dto;
 
+import com.example.backend.petFacility.dto.PetFacilitySimpleDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,7 +15,8 @@ import java.util.List;
 @Builder
 public class ReviewListDto {
     private Integer id;
-    private String facilityName;
+    // private String facilityName; // 🗑️ 삭제
+    private PetFacilitySimpleDto petFacility; // ✨ 추가
     private String memberEmail;            // 작성자 이메일
     private String memberEmailNickName;    // 작성자 닉네임 ✅ 추가
     private String review;

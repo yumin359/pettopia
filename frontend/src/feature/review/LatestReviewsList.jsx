@@ -147,6 +147,7 @@ export function LatestReviewsList() {
           const isExpanded = expandedIds.includes(r.id);
           const imageFiles = r.files?.filter(isImageFile) || [];
           const hasImages = imageFiles.length > 0;
+          const facilityInfo = r.petFacility;
 
           return (
             <Col key={r.id} xs={12} sm={6} md={4} lg={3}>
@@ -159,23 +160,11 @@ export function LatestReviewsList() {
                   overflow: "hidden",
                 }}
                 onClick={() => {
-                  // facility ID를 URL에 포함시켜야 함
-                  const url = `/facility/${encodeURIComponent(r.facilityName)}`;
+                  if (!facilityInfo || !facilityInfo.id) return; // 방어 코드
+
+                  const url = `/facility/${facilityInfo.id}`;
+
                   const params = new URLSearchParams();
-
-                  // 리뷰에 facilityId가 있다면 추가
-                  if (r.facilityId) {
-                    params.append("id", r.facilityId);
-                  }
-
-                  // 시도/시군구 정보가 있다면 추가 (중복 구분용)
-                  if (r.facilitySidoName) {
-                    params.append("sido", r.facilitySidoName);
-                  }
-                  if (r.facilitySigunguName) {
-                    params.append("sigungu", r.facilitySigunguName);
-                  }
-
                   params.append("focusReviewId", r.id);
 
                   navigate(`${url}?${params.toString()}`);
@@ -308,10 +297,16 @@ export function LatestReviewsList() {
                         fontSize: "0.9rem",
                         maxWidth: "70%",
                       }}
-                      onClick={(e) => handleFacilityButton(r.facilityName, e)}
-                      title={r.facilityName}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (facilityInfo && facilityInfo.id) {
+                          navigate(`/facility/${facilityInfo.id}`);
+                        }
+                      }}
+                      title={facilityInfo?.name || "정보 없음"}
                     >
-                      📍 {r.facilityName}
+                      {/* ✨ facilityInfo 객체에서 이름을 가져와 표시합니다. */}
+                      📍 {facilityInfo?.name || "정보 없음"}
                     </div>
                     <div className="text-nowrap">
                       <span style={{ color: "#f0ad4e", fontSize: "0.9rem" }}>

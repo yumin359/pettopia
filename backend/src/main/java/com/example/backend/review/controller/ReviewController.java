@@ -27,13 +27,12 @@ public class ReviewController {
         return ResponseEntity.ok("리뷰가 등록되었습니다.");
     }
 
-    // 특정 시설 리뷰 조회 (PathVariable)
-    @GetMapping("/facility/{facilityName}")
-    public ResponseEntity<List<ReviewListDto>> getReviewsByFacilityName(@PathVariable String facilityName) {
-        List<ReviewListDto> reviews = reviewService.findAllByFacilityName(facilityName);
+    // ✨ 특정 시설 리뷰 조회 (엔드포인트 및 메소드 시그니처 변경)
+    @GetMapping("/facility/{facilityId}")
+    public ResponseEntity<List<ReviewListDto>> getReviewsByFacilityId(@PathVariable Long facilityId) {
+        List<ReviewListDto> reviews = reviewService.findAllByFacilityId(facilityId);
         return ResponseEntity.ok(reviews);
     }
-
 
     // 리뷰 수정
     @PutMapping("/update/{id}")

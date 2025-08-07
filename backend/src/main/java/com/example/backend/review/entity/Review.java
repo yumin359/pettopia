@@ -1,6 +1,7 @@
 package com.example.backend.review.entity;
 
 import com.example.backend.member.entity.Member;
+import com.example.backend.petFacility.entity.PetFacility;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -22,8 +23,12 @@ public class Review {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(nullable = false)
-    private String facilityName;
+//    @Column(nullable = false)
+//    private String facilityName;
+
+    @ManyToOne(fetch = FetchType.LAZY) // ✨ 추가: PetFacility 와의 관계
+    @JoinColumn(name = "facility_id", nullable = false)
+    private PetFacility petFacility;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_email", referencedColumnName = "email", nullable = false)

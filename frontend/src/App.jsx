@@ -21,6 +21,7 @@ import { MyReview } from "./feature/review/MyReview.jsx";
 import { KakaoCallback } from "./feature/member/KakaoCallback.jsx";
 import { AdminPage } from "./AdminPage.jsx";
 import ReviewReportList from "./feature/report/ReviewReportList.jsx";
+
 function App() {
   return (
     <AuthenticationContextProvider>
@@ -43,7 +44,7 @@ function App() {
 
             <Route path="/KakaoMap" element={<FullFilterKakaoMap />} />
 
-            <Route path="/facility/:name" element={<MapDetail />} />
+            <Route path="/facility/:id" element={<MapDetail />} />
 
             <Route path="/review/my" element={<MyReview />} />
             <Route path="/review/latest" element={<LatestReviewsList />} />

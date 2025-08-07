@@ -285,5 +285,13 @@ SHOW CREATE TABLE review;
 SHOW CREATE TABLE review_file;
 SHOW CREATE TABLE review_like;
 SHOW CREATE TABLE review_report;
+
+UPDATE review r
+    JOIN pet_facility pf ON TRIM(r.facility_name) = TRIM(pf.name)
+SET r.facility_id = pf.id;
+
+# 이건 선택사항입니다. 더이상 사용하지 않는 컬럼이지만 (바로 위에 update 에서 옮겼음) 혹시 몰라 두겠습니다.
+# ALTER TABLE review DROP COLUMN facility_name;
+
 # ---------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------
