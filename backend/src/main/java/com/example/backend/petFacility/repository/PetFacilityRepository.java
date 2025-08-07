@@ -72,4 +72,6 @@ public interface PetFacilityRepository extends JpaRepository<PetFacility, Long> 
 
     // 단일 시설명으로 조회 (추가)
     Optional<PetFacility> findByName(String facilityName);
+
+    List<PetFacility> findByNameAndSidoNameAndSigunguName(String name, String sidoName, String sigunguName);
 }

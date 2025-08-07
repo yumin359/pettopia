@@ -5,6 +5,9 @@ import com.example.backend.member.entity.Member;
 import com.example.backend.member.entity.MemberFile;
 import com.example.backend.member.entity.MemberFileId;
 import com.example.backend.member.repository.MemberRepository;
+import com.example.backend.petFacility.dto.PetFacilitySimpleDto;
+import com.example.backend.petFacility.entity.PetFacility;
+import com.example.backend.petFacility.repository.PetFacilityRepository;
 import com.example.backend.review.dto.ReviewFormDto;
 import com.example.backend.review.dto.ReviewListDto;
 import com.example.backend.review.dto.TagDto;
@@ -43,6 +46,7 @@ public class ReviewService {
     private final MemberRepository memberRepository;
     private final ReviewFileRepository reviewFileRepository;
     private final TagRepository tagRepository;
+    private final PetFacilityRepository petFacilityRepository;
     private final S3Client s3Client;
 
     @Value("${image.prefix}")
@@ -129,8 +133,12 @@ public class ReviewService {
         Member member = memberRepository.findByEmail(dto.getMemberEmail())
                 .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없습니다: " + dto.getMemberEmail()));
 
+        PetFacility petFacility = petFacilityRepository.findById(dto.getFacilityId())
+                .orElseThrow(() -> new NoSuchElementException("시설을 찾을 수 없습니다: " + dto.getFacilityId()));
+
         Review review = Review.builder()
-                .facilityName(dto.getFacilityName())
+                // .facilityName(dto.getFacilityName()) // 🗑️ 삭제
+                .petFacility(petFacility) // ✨ 조회한 PetFacility 엔티티를 설정
                 .memberEmail(member)
                 .review(dto.getReview())
                 .rating(dto.getRating())
@@ -144,7 +152,7 @@ public class ReviewService {
         saveFiles(review, dto.getFiles());
     }
 
-    // 리뷰 수정
+    // 리뷰 수정 (리뷰의 시설은 변경하지 않는 것이 일반적이므로 facility 관련 로직은 없음)
     public void update(Integer id, ReviewFormDto dto) {
         Review review = reviewRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("리뷰를 찾을 수 없습니다: " + id));
@@ -192,11 +200,11 @@ public class ReviewService {
         reviewRepository.deleteById(id);
     }
 
-    // 특정 시설 리뷰 목록 조회
-    public List<ReviewListDto> findAllByFacilityName(String facilityName) {
-        return reviewRepository.findAllByFacilityNameOrderByInsertedAtDesc(facilityName)
+    // ✨ 특정 시설 리뷰 목록 조회 (메소드명 및 파라미터 변경)
+    public List<ReviewListDto> findAllByFacilityId(Long facilityId) {
+        return reviewRepository.findAllByPetFacility_IdOrderByInsertedAtDesc(facilityId)
                 .stream()
-                .map(this::convertToDto) // private 헬퍼 메소드 사용
+                .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
 
@@ -243,7 +251,7 @@ public class ReviewService {
                 .collect(Collectors.toList());
     }
 
-    // Private 헬퍼 메소드 추가
+    // Private 헬퍼 메소드 추가 (✨ 가장 중요한 변경)
     private ReviewListDto convertToDto(Review review) {
         // 리뷰 첨부 이미지들 URL 생성
         List<String> fileUrls = review.getFiles().stream()
@@ -254,7 +262,6 @@ public class ReviewService {
         String profileImageUrl = null;
         if (review.getMemberEmail() != null && review.getMemberEmail().getFiles() != null && !review.getMemberEmail().getFiles().isEmpty()) {
             MemberFile profileFile = review.getMemberEmail().getFiles().get(0);
-            // Member의 ID를 사용해야 합니다.
             profileImageUrl = imagePrefix + "prj3/member/" + review.getMemberEmail().getId() + "/" + profileFile.getId().getName();
         }
 
@@ -263,9 +270,19 @@ public class ReviewService {
                 .map(tag -> TagDto.builder().id(tag.getId()).name(tag.getName()).build())
                 .collect(Collectors.toList());
 
+        // ✨ PetFacility 엔티티에서 정보를 추출하여 DTO 생성
+        PetFacility facility = review.getPetFacility();
+        PetFacilitySimpleDto facilityDto = PetFacilitySimpleDto.builder()
+                .id(facility.getId())
+                .name(facility.getName())
+                .sidoName(facility.getSidoName())
+                .sigunguName(facility.getSigunguName())
+                .build();
+
         return ReviewListDto.builder()
                 .id(review.getId())
-                .facilityName(review.getFacilityName())
+                // .facilityName(review.getFacilityName()) // 🗑️ 삭제
+                .petFacility(facilityDto) // ✨ 구조화된 DTO 설정
                 .memberEmail(review.getMemberEmail().getEmail())
                 .memberEmailNickName(review.getMemberEmail().getNickName())
                 .review(review.getReview())
@@ -273,7 +290,7 @@ public class ReviewService {
                 .insertedAt(review.getInsertedAt())
                 .profileImageUrl(profileImageUrl)
                 .files(fileUrls)
-                .tags(tagDtos) // 변환된 태그 DTO 리스트 설정
+                .tags(tagDtos)
                 .build();
     }
 

@@ -1,18 +1,21 @@
 export const createInfoWindowContent = (
   facility,
   categoryColors,
-  reviewData,
+  reviewInfo,
 ) => {
-  // ✅ 배지 HTML을 담을 변수를 빈 문자열로 초기화합니다.
+  const detailUrl =
+    `/facility/${encodeURIComponent(facility.name)}` +
+    (facility.id ? `?id=${facility.id}` : "") +
+    `&sido=${encodeURIComponent(facility.sidoName || "")}` +
+    `&sigungu=${encodeURIComponent(facility.sigunguName || "")}`;
+
   let badgesHtml = "";
 
-  // ✅ 1. category2에 대한 배지를 생성합니다.
   if (facility.category2 && categoryColors[facility.category2]) {
     const category2Color = categoryColors[facility.category2];
     badgesHtml += `<span class="badge ms-1" style="background-color:${category2Color}; font-size: 8px;">${facility.category2}</span>`;
   }
 
-  // ✅ 2. category3에 대한 배지를 생성합니다.
   if (facility.category3 && categoryColors[facility.category3]) {
     const category3Color = categoryColors[facility.category3];
     badgesHtml += `<span class="badge ms-1" style="background-color:${category3Color}; font-size: 8px;">${facility.category3}</span>`;
@@ -24,10 +27,10 @@ export const createInfoWindowContent = (
     </p>
   `;
 
-  if (reviewData) {
+  if (reviewInfo && reviewInfo.reviewCount > 0) {
     reviewHtml = `
       <p class="mb-1 small">
-        ⭐ <strong>${reviewData.averageRating}</strong> / 5점 (${reviewData.reviewCount}개)
+        ⭐ <strong>${reviewInfo.averageRating}</strong> / 5점 (${reviewInfo.reviewCount}개)
       </p>
     `;
   }
@@ -50,6 +53,7 @@ export const createInfoWindowContent = (
         ${facility.operatingHours ? `<p class="text-muted mb-1 small">⏰ ${facility.operatingHours}</p>` : ""}
         ${facility.petRestrictions ? `<p class="text-warning mb-1 small">🚫 ${facility.petRestrictions}</p>` : ""}
       </div>
+      <a href="${detailUrl}">상세보기</a>
     </div>
   `;
 };
