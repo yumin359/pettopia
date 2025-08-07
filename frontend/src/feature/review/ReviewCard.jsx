@@ -4,11 +4,14 @@ import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
 import ReviewEdit from "./ReviewEdit.jsx";
 
-function ReviewCard({ review, onUpdate, onDelete }) {
+function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
   const { user } = useContext(AuthenticationContext);
   const [isEditing, setIsEditing] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
   const [modalImageUrl, setModalImageUrl] = useState("");
+
+  const [showAllImages, setShowAllImages] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const defaultProfileImage = "/user.png";
 
@@ -21,8 +24,16 @@ function ReviewCard({ review, onUpdate, onDelete }) {
   };
 
   const isImageFile = (fileUrl) => {
-    return /\.(jpg|jpeg|png|gif|webp)$/i.test(fileUrl.split("?")[0]);
+    const extension = fileUrl.split(".").pop().split("?")[0];
+    return ["jpg", "jpeg", "png", "gif", "webp"].includes(
+      extension.toLowerCase(),
+    );
   };
+
+  // 모든 이미지 파일을 컴포넌트 상단에서 한 번만 필터링합니다.
+  const allImages = Array.isArray(review.files)
+    ? review.files.filter(isImageFile)
+    : [];
 
   const handleImageClick = (imageUrl) => {
     setModalImageUrl(imageUrl);
@@ -49,6 +60,11 @@ function ReviewCard({ review, onUpdate, onDelete }) {
     setIsEditing(false);
   };
 
+  const handleDeleteConfirmed = () => {
+    onDelete?.(review.id);
+    setShowDeleteModal(false);
+  };
+
   // 편집 모드일 때는 ReviewEdit 컴포넌트 렌더링
   if (isEditing) {
     return (
@@ -57,6 +73,94 @@ function ReviewCard({ review, onUpdate, onDelete }) {
         onSave={handleEditSave}
         onCancel={handleEditCancel}
       />
+    );
+  }
+
+  // showOnlyImages prop이 true일 경우, 이미지 파일만 렌더링
+  if (showOnlyImages) {
+    const imagesToShow = showAllImages ? allImages : allImages.slice(0, 6);
+    const hasMoreImages = allImages.length > 6;
+
+    return (
+      <>
+        {/* 이미지들을 유연하게 배치하도록 flex-wrap 추가 */}
+        <div className="d-flex flex-wrap gap-2">
+          {imagesToShow.map((fileUrl, idx) => (
+            <Image
+              key={idx}
+              src={fileUrl}
+              alt={`첨부 이미지 ${idx + 1}`}
+              className="shadow rounded"
+              style={{
+                width: "150px",
+                height: "150px",
+                objectFit: "cover",
+                display: "inline-block",
+                cursor: "pointer",
+              }}
+              onClick={() => handleImageClick(fileUrl)}
+            />
+          ))}
+          {hasMoreImages && !showAllImages && (
+            <Button
+              variant="outline-secondary"
+              className="d-flex align-items-center justify-content-center"
+              style={{
+                width: "150px",
+                height: "150px",
+                fontSize: "1rem",
+                fontWeight: "bold",
+              }}
+              onClick={() => setShowAllImages(true)}
+            >
+              더보기 ({allImages.length - 6})
+            </Button>
+          )}
+          {hasMoreImages && showAllImages && (
+            <Button
+              variant="outline-secondary"
+              className="d-flex align-items-center justify-content-center"
+              style={{
+                width: "150px",
+                height: "150px",
+                fontSize: "1rem",
+                fontWeight: "bold",
+              }}
+              onClick={() => setShowAllImages(false)}
+            >
+              간략히
+            </Button>
+          )}
+        </div>
+
+        {/* 사진 눌렀을 때 확대 모달 */}
+        {/* Bootstrap 기본 스타일을 활용하도록 수정 */}
+        <Modal
+          show={showImageModal}
+          onHide={handleCloseImageModal}
+          dialogClassName="fullscreen-modal"
+          centered
+          fullscreen
+        >
+          <Modal.Header closeButton className="border-0" />
+          <Modal.Body
+            className="d-flex justify-content-center align-items-center bg-black"
+            onClick={handleCloseImageModal}
+            style={{ cursor: "zoom-out" }}
+          >
+            <Image
+              src={modalImageUrl}
+              fluid
+              alt="확대 이미지"
+              style={{
+                maxHeight: "80vh",
+                maxWidth: "80%",
+                objectFit: "contain",
+              }}
+            />
+          </Modal.Body>
+        </Modal>
+      </>
     );
   }
 
@@ -114,11 +218,7 @@ function ReviewCard({ review, onUpdate, onDelete }) {
             <Button
               variant="outline-danger"
               size="sm"
-              onClick={() => {
-                if (window.confirm("정말 삭제하시겠습니까?")) {
-                  onDelete?.(review.id);
-                }
-              }}
+              onClick={() => setShowDeleteModal(true)}
               style={{ height: "32px" }}
             >
               <FaTrashAlt /> 삭제
@@ -158,41 +258,38 @@ function ReviewCard({ review, onUpdate, onDelete }) {
         </p>
       </div>
 
-      {/* 첨부 이미지 */}
-      {Array.isArray(review.files) &&
-        review.files.filter(isImageFile).length > 0 && (
-          <div className="mb-3">
-            <div
-              className="d-flex gap-2"
-              style={{
-                overflowX: "auto",
-                paddingBottom: "0.5rem",
-              }}
-            >
-              {review.files.filter(isImageFile).map((fileUrl, idx) => (
-                <Image
-                  key={idx}
-                  src={fileUrl}
-                  alt={`첨부 이미지 ${idx + 1}`}
-                  className="shadow-sm rounded"
-                  style={{
-                    width: "120px",
-                    height: "120px",
-                    objectFit: "cover",
-                    cursor: "pointer",
-                    flexShrink: 0,
-                    transition: "transform 0.2s",
-                  }}
-                  onClick={() => handleImageClick(fileUrl)}
-                  onMouseOver={(e) =>
-                    (e.target.style.transform = "scale(1.05)")
-                  }
-                  onMouseOut={(e) => (e.target.style.transform = "scale(1)")}
-                />
-              ))}
-            </div>
+      {/* 첨부 이미지 - 상단에서 필터링한 allImages 변수를 사용 */}
+      {allImages.length > 0 && (
+        <div className="mb-3">
+          <div
+            className="d-flex gap-2"
+            style={{
+              overflowX: "auto",
+              paddingBottom: "0.5rem",
+            }}
+          >
+            {allImages.map((fileUrl, idx) => (
+              <Image
+                key={idx}
+                src={fileUrl}
+                alt={`첨부 이미지 ${idx + 1}`}
+                className="shadow-sm rounded"
+                style={{
+                  width: "120px",
+                  height: "120px",
+                  objectFit: "cover",
+                  cursor: "pointer",
+                  flexShrink: 0,
+                  transition: "transform 0.2s",
+                }}
+                onClick={() => handleImageClick(fileUrl)}
+                onMouseOver={(e) => (e.target.style.transform = "scale(1.05)")}
+                onMouseOut={(e) => (e.target.style.transform = "scale(1)")}
+              />
+            ))}
           </div>
-        )}
+        </div>
+      )}
 
       {/* PDF 파일 표시 */}
       {Array.isArray(review.files) &&
@@ -234,32 +331,17 @@ function ReviewCard({ review, onUpdate, onDelete }) {
           </div>
         )}
 
-      {/* 이미지 확대 모달 */}
+      {/* 이미지 확대 모달 - Bootstrap 기본 스타일을 활용하도록 수정 */}
       <Modal
         show={showImageModal}
         onHide={handleCloseImageModal}
         centered
         size="xl"
-        style={{ backgroundColor: "rgba(0, 0, 0, 0.9)" }}
       >
         <Modal.Header
           closeButton
-          style={{
-            backgroundColor: "transparent",
-            border: "none",
-            position: "absolute",
-            right: 0,
-            top: 0,
-            zIndex: 1000,
-          }}
-        >
-          <button
-            type="button"
-            className="btn-close btn-close-white"
-            aria-label="Close"
-            onClick={handleCloseImageModal}
-          />
-        </Modal.Header>
+          style={{ backgroundColor: "transparent", border: "none" }}
+        />
         <Modal.Body
           className="d-flex justify-content-center align-items-center p-0"
           style={{
@@ -278,6 +360,22 @@ function ReviewCard({ review, onUpdate, onDelete }) {
             }}
           />
         </Modal.Body>
+      </Modal>
+
+      {/* 삭제 확인 모달 */}
+      <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>리뷰 삭제</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>정말 삭제하시겠습니까?</Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
+            취소
+          </Button>
+          <Button variant="danger" onClick={handleDeleteConfirmed}>
+            삭제
+          </Button>
+        </Modal.Footer>
       </Modal>
     </div>
   );
