@@ -208,9 +208,13 @@ export function ReviewAdd({ facility, onSave, onCancel }) {
             classNamePrefix="react-select"
 
             // # 붙여서 보여주기
-            formatOptionLabel={(option) => <span>#{option.label}</span>}
+            formatOptionLabel={(option) => (
+              <span>{option.label.startsWith("#") ? option.label : `#${option.label}`}</span>
+            )}
             components={{
-              MultiValueLabel: ({ data }) => <span>#{data.label}</span>,
+              MultiValueLabel: ({ data }) => (
+                <span>{data.label.startsWith("#") ? data.label : `#${data.label}`}</span>
+              ),
             }}
           />
         </FormGroup>
