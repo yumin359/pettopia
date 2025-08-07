@@ -7,6 +7,7 @@ import img1 from "../../assets/event1.jpg";
 import img2 from "../../assets/event2.jpg";
 import img3 from "../../assets/event3.jpg";
 import { BoardListMini } from "../main/BoardListMini.jsx";
+import { ReviewCarousel } from "../main/ReviewCarousel.jsx";
 
 export function BoardLayout() {
   const navigate = useNavigate();
@@ -90,10 +91,10 @@ export function BoardLayout() {
           <BoardListMini fontSize="1.25rem" iconSize={18} />
         </Col>
 
-        {/*<Col md={6} style={{ overflowY: "auto" }}>*/}
-        {/*  <h5 style={{ fontSize: "1.5rem", fontWeight: "600" }}>최신 리뷰</h5>*/}
-        {/*  <ReviewListPage />*/}
-        {/*</Col>*/}
+        <Col md={6}>
+          <h5 style={{ fontSize: "1.5rem", fontWeight: "600" }}>최신 리뷰</h5>
+          <ReviewCarousel />
+        </Col>
       </Row>
     </div>
   );
