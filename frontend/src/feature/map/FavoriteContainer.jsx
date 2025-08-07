@@ -9,15 +9,15 @@ export function FavoriteContainer({ facilityName, facilityId }) {
   const [favoriteInfo, setFavoriteInfo] = useState(null);
   const { user } = useContext(AuthenticationContext);
 
-  // 🔍 디버깅 로그 추가
-  useEffect(() => {
-    console.log("=== FavoriteContainer Debug ===");
-    console.log("1. User:", user);
-    console.log("2. Token:", localStorage.getItem("token"));
-    console.log("3. FacilityName:", facilityName);
-    console.log("4. FacilityId:", facilityId);
-    console.log("==============================");
-  }, [user, facilityName, facilityId]);
+  // 🔍 디버깅 로그 추가 : 오류 없는 거 확인했으니 없애볼까나 콘솔 개더러워짐.
+  // useEffect(() => {
+  //   console.log("=== FavoriteContainer Debug ===");
+  //   console.log("1. User:", user);
+  //   console.log("2. Token:", localStorage.getItem("token"));
+  //   console.log("3. FacilityName:", facilityName);
+  //   console.log("4. FacilityId:", facilityId);
+  //   console.log("==============================");
+  // }, [user, facilityName, facilityId]);
 
   function fetchLikeInfo() {
     if (!facilityName || !facilityName.trim()) {

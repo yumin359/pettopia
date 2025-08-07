@@ -76,6 +76,7 @@ export function ReviewCarousel() {
                   `/facility/${review.petFacility.id}?focusReviewId=${review.id}`,
                 )
               }
+              style={{ background: "lightgoldenrodyellow" }}
             >
               <Row className="g-0 h-100">
                 {/* 이미지 영역 - 30% */}
