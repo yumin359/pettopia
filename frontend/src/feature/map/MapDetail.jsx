@@ -132,7 +132,7 @@ export function MapDetail() {
 
   // 모든 이미지 파일만 추출
   const allImagesFromReviews = reviews.flatMap((review) =>
-    (review.files || []).filter(isImageFile)
+    (review.files || []).filter(isImageFile),
   );
 
   // 정렬된 리뷰 배열 (최신순 또는 좋아요순)
@@ -161,7 +161,10 @@ export function MapDetail() {
       if (el) {
         el.scrollIntoView({ behavior: "smooth", block: "center" });
         el.classList.add("review-highlight");
-        const timer = setTimeout(() => el.classList.remove("review-highlight"), 2500);
+        const timer = setTimeout(
+          () => el.classList.remove("review-highlight"),
+          2500,
+        );
         return () => clearTimeout(timer);
       }
     }
@@ -170,11 +173,23 @@ export function MapDetail() {
   return (
     <div style={{ padding: "2rem", maxWidth: "1200px", margin: "0 auto" }}>
       {/* 헤더 */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "1.5rem",
+        }}
+      >
         <h2 style={{ margin: 0 }}>
-          {loadingFacility ? "불러오는 중..." : facility ? facility.name : "시설 정보 없음"}
+          {loadingFacility
+            ? "불러오는 중..."
+            : facility
+              ? facility.name
+              : "시설 정보 없음"}
         </h2>
-        <FavoriteContainer facilityName={facility ? facility.name : ""} />
+        {/*<FavoriteContainer facilityName={facility ? facility.name : ""} />*/}
+        {facility && <FavoriteContainer facilityName={facility.name} />}
       </div>
 
       {/* 시설 정보 */}
@@ -191,10 +206,12 @@ export function MapDetail() {
           }}
         >
           <div style={{ marginBottom: "0.8rem" }}>
-            <strong>📍 도로명 주소:</strong> <span>{facility.roadAddress || "정보 없음"}</span>
+            <strong>📍 도로명 주소:</strong>
+            <span>{facility.roadAddress || "정보 없음"}</span>
           </div>
           <div style={{ marginBottom: "0.8rem" }}>
-            <strong>📞 전화번호:</strong> <span>{facility.phoneNumber || "정보 없음"}</span>
+            <strong>📞 전화번호:</strong>
+            <span>{facility.phoneNumber || "정보 없음"}</span>
           </div>
           <div style={{ marginBottom: "0.8rem" }}>
             <strong>🌐 홈페이지:</strong>{" "}
@@ -207,7 +224,12 @@ export function MapDetail() {
                 homepage !== "none" &&
                 homepage !== "null";
               return isValid ? (
-                <a href={facility.homepage} target="_blank" rel="noreferrer" style={{ color: "#007bff", textDecoration: "none" }}>
+                <a
+                  href={facility.homepage}
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{ color: "#007bff", textDecoration: "none" }}
+                >
                   {facility.homepage}
                 </a>
               ) : (
@@ -216,10 +238,12 @@ export function MapDetail() {
             })()}
           </div>
           <div style={{ marginBottom: "0.8rem" }}>
-            <strong>🏖️ 휴무일:</strong> <span>{facility.holiday || "정보 없음"}</span>
+            <strong>🏖️ 휴무일:</strong>
+            <span>{facility.holiday || "정보 없음"}</span>
           </div>
           <div>
-            <strong>⏰ 운영시간:</strong> <span>{facility.operatingHours || "정보 없음"}</span>
+            <strong>⏰ 운영시간:</strong>
+            <span>{facility.operatingHours || "정보 없음"}</span>
           </div>
         </div>
       ) : (
@@ -253,8 +277,12 @@ export function MapDetail() {
                 fontWeight: "500",
                 transition: "background-color 0.2s",
               }}
-              onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#ffb300")}
-              onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "#ffc107")}
+              onMouseOver={(e) =>
+                (e.currentTarget.style.backgroundColor = "#ffb300")
+              }
+              onMouseOut={(e) =>
+                (e.currentTarget.style.backgroundColor = "#ffc107")
+              }
             >
               ✍️ 리뷰 작성하기
             </button>
@@ -276,7 +304,11 @@ export function MapDetail() {
       {/* 리뷰 작성 폼 */}
       {isWriting && facility && (
         <div style={{ marginBottom: "2rem" }}>
-          <ReviewAdd facility={facility} onSave={handleReviewSaved} onCancel={handleReviewCancel} />
+          <ReviewAdd
+            facility={facility}
+            onSave={handleReviewSaved}
+            onCancel={handleReviewCancel}
+          />
         </div>
       )}
 
@@ -300,7 +332,9 @@ export function MapDetail() {
           <span style={{ fontSize: "1.1rem", fontWeight: "600" }}>
             {getAverageRating()} / 5
           </span>
-          <span style={{ fontSize: "0.9rem", color: "#666" }}>({reviews.length}개의 리뷰)</span>
+          <span style={{ fontSize: "0.9rem", color: "#666" }}>
+            ({reviews.length}개의 리뷰)
+          </span>
         </div>
       )}
 
@@ -312,7 +346,10 @@ export function MapDetail() {
         ) : allImagesFromReviews.length === 0 ? (
           <p>아직 사진•영상이 없습니다.</p>
         ) : (
-          <ReviewCard review={{ files: allImagesFromReviews }} showOnlyImages={true} />
+          <ReviewCard
+            review={{ files: allImagesFromReviews }}
+            showOnlyImages={true}
+          />
         )}
       </div>
 
@@ -327,12 +364,26 @@ export function MapDetail() {
           }}
         >
           <h3 style={{ margin: 0 }}>
-            📝 리뷰 목록 <span style={{ color: "#6c757d", fontWeight: "normal", fontSize: "1rem" }}>({reviews.length}개)</span>
+            📝 리뷰 목록{" "}
+            <span
+              style={{
+                color: "#6c757d",
+                fontWeight: "normal",
+                fontSize: "1rem",
+              }}
+            >
+              ({reviews.length}개)
+            </span>
           </h3>
 
           {reviews.length > 0 && (
-            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-              <label htmlFor="sortSelect" style={{ fontWeight: "500", margin: 0 }}>
+            <div
+              style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
+            >
+              <label
+                htmlFor="sortSelect"
+                style={{ fontWeight: "500", margin: 0 }}
+              >
                 정렬:
               </label>
               <select
@@ -370,8 +421,14 @@ export function MapDetail() {
               color: "#6c757d",
             }}
           >
-            <p style={{ fontSize: "1.1rem", margin: 0 }}>아직 작성된 리뷰가 없습니다.</p>
-            {user && <p style={{ marginTop: "0.5rem", fontSize: "0.95rem" }}>첫 번째 리뷰를 작성해보세요!</p>}
+            <p style={{ fontSize: "1.1rem", margin: 0 }}>
+              아직 작성된 리뷰가 없습니다.
+            </p>
+            {user && (
+              <p style={{ marginTop: "0.5rem", fontSize: "0.95rem" }}>
+                첫 번째 리뷰를 작성해보세요!
+              </p>
+            )}
           </div>
         ) : (
           <ul style={{ paddingLeft: 0, listStyle: "none" }}>
@@ -401,9 +458,16 @@ export function MapDetail() {
                   }}
                 >
                   <span style={{ color: "#f0ad4e", fontSize: "1.2rem" }}>
-                    {"★".repeat(review.rating)}{"☆".repeat(5 - review.rating)}
+                    {"★".repeat(review.rating)}
+                    {"☆".repeat(5 - review.rating)}
                   </span>
-                  <span style={{ fontWeight: "600", color: "#495057", fontSize: "1rem" }}>
+                  <span
+                    style={{
+                      fontWeight: "600",
+                      color: "#495057",
+                      fontSize: "1rem",
+                    }}
+                  >
                     {review.rating}.0 / 5.0
                   </span>
                 </div>
@@ -491,10 +555,19 @@ export function MapDetail() {
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 style={{ marginBottom: "1.5rem", color: "#212529" }}>🚨 리뷰 신고하기</h3>
+            <h3 style={{ marginBottom: "1.5rem", color: "#212529" }}>
+              🚨 리뷰 신고하기
+            </h3>
 
             <div style={{ marginBottom: "1.5rem" }}>
-              <label htmlFor="reportReason" style={{ display: "block", marginBottom: "0.5rem", fontWeight: "600" }}>
+              <label
+                htmlFor="reportReason"
+                style={{
+                  display: "block",
+                  marginBottom: "0.5rem",
+                  fontWeight: "600",
+                }}
+              >
                 신고 사유
               </label>
               <textarea
@@ -514,7 +587,13 @@ export function MapDetail() {
               />
             </div>
 
-            <div style={{ display: "flex", justifyContent: "flex-end", gap: "1rem" }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "flex-end",
+                gap: "1rem",
+              }}
+            >
               <button
                 onClick={closeReportModal}
                 disabled={reportLoading}
@@ -527,8 +606,12 @@ export function MapDetail() {
                   cursor: "pointer",
                   transition: "background-color 0.2s",
                 }}
-                onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#dee2e6")}
-                onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "#e9ecef")}
+                onMouseOver={(e) =>
+                  (e.currentTarget.style.backgroundColor = "#dee2e6")
+                }
+                onMouseOut={(e) =>
+                  (e.currentTarget.style.backgroundColor = "#e9ecef")
+                }
               >
                 취소
               </button>
@@ -545,8 +628,14 @@ export function MapDetail() {
                   cursor: reportLoading ? "not-allowed" : "pointer",
                   transition: "background-color 0.2s",
                 }}
-                onMouseOver={(e) => !reportLoading && (e.currentTarget.style.backgroundColor = "#c82333")}
-                onMouseOut={(e) => !reportLoading && (e.currentTarget.style.backgroundColor = "#dc3545")}
+                onMouseOver={(e) =>
+                  !reportLoading &&
+                  (e.currentTarget.style.backgroundColor = "#c82333")
+                }
+                onMouseOut={(e) =>
+                  !reportLoading &&
+                  (e.currentTarget.style.backgroundColor = "#dc3545")
+                }
               >
                 {reportLoading ? "신고 중..." : "신고하기"}
               </button>

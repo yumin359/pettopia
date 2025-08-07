@@ -59,23 +59,17 @@ public class FavoriteService {
     }
 
     public FavoriteDto get(String facilityName, Authentication authentication) {
-        // 현재 사용자가 찜 눌렀는지 여부 (기본값 false)
         boolean isFavorite = false;
 
-        // 로그인된 사용자라면, 해당 사용자가 이 시설을 찜 했는지 확인
         if (authentication != null) {
             var row = favoriteRepository.findByFacilityNameAndMemberEmail(facilityName, authentication.getName());
-            // 찜 기록이 존재하면 true, 아니면 false
             isFavorite = row.isPresent();
         }
 
-        // 조회된 정보를 dto에 담아 반환
         FavoriteDto favoriteDto = new FavoriteDto();
         favoriteDto.setIsFavorite(isFavorite);
         return favoriteDto;
     }
-
-    // in FavoriteService.java
 
     public List<FavoriteFacilityDto> getMyFavorite(Authentication authentication) {
         if (authentication == null) {
@@ -90,13 +84,11 @@ public class FavoriteService {
         if (favoriteList.isEmpty()) {
             return Collections.emptyList();
         }
-
-        // PetFacility 엔티티의 필드를 FavoriteFacilityDto로 매핑합니다.
+        
         return favoriteList.stream()
                 .map(fav -> {
-                    PetFacility facility = fav.getFacility(); // 연관된 시설 엔티티 가져오기
+                    PetFacility facility = fav.getFacility();
 
-                    // ✅ 수정된 부분: 엔티티의 주소 필드를 DTO에 직접 매핑
                     return FavoriteFacilityDto.builder()
                             .facilityId(facility.getId())
                             .name(facility.getName())
@@ -104,8 +96,8 @@ public class FavoriteService {
                             .longitude(facility.getLongitude())
                             .category2(facility.getCategory2())
                             .category3(facility.getCategory3())
-                            .roadAddress(facility.getRoadAddress())   // DB에 저장된 도로명 주소를 그대로 사용
-                            .jibunAddress(facility.getJibunAddress()) // DB에 저장된 지번 주소를 그대로 사용
+                            .roadAddress(facility.getRoadAddress())
+                            .jibunAddress(facility.getJibunAddress())
                             .phoneNumber(facility.getPhoneNumber())
                             .holiday(facility.getHoliday())
                             .operatingHours(facility.getOperatingHours())
