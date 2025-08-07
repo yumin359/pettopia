@@ -60,9 +60,7 @@ export function MyReview() {
                 style={{ backgroundColor: "#fffdf7", cursor: "pointer" }}
                 onClick={() =>
                   navigate(
-                    `/facility/${encodeURIComponent(
-                      r.facilityName,
-                    )}?focusReviewId=${r.id}`,
+                    `/facility/${r.petFacility.id}?focusReviewId=${r.id}`,
                   )
                 }
               >
