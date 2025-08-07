@@ -132,7 +132,7 @@ public class PetFacilityController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // --- 수정된 매핑 로직 ---
+    // --- 수정된 펫 사이즈 매핑 로직 ---
     private Set<String> mapToOriginalPetSizes(Set<String> simplifiedSizes) {
         Set<String> originalSizes = new HashSet<>();
         List<String> allDbSizes = petFacilityRepository.findDistinctAllowedPetSize();

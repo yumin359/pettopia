@@ -34,11 +34,43 @@ export function MapDetail() {
   const fetchFacility = async () => {
     setLoadingFacility(true);
     try {
+      // 1차 시도: 원본 이름으로
       const res = await get("/pet_facilities/detail", { name: decodedName });
       setFacility(res);
     } catch (err) {
-      console.error("시설 정보 조회 실패:", err);
-      setFacility(null);
+      if (err.response?.status === 404) {
+        try {
+          // 2차 시도: 검색 API로 정확한 이름 찾기
+          const searchRes = await get("/pet_facilities/search", {
+            keyword: decodedName,
+            limit: 10,
+          });
+
+          // content 배열에서 데이터 추출
+          const results = searchRes.content || [];
+
+          // 검색 결과에서 정확히 일치하는 것 찾기
+          const exactMatch = results.find(
+            (item) =>
+              item.name === decodedName ||
+              item.name.trim() === decodedName.trim(),
+          );
+
+          if (exactMatch) {
+            setFacility(exactMatch);
+          } else if (results.length > 0) {
+            // 정확한 일치가 없으면 첫 번째 결과 사용
+            setFacility(results[0]);
+          } else {
+            setFacility(null);
+          }
+        } catch (searchErr) {
+          console.error("검색도 실패:", searchErr);
+          setFacility(null);
+        }
+      } else {
+        setFacility(null);
+      }
     } finally {
       setLoadingFacility(false);
     }
@@ -49,7 +81,7 @@ export function MapDetail() {
     setLoadingReviews(true);
     try {
       const response = await axios.get(
-        `/api/review/facility/${encodeURIComponent(decodedName)}`
+        `/api/review/facility/${encodeURIComponent(decodedName)}`,
       );
       setReviews(response.data || []);
     } catch (err) {
@@ -335,8 +367,6 @@ export function MapDetail() {
             marginBottom: "1.5rem",
           }}
         >
-
-
           {/* 사진, 동영상 목록 */}
           <div style={{ marginTop: "1.5rem" }}>
             <h4 className="mb-3">🎞 리뷰 목록 📸</h4>
