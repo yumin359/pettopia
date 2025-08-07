@@ -146,8 +146,6 @@ const FacilityCard = React.memo(({ facility, categoryColors, onClick }) => {
     fetchReviews();
   }, [facilityId]);
 
-  console.log("시설:", facility.name, "리뷰 데이터:", reviewData);
-
   // createInfoWindowContent 함수가 reviewData를 올바르게 처리하는지 확인 필요
   const fullInfoWindowHtml = createInfoWindowContent(
     facility,
