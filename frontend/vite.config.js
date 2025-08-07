@@ -8,7 +8,7 @@ export default defineConfig({
     proxy: {
       "/api": {
         target: "http://localhost:8080",
-        changeOrigin: true, // CORS 에러 방지를 위해 필요한 설정
+        changeOrigin: true,
       },
     },
   },
