@@ -179,16 +179,19 @@ CREATE TABLE `reply_comment`
 CREATE TABLE `review`
 (
     `id`            int(11)       NOT NULL AUTO_INCREMENT,
-    `facility_name` varchar(255)  NOT NULL,
+    `facility_name` varchar(255)           DEFAULT NULL,
     `member_email`  varchar(255)  NOT NULL,
     `review`        varchar(2000) NOT NULL,
     `rating`        int(11)       NOT NULL,
     `inserted_at`   datetime      NOT NULL DEFAULT current_timestamp(),
+    `facility_id`   bigint(20)    NOT NULL,
     PRIMARY KEY (`id`),
     KEY `member_email` (`member_email`),
+    KEY `FKg5515o0nnntje78uxpmiaq084` (`facility_id`),
+    CONSTRAINT `FKg5515o0nnntje78uxpmiaq084` FOREIGN KEY (`facility_id`) REFERENCES `pet_facility` (`id`),
     CONSTRAINT `review_ibfk_1` FOREIGN KEY (`member_email`) REFERENCES `member` (`email`) ON DELETE CASCADE
 ) ENGINE = InnoDB
-  AUTO_INCREMENT = 51
+  AUTO_INCREMENT = 65
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 # ---------------------------------------------------------------------------------
@@ -290,8 +293,13 @@ UPDATE review r
     JOIN pet_facility pf ON TRIM(r.facility_name) = TRIM(pf.name)
 SET r.facility_id = pf.id;
 
-# 이건 선택사항입니다. 더이상 사용하지 않는 컬럼이지만 (바로 위에 update 에서 옮겼음) 혹시 몰라 두겠습니다.
-# ALTER TABLE review DROP COLUMN facility_name;
+# 이건 너무 극단적인 마지막 수단.
+# ALTER TABLE review
+#     DROP COLUMN facility_name;
+
+# 사용을 안하게 해버리기.
+ALTER TABLE review
+    MODIFY COLUMN facility_name VARCHAR(255) NULL;
 
 # ---------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------
