@@ -28,7 +28,10 @@ export function BoardLayout() {
                 key={id}
                 onClick={() => {
                   if (id === 19) {
-                    window.open("https://www.youtube.com/watch?v=0dQBxYc_8ZM", "_blank");
+                    window.open(
+                      "https://www.youtube.com/watch?v=0dQBxYc_8ZM",
+                      "_blank",
+                    );
                   } else {
                     navigate(`/board/${id}`);
                   }
@@ -92,30 +95,6 @@ export function BoardLayout() {
         {/*  <ReviewListPage />*/}
         {/*</Col>*/}
       </Row>
-
-      {/*/!* 관리자 버튼 영역 *!/*/}
-      {/*{isAdmin() && (*/}
-      {/*  <Row className="mt-4">*/}
-      {/*    <Col className="d-flex justify-content-center gap-3">*/}
-      {/*      <Button*/}
-      {/*        variant="outline-warning"*/}
-      {/*        size="sm"*/}
-      {/*        onClick={() => navigate("/member/list")}*/}
-      {/*        style={{ minWidth: "120px" }}*/}
-      {/*      >*/}
-      {/*        회원목록 (관리자)*/}
-      {/*      </Button>*/}
-      {/*      <Button*/}
-      {/*        variant="outline-danger"*/}
-      {/*        size="sm"*/}
-      {/*        onClick={() => navigate("/support/list")}*/}
-      {/*        style={{ minWidth: "120px" }}*/}
-      {/*      >*/}
-      {/*        문의내역보기 (관리자)*/}
-      {/*      </Button>*/}
-      {/*    </Col>*/}
-      {/*  </Row>*/}
-      {/*)}*/}
     </div>
   );
 }

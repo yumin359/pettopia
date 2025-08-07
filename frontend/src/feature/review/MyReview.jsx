@@ -1,13 +1,51 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Card, Col, Image, Row, Spinner, Badge } from "react-bootstrap";
+import { Card, Col, Row, Spinner, Badge, Container } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { LikeContainer } from "../like/LikeContainer.jsx";
+import ReviewCard from "../review/ReviewCard.jsx";
 import { ReviewLikeContainer } from "../like/ReviewLikeContainer.jsx";
+import { FaEdit, FaTrashAlt } from "react-icons/fa";
 
 export function MyReview() {
   const [reviews, setReviews] = useState(null);
   const navigate = useNavigate();
+
+  // ✨ 리뷰 목록을 다시 불러오는 함수
+  const fetchMyReviews = () => {
+    axios
+      .get("/api/review/myReview")
+      .then((res) => setReviews(res.data))
+      .catch((err) => {
+        console.error("리뷰 불러오기 실패", err);
+        setReviews([]);
+      });
+  };
+
+  useEffect(() => {
+    fetchMyReviews();
+  }, []);
+
+  // ✨ 리뷰 삭제를 위한 핸들러 함수 추가
+  const handleDelete = async (reviewId, event) => {
+    event.stopPropagation();
+    if (window.confirm("정말 이 리뷰를 삭제하시겠습니까?")) {
+      try {
+        await axios.delete(`/api/review/delete/${reviewId}`);
+        alert("리뷰가 삭제되었습니다.");
+        fetchMyReviews();
+      } catch (err) {
+        console.error("리뷰 삭제 실패", err);
+        alert("리뷰 삭제에 실패했습니다.");
+      }
+    }
+  };
+
+  // TODO: 수정 기능 구현 시 사용
+  const handleEdit = (reviewId, event) => {
+    event.stopPropagation();
+    // alert(`${reviewId}번 리뷰 수정 기능은 구현 예정입니다.`);
+    // navigate(`/review/edit/${reviewId}`); 와 같은 로직 추가
+  };
 
   useEffect(() => {
     axios
@@ -18,10 +56,6 @@ export function MyReview() {
         setReviews([]);
       });
   }, []);
-
-  const isImageFile = (url) =>
-    /\.(jpg|jpeg|png|gif|webp)$/i.test(url?.split("?")[0]);
-  const defaultProfileImage = "/user.png";
 
   if (!reviews) {
     return (
@@ -38,124 +72,109 @@ export function MyReview() {
   }
 
   return (
-    <Row className="justify-content-center mt-4">
-      <Col xs={12} md={10} lg={8} style={{ maxWidth: "900px" }}>
-        <h2 className="fw-bold mb-4">내가 쓴 리뷰</h2>
-        <div className="d-flex flex-column gap-3">
+    <Container className="my-4">
+      <h2 className="fw-bold mb-4">내가 쓴 리뷰 ({reviews.length}개)</h2>
+
+      {reviews.length === 0 ? (
+        <div className="text-center mt-5 p-5 bg-light rounded text-muted">
+          작성한 리뷰가 없습니다.
+        </div>
+      ) : (
+        <Row xs={1} md={2} lg={3} xl={4} className="g-4">
           {reviews.map((r) => {
-            const firstImage = r.files?.find(isImageFile) || null;
+            const facilityInfo = r.petFacility;
+            const firstImage = r.files?.[0] || null;
 
             return (
-              <Card
-                key={r.id}
-                className="shadow-sm border-0 p-3"
-                style={{ backgroundColor: "#fffdf7", cursor: "pointer" }}
-                onClick={() =>
-                  navigate(
-                    `/facility/${encodeURIComponent(
-                      r.facilityName,
-                    )}?focusReviewId=${r.id}`,
-                  )
-                }
-              >
-                {/* 상단: 시설명 + 별점 */}
-                <div className="d-flex justify-content-between align-items-center mb-2">
-                  <div
-                    className="fw-semibold hover-underline-on-hover"
-                    style={{ color: "#5a3600", cursor: "pointer" }}
-                    // onClick={() =>
-                    //   navigate(
-                    //     `/facility/${encodeURIComponent(r.facilityName)}`,
-                    //   )
-                    // }
-                  >
-                    {r.facilityName}
-                  </div>
-                  <div className="small d-flex align-items-center">
-                    <span style={{ color: "#f0ad4e", fontSize: "1.1rem" }}>
-                      {"★".repeat(r.rating)}
-                    </span>
-                    <span className="ms-2 text-dark fw-semibold">
-                      {r.rating}
-                    </span>
-                  </div>
-                </div>
-
-                <hr className="mt-1 border-gray-300" />
-
-                {/* 본문 + 이미지 */}
-                <Row>
-                  <Col xs={12} md={firstImage ? 8 : 12}>
-                    <div style={{ whiteSpace: "pre-wrap" }}>{r.review}</div>
-                  </Col>
-                  {firstImage && (
-                    <Col xs={12} md={4} className="mt-3 mt-md-0 text-end">
-                      <Image
-                        src={firstImage}
-                        alt="리뷰 이미지"
-                        className="rounded shadow"
-                        style={{
-                          width: "100px",
-                          height: "100px",
-                          objectFit: "cover",
-                        }}
-                      />
-                    </Col>
-                  )}
-                </Row>
-
-                {/* 태그 */}
-                {Array.isArray(r.tags) && r.tags.length > 0 && (
-                  <div className="d-flex flex-wrap gap-2 mt-3">
-                    {r.tags.map((tag) => (
-                      <Badge
-                        key={tag.id}
-                        bg="info" // 마이페이지에서는 다른 색상으로 구분감을 줄 수도 있습니다.
-                        className="fw-normal"
-                      >
-                        # {tag.name}
-                      </Badge>
-                    ))}
-                  </div>
-                )}
-
-                {/* 하단: 날짜 + 프로필 */}
-                <div
-                  className="text-muted mt-2"
-                  style={{ fontSize: "0.85rem" }}
+              <Col key={r.id}>
+                <Card
+                  className="h-100 shadow-sm"
+                  style={{ cursor: "pointer" }}
+                  onClick={() => {
+                    if (facilityInfo && facilityInfo.id) {
+                      navigate(
+                        `/facility/${facilityInfo.id}?focusReviewId=${r.id}`,
+                      );
+                    }
+                  }}
                 >
-                  {/* 리뷰 좋아요 */}
-                  {/*<ReviewLikeContainer reviewId={r.id} />*/}
-                  <Image
-                    roundedCircle
-                    className="me-2"
-                    src={r.profileImageUrl || defaultProfileImage}
-                    alt={`${r.memberEmailNickName ?? "익명"} 프로필`}
-                    style={{
-                      width: "24px",
-                      height: "24px",
-                      objectFit: "cover",
-                    }}
-                  />
-                  {r.insertedAt?.split("T")[0]}
-                </div>
-              </Card>
+                  {firstImage && (
+                    <Card.Img
+                      variant="top"
+                      src={firstImage}
+                      style={{
+                        height: "180px",
+                        objectFit: "cover",
+                      }}
+                    />
+                  )}
+
+                  <Card.Body className="d-flex flex-column">
+                    {/* 시설명과 별점 */}
+                    <div className="mb-2">
+                      <div className="fw-bold text-truncate">
+                        📍 {facilityInfo?.name || "시설 정보 없음"}
+                      </div>
+                      <div style={{ color: "#f0ad4e" }}>
+                        {"★".repeat(r.rating)}
+                        <span className="text-muted">
+                          {"☆".repeat(5 - r.rating)}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* 리뷰 내용 (최대 3줄) */}
+                    <Card.Text
+                      className="text-muted"
+                      style={{
+                        fontSize: "0.9rem",
+                        flexGrow: 1,
+                        display: "-webkit-box",
+                        WebkitLineClamp: 3,
+                        WebkitBoxOrient: "vertical",
+                        overflow: "hidden",
+                      }}
+                    >
+                      {r.review}
+                    </Card.Text>
+
+                    {/* 태그 */}
+                    {Array.isArray(r.tags) && r.tags.length > 0 && (
+                      <div className="d-flex flex-wrap gap-1 mt-2">
+                        {r.tags.slice(0, 3).map((tag) => (
+                          <Badge key={tag.id} bg="info" className="fw-normal">
+                            #{tag.name}
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
+                  </Card.Body>
+
+                  {/* 카드 하단 푸터 */}
+                  <Card.Footer className="d-flex justify-content-between align-items-center bg-white border-top-0">
+                    <ReviewLikeContainer reviewId={r.id} compact={true} />
+                    <div>
+                      {/* TODO: 수정 기능 연결 */}
+                      <button
+                        className="btn btn-sm btn-outline-secondary me-2"
+                        onClick={(e) => handleEdit(r.id, e)}
+                      >
+                        <FaEdit />
+                      </button>
+                      <button
+                        className="btn btn-sm btn-outline-danger"
+                        onClick={(e) => handleDelete(r.id, e)}
+                      >
+                        <FaTrashAlt />
+                      </button>
+                    </div>
+                  </Card.Footer>
+                </Card>
+              </Col>
             );
           })}
-        </div>
-      </Col>
-
-      <style>{`
-        .line-clamp {
-          display: -webkit-box;
-          -webkit-line-clamp: 3;
-          -webkit-box-orient: vertical;
-          overflow: hidden;
-        }
-        .hover-underline-on-hover:hover {
-          text-decoration: underline !important;
-        }
-      `}</style>
-    </Row>
+        </Row>
+      )}
+    </Container>
   );
 }
