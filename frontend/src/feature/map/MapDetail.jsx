@@ -49,7 +49,7 @@ export function MapDetail() {
     setLoadingReviews(true);
     try {
       const response = await axios.get(
-        `/api/review/facility/${encodeURIComponent(decodedName)}`,
+        `/api/review/facility/${encodeURIComponent(decodedName)}`
       );
       setReviews(response.data || []);
     } catch (err) {
@@ -329,28 +329,17 @@ export function MapDetail() {
       <div>
         <div
           style={{
-            display: "flex",
+            // display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
             marginBottom: "1.5rem",
           }}
         >
-          <h3 style={{ margin: 0 }}>
-            📝 리뷰 목록{" "}
-            <span
-              style={{
-                color: "#6c757d",
-                fontWeight: "normal",
-                fontSize: "1rem",
-              }}
-            >
-              ({reviews.length}개)
-            </span>
-          </h3>
+
 
           {/* 사진, 동영상 목록 */}
           <div style={{ marginTop: "1.5rem" }}>
-            <h4 className="mb-3">🎞 사진•영상 📸</h4>
+            <h4 className="mb-3">🎞 리뷰 목록 📸</h4>
             {loadingReviews ? (
               <p>불러오는 중...</p>
             ) : sortedReviews.length === 0 ? (
