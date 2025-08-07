@@ -135,7 +135,7 @@ export function LatestReviewsList() {
           return (
             <Col key={r.id} xs={12} sm={6} md={4} lg={3}>
               <Card
-                className="h-100 border shadow-sm"
+                className="h-100 border shadow-sm position-relative"
                 onClick={() => {
                   if (!facilityInfo || !facilityInfo.id) return;
                   const url = `/facility/${facilityInfo.id}`;
@@ -143,6 +143,7 @@ export function LatestReviewsList() {
                   params.append("focusReviewId", r.id);
                   navigate(`${url}?${params.toString()}`);
                 }}
+                style={{ cursor: "pointer" }}
               >
                 {hasImages && (
                   <Card.Img
@@ -153,26 +154,33 @@ export function LatestReviewsList() {
                 )}
 
                 <Card.Body className="d-flex flex-column">
-                  <div className="d-flex justify-content-between align-items-start mb-2">
-                    <div
-                      className="fw-semibold text-truncate text-secondary"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (facilityInfo?.id)
-                          navigate(`/facility/${facilityInfo.id}`);
-                      }}
-                    >
-                      📍 {facilityInfo?.name || "정보 없음"}
-                    </div>
-                    <div className="text-nowrap">
-                      <span style={{ color: "#f0ad4e" }}>{"★".repeat(r.rating)}</span>
-                    </div>
+                  {/* 제목 영역 */}
+                  <div
+                    className="fw-semibold text-truncate text-secondary mb-1"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (facilityInfo?.id)
+                        navigate(`/facility/${facilityInfo.id}`);
+                    }}
+                  >
+                    📍 {facilityInfo?.name || "정보 없음"}
                   </div>
 
+                  {/* 별점 - 제목 바로 아래 */}
+                  <div className="mb-2" style={{ color: "#f0ad4e", fontSize: "1.1rem" }}>
+                    {"★".repeat(r.rating)}
+                  </div>
+
+                  {/* 리뷰 본문 */}
                   <div
                     ref={(el) => (reviewRefs.current[r.id] = el)}
                     className={`${!isExpanded ? "line-clamp-2" : ""} mb-2 text-muted`}
-                    style={{ fontSize: "0.85rem", background: "#f9f9f9", borderRadius: "6px", padding: "8px" }}
+                    style={{
+                      fontSize: "0.85rem",
+                      background: "#f9f9f9",
+                      borderRadius: "6px",
+                      padding: "8px",
+                    }}
                   >
                     {r.review}
                   </div>
@@ -202,27 +210,51 @@ export function LatestReviewsList() {
                         </Badge>
                       ))}
                       {r.tags.length > 3 && (
-                        <Badge bg="light" text="dark" className="small" style={{ fontSize: "0.7rem" }}>
+                        <Badge
+                          bg="light"
+                          text="dark"
+                          className="small"
+                          style={{ fontSize: "0.7rem" }}
+                        >
                           +{r.tags.length - 3}
                         </Badge>
                       )}
                     </div>
                   )}
 
-                  <div className="d-flex justify-content-between align-items-center mt-auto">
-                    <div className="d-flex align-items-center gap-2" onClick={(e) => e.stopPropagation()}>
-                      <ReviewLikeContainer reviewId={r.id} compact={true} />
-                      <button
-                        onClick={(e) => openReportModal(r.id, e)}
-                        title="신고"
-                        className="btn btn-link text-danger p-0"
-                        style={{ fontSize: "0.9rem" }}
-                      >
-                        🚨
-                      </button>
-                    </div>
+                  {/* 좋아요 + 신고 버튼 제외 */}
+                  <div
+                    className="d-flex align-items-center gap-2 mt-auto"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <ReviewLikeContainer reviewId={r.id} compact={true} />
                   </div>
                 </Card.Body>
+
+                {/* 신고 버튼 - 카드 하단 오른쪽 고정 */}
+                <Button
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    openReportModal(r.id, e);
+                  }}
+                  style={{
+                    position: "absolute",
+                    bottom: "10px",
+                    right: "10px",
+                    padding: "0.25rem 0.4rem",
+                    fontSize: "0.75rem",
+                    lineHeight: "1",
+                    borderRadius: "4px",
+                    backgroundColor: "transparent",
+                    border: "none",
+                    color: "red",
+                    zIndex: 10,
+                  }}
+                  title="신고"
+                >
+                  🚨
+                </Button>
               </Card>
             </Col>
           );
@@ -254,7 +286,13 @@ export function LatestReviewsList() {
           onClick={closeReportModal}
         >
           <div
-            style={{ backgroundColor: "white", padding: "2rem", borderRadius: "12px", width: "90%", maxWidth: "400px" }}
+            style={{
+              backgroundColor: "white",
+              padding: "2rem",
+              borderRadius: "12px",
+              width: "90%",
+              maxWidth: "400px",
+            }}
             onClick={(e) => e.stopPropagation()}
           >
             <h4 className="mb-3">🚨 리뷰 신고하기</h4>
@@ -266,8 +304,18 @@ export function LatestReviewsList() {
               className="form-control mb-3"
             />
             <div className="d-flex justify-content-end gap-2">
-              <Button variant="secondary" onClick={closeReportModal} disabled={reportLoading}>취소</Button>
-              <Button variant="danger" onClick={submitReport} disabled={reportLoading || !reportReason.trim()}>
+              <Button
+                variant="secondary"
+                onClick={closeReportModal}
+                disabled={reportLoading}
+              >
+                취소
+              </Button>
+              <Button
+                variant="danger"
+                onClick={submitReport}
+                disabled={reportLoading || !reportReason.trim()}
+              >
                 {reportLoading ? "신고 중..." : "신고하기"}
               </Button>
             </div>
