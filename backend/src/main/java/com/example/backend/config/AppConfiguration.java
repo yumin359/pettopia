@@ -81,6 +81,7 @@ public class AppConfiguration {
                         "/api/board/{id}",
                         "/api/review/latest",
                         "/api/review/list",
+                        "/api/review/myReview/**",
                         "/api/review/facility/**",
                         "/api/chatbot",
                         "/api/comment/list",
