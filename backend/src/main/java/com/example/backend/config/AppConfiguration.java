@@ -75,19 +75,23 @@ public class AppConfiguration {
                         "/api/member/add",
                         "/api/member/login/kakao",
                         "/api/pet_facilities/**",
-                        "/api/board/latest",     // 여기 추가
-                        "/api/board/list",       // 공지사항 목록도 공개한다면 추가
+                        "/api/board/latest",
+                        "/api/board/list",
                         "/api/board/*",
                         "/api/board/{id}",
-                        "/api/review/latest",// 특정 글 상세도 공개한다면 추가 (패턴 주의)
+                        "/api/review/latest",
+                        "/api/review/list",
+                        "/api/review/facility/**",
                         "/api/chatbot",
                         "/api/comment/list",
                         "/api/like/board/**",
-                        "/api/review/list",
-                        "/api/reviewlike/review/**"
+                        "/api/reviewlike/review/**",
+                        "/api/facility/**",
+                        "/api/facility/detail"
                 ).permitAll()
                 .anyRequest().authenticated()
         );
+
 
         return http.build();
     }
