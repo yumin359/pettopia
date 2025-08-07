@@ -15,16 +15,16 @@ import java.util.List;
 @Builder
 public class ReviewListDto {
     private Integer id;
-    // private String facilityName; // 🗑️ 삭제
-    private PetFacilitySimpleDto petFacility; // ✨ 추가
-    private String memberEmail;            // 작성자 이메일
-    private String memberEmailNickName;    // 작성자 닉네임 ✅ 추가
+    private PetFacilitySimpleDto petFacility;
+    private String memberEmail;
+    private String memberEmailNickName;
     private String review;
     private Integer rating;
     private Instant insertedAt;
-    private List<String> files; // 리뷰 첨부 이미지 여러개
-    private String profileImageUrl; // 프로필 이미지 한개만
+    private List<String> files;
+    private String profileImageUrl;
     private Long memberId;
-
     private List<TagDto> tags;
+
+    private Long likesCount; // ✨ 좋아요 수 필드 추가
 }
