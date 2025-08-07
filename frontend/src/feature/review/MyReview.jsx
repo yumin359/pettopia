@@ -78,7 +78,7 @@ export function MyReview() {
                     //   )
                     // }
                   >
-                    {r.facilityName}
+                    {r.petFacility.name}
                   </div>
                   <div className="small d-flex align-items-center">
                     <span style={{ color: "#f0ad4e", fontSize: "1.1rem" }}>
