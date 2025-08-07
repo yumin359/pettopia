@@ -88,12 +88,12 @@ public class AppConfiguration {
                         "/api/like/board/**",
                         "/api/reviewlike/review/**",
                         "/api/facility/**",
-                        "/api/facility/detail"
+                        "/api/facility/detail",
+                        "/api/favorite/{facilityName}"
                 ).permitAll()
+                .requestMatchers("/api/favorite", "/api/favorite/**").authenticated()
                 .anyRequest().authenticated()
         );
-
-
         return http.build();
     }
 

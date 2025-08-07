@@ -244,14 +244,17 @@ CREATE TABLE `support`
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 # ---------------------------------------------------------------------------------
-CREATE TABLE favorite
+CREATE TABLE `favorite`
 (
-    member_id   BIGINT(20) NOT NULL,
-    facility_id BIGINT(20) NOT NULL,
-    PRIMARY KEY (member_id, facility_id),
-    FOREIGN KEY (member_id) REFERENCES member (id) ON DELETE CASCADE,
-    FOREIGN KEY (facility_id) REFERENCES pet_facility (id) ON DELETE CASCADE
-);
+    `member_id`   bigint(20) NOT NULL,
+    `facility_id` bigint(20) NOT NULL,
+    PRIMARY KEY (`member_id`, `facility_id`),
+    KEY `facility_id` (`facility_id`),
+    CONSTRAINT `favorite_ibfk_1` FOREIGN KEY (`member_id`) REFERENCES `member` (`id`) ON DELETE CASCADE,
+    CONSTRAINT `favorite_ibfk_2` FOREIGN KEY (`facility_id`) REFERENCES `pet_facility` (`id`) ON DELETE CASCADE
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci;
 # ---------------------------------------------------------------------------------
 CREATE TABLE `tags`
 (
@@ -288,6 +291,7 @@ SHOW CREATE TABLE review;
 SHOW CREATE TABLE review_file;
 SHOW CREATE TABLE review_like;
 SHOW CREATE TABLE review_report;
+SHOW CREATE TABLE favorite;
 
 UPDATE review r
     JOIN pet_facility pf ON TRIM(r.facility_name) = TRIM(pf.name)

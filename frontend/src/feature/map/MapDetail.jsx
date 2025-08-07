@@ -189,7 +189,12 @@ export function MapDetail() {
               : "시설 정보 없음"}
         </h2>
         {/*<FavoriteContainer facilityName={facility ? facility.name : ""} />*/}
-        {facility && <FavoriteContainer facilityName={facility.name} />}
+        {facility && facility.id && (
+          <FavoriteContainer
+            facilityName={facility.name}
+            facilityId={facility.id}
+          />
+        )}
       </div>
 
       {/* 시설 정보 */}

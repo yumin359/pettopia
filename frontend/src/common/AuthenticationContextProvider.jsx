@@ -12,8 +12,7 @@ if (token) {
   }
 }
 
-// axios interceptor
-// token 이 있으면 Authorization 헤더에 'Bearer token' 붙이기
+// axios interceptor: token 이 있으면 Authorization 헤더에 'Bearer token' 붙이기
 axios.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
 
@@ -31,17 +30,16 @@ export function AuthenticationContextProvider({ children }) {
   const [user, setUser] = useState(null);
 
   const updateUser = useCallback((newUserInfo) => {
-    // 현재 user 상태를 기반으로 새로운 정보를 덮어씁니다.
     setUser((currentUser) => {
-      if (!currentUser) return null; // 혹시 로그아웃된 상태면 아무것도 안 함
+      if (!currentUser) return null;
       return {
-        ...currentUser, // email, scope 등 기존 정보는 그대로 유지
-        ...newUserInfo, // nickName 등 새로 들어온 정보만 변경
+        ...currentUser,
+        ...newUserInfo,
       };
     });
   }, []);
 
-  // ✅ login 함수를 하나로 통합하고 정리합니다.
+  // login 함수를 하나로 통합하고 정리합니다.
   // 이 함수는 토큰을 받아 저장하고, 사용자 정보를 가져와 상태를 업데이트합니다.
   const login = (token) => {
     localStorage.setItem("token", token);
@@ -67,13 +65,13 @@ export function AuthenticationContextProvider({ children }) {
     setUser(null);
   };
 
-  // ✅ 페이지가 처음 로드될 때 토큰이 있으면 로그인 상태를 복원합니다.
+  // 페이지가 처음 로드될 때 토큰이 있으면 로그인 상태를 복원합니다.
   useEffect(() => {
     const tokenInStorage = localStorage.getItem("token");
     if (tokenInStorage) {
-      login(tokenInStorage); // 기존 login 함수를 재활용
+      login(tokenInStorage);
     }
-  }, []); // []를 사용하여 처음 한 번만 실행되도록 합니다.
+  }, []);
 
   function hasAccess(email) {
     return user && user.email === email;
@@ -87,7 +85,7 @@ export function AuthenticationContextProvider({ children }) {
     <AuthenticationContext.Provider
       value={{
         user,
-        login, // 정리된 login 함수 제공
+        login,
         logout,
         hasAccess,
         isAdmin,
