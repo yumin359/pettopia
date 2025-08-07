@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Carousel, Spinner, Alert, Card, Row, Col } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { BsCardImage, BsGeoAltFill } from "react-icons/bs"; // 아이콘 추가
+import { BsCardImage, BsGeoAltFill } from "react-icons/bs";
 
 export function ReviewCarousel() {
   const [reviews, setReviews] = useState([]);
@@ -33,7 +33,6 @@ export function ReviewCarousel() {
       .padStart(2, "0")}.${date.getDate().toString().padStart(2, "0")}`;
   };
 
-  // 로딩, 에러, 빈 배열 처리는 기존과 동일
   if (loading) {
     return (
       <div
@@ -49,13 +48,12 @@ export function ReviewCarousel() {
   if (reviews.length === 0)
     return <Alert variant="info">아직 등록된 리뷰가 없습니다.</Alert>;
 
-  // --- 🎨 최종 디자인 적용 캐러셀 UI ---
   return (
     <>
       <style type="text/css">
         {`
         .review-carousel-item {
-          height: 300px; /* 👈 모든 슬라이드 아이템의 높이를 300px로 고정! */
+          height: 300px;
           padding: 0.5rem 0;
         }
 
@@ -89,7 +87,7 @@ export function ReviewCarousel() {
         .review-text-truncate {
           display: -webkit-box;
           -webkit-box-orient: vertical;
-          -webkit-line-clamp: 4; /* 👈 보여줄 줄 수를 4줄로 늘림 */
+          -webkit-line-clamp: 4;
           overflow: hidden;
           text-overflow: ellipsis;
           line-height: 1.5;
@@ -107,14 +105,15 @@ export function ReviewCarousel() {
             <Carousel.Item key={review.id} className="review-carousel-item">
               <Card
                 className="review-card-custom"
-                onClick={() =>
-                  navigate(
-                    `/map/detail/${review.petFacility.id}?focusReviewId=${review.id}`,
-                  )
-                }
+                onClick={() => {
+                  // ✅ 수정: /map/detail → /facility
+                  const url = `/facility/${review.petFacility.id}?focusReviewId=${review.id}`;
+                  console.log("Navigating to:", url);
+                  navigate(url);
+                }}
               >
                 <Row g={0} className="h-100">
-                  {/* 왼쪽: 이미지 영역 (너비 40%) */}
+                  {/* 왼쪽: 이미지 영역 */}
                   <Col xs={5}>
                     {firstImage ? (
                       <img
@@ -129,10 +128,10 @@ export function ReviewCarousel() {
                     )}
                   </Col>
 
-                  {/* 오른쪽: 텍스트 영역 (너비 60%) */}
+                  {/* 오른쪽: 텍스트 영역 */}
                   <Col xs={7}>
                     <Card.Body className="d-flex flex-column h-100 review-card-body-custom">
-                      {/* 1. 상단: 유저 정보 */}
+                      {/* 상단: 유저 정보 */}
                       <div className="d-flex align-items-center mb-2">
                         <img
                           src={review.profileImageUrl || "/user.png"}
@@ -154,7 +153,7 @@ export function ReviewCarousel() {
                         </div>
                       </div>
 
-                      {/* 2. 중간: 리뷰 제목/내용 (남는 공간을 모두 차지) */}
+                      {/* 중간: 리뷰 내용 */}
                       <div
                         className="flex-grow-1 my-2"
                         style={{ overflow: "hidden" }}
@@ -164,7 +163,7 @@ export function ReviewCarousel() {
                         </p>
                       </div>
 
-                      {/* 3. 하단: 별점과 시설 정보 */}
+                      {/* 하단: 별점과 시설 정보 */}
                       <div className="mt-auto">
                         <div className="mb-2">
                           <span
