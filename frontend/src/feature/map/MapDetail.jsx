@@ -196,6 +196,20 @@ export function MapDetail() {
     }
   });
 
+  // 모든 리뷰에서 이미지 파일 URL을 한 번에 추출합니다.
+  // 이 로직은 `MapDetail` 컴포넌트의 렌더링 최상단에 위치하여
+  // 모든 이미지 파일을 통합된 배열로 만듭니다.
+  const isImageFile = (fileUrl) => {
+    const extension = fileUrl.split(".").pop().split("?")[0];
+    return ["jpg", "jpeg", "png", "gif", "webp"].includes(
+      extension.toLowerCase(),
+    );
+  };
+
+  const allImagesFromReviews = sortedReviews.flatMap((review) =>
+    (review.files || []).filter(isImageFile),
+  );
+
   return (
     <div style={{ padding: "2rem", maxWidth: "1200px", margin: "0 auto" }}>
       {/* 헤더 영역 */}
@@ -357,8 +371,26 @@ export function MapDetail() {
         </div>
       )}
 
+      {/* 사진, 동영상 목록 - 모든 이미지를 통합하여 한 번에 렌더링 */}
+      <div style={{ marginTop: "1.5rem" }}>
+        <h3 className="mb-3">🎞 사진•영상 📸</h3>
+        {loadingReviews ? (
+          <p>불러오는 중...</p>
+        ) : allImagesFromReviews.length === 0 ? (
+          <p>아직 사진•영상이 없습니다.</p>
+        ) : (
+          // ReviewCard 컴포넌트를 단일 이미지 갤러리 모드로 한 번만 사용합니다.
+          // 이 때 review 객체 대신 모든 이미지 URL이 담긴 배열을 전달해야 합니다.
+          // 하지만 ReviewCard는 review 객체를 기대하므로, 임시 review 객체를 만들고 files에 모든 이미지를 넣습니다.
+          <ReviewCard
+            review={{ files: allImagesFromReviews }}
+            showOnlyImages={true}
+          />
+        )}
+      </div>
+
       {/* 리뷰 목록 섹션 */}
-      <div>
+      <div style={{ marginTop: "1.5rem" }}>
         <div
           style={{
             // display: "flex",
@@ -367,30 +399,18 @@ export function MapDetail() {
             marginBottom: "1.5rem",
           }}
         >
-          {/* 사진, 동영상 목록 */}
-          <div style={{ marginTop: "1.5rem" }}>
-            <h4 className="mb-3">🎞 리뷰 목록 📸</h4>
-            {loadingReviews ? (
-              <p>불러오는 중...</p>
-            ) : sortedReviews.length === 0 ? (
-              <p>아직 사진•영상이 없습니다.</p>
-            ) : (
-              <ul
-                style={{
-                  paddingLeft: 0,
-                  listStyle: "none",
-                  display: "flex",
-                  flexWrap: "wrap",
-                  gap: "1rem",
-                }}
-              >
-                {sortedReviews.map((r) => (
-                  // 리뷰의 파일들을 보여주기 위해 ReviewPreview 컴포넌트의 기능을 활용
-                  <ReviewPreview key={r.id} review={r} showOnlyImages={true} />
-                ))}
-              </ul>
-            )}
-          </div>
+          <h3 style={{ margin: 0 }}>
+            📝 리뷰 목록{" "}
+            <span
+              style={{
+                color: "#6c757d",
+                fontWeight: "normal",
+                fontSize: "1rem",
+              }}
+            >
+              ({reviews.length}개)
+            </span>
+          </h3>
 
           {reviews.length > 0 && (
             <div
@@ -494,11 +514,13 @@ export function MapDetail() {
                   </span>
                 </div>
 
-                {/* 리뷰 카드 컴포넌트 */}
+                {/* 리뷰 카드 컴포넌트 - 이 부분은 showOnlyImages={false}로 작동 */}
                 <ReviewCard
+                  key={review.id}
                   review={review}
                   onUpdate={fetchReviews}
                   onDelete={handleDelete}
+                  showOnlyImages={false}
                 />
 
                 {/* 액션 버튼들 */}
