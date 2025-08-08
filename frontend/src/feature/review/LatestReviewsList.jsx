@@ -5,9 +5,7 @@ import {
   Button,
   Card,
   Col,
-  Image,
   Row,
-  Spinner,
   Container,
   Form,
 } from "react-bootstrap";
@@ -17,8 +15,6 @@ import { ReviewLikeContainer } from "../like/ReviewLikeContainer.jsx";
 export function LatestReviewsList() {
   const [reviews, setReviews] = useState(null);
   const [displayCount, setDisplayCount] = useState(12);
-  const [expandedIds, setExpandedIds] = useState([]);
-  const [clampedIds, setClampedIds] = useState([]);
   const [tagFilter, setTagFilter] = useState("");
 
   const [reportModalOpen, setReportModalOpen] = useState(false);
@@ -36,28 +32,8 @@ export function LatestReviewsList() {
       .catch(() => setReviews([]));
   }, []);
 
-  useEffect(() => {
-    if (!reviews) return;
-    const newClampedIds = [];
-    const visibleReviews = filteredReviews.slice(0, displayCount);
-    visibleReviews.forEach((r) => {
-      const el = reviewRefs.current[r.id];
-      if (!el) return;
-      const isClamped = el.scrollHeight > el.clientHeight + 1;
-      if (isClamped) newClampedIds.push(r.id);
-    });
-    setClampedIds(newClampedIds);
-  }, [reviews, displayCount, tagFilter]);
-
   const isImageFile = (fileUrl) =>
     /\.(jpg|jpeg|png|gif|webp)$/i.test(fileUrl.split("?")[0]);
-
-  const toggleExpand = (id, event) => {
-    event.stopPropagation();
-    setExpandedIds((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id],
-    );
-  };
 
   const openReportModal = (reviewId, event) => {
     event.stopPropagation();
@@ -96,16 +72,15 @@ export function LatestReviewsList() {
     setDisplayCount((prev) => Math.min(prev + 12, filteredReviews.length));
   };
 
-  const filteredReviews =
-    reviews?.filter((r) => {
-      if (!tagFilter.trim()) return true;
-      return r.tags?.some((tag) => tag.name.includes(tagFilter.trim()));
-    }) || [];
+  const filteredReviews = reviews?.filter((r) => {
+    if (!tagFilter.trim()) return true;
+    return r.tags?.some((tag) => tag.name.includes(tagFilter.trim()));
+  }) || [];
 
   if (!reviews) {
     return (
       <Container className="my-5 text-center">
-        <Spinner animation="border" />
+        <div className="spinner-border" role="status" />
       </Container>
     );
   }
@@ -114,12 +89,9 @@ export function LatestReviewsList() {
     <Container className="my-4 p-4 bg-light rounded shadow">
       <h2 className="text-center mb-4 fw-bold">
         📝 최신 리뷰
-        <span className="ms-2 fs-6 text-muted">
-          ({filteredReviews.length}개)
-        </span>
+        <span className="ms-2 fs-6 text-muted">({filteredReviews.length}개)</span>
       </h2>
 
-      {/* 태그 검색 */}
       <Form className="mb-4">
         <Form.Control
           type="text"
@@ -131,7 +103,6 @@ export function LatestReviewsList() {
 
       <Row className="g-3">
         {filteredReviews.slice(0, displayCount).map((r) => {
-          const isExpanded = expandedIds.includes(r.id);
           const imageFiles = r.files?.filter(isImageFile) || [];
           const facilityInfo = r.petFacility;
           const hasImages = imageFiles.length > 0;
@@ -149,16 +120,8 @@ export function LatestReviewsList() {
                 }}
                 style={{ cursor: "pointer" }}
               >
-                {hasImages && (
-                  <Card.Img
-                    variant="top"
-                    src={imageFiles[0]}
-                    style={{ objectFit: "cover", height: "150px" }}
-                  />
-                )}
-
                 <Card.Body className="d-flex flex-column">
-                  {/* 제목 영역 */}
+                  {/* 1. 시설명 */}
                   <div
                     className="fw-semibold text-truncate text-secondary mb-1"
                     onClick={(e) => {
@@ -170,7 +133,7 @@ export function LatestReviewsList() {
                     📍 {facilityInfo?.name || "정보 없음"}
                   </div>
 
-                  {/* 별점 - 제목 바로 아래 */}
+                  {/* 2. 별점 */}
                   <div
                     className="mb-2"
                     style={{ color: "#f0ad4e", fontSize: "1.1rem" }}
@@ -178,31 +141,109 @@ export function LatestReviewsList() {
                     {"★".repeat(r.rating)}
                   </div>
 
-                  {/* 리뷰 본문 */}
+                  {/* 3. 사진 */}
+                  {hasImages && (
+                    <>
+                      {imageFiles.length === 1 && (
+                        <Card.Img
+                          variant="top"
+                          src={imageFiles[0]}
+                          style={{
+                            objectFit: "cover",
+                            height: "150px",
+                            borderRadius: "6px",
+                            marginBottom: "8px",
+                          }}
+                        />
+                      )}
+
+                      {(imageFiles.length === 2 ||
+                        imageFiles.length === 3 ||
+                        imageFiles.length >= 4) && (
+                        <div
+                          style={{
+                            display: "grid",
+                            gridTemplateColumns: "1fr 1fr",
+                            gridTemplateRows: "1fr 1fr",
+                            gap: "4px",
+                            height: "150px",
+                            borderRadius: "6px",
+                            overflow: "hidden",
+                            marginBottom: "8px",
+                          }}
+                        >
+                          {imageFiles.slice(0, 3).map((img, i) => (
+                            <div
+                              key={i}
+                              style={{
+                                width: "100%",
+                                height: "100%",
+                                overflow: "hidden",
+                              }}
+                            >
+                              <img
+                                src={img}
+                                alt=""
+                                style={{
+                                  width: "100%",
+                                  height: "100%",
+                                  objectFit: "cover",
+                                  display: "block",
+                                }}
+                              />
+                            </div>
+                          ))}
+
+                          {imageFiles.length === 2 && <div />}
+
+                          {imageFiles.length === 3 && <div />}
+
+                          {imageFiles.length >= 4 && (
+                            <div
+                              style={{
+                                backgroundColor: "rgba(0,0,0,0.5)",
+                                color: "white",
+                                fontWeight: "bold",
+                                fontSize: "1.5rem",
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                userSelect: "none",
+                              }}
+                            >
+                              +{imageFiles.length - 3}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </>
+                  )}
+
+                  {/* 4. 리뷰 본문 (2줄 clamp with ellipsis) */}
                   <div
                     ref={(el) => (reviewRefs.current[r.id] = el)}
-                    className={`${!isExpanded ? "line-clamp-2" : ""} mb-2 text-muted`}
+                    className="mb-2 text-muted"
                     style={{
                       fontSize: "0.85rem",
+                      lineHeight: "1.0em",
+                      display: "-webkit-box",
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: "vertical",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "normal",
+                      maxHeight: "2.0em",
                       background: "#f9f9f9",
                       borderRadius: "6px",
-                      padding: "8px",
+                      padding: "0 8px",
+                      cursor: "default",
+                      userSelect: "text",
                     }}
                   >
                     {r.review}
                   </div>
 
-                  {clampedIds.includes(r.id) && (
-                    <Button
-                      variant="link"
-                      size="sm"
-                      className="p-0"
-                      onClick={(e) => toggleExpand(r.id, e)}
-                    >
-                      {isExpanded ? "접기" : "더보기"}
-                    </Button>
-                  )}
-
+                  {/* 태그 */}
                   {r.tags?.length > 0 && (
                     <div className="mb-2 d-flex flex-wrap gap-1">
                       {r.tags.slice(0, 3).map((tag) => (
@@ -229,7 +270,7 @@ export function LatestReviewsList() {
                     </div>
                   )}
 
-                  {/* 좋아요 + 신고 버튼 제외 */}
+                  {/* 좋아요 버튼 */}
                   <div
                     className="d-flex align-items-center gap-2 mt-auto"
                     onClick={(e) => e.stopPropagation()}
@@ -329,15 +370,6 @@ export function LatestReviewsList() {
           </div>
         </div>
       )}
-
-      <style>{`
-        .line-clamp-2 {
-          display: -webkit-box;
-          -webkit-line-clamp: 2;
-          -webkit-box-orient: vertical;
-          overflow: hidden;
-        }
-      `}</style>
     </Container>
   );
 }
