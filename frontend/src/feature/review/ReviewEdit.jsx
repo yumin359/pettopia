@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Form, ListGroup, Spinner } from "react-bootstrap";
 import { FaSave, FaTimes, FaTrashAlt } from "react-icons/fa";
 import Select from "react-select/creatable";
@@ -105,6 +105,13 @@ function ReviewEdit({ review, onSave, onCancel }) {
       return;
     }
 
+    // 파일 개수 제한 체크
+    const totalFiles = newFiles.length;
+    if (totalFiles > 10) {
+      toast.warning("새로 추가할 파일은 최대 10개까지만 가능합니다.");
+      return;
+    }
+
     setIsProcessing(true);
 
     try {
@@ -121,9 +128,18 @@ function ReviewEdit({ review, onSave, onCancel }) {
       newFiles.forEach((fileObj) => formData.append("files", fileObj.file));
       selectedTags.forEach((tag) => formData.append("tagNames", tag.value));
 
+      // ✨ 절대 경로로 강제 지정 - 8080 포트 직접 사용
       await axios.put(
         `http://localhost:8080/api/review/update/${review.id}`,
         formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          withCredentials: true,
+          timeout: 30000,
+        },
       );
 
       toast.success("수정 완료!");
@@ -146,8 +162,26 @@ function ReviewEdit({ review, onSave, onCancel }) {
     }
   };
 
+  // ReviewEdit.jsx의 handleFileChange 함수에 추가할 검증 로직
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
+
+    // 전체 파일 개수 체크 (기존 + 새로운 파일)
+    const totalFileCount =
+      existingFiles.length + newFiles.length + selectedFiles.length;
+    if (totalFileCount > 15) {
+      // 적절한 제한값 설정
+      toast.warning(
+        `전체 파일은 최대 15개까지만 업로드할 수 있습니다. 현재: ${totalFileCount}개`,
+      );
+      return;
+    }
+
+    // 새로 추가할 파일만 체크
+    if (newFiles.length + selectedFiles.length > 10) {
+      toast.warning(`새로 추가할 파일은 최대 10개까지만 가능합니다.`);
+      return;
+    }
 
     const validFiles = selectedFiles.filter((file) => {
       const isValidType =

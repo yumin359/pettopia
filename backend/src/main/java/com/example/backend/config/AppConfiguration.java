@@ -7,6 +7,7 @@ import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -22,6 +23,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.multipart.support.StandardServletMultipartResolver;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
@@ -56,6 +58,30 @@ public class AppConfiguration {
                 .region(Region.AP_NORTHEAST_2)
                 .credentialsProvider(provider)
                 .build();
+    }
+
+    @Bean
+    public TomcatServletWebServerFactory tomcatServletWebServerFactory() {
+        TomcatServletWebServerFactory factory = new TomcatServletWebServerFactory();
+
+        factory.addConnectorCustomizers(connector -> {
+            // ✨ maxParameterCount 직접 설정 (가장 중요!)
+            connector.setMaxParameterCount(50000);
+
+            // maxPostSize 설정
+            connector.setMaxPostSize(200 * 1024 * 1024); // 200MB
+
+            // 추가 설정
+            connector.setProperty("maxSwallowSize", "200000000");
+        });
+
+        return factory;
+    }
+
+    // ✨ MultipartResolver 커스터마이징
+    @Bean
+    public StandardServletMultipartResolver multipartResolver() {
+        return new StandardServletMultipartResolver();
     }
 
     @Bean
