@@ -1,14 +1,15 @@
 import { useEffect, useState, useContext } from "react";
 import { Table, Alert, Spinner } from "react-bootstrap";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
-import { Navigate } from "react-router-dom";
-import axios from "axios"; // ✅ 추가
+import { Navigate, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 export default function ServiceListPage() {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const { isAdmin } = useContext(AuthenticationContext);
+  const navigate = useNavigate();
 
   if (!(typeof isAdmin === "function" ? isAdmin() : isAdmin)) {
     return <Navigate to="/login" replace />;
@@ -17,9 +18,8 @@ export default function ServiceListPage() {
   useEffect(() => {
     async function fetchServices() {
       try {
-        const res = await axios.get("/api/support/list"); // ✅ 수정됨
-        const data = res.data; // ✅ 수정됨
-        setServices(data);
+        const res = await axios.get("/api/support/list");
+        setServices(res.data);
       } catch (err) {
         if (err.response?.status === 401) {
           setError("로그인이 필요합니다.");
@@ -30,7 +30,6 @@ export default function ServiceListPage() {
         setLoading(false);
       }
     }
-
     fetchServices();
   }, []);
 
@@ -56,29 +55,31 @@ export default function ServiceListPage() {
       <h2 className="mb-4">문의 내역 목록</h2>
       <Table striped bordered hover>
         <thead>
-          <tr>
-            <th>#</th>
-            <th>이메일</th>
-            <th>제목</th>
-            <th>내용</th>
-            <th>접수일</th>
-          </tr>
+        <tr>
+          <th>#</th>
+          <th>이메일</th>
+          <th>제목</th>
+          <th>내용</th>
+          <th>접수일</th>
+        </tr>
         </thead>
         <tbody>
-          {services.map(({ id, email, title, content, inserted_at }, idx) => (
-            <tr key={id ?? idx}>
-              <td>{idx + 1}</td>
-              <td>{email}</td>
-              <td>{title}</td>
-              <td style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
-                {content.length > 100
-                  ? content.substring(0, 50) + "..."
-                  : content}
-              </td>
-
-              <td>{new Date(inserted_at).toLocaleString()}</td>
-            </tr>
-          ))}
+        {services.map(({ id, email, title, content, inserted_at }, idx) => (
+          <tr key={id ?? idx}>
+            <td>{idx + 1}</td>
+            <td
+              style={{ cursor: "pointer", color: "blue", textDecoration: "underline" }}
+              onClick={() => navigate(`/member?email=${encodeURIComponent(email)}`)}
+            >
+              {email}
+            </td>
+            <td>{title}</td>
+            <td style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
+              {content.length > 100 ? content.substring(0, 50) + "..." : content}
+            </td>
+            <td>{new Date(inserted_at).toLocaleString()}</td>
+          </tr>
+        ))}
         </tbody>
       </Table>
     </div>
