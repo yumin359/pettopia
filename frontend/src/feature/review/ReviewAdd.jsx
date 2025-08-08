@@ -32,10 +32,13 @@ export function ReviewAdd({ facility, onSave, onCancel }) {
       const res = await axios.get("/api/tags", {
         params: { q: searchTerm },
       });
-      const options = res.data.map((tag) => ({
-        value: tag.name.replace(/^#/, ""),
-        label: tag.name.replace(/^#/, ""),
-      }));
+      const options = res.data.map((tag) => {
+        const cleanName = tag.name.replace(/#/g, ""); // 모든 # 제거
+        return {
+          value: cleanName,
+          label: cleanName,
+        };
+      });
       setTagOptions(options);
     } catch (error) {
       console.error("태그 검색 실패:", error);
@@ -108,6 +111,42 @@ export function ReviewAdd({ facility, onSave, onCancel }) {
   }, []);
 
   const isValid = content.trim() !== "";
+
+  // 새 태그 생성 시 #, 띄어쓰기, 특수기호 금지 + 최대 6개 제한
+  const handleCreateTag = (inputValue) => {
+    const isValidTag = /^[a-zA-Z0-9가-힣_]+$/.test(inputValue);
+
+    if (!isValidTag) {
+      toast.warning("태그는 띄어쓰기, 특수문자를 포함할 수 없습니다.");
+      return;
+    }
+
+    if (selectedTags.length >= 6) {
+      toast.warning("태그는 최대 6개까지만 선택할 수 있습니다.");
+      return;
+    }
+
+    const newTag = {
+      value: inputValue,
+      label: inputValue,
+    };
+
+    setSelectedTags((prev) => [...prev, newTag]);
+  };
+
+  // 태그 선택 시 # 제거 후 저장
+  const handleTagChange = (newValue) => {
+    if (newValue && newValue.length > 6) {
+      toast.warning("태그는 최대 6개까지만 선택할 수 있습니다.");
+      return;
+    }
+    const cleaned = (newValue || []).map((tag) => ({
+      ...tag,
+      value: tag.value.replace(/#/g, ""),
+      label: tag.label.replace(/#/g, ""),
+    }));
+    setSelectedTags(cleaned);
+  };
 
   const handleSave = async () => {
     if (!isValid) {
@@ -192,28 +231,25 @@ export function ReviewAdd({ facility, onSave, onCancel }) {
             isClearable
             options={tagOptions}
             value={selectedTags}
-            onChange={(newValue) => {
-              if (newValue && newValue.length > 6) {
-                toast.warning("태그는 최대 6개까지만 선택할 수 있습니다.");
-                return;
-              }
-              setSelectedTags(newValue || []);
-            }}
+            onChange={handleTagChange}
             onInputChange={(value) => setInputValue(value)}
+            onCreateOption={handleCreateTag}
             placeholder="태그를 입력하거나 선택하세요..."
             formatCreateLabel={(inputValue) => `"${inputValue}" 태그 추가`}
             noOptionsMessage={() => "태그가 없습니다"}
             isDisabled={isProcessing}
             className="react-select-container"
             classNamePrefix="react-select"
-
-            // # 붙여서 보여주기
             formatOptionLabel={(option) => (
-              <span>{option.label.startsWith("#") ? option.label : `#${option.label}`}</span>
+              <span>
+                {option.label.startsWith("#") ? option.label : `#${option.label}`}
+              </span>
             )}
             components={{
               MultiValueLabel: ({ data }) => (
-                <span>{data.label.startsWith("#") ? data.label : `#${data.label}`}</span>
+                <span>
+                  {data.label.startsWith("#") ? data.label : `#${data.label}`}
+                </span>
               ),
             }}
           />
