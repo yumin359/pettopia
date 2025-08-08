@@ -9,35 +9,20 @@ export function FavoriteContainer({ facilityName, facilityId }) {
   const [favoriteInfo, setFavoriteInfo] = useState(null);
   const { user } = useContext(AuthenticationContext);
 
-  // 🔍 디버깅 로그 추가
-  useEffect(() => {
-    console.log("=== FavoriteContainer Debug ===");
-    console.log("1. User:", user);
-    console.log("2. Token:", localStorage.getItem("token"));
-    console.log("3. FacilityName:", facilityName);
-    console.log("4. FacilityId:", facilityId);
-    console.log("==============================");
-  }, [user, facilityName, facilityId]);
-
   function fetchLikeInfo() {
     if (!facilityName || !facilityName.trim()) {
-      console.log("fetchLikeInfo: No facility name");
       return Promise.resolve();
     }
 
     const trimmedName = facilityName.trim();
     const encodedName = encodeURIComponent(trimmedName);
 
-    console.log("Fetching favorite info for:", encodedName);
-
     return axios
       .get(`/api/favorite/${encodedName}`)
       .then((res) => {
-        console.log("Favorite info response:", res.data);
         setFavoriteInfo(res.data);
       })
       .catch((err) => {
-        console.error("찜 정보 불러오기 실패:", err.response || err);
         // 404나 401은 정상적인 경우일 수 있음
         if (err.response?.status === 404 || err.response?.status === 401) {
           setFavoriteInfo({ isFavorite: false });
@@ -47,7 +32,6 @@ export function FavoriteContainer({ facilityName, facilityId }) {
 
   useEffect(() => {
     if (!user || !facilityName || !facilityName.trim()) {
-      console.log("Skip fetch - user:", !!user, "facilityName:", facilityName);
       setFavoriteInfo({ isFavorite: false });
       return;
     }
@@ -57,14 +41,7 @@ export function FavoriteContainer({ facilityName, facilityId }) {
   }, [facilityName, user]);
 
   function handleFavoriteClick() {
-    console.log("=== Handle Favorite Click ===");
-    console.log("isProcessing:", isProcessing);
-    console.log("user:", user);
-    console.log("facilityName:", facilityName);
-    console.log("Token before request:", localStorage.getItem("token"));
-
     if (isProcessing || !user || !facilityName || !facilityName.trim()) {
-      console.log("Click blocked!");
       return;
     }
 
@@ -78,13 +55,10 @@ export function FavoriteContainer({ facilityName, facilityId }) {
       requestData.facilityId = facilityId;
     }
 
-    console.log("Request data:", requestData);
-
     // axios 직접 사용 (인터셉터가 토큰 추가)
     axios
       .put("/api/favorite", requestData)
-      .then((res) => {
-        console.log("✅ 찜 처리 성공:", res);
+      .then(() => {
         // 낙관적 업데이트
         setFavoriteInfo((prev) => ({
           ...prev,

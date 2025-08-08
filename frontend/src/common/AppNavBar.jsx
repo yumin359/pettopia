@@ -185,8 +185,8 @@ export function AppNavBar() {
         style={{
           background: "linear-gradient(90deg, #FFB75E, #FF9900)",
           minHeight: "80px",
-          borderRadius: "0 0 12px 12px", // 네비바 자체에 borderRadius 적용
-          overflow: "visible", // 네비바에서도 overflow visible 설정
+          borderRadius: "0 0 12px 12px",
+          overflow: "visible",
         }}
       >
         <Container fluid>
