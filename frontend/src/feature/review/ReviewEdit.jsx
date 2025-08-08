@@ -16,7 +16,10 @@ function ReviewEdit({ review, onSave, onCancel }) {
   // 태그 상태
   const [tagOptions, setTagOptions] = useState([]);
   const [selectedTags, setSelectedTags] = useState(
-    (review.tags || []).map((tag) => ({ value: tag.name.replace(/#/g, ""), label: tag.name.replace(/#/g, "") }))
+    (review.tags || []).map((tag) => ({
+      value: tag.name.replace(/#/g, ""),
+      label: tag.name.replace(/#/g, ""),
+    })),
   );
   const [inputValue, setInputValue] = useState("");
 
@@ -95,6 +98,7 @@ function ReviewEdit({ review, onSave, onCancel }) {
     }
   };
 
+  // ReviewEdit.jsx에 인증 토큰 추가
   const handleSave = async () => {
     if (!content.trim()) {
       toast.warning("내용을 입력하세요.");
@@ -105,18 +109,22 @@ function ReviewEdit({ review, onSave, onCancel }) {
 
     try {
       const formData = new FormData();
+
       formData.append("review", content.trim());
       formData.append("rating", rating);
       formData.append("facilityName", review.facilityName);
       formData.append("memberEmail", review.memberEmail);
 
-      deleteFileNames.forEach((name) => formData.append("deleteFileNames", name));
+      deleteFileNames.forEach((name) =>
+        formData.append("deleteFileNames", name),
+      );
       newFiles.forEach((fileObj) => formData.append("files", fileObj.file));
       selectedTags.forEach((tag) => formData.append("tagNames", tag.value));
 
-      await axios.put(`/api/review/update/${review.id}`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      await axios.put(
+        `http://localhost:8080/api/review/update/${review.id}`,
+        formData,
+      );
 
       toast.success("수정 완료!");
 
@@ -125,7 +133,14 @@ function ReviewEdit({ review, onSave, onCancel }) {
       }
     } catch (error) {
       console.error("수정 실패:", error);
-      toast.error("수정 실패: " + (error.response?.data?.message || error.message));
+      // 401 에러인 경우 로그인 페이지로 리다이렉트
+      if (error.response?.status === 401) {
+        toast.error("로그인이 필요합니다.");
+      } else {
+        toast.error(
+          "수정 실패: " + (error.response?.data?.message || error.message),
+        );
+      }
     } finally {
       setIsProcessing(false);
     }
@@ -152,7 +167,9 @@ function ReviewEdit({ review, onSave, onCancel }) {
 
     const filesWithPreview = validFiles.map((file) => ({
       file,
-      previewUrl: file.type.startsWith("image/") ? URL.createObjectURL(file) : null,
+      previewUrl: file.type.startsWith("image/")
+        ? URL.createObjectURL(file)
+        : null,
     }));
 
     setNewFiles((prev) => [...prev, ...filesWithPreview]);
@@ -294,7 +311,9 @@ function ReviewEdit({ review, onSave, onCancel }) {
                       }}
                     />
                   )}
-                  <span className="text-truncate">{getFileNameFromUrl(fileUrl)}</span>
+                  <span className="text-truncate">
+                    {getFileNameFromUrl(fileUrl)}
+                  </span>
                 </div>
                 <Button
                   size="sm"
@@ -369,11 +388,21 @@ function ReviewEdit({ review, onSave, onCancel }) {
 
       {/* 편집 버튼들 */}
       <div className="d-flex justify-content-end gap-2">
-        <Button variant="outline-secondary" onClick={handleCancel} disabled={isProcessing}>
+        <Button
+          variant="outline-secondary"
+          onClick={handleCancel}
+          disabled={isProcessing}
+        >
           <FaTimes /> 취소
         </Button>
-        <Button variant="primary" onClick={handleSave} disabled={isProcessing || !content.trim()}>
-          {isProcessing && <Spinner animation="border" size="sm" className="me-2" />}
+        <Button
+          variant="primary"
+          onClick={handleSave}
+          disabled={isProcessing || !content.trim()}
+        >
+          {isProcessing && (
+            <Spinner animation="border" size="sm" className="me-2" />
+          )}
           <FaSave /> 저장
         </Button>
       </div>
