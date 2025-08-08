@@ -83,7 +83,11 @@ export function ReviewCarousel() {
                 <Col xs={4} className="position-relative bg-light">
                   {totalImages === 0 ? (
                     <div className="d-flex justify-content-center align-items-center h-100">
-                      <BsCardImage size={30} className="text-muted" />
+                      <img
+                        src="/PETOPIA-Photoroom.png"
+                        alt="이미지 없음"
+                        style={{ maxWidth: "80%", maxHeight: "80%", objectFit: "contain" }}
+                      />
                     </div>
                   ) : totalImages === 1 ? (
                     <img
