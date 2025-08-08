@@ -295,16 +295,16 @@ SHOW CREATE TABLE review_report;
 SHOW CREATE TABLE favorite;
 SHOW CREATE TABLE tags;
 # ---------------------------------------------------------------------------------
-UPDATE review r
-    JOIN pet_facility pf ON TRIM(r.facility_name) = TRIM(pf.name)
-SET r.facility_id = pf.id;
+# UPDATE review r
+#     JOIN pet_facility pf ON TRIM(r.facility_name) = TRIM(pf.name)
+# SET r.facility_id = pf.id;
 
 # 이건 너무 극단적인 마지막 수단.
 # ALTER TABLE review
 #     DROP COLUMN facility_name;
 
 # 사용을 안하게 해버리기.
-ALTER TABLE review
-    MODIFY COLUMN facility_name VARCHAR(255) NULL;
+# ALTER TABLE review
+#     MODIFY COLUMN facility_name VARCHAR(255) NULL;
 # ---------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------
