@@ -367,7 +367,7 @@ export function LatestReviewsList() {
                 {reportLoading ? "신고 중..." : "신고하기"}
               </Button>
             </div>
-          </div>
+          </div>제
         </div>
       )}
     </Container>
