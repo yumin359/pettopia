@@ -181,7 +181,7 @@ export function MapDetail() {
           marginBottom: "1.5rem",
         }}
       >
-        <h2 style={{ margin: 0 }}>
+        <h2 style={{ margin: 0, textAlign: "center", width: "100%" }}>
           {loadingFacility
             ? "불러오는 중..."
             : facility
@@ -210,16 +210,16 @@ export function MapDetail() {
             border: "1px solid #e9ecef",
           }}
         >
-          <div style={{ marginBottom: "0.8rem" }}>
-            <strong>📍 도로명 주소:</strong>
+          <div style={{ marginBottom: "0.8rem", fontSize: "1.2rem" }}>
+            <strong style={{ marginRight: "0.5rem" }}>📍 도로명 주소:</strong>
             <span>{facility.roadAddress || "정보 없음"}</span>
           </div>
-          <div style={{ marginBottom: "0.8rem" }}>
-            <strong>📞 전화번호:</strong>
+          <div style={{ marginBottom: "0.8rem", fontSize: "1.2rem" }}>
+            <strong style={{ marginRight: "0.5rem" }}>📞 전화번호:</strong>
             <span>{facility.phoneNumber || "정보 없음"}</span>
           </div>
-          <div style={{ marginBottom: "0.8rem" }}>
-            <strong>🌐 홈페이지:</strong>{" "}
+          <div style={{ marginBottom: "0.8rem", fontSize: "1.2rem" }}>
+            <strong style={{ marginRight: "0.5rem" }}>🌐 홈페이지:</strong>{" "}
             {(() => {
               const homepageRaw = facility?.homepage ?? "";
               const homepage = homepageRaw.trim().toLowerCase();
@@ -242,12 +242,12 @@ export function MapDetail() {
               );
             })()}
           </div>
-          <div style={{ marginBottom: "0.8rem" }}>
-            <strong>🏖️ 휴무일:</strong>
+          <div style={{ marginBottom: "0.8rem", fontSize: "1.2rem" }}>
+            <strong style={{ marginRight: "0.5rem" }}>🏖️ 휴무일:</strong>
             <span>{facility.holiday || "정보 없음"}</span>
           </div>
-          <div>
-            <strong>⏰ 운영시간:</strong>
+          <div style={{ fontSize: "1.2rem" }}>
+            <strong style={{ marginRight: "0.5rem" }}>⏰ 운영시간:</strong>
             <span>{facility.operatingHours || "정보 없음"}</span>
           </div>
         </div>
