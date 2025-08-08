@@ -311,7 +311,7 @@ function ReviewEdit({ review, onSave, onCancel }) {
                       }}
                     />
                   )}
-                  <span className="text-truncate">
+                  <span style={{ wordBreak: "break-all" }}>
                     {getFileNameFromUrl(fileUrl)}
                   </span>
                 </div>
