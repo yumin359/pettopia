@@ -10,19 +10,28 @@ import {
   Badge,
 } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { BsCardImage, BsGeoAltFill, BsImages, BsHash } from "react-icons/bs";
+import { BsImages, BsGeoAltFill, BsHash } from "react-icons/bs";
+import { BsChevronLeft, BsChevronRight } from "react-icons/bs";
 
-export function ReviewCarousel() {
+export const ReviewCarousel = () => {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-
+  const arrowStyle = {
+    color: "#333",  
+    borderRadius: "50%",
+    padding: "6px",
+    fontSize: "1.8rem",
+    filter: "drop-shadow(0 0 3px rgba(0,0,0,0.4))", // 그림자 추가해서 입체감
+    cursor: "pointer",
+    userSelect: "none",
+  };
   useEffect(() => {
     const fetchLatestReviews = async () => {
       try {
-        const response = await axios.get("/api/review/latest");
-        setReviews(response.data);
+        const { data } = await axios.get("/api/review/latest");
+        setReviews(data);
       } catch (err) {
         console.error("최신 리뷰 조회 실패:", err);
         setError("리뷰를 불러오는 중 오류가 발생했습니다.");
@@ -42,7 +51,7 @@ export function ReviewCarousel() {
       .replace(".", "");
   };
 
-  if (loading) {
+  if (loading)
     return (
       <div
         className="d-flex justify-content-center align-items-center"
@@ -52,14 +61,21 @@ export function ReviewCarousel() {
         <span>로딩 중...</span>
       </div>
     );
-  }
 
   if (error) return <Alert variant="danger">{error}</Alert>;
+
   if (reviews.length === 0)
     return <Alert variant="info">등록된 리뷰가 없습니다.</Alert>;
 
+
   return (
-    <Carousel indicators={false} interval={5000} className="shadow-sm">
+    <Carousel
+      indicators={false}
+      interval={5000}
+      className="shadow-sm"
+      prevIcon={<BsChevronLeft style={arrowStyle} />}
+      nextIcon={<BsChevronRight style={arrowStyle} />}
+    >
       {reviews.map((review) => {
         const imageFiles =
           review.files?.filter((f) => /\.(jpg|jpeg|png|gif|webp)$/i.test(f)) ||
@@ -67,7 +83,7 @@ export function ReviewCarousel() {
         const totalImages = imageFiles.length;
 
         return (
-          <Carousel.Item key={review.id} style={{ height: "200px" }}>
+          <Carousel.Item key={review.id}>
             <Card
               className="h-100 border-0 shadow-sm"
               role="button"
@@ -79,8 +95,7 @@ export function ReviewCarousel() {
               style={{ background: "lightgoldenrodyellow", cursor: "pointer" }}
             >
               <Row className="g-0 h-100">
-                {/* 이미지 영역 - 30% */}
-                <Col xs={4} className="position-relative bg-light">
+                <Col xs={4} className="position-relative bg-light" style={{ minHeight: "200px" }}>
                   {totalImages === 0 ? (
                     <div className="d-flex justify-content-center align-items-center h-100">
                       <img
@@ -93,18 +108,13 @@ export function ReviewCarousel() {
                         }}
                       />
                     </div>
-                  ) : totalImages === 1 ? (
-                    <img
-                      src={imageFiles[0]}
-                      alt=""
-                      className="w-100 h-100 object-fit-cover"
-                    />
                   ) : (
                     <div className="row g-1 h-100 m-0">
                       {imageFiles.slice(0, 4).map((img, i) => (
                         <div
                           key={i}
-                          className={`${totalImages === 2 ? "col-12" : "col-6"} p-0 position-relative`}
+                          className={`col-${totalImages === 2 ? 6 : 3} p-0 position-relative`}
+                          style={{ height: "100px" }}
                         >
                           <img
                             src={img}
@@ -121,7 +131,6 @@ export function ReviewCarousel() {
                     </div>
                   )}
 
-                  {/* 이미지 개수 뱃지 */}
                   {totalImages > 1 && (
                     <Badge
                       bg="dark"
@@ -132,10 +141,8 @@ export function ReviewCarousel() {
                   )}
                 </Col>
 
-                {/* 텍스트 영역 - 70% */}
                 <Col xs={8}>
                   <Card.Body className="p-3 d-flex flex-column h-100">
-                    {/* 유저 정보 */}
                     <div className="d-flex align-items-center mb-2">
                       <img
                         src={review.profileImageUrl || "/user.png"}
@@ -149,23 +156,19 @@ export function ReviewCarousel() {
                       />
                       <div className="small">
                         <div className="fw-semibold">
-                          {review.memberEmailNickName}
+                          {review.memberNickname || review.memberEmail}
                         </div>
-                        <div
-                          className="text-muted"
-                          style={{ fontSize: "0.75rem" }}
-                        >
+                        <div className="text-muted" style={{ fontSize: "0.75rem" }}>
                           {formatDate(review.insertedAt)}
                         </div>
                       </div>
                     </div>
 
-                    {/* 태그 영역 */}
-                    {review.tags && review.tags.length > 0 && (
+                    {review.tags?.length > 0 && (
                       <div className="mb-2 d-flex flex-wrap gap-1">
-                        {review.tags.slice(0, 3).map((tag, index) => (
+                        {review.tags.slice(0, 3).map((tag, i) => (
                           <Badge
-                            key={tag.id || index}
+                            key={tag.id || i}
                             bg="secondary"
                             className="fw-normal"
                             style={{
@@ -193,38 +196,31 @@ export function ReviewCarousel() {
                       </div>
                     )}
 
-                    {/* 리뷰 내용 */}
                     <p
-                      className="small mb-auto text-truncate-3"
+                      className="small mb-auto"
                       style={{
                         display: "-webkit-box",
-                        WebkitLineClamp:
-                          review.tags && review.tags.length > 0 ? 2 : 3,
+                        WebkitLineClamp: review.tags?.length > 0 ? 2 : 3,
                         WebkitBoxOrient: "vertical",
                         overflow: "hidden",
-                        lineHeight: "1.4",
+                        lineHeight: 1.4,
                         fontSize: "0.85rem",
                       }}
                     >
                       {review.review}
                     </p>
 
-                    {/* 별점과 시설 */}
                     <div className="mt-2">
                       <div className="text-warning small mb-1">
                         {"★".repeat(review.rating)}
-                        <span className="text-muted">
-                          {"★".repeat(5 - review.rating)}
-                        </span>
+                        <span className="text-muted">{"★".repeat(5 - review.rating)}</span>
                       </div>
                       <div
                         className="d-flex align-items-center text-muted"
                         style={{ fontSize: "0.75rem" }}
                       >
                         <BsGeoAltFill size={10} className="me-1" />
-                        <span className="text-truncate">
-                          {review.petFacility.name}
-                        </span>
+                        <span className="text-truncate">{review.petFacility.name}</span>
                       </div>
                     </div>
                   </Card.Body>
@@ -236,4 +232,4 @@ export function ReviewCarousel() {
       })}
     </Carousel>
   );
-}
+};
