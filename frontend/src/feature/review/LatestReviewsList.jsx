@@ -55,7 +55,7 @@ export function LatestReviewsList() {
   const toggleExpand = (id, event) => {
     event.stopPropagation();
     setExpandedIds((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id],
     );
   };
 
@@ -96,10 +96,11 @@ export function LatestReviewsList() {
     setDisplayCount((prev) => Math.min(prev + 12, filteredReviews.length));
   };
 
-  const filteredReviews = reviews?.filter((r) => {
-    if (!tagFilter.trim()) return true;
-    return r.tags?.some((tag) => tag.name.includes(tagFilter.trim()));
-  }) || [];
+  const filteredReviews =
+    reviews?.filter((r) => {
+      if (!tagFilter.trim()) return true;
+      return r.tags?.some((tag) => tag.name.includes(tagFilter.trim()));
+    }) || [];
 
   if (!reviews) {
     return (
@@ -113,9 +114,12 @@ export function LatestReviewsList() {
     <Container className="my-4 p-4 bg-light rounded shadow">
       <h2 className="text-center mb-4 fw-bold">
         📝 최신 리뷰
-        <span className="ms-2 fs-6 text-muted">({filteredReviews.length}개)</span>
+        <span className="ms-2 fs-6 text-muted">
+          ({filteredReviews.length}개)
+        </span>
       </h2>
 
+      {/* 태그 검색 */}
       <Form className="mb-4">
         <Form.Control
           type="text"
@@ -167,7 +171,10 @@ export function LatestReviewsList() {
                   </div>
 
                   {/* 별점 - 제목 바로 아래 */}
-                  <div className="mb-2" style={{ color: "#f0ad4e", fontSize: "1.1rem" }}>
+                  <div
+                    className="mb-2"
+                    style={{ color: "#f0ad4e", fontSize: "1.1rem" }}
+                  >
                     {"★".repeat(r.rating)}
                   </div>
 
