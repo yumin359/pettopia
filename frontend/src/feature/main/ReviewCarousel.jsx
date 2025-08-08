@@ -10,7 +10,7 @@ import {
   Badge,
 } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { BsCardImage, BsGeoAltFill, BsImages } from "react-icons/bs";
+import { BsCardImage, BsGeoAltFill, BsImages, BsHash } from "react-icons/bs";
 
 export function ReviewCarousel() {
   const [reviews, setReviews] = useState([]);
@@ -76,7 +76,7 @@ export function ReviewCarousel() {
                   `/facility/${review.petFacility.id}?focusReviewId=${review.id}`,
                 )
               }
-              style={{ background: "lightgoldenrodyellow" }}
+              style={{ background: "lightgoldenrodyellow", cursor: "pointer" }}
             >
               <Row className="g-0 h-100">
                 {/* 이미지 영역 - 30% */}
@@ -86,7 +86,11 @@ export function ReviewCarousel() {
                       <img
                         src="/PETOPIA-Photoroom.png"
                         alt="이미지 없음"
-                        style={{ maxWidth: "80%", maxHeight: "80%", objectFit: "contain" }}
+                        style={{
+                          maxWidth: "80%",
+                          maxHeight: "80%",
+                          objectFit: "contain",
+                        }}
                       />
                     </div>
                   ) : totalImages === 1 ? (
@@ -156,15 +160,50 @@ export function ReviewCarousel() {
                       </div>
                     </div>
 
+                    {/* 태그 영역 */}
+                    {review.tags && review.tags.length > 0 && (
+                      <div className="mb-2 d-flex flex-wrap gap-1">
+                        {review.tags.slice(0, 3).map((tag, index) => (
+                          <Badge
+                            key={tag.id || index}
+                            bg="secondary"
+                            className="fw-normal"
+                            style={{
+                              fontSize: "0.7rem",
+                              padding: "0.2rem 0.4rem",
+                            }}
+                          >
+                            <BsHash size={10} className="me-0" />
+                            {tag.name.replace(/#/g, "")}
+                          </Badge>
+                        ))}
+                        {review.tags.length > 3 && (
+                          <Badge
+                            bg="light"
+                            text="dark"
+                            className="fw-normal"
+                            style={{
+                              fontSize: "0.7rem",
+                              padding: "0.2rem 0.4rem",
+                            }}
+                          >
+                            +{review.tags.length - 3}
+                          </Badge>
+                        )}
+                      </div>
+                    )}
+
                     {/* 리뷰 내용 */}
                     <p
                       className="small mb-auto text-truncate-3"
                       style={{
                         display: "-webkit-box",
-                        WebkitLineClamp: 3,
+                        WebkitLineClamp:
+                          review.tags && review.tags.length > 0 ? 2 : 3,
                         WebkitBoxOrient: "vertical",
                         overflow: "hidden",
                         lineHeight: "1.4",
+                        fontSize: "0.85rem",
                       }}
                     >
                       {review.review}
