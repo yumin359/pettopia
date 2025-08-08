@@ -171,365 +171,329 @@ export function MapDetail() {
   }, [reviews, searchParams]);
 
   return (
-    <div style={{ padding: "2rem", maxWidth: "1200px", margin: "0 auto" }}>
+    <div className="container-fluid px-4 py-4" style={{ maxWidth: "1400px" }}>
       {/* 헤더 */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "1.5rem",
-        }}
-      >
-        <h2 style={{ margin: 0, textAlign: "center", width: "100%" }}>
-          {loadingFacility
-            ? "불러오는 중..."
-            : facility
-              ? facility.name
-              : "시설 정보 없음"}
-        </h2>
-        {/*<FavoriteContainer facilityName={facility ? facility.name : ""} />*/}
-        {facility && facility.id && (
-          <FavoriteContainer
-            facilityName={facility.name}
-            facilityId={facility.id}
-          />
-        )}
+      <div className="row mb-4">
+        <div className="col-12">
+          <div className="d-flex justify-content-between align-items-center">
+            <h2 className="fw-bold mb-0">
+              {loadingFacility
+                ? "불러오는 중..."
+                : facility
+                  ? facility.name
+                  : "시설 정보 없음"}
+            </h2>
+            {facility && facility.id && (
+              <FavoriteContainer
+                facilityName={facility.name}
+                facilityId={facility.id}
+              />
+            )}
+          </div>
+        </div>
       </div>
 
-      {/* 시설 정보 */}
-      {loadingFacility ? (
-        <p>시설 정보 불러오는 중...</p>
-      ) : facility ? (
-        <div
-          style={{
-            marginBottom: "2rem",
-            padding: "1.5rem",
-            backgroundColor: "#f8f9fa",
-            borderRadius: "8px",
-            border: "1px solid #e9ecef",
-          }}
-        >
-          <div style={{ marginBottom: "0.8rem", fontSize: "1.2rem" }}>
-            <strong style={{ marginRight: "0.5rem" }}>📍 도로명 주소:</strong>
-            <span>{facility.roadAddress || "정보 없음"}</span>
-          </div>
-          <div style={{ marginBottom: "0.8rem", fontSize: "1.2rem" }}>
-            <strong style={{ marginRight: "0.5rem" }}>📞 전화번호:</strong>
-            <span>{facility.phoneNumber || "정보 없음"}</span>
-          </div>
-          <div style={{ marginBottom: "0.8rem", fontSize: "1.2rem" }}>
-            <strong style={{ marginRight: "0.5rem" }}>🌐 홈페이지:</strong>{" "}
-            {(() => {
-              const homepageRaw = facility?.homepage ?? "";
-              const homepage = homepageRaw.trim().toLowerCase();
-              const isValid =
-                homepage &&
-                homepage !== "정보없음" &&
-                homepage !== "none" &&
-                homepage !== "null";
-              return isValid ? (
-                <a
-                  href={facility.homepage}
-                  target="_blank"
-                  rel="noreferrer"
-                  style={{ color: "#007bff", textDecoration: "none" }}
-                >
-                  {facility.homepage}
-                </a>
-              ) : (
-                <span>정보 없음</span>
-              );
-            })()}
-          </div>
-          <div style={{ marginBottom: "0.8rem", fontSize: "1.2rem" }}>
-            <strong style={{ marginRight: "0.5rem" }}>🏖️ 휴무일:</strong>
-            <span>{facility.holiday || "정보 없음"}</span>
-          </div>
-          <div style={{ fontSize: "1.2rem" }}>
-            <strong style={{ marginRight: "0.5rem" }}>⏰ 운영시간:</strong>
-            <span>{facility.operatingHours || "정보 없음"}</span>
+      {/* 시설 정보 및 지도 섹션 */}
+      <div className="row mb-4">
+        <div className="col-lg-7">
+          {loadingFacility ? (
+            <div className="text-center py-4">
+              <div className="spinner-border text-primary" role="status">
+                <span className="visually-hidden">Loading...</span>
+              </div>
+            </div>
+          ) : facility ? (
+            <div className="card border-0 shadow-sm">
+              <div className="card-body p-4">
+                <h5 className="card-title mb-4 text-primary">
+                  <i className="bi bi-info-circle-fill me-2"></i>
+                  시설 정보
+                </h5>
+                <div className="row g-3">
+                  <div className="col-12">
+                    <div className="d-flex align-items-start">
+                      <i className="bi bi-geo-alt-fill text-danger me-3 mt-1"></i>
+                      <div>
+                        <small className="text-muted">도로명 주소</small>
+                        <p className="mb-0 fw-semibold">
+                          {facility.roadAddress || "정보 없음"}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-12">
+                    <div className="d-flex align-items-start">
+                      <i className="bi bi-telephone-fill text-success me-3 mt-1"></i>
+                      <div>
+                        <small className="text-muted">전화번호</small>
+                        <p className="mb-0 fw-semibold">
+                          {facility.phoneNumber || "정보 없음"}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-12">
+                    <div className="d-flex align-items-start">
+                      <i className="bi bi-globe text-info me-3 mt-1"></i>
+                      <div>
+                        <small className="text-muted">홈페이지</small>
+                        <p className="mb-0 fw-semibold">
+                          {(() => {
+                            const homepageRaw = facility?.homepage ?? "";
+                            const homepage = homepageRaw.trim().toLowerCase();
+                            const isValid =
+                              homepage &&
+                              homepage !== "정보없음" &&
+                              homepage !== "none" &&
+                              homepage !== "null";
+                            return isValid ? (
+                              <a
+                                href={facility.homepage}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-decoration-none"
+                              >
+                                {facility.homepage}
+                              </a>
+                            ) : (
+                              "정보 없음"
+                            );
+                          })()}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-12">
+                    <div className="d-flex align-items-start">
+                      <i className="bi bi-calendar-x-fill text-warning me-3 mt-1"></i>
+                      <div>
+                        <small className="text-muted">휴무일</small>
+                        <p className="mb-0 fw-semibold">
+                          {facility.holiday || "정보 없음"}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-12">
+                    <div className="d-flex align-items-start">
+                      <i className="bi bi-clock-fill text-primary me-3 mt-1"></i>
+                      <div>
+                        <small className="text-muted">운영시간</small>
+                        <p className="mb-0 fw-semibold">
+                          {facility.operatingHours || "정보 없음"}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="alert alert-danger" role="alert">
+              <i className="bi bi-exclamation-triangle-fill me-2"></i>
+              시설 정보를 찾을 수 없습니다.
+            </div>
+          )}
+        </div>
+
+        {/* 지도 미리보기 영역 */}
+        <div className="col-lg-5">
+          <div className="card border-0 shadow-sm h-100">
+            <div className="card-body p-0">
+              <div
+                className="bg-light d-flex align-items-center justify-content-center rounded"
+                style={{ height: "350px" }}
+              >
+                <div className="text-center text-muted">
+                  <i className="bi bi-map display-1"></i>
+                  <p className="mt-3">지도 미리보기</p>
+                  <small>{facility?.roadAddress || "위치 정보 없음"}</small>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      ) : (
-        <div
-          style={{
-            padding: "1rem",
-            backgroundColor: "#f8d7da",
-            color: "#721c24",
-            borderRadius: "8px",
-            marginBottom: "2rem",
-          }}
-        >
-          시설 정보를 찾을 수 없습니다.
-        </div>
-      )}
+      </div>
 
       {/* 리뷰 작성 버튼 */}
       {!isWriting && (
-        <div style={{ marginBottom: "2rem" }}>
-          {user ? (
-            <button
-              onClick={handleGoToWrite}
-              style={{
-                padding: "0.75rem 1.5rem",
-                fontSize: "1rem",
-                backgroundColor: "#ffc107",
-                color: "#212529",
-                border: "none",
-                borderRadius: "6px",
-                cursor: "pointer",
-                fontWeight: "500",
-                transition: "background-color 0.2s",
-              }}
-              onMouseOver={(e) =>
-                (e.currentTarget.style.backgroundColor = "#ffb300")
-              }
-              onMouseOut={(e) =>
-                (e.currentTarget.style.backgroundColor = "#ffc107")
-              }
-            >
-              ✍️ 리뷰 작성하기
-            </button>
-          ) : (
-            <div
-              style={{
-                padding: "1rem",
-                backgroundColor: "#e7f3ff",
-                borderRadius: "6px",
-                color: "#004085",
-              }}
-            >
-              💡 로그인한 사용자만 리뷰를 작성할 수 있습니다.
-            </div>
-          )}
+        <div className="row mb-4">
+          <div className="col-12">
+            {user ? (
+              <button
+                onClick={handleGoToWrite}
+                className="btn btn-warning btn-lg px-4"
+              >
+                <i className="bi bi-pencil-square me-2"></i>
+                리뷰 작성하기
+              </button>
+            ) : (
+              <div className="alert alert-info" role="alert">
+                <i className="bi bi-info-circle-fill me-2"></i>
+                로그인한 사용자만 리뷰를 작성할 수 있습니다.
+              </div>
+            )}
+          </div>
         </div>
       )}
 
       {/* 리뷰 작성 폼 */}
       {isWriting && facility && (
-        <div style={{ marginBottom: "2rem" }}>
-          <ReviewAdd
-            facility={facility}
-            onSave={handleReviewSaved}
-            onCancel={handleReviewCancel}
-          />
+        <div className="row mb-4">
+          <div className="col-12">
+            <ReviewAdd
+              facility={facility}
+              onSave={handleReviewSaved}
+              onCancel={handleReviewCancel}
+            />
+          </div>
         </div>
       )}
 
       {/* 평균 평점 */}
       {reviews.length > 0 && (
-        <div
-          style={{
-            marginBottom: "1.5rem",
-            padding: "1rem",
-            backgroundColor: "#fff3cd",
-            borderRadius: "6px",
-            display: "flex",
-            alignItems: "center",
-            gap: "0.5rem",
-          }}
-        >
-          <strong>평균 평점:</strong>
-          <span style={{ fontSize: "1.2rem", color: "#f0ad4e" }}>
-            {"★".repeat(Math.round(getAverageRating()))}
-          </span>
-          <span style={{ fontSize: "1.1rem", fontWeight: "600" }}>
-            {getAverageRating()} / 5
-          </span>
-          <span style={{ fontSize: "0.9rem", color: "#666" }}>
-            ({reviews.length}개의 리뷰)
-          </span>
+        <div className="row mb-4">
+          <div className="col-12">
+            <div className="alert alert-warning d-flex align-items-center">
+              <div className="d-flex align-items-center">
+                <strong className="me-3">평균 평점:</strong>
+                <span className="text-warning fs-4 me-2">
+                  {"★".repeat(Math.round(getAverageRating()))}
+                </span>
+                <span className="fw-bold fs-5 me-3">
+                  {getAverageRating()} / 5
+                </span>
+                <span className="text-muted">({reviews.length}개의 리뷰)</span>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
-      {/* 사진/영상 통합 갤러리 */}
-      <div style={{ marginTop: "1.5rem" }}>
-        <h3 className="mb-3">🎞 사진•영상 📸</h3>
-        {loadingReviews ? (
-          <p>불러오는 중...</p>
-        ) : allImagesFromReviews.length === 0 ? (
-          <p>아직 사진•영상이 없습니다.</p>
-        ) : (
-          <ReviewCard
-            review={{ files: allImagesFromReviews }}
-            showOnlyImages={true}
-          />
-        )}
+      {/* 사진/영상 갤러리 */}
+      <div className="row mb-4">
+        <div className="col-12">
+          <div className="card border-0 shadow-sm">
+            <div className="card-body">
+              <h4 className="card-title mb-3">
+                <i className="bi bi-camera-fill me-2"></i>
+                사진•영상
+              </h4>
+              {loadingReviews ? (
+                <div className="text-center py-3">
+                  <div className="spinner-border text-primary" role="status">
+                    <span className="visually-hidden">Loading...</span>
+                  </div>
+                </div>
+              ) : allImagesFromReviews.length === 0 ? (
+                <p className="text-muted">아직 사진•영상이 없습니다.</p>
+              ) : (
+                <ReviewCard
+                  review={{ files: allImagesFromReviews }}
+                  showOnlyImages={true}
+                />
+              )}
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* 리뷰 목록 */}
-      <div style={{ marginTop: "1.5rem" }}>
-        <div
-          style={{
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: "1.5rem",
-            display: "flex",
-          }}
-        >
-          <h3 style={{ margin: 0 }}>
-            📝 리뷰 목록{" "}
-            <span
-              style={{
-                color: "#6c757d",
-                fontWeight: "normal",
-                fontSize: "1rem",
-              }}
-            >
-              ({reviews.length}개)
-            </span>
-          </h3>
+      <div className="row">
+        <div className="col-12">
+          <div className="card border-0 shadow-sm">
+            <div className="card-body">
+              <div className="d-flex justify-content-between align-items-center mb-4">
+                <h4 className="card-title mb-0">
+                  <i className="bi bi-chat-quote-fill me-2"></i>
+                  리뷰 목록
+                  <span className="text-muted fs-6 ms-2">
+                    ({reviews.length}개)
+                  </span>
+                </h4>
 
-          {reviews.length > 0 && (
-            <div
-              style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
-            >
-              <label
-                htmlFor="sortSelect"
-                style={{ fontWeight: "500", margin: 0 }}
-              >
-                정렬:
-              </label>
-              <select
-                id="sortSelect"
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                style={{
-                  padding: "0.5rem 1rem",
-                  fontSize: "1rem",
-                  borderRadius: "6px",
-                  border: "1px solid #ced4da",
-                  backgroundColor: "#fff",
-                  cursor: "pointer",
-                  minWidth: "120px",
-                }}
-              >
-                <option value="latest">최신순</option>
-                <option value="likes">좋아요순</option>
-              </select>
+                {reviews.length > 0 && (
+                  <div className="d-flex align-items-center">
+                    <label htmlFor="sortSelect" className="me-2 mb-0">
+                      정렬:
+                    </label>
+                    <select
+                      id="sortSelect"
+                      value={sortBy}
+                      onChange={(e) => setSortBy(e.target.value)}
+                      className="form-select form-select-sm"
+                      style={{ width: "auto" }}
+                    >
+                      <option value="latest">최신순</option>
+                      <option value="likes">좋아요순</option>
+                    </select>
+                  </div>
+                )}
+              </div>
+
+              {loadingReviews ? (
+                <div className="text-center py-5">
+                  <div className="spinner-border text-primary" role="status">
+                    <span className="visually-hidden">Loading...</span>
+                  </div>
+                  <p className="mt-3 text-muted">리뷰를 불러오는 중...</p>
+                </div>
+              ) : sortedReviews.length === 0 ? (
+                <div className="text-center py-5">
+                  <i className="bi bi-chat-left-text display-1 text-muted"></i>
+                  <p className="mt-3 fs-5 text-muted">
+                    아직 작성된 리뷰가 없습니다.
+                  </p>
+                  {user && (
+                    <p className="text-muted">첫 번째 리뷰를 작성해보세요!</p>
+                  )}
+                </div>
+              ) : (
+                <div className="list-group list-group-flush">
+                  {sortedReviews.map((review) => (
+                    <div
+                      key={review.id}
+                      ref={(el) => (reviewRefs.current[review.id] = el)}
+                      className="list-group-item px-0 py-4 border-bottom"
+                    >
+                      {/* 평점 */}
+                      <div className="d-flex align-items-center mb-3">
+                        <span className="text-warning fs-5 me-2">
+                          {"★".repeat(review.rating)}
+                          {"☆".repeat(5 - review.rating)}
+                        </span>
+                        <span className="fw-semibold">
+                          {review.rating}.0 / 5.0
+                        </span>
+                      </div>
+
+                      {/* 리뷰 카드 */}
+                      <ReviewCard
+                        key={review.id}
+                        review={review}
+                        onUpdate={fetchReviews}
+                        onDelete={handleDelete}
+                        showOnlyImages={false}
+                      />
+
+                      {/* 액션 버튼 */}
+                      <div className="d-flex align-items-center gap-3 mt-3 pt-3 border-top">
+                        <ReviewLikeContainer reviewId={review.id} />
+                        <button
+                          onClick={() => openReportModal(review.id)}
+                          className="btn btn-outline-danger btn-sm"
+                        >
+                          <i className="bi bi-flag-fill me-1"></i>
+                          신고
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
-
-        {loadingReviews ? (
-          <div style={{ textAlign: "center", padding: "2rem" }}>
-            <p>리뷰를 불러오는 중...</p>
-          </div>
-        ) : sortedReviews.length === 0 ? (
-          <div
-            style={{
-              textAlign: "center",
-              padding: "3rem",
-              backgroundColor: "#f8f9fa",
-              borderRadius: "8px",
-              color: "#6c757d",
-            }}
-          >
-            <p style={{ fontSize: "1.1rem", margin: 0 }}>
-              아직 작성된 리뷰가 없습니다.
-            </p>
-            {user && (
-              <p style={{ marginTop: "0.5rem", fontSize: "0.95rem" }}>
-                첫 번째 리뷰를 작성해보세요!
-              </p>
-            )}
-          </div>
-        ) : (
-          <ul style={{ paddingLeft: 0, listStyle: "none" }}>
-            {sortedReviews.map((review) => (
-              <li
-                key={review.id}
-                ref={(el) => (reviewRefs.current[review.id] = el)}
-                style={{
-                  padding: "1.5rem",
-                  marginBottom: "1rem",
-                  border: "1px solid #dee2e6",
-                  borderRadius: "8px",
-                  backgroundColor: "#fff",
-                  transition: "all 0.3s ease",
-                  boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
-                }}
-              >
-                {/* 평점 */}
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.5rem",
-                    marginBottom: "1rem",
-                    paddingBottom: "1rem",
-                    borderBottom: "1px solid #e9ecef",
-                  }}
-                >
-                  <span style={{ color: "#f0ad4e", fontSize: "1.2rem" }}>
-                    {"★".repeat(review.rating)}
-                    {"☆".repeat(5 - review.rating)}
-                  </span>
-                  <span
-                    style={{
-                      fontWeight: "600",
-                      color: "#495057",
-                      fontSize: "1rem",
-                    }}
-                  >
-                    {review.rating}.0 / 5.0
-                  </span>
-                </div>
-
-                {/* 리뷰 카드 */}
-                <ReviewCard
-                  key={review.id}
-                  review={review}
-                  onUpdate={fetchReviews}
-                  onDelete={handleDelete}
-                  showOnlyImages={false}
-                />
-
-                {/* 액션 버튼 */}
-                <div
-                  style={{
-                    marginTop: "1rem",
-                    paddingTop: "1rem",
-                    borderTop: "1px solid #e9ecef",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "1rem",
-                  }}
-                >
-                  <ReviewLikeContainer reviewId={review.id} />
-                  <button
-                    onClick={() => openReportModal(review.id)}
-                    title="리뷰 신고하기"
-                    style={{
-                      background: "none",
-                      border: "1px solid #dc3545",
-                      borderRadius: "4px",
-                      padding: "0.25rem 0.5rem",
-                      cursor: "pointer",
-                      fontSize: "0.9rem",
-                      color: "#dc3545",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "0.25rem",
-                      transition: "background-color 0.2s",
-                    }}
-                    onMouseOver={(e) => {
-                      e.currentTarget.style.backgroundColor = "#dc3545";
-                      e.currentTarget.style.color = "#fff";
-                    }}
-                    onMouseOut={(e) => {
-                      e.currentTarget.style.backgroundColor = "transparent";
-                      e.currentTarget.style.color = "#dc3545";
-                    }}
-                  >
-                    🚨 신고
-                  </button>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
       </div>
 
       {/* 신고 모달 */}
