@@ -48,7 +48,7 @@ public class ReviewController {
     }
 
     // 리뷰 수정
-    @PutMapping("/update/{id}")
+    @PostMapping("/update/{id}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<String> updateReview(@PathVariable Integer id,
                                                @ModelAttribute ReviewFormDto dto,

@@ -110,6 +110,7 @@ function ReviewEdit({ review, onSave, onCancel }) {
     try {
       const formData = new FormData();
 
+      formData.append("facilityId", review.petFacility.id || review.facilityId);
       formData.append("review", content.trim());
       formData.append("rating", rating);
       formData.append("facilityName", review.facilityName);
@@ -137,7 +138,8 @@ function ReviewEdit({ review, onSave, onCancel }) {
         console.log(pair[0], pair[1]);
       }
 
-      await axios.put(
+      await axios.post(
+        //  <- 이렇게 post로 변경하세요.
         `http://localhost:8080/api/review/update/${review.id}`,
         formData,
         {
@@ -252,45 +254,29 @@ function ReviewEdit({ review, onSave, onCancel }) {
     setExistingFiles((prev) => prev.filter((url) => url !== fileUrlToRemove));
   };
 
-  const normalizeFileName = (fileName) => {
-    // URL 디코딩
-    let normalized = decodeURIComponent(fileName);
-
-    // 추가 정규화 (필요시)
-    normalized = normalized
-      .replace(/\s+/g, " ") // 연속 공백을 하나로
-      .trim(); // 앞뒤 공백 제거
-
-    console.log("Normalized filename:", normalized);
-    return normalized;
-  };
-
   const getFileNameFromUrl = (fileUrl) => {
     try {
       console.log("=== 파일명 추출 ===");
-      console.log("Original URL:", fileUrl);
+      console.log("Original URL from state:", fileUrl);
 
       const url = new URL(fileUrl);
       const pathSegments = url.pathname.split("/");
-      const fileNameWithQuery = pathSegments[pathSegments.length - 1];
-      const encodedFileName = fileNameWithQuery.split("?")[0];
+      const encodedFileName = pathSegments[pathSegments.length - 1];
 
-      // ✨ 정규화 적용
-      const fileName = normalizeFileName(encodedFileName);
+      console.log("Encoded filename from URL object:", encodedFileName);
 
-      console.log("Encoded filename:", encodedFileName);
-      console.log("Final filename:", fileName);
-      return fileName;
+      // 인코딩된 파일명(예: %ED%99%94)을 원래의 한글/특수문자로 되돌립니다.
+      const decodedFileName = decodeURIComponent(encodedFileName);
+
+      console.log("Decoded filename to be sent:", decodedFileName);
+      return decodedFileName;
     } catch (error) {
-      console.error("Invalid URL:", fileUrl, error);
-
+      console.error("Invalid URL, using fallback:", fileUrl, error);
       const segments = fileUrl.split("/");
       const lastSegment = segments[segments.length - 1];
       const encodedFileName = lastSegment.split("?")[0];
-      const fileName = normalizeFileName(encodedFileName);
 
-      console.log("Fallback normalized filename:", fileName);
-      return fileName;
+      return decodeURIComponent(encodedFileName);
     }
   };
 

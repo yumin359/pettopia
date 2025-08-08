@@ -147,72 +147,48 @@ public class ReviewService {
         saveFiles(review, newFiles);
     }
 
-    // ✨ 수정된 deleteFiles 메서드 (디버깅 포함)
+    // ✨ 수정된 deleteFiles 메서드
     private void deleteFiles(Review review, List<String> deleteFileNames) {
-        System.out.println("=== 파일 삭제 시작 ===");
+        if (deleteFileNames == null || deleteFileNames.isEmpty()) {
+            return;
+        }
+
+        System.out.println("=== 파일 삭제 시작 (수정된 로직) ===");
         System.out.println("Review ID: " + review.getId());
-        System.out.println("Delete file names: " + deleteFileNames);
+        System.out.println("삭제 요청 파일명 리스트: " + deleteFileNames);
 
-        // 현재 리뷰의 모든 파일 출력
-        System.out.println("Current review files:");
-        review.getFiles().forEach(f -> {
-            System.out.println("  - " + f.getId().getName());
-        });
+        // 1. 삭제할 파일 목록을 먼저 찾습니다. (ConcurrentModificationException 방지)
+        List<ReviewFile> filesToDelete = review.getFiles().stream()
+                .filter(reviewFile -> deleteFileNames.contains(reviewFile.getId().getName()))
+                .collect(Collectors.toList());
 
-        for (String fileName : deleteFileNames) {
-            System.out.println("삭제 시도할 파일: " + fileName);
+        if (filesToDelete.isEmpty()) {
+            System.out.println("DB에서 삭제할 파일을 찾지 못했습니다.");
+            return;
+        }
 
-            // ✨ 직접 매칭 시도
-            boolean found = false;
-            for (ReviewFile reviewFile : review.getFiles()) {
-                String dbFileName = reviewFile.getId().getName();
+        System.out.println("DB에서 삭제 대상으로 찾은 파일들: " + filesToDelete.stream().map(f -> f.getId().getName()).collect(Collectors.toList()));
 
-                // ✨ 여러 방법으로 매칭 시도
-                if (dbFileName.equals(fileName) ||
-                        dbFileName.equals(decodeFileName(fileName)) ||
-                        encodeFileName(dbFileName).equals(fileName)) {
+        // 2. 찾은 파일들을 S3와 DB에서 삭제합니다.
+        for (ReviewFile fileToDelete : filesToDelete) {
+            String fileName = fileToDelete.getId().getName();
+            String objectKey = "prj3/review/" + review.getId() + "/" + fileName;
 
-                    System.out.println("매칭 성공: DB=" + dbFileName + ", 요청=" + fileName);
-
-                    String objectKey = "prj3/review/" + review.getId() + "/" + dbFileName;
-                    System.out.println("S3에서 삭제할 objectKey: " + objectKey);
-
-                    try {
-                        deleteFileFromS3(objectKey);
-                        reviewFileRepository.delete(reviewFile);
-                        review.getFiles().remove(reviewFile);
-                        System.out.println("파일 삭제 성공: " + dbFileName);
-                        found = true;
-                        break;
-                    } catch (Exception e) {
-                        System.out.println("파일 삭제 실패: " + dbFileName + ", 오류: " + e.getMessage());
-                    }
-                }
-            }
-
-            if (!found) {
-                System.out.println("매칭되는 파일을 찾을 수 없음: " + fileName);
+            try {
+                // S3에서 삭제
+                deleteFileFromS3(objectKey);
+                // DB에서 삭제
+                reviewFileRepository.delete(fileToDelete);
+                System.out.println("성공적으로 삭제됨: " + fileName);
+            } catch (Exception e) {
+                System.err.println("파일 삭제 중 오류 발생: " + fileName + ", 오류: " + e.getMessage());
             }
         }
+
+        // 3. 엔티티의 연관관계 컬렉션에서도 제거합니다.
+        review.getFiles().removeAll(filesToDelete);
+
         System.out.println("=== 파일 삭제 완료 ===");
-    }
-
-    // ✨ 파일명 디코딩 헬퍼 메서드
-    private String decodeFileName(String fileName) {
-        try {
-            return java.net.URLDecoder.decode(fileName, "UTF-8");
-        } catch (Exception e) {
-            return fileName;
-        }
-    }
-
-    // ✨ 파일명 인코딩 헬퍼 메서드
-    private String encodeFileName(String fileName) {
-        try {
-            return java.net.URLEncoder.encode(fileName, "UTF-8");
-        } catch (Exception e) {
-            return fileName;
-        }
     }
 
     // 리뷰 저장
