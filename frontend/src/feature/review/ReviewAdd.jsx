@@ -112,12 +112,17 @@ export function ReviewAdd({ facility, onSave, onCancel }) {
 
   const isValid = content.trim() !== "";
 
-  // 새 태그 생성 시 #, 띄어쓰기, 특수기호 금지 + 최대 6개 제한
-  const handleCreateTag = (inputValue) => {
-    const isValidTag = /^[a-zA-Z0-9가-힣_]+$/.test(inputValue);
+  // 새 태그 생성 함수: 특수기호, 띄어쓰기 금지
+  const handleCreateTag = (tagValue) => {
+    const validTagRegex = /^[a-zA-Z0-9가-힣_]+$/;
 
-    if (!isValidTag) {
-      toast.warning("태그는 띄어쓰기, 특수문자를 포함할 수 없습니다.");
+    if (!validTagRegex.test(tagValue)) {
+      toast.warning("태그는 띄어쓰기 및 특수문자를 포함할 수 없습니다.");
+      return;
+    }
+
+    if (selectedTags.find((tag) => tag.value === tagValue)) {
+      toast.warning("이미 존재하는 태그입니다.");
       return;
     }
 
@@ -126,15 +131,11 @@ export function ReviewAdd({ facility, onSave, onCancel }) {
       return;
     }
 
-    const newTag = {
-      value: inputValue,
-      label: inputValue,
-    };
-
+    const newTag = { value: tagValue, label: tagValue };
     setSelectedTags((prev) => [...prev, newTag]);
   };
 
-  // 태그 선택 시 # 제거 후 저장
+  // 태그 선택 시 # 제거 후 저장, 6개 초과 방지
   const handleTagChange = (newValue) => {
     if (newValue && newValue.length > 6) {
       toast.warning("태그는 최대 6개까지만 선택할 수 있습니다.");
@@ -146,6 +147,19 @@ export function ReviewAdd({ facility, onSave, onCancel }) {
       label: tag.label.replace(/#/g, ""),
     }));
     setSelectedTags(cleaned);
+  };
+
+  // 띄어쓰기 입력 시 태그 생성 처리
+  const handleInputKeyDown = (e) => {
+    if (e.key === " " || e.key === "Spacebar") {
+      e.preventDefault(); // 띄어쓰기 기본 동작 막기
+      const val = inputValue.trim();
+
+      if (val) {
+        handleCreateTag(val);
+        setInputValue("");
+      }
+    }
   };
 
   const handleSave = async () => {
@@ -232,8 +246,10 @@ export function ReviewAdd({ facility, onSave, onCancel }) {
             options={tagOptions}
             value={selectedTags}
             onChange={handleTagChange}
-            onInputChange={(value) => setInputValue(value)}
+            inputValue={inputValue}
+            onInputChange={setInputValue}
             onCreateOption={handleCreateTag}
+            onKeyDown={handleInputKeyDown}
             placeholder="태그를 입력하거나 선택하세요..."
             formatCreateLabel={(inputValue) => `"${inputValue}" 태그 추가`}
             noOptionsMessage={() => "태그가 없습니다"}
@@ -242,13 +258,17 @@ export function ReviewAdd({ facility, onSave, onCancel }) {
             classNamePrefix="react-select"
             formatOptionLabel={(option) => (
               <span>
-                {option.label.startsWith("#") ? option.label : `#${option.label}`}
+                {option.label.startsWith("#")
+                  ? option.label
+                  : `#${option.label}`}
               </span>
             )}
             components={{
               MultiValueLabel: ({ data }) => (
                 <span>
-                  {data.label.startsWith("#") ? data.label : `#${data.label}`}
+                  {data.label.startsWith("#")
+                    ? data.label
+                    : `#${data.label}`}
                 </span>
               ),
             }}

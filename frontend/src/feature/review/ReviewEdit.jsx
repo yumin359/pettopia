@@ -13,11 +13,12 @@ function ReviewEdit({ review, onSave, onCancel }) {
   const [deleteFileNames, setDeleteFileNames] = useState([]);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // 태그 관련 상태
+  // 태그 상태
   const [tagOptions, setTagOptions] = useState([]);
   const [selectedTags, setSelectedTags] = useState(
-    (review.tags || []).map((tag) => ({ value: tag.name, label: tag.name })),
+    (review.tags || []).map((tag) => ({ value: tag.name.replace(/#/g, ""), label: tag.name.replace(/#/g, "") }))
   );
+  const [inputValue, setInputValue] = useState("");
 
   // 태그 옵션 로드
   useEffect(() => {
@@ -25,8 +26,8 @@ function ReviewEdit({ review, onSave, onCancel }) {
       try {
         const response = await axios.get("/api/tags");
         const options = response.data.map((tag) => ({
-          value: tag.name,
-          label: tag.name,
+          value: tag.name.replace(/#/g, ""),
+          label: tag.name.replace(/#/g, ""),
         }));
         setTagOptions(options);
       } catch (error) {
@@ -47,6 +48,53 @@ function ReviewEdit({ review, onSave, onCancel }) {
     };
   }, [newFiles]);
 
+  // 특수기호 및 띄어쓰기 검사 정규식
+  const validTagRegex = /^[a-zA-Z0-9가-힣_]+$/;
+
+  // 새 태그 생성 함수 (중복/개수 제한 포함)
+  const handleCreateTag = (tagValue) => {
+    if (!validTagRegex.test(tagValue)) {
+      toast.warning("태그는 띄어쓰기 및 특수문자를 포함할 수 없습니다.");
+      return;
+    }
+    if (selectedTags.find((tag) => tag.value === tagValue)) {
+      toast.warning("이미 존재하는 태그입니다.");
+      return;
+    }
+    if (selectedTags.length >= 6) {
+      toast.warning("태그는 최대 6개까지만 선택할 수 있습니다.");
+      return;
+    }
+    const newTag = { value: tagValue, label: tagValue };
+    setSelectedTags((prev) => [...prev, newTag]);
+  };
+
+  // 태그 선택 변경 (6개 제한, # 제거)
+  const handleTagChange = (newValue) => {
+    if (newValue && newValue.length > 6) {
+      toast.warning("태그는 최대 6개까지만 선택할 수 있습니다.");
+      return;
+    }
+    const cleaned = (newValue || []).map((tag) => ({
+      ...tag,
+      value: tag.value.replace(/#/g, ""),
+      label: tag.label.replace(/#/g, ""),
+    }));
+    setSelectedTags(cleaned);
+  };
+
+  // 띄어쓰기 입력 시 태그 생성 및 인풋 초기화
+  const handleInputKeyDown = (e) => {
+    if (e.key === " " || e.key === "Spacebar") {
+      e.preventDefault();
+      const val = inputValue.trim();
+      if (val) {
+        handleCreateTag(val);
+        setInputValue("");
+      }
+    }
+  };
+
   const handleSave = async () => {
     if (!content.trim()) {
       toast.warning("내용을 입력하세요.");
@@ -62,18 +110,9 @@ function ReviewEdit({ review, onSave, onCancel }) {
       formData.append("facilityName", review.facilityName);
       formData.append("memberEmail", review.memberEmail);
 
-      // 삭제할 파일들
-      deleteFileNames.forEach((name) =>
-        formData.append("deleteFileNames", name),
-      );
-
-      // 새 파일들
+      deleteFileNames.forEach((name) => formData.append("deleteFileNames", name));
       newFiles.forEach((fileObj) => formData.append("files", fileObj.file));
-
-      // 태그들
-      selectedTags.forEach((tag) => {
-        formData.append("tagNames", tag.value);
-      });
+      selectedTags.forEach((tag) => formData.append("tagNames", tag.value));
 
       await axios.put(`/api/review/update/${review.id}`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -81,15 +120,12 @@ function ReviewEdit({ review, onSave, onCancel }) {
 
       toast.success("수정 완료!");
 
-      // 부모 컴포넌트에 저장 알림
       if (onSave) {
         onSave();
       }
     } catch (error) {
       console.error("수정 실패:", error);
-      toast.error(
-        "수정 실패: " + (error.response?.data?.message || error.message),
-      );
+      toast.error("수정 실패: " + (error.response?.data?.message || error.message));
     } finally {
       setIsProcessing(false);
     }
@@ -116,9 +152,7 @@ function ReviewEdit({ review, onSave, onCancel }) {
 
     const filesWithPreview = validFiles.map((file) => ({
       file,
-      previewUrl: file.type.startsWith("image/")
-        ? URL.createObjectURL(file)
-        : null,
+      previewUrl: file.type.startsWith("image/") ? URL.createObjectURL(file) : null,
     }));
 
     setNewFiles((prev) => [...prev, ...filesWithPreview]);
@@ -142,7 +176,6 @@ function ReviewEdit({ review, onSave, onCancel }) {
   };
 
   const handleCancel = () => {
-    // 새 파일들의 미리보기 URL 정리
     newFiles.forEach((fileObj) => {
       if (fileObj.previewUrl) {
         URL.revokeObjectURL(fileObj.previewUrl);
@@ -179,7 +212,11 @@ function ReviewEdit({ review, onSave, onCancel }) {
           isClearable
           options={tagOptions}
           value={selectedTags}
-          onChange={(newValue) => setSelectedTags(newValue || [])}
+          onChange={handleTagChange}
+          inputValue={inputValue}
+          onInputChange={setInputValue}
+          onCreateOption={handleCreateTag}
+          onKeyDown={handleInputKeyDown}
           placeholder="태그를 입력하거나 선택하세요..."
           formatCreateLabel={(inputValue) => `"${inputValue}" 태그 추가`}
           noOptionsMessage={() => "태그가 없습니다"}
@@ -257,9 +294,7 @@ function ReviewEdit({ review, onSave, onCancel }) {
                       }}
                     />
                   )}
-                  <span className="text-truncate">
-                    {getFileNameFromUrl(fileUrl)}
-                  </span>
+                  <span className="text-truncate">{getFileNameFromUrl(fileUrl)}</span>
                 </div>
                 <Button
                   size="sm"
@@ -334,21 +369,11 @@ function ReviewEdit({ review, onSave, onCancel }) {
 
       {/* 편집 버튼들 */}
       <div className="d-flex justify-content-end gap-2">
-        <Button
-          variant="outline-secondary"
-          onClick={handleCancel}
-          disabled={isProcessing}
-        >
+        <Button variant="outline-secondary" onClick={handleCancel} disabled={isProcessing}>
           <FaTimes /> 취소
         </Button>
-        <Button
-          variant="primary"
-          onClick={handleSave}
-          disabled={isProcessing || !content.trim()}
-        >
-          {isProcessing && (
-            <Spinner animation="border" size="sm" className="me-2" />
-          )}
+        <Button variant="primary" onClick={handleSave} disabled={isProcessing || !content.trim()}>
+          {isProcessing && <Spinner animation="border" size="sm" className="me-2" />}
           <FaSave /> 저장
         </Button>
       </div>
