@@ -8,9 +8,8 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface TagRepository extends JpaRepository<Tag, Integer> {
-    Set<Tag> findAllByIdIn(List<Integer> ids);
+    Optional<Tag> findByName(String name);
 
-    Optional<Tag> findByName(String name);  // ✅ 추가
-
-    Set<Tag> findAllByNameIn(List<String> names);  // ✅ 추가
+    // Set<String> names -> List<String> names로 변경 (JPA 쿼리 메서드 규칙)
+    List<Tag> findAllByNameIn(Set<String> names);
 }

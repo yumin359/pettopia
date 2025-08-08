@@ -258,11 +258,12 @@ CREATE TABLE `favorite`
 # ---------------------------------------------------------------------------------
 CREATE TABLE `tags`
 (
-    `id`   INT(11)     NOT NULL AUTO_INCREMENT,
-    `name` VARCHAR(50) NOT NULL,
+    `id`   int(11)     NOT NULL AUTO_INCREMENT,
+    `name` varchar(50) NOT NULL,
     PRIMARY KEY (`id`),
-    UNIQUE KEY `uk_tag_name` (`name`) -- 태그 이름은 중복되면 안 됨
+    UNIQUE KEY `uk_tag_name` (`name`)
 ) ENGINE = InnoDB
+  AUTO_INCREMENT = 32
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 # ---------------------------------------------------------------------------------
@@ -292,7 +293,8 @@ SHOW CREATE TABLE review_file;
 SHOW CREATE TABLE review_like;
 SHOW CREATE TABLE review_report;
 SHOW CREATE TABLE favorite;
-
+SHOW CREATE TABLE tags;
+# ---------------------------------------------------------------------------------
 UPDATE review r
     JOIN pet_facility pf ON TRIM(r.facility_name) = TRIM(pf.name)
 SET r.facility_id = pf.id;
@@ -304,6 +306,5 @@ SET r.facility_id = pf.id;
 # 사용을 안하게 해버리기.
 ALTER TABLE review
     MODIFY COLUMN facility_name VARCHAR(255) NULL;
-
 # ---------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------
