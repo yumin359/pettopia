@@ -105,13 +105,6 @@ function ReviewEdit({ review, onSave, onCancel }) {
       return;
     }
 
-    // 파일 개수 제한 체크
-    const totalFiles = newFiles.length;
-    if (totalFiles > 10) {
-      toast.warning("새로 추가할 파일은 최대 10개까지만 가능합니다.");
-      return;
-    }
-
     setIsProcessing(true);
 
     try {
@@ -122,13 +115,28 @@ function ReviewEdit({ review, onSave, onCancel }) {
       formData.append("facilityName", review.facilityName);
       formData.append("memberEmail", review.memberEmail);
 
-      deleteFileNames.forEach((name) =>
-        formData.append("deleteFileNames", name),
-      );
-      newFiles.forEach((fileObj) => formData.append("files", fileObj.file));
+      console.log("=== FormData 구성 ===");
+      console.log("Delete file names:", deleteFileNames);
+      console.log("New files count:", newFiles.length);
+
+      deleteFileNames.forEach((name) => {
+        console.log("Adding to FormData - deleteFileNames:", name);
+        formData.append("deleteFileNames", name);
+      });
+
+      newFiles.forEach((fileObj) => {
+        console.log("Adding to FormData - files:", fileObj.file.name);
+        formData.append("files", fileObj.file);
+      });
+
       selectedTags.forEach((tag) => formData.append("tagNames", tag.value));
 
-      // ✨ 절대 경로로 강제 지정 - 8080 포트 직접 사용
+      // FormData 내용 확인
+      console.log("=== FormData 최종 확인 ===");
+      for (let pair of formData.entries()) {
+        console.log(pair[0], pair[1]);
+      }
+
       await axios.put(
         `http://localhost:8080/api/review/update/${review.id}`,
         formData,
@@ -149,7 +157,6 @@ function ReviewEdit({ review, onSave, onCancel }) {
       }
     } catch (error) {
       console.error("수정 실패:", error);
-      // 401 에러인 경우 로그인 페이지로 리다이렉트
       if (error.response?.status === 401) {
         toast.error("로그인이 필요합니다.");
       } else {
@@ -210,10 +217,13 @@ function ReviewEdit({ review, onSave, onCancel }) {
     e.target.value = null;
   };
 
-  const handleRemoveExistingFile = (fileUrlToRemove) => {
-    const fileName = getFileNameFromUrl(fileUrlToRemove);
-    setDeleteFileNames((prev) => [...prev, fileName]);
-    setExistingFiles((prev) => prev.filter((url) => url !== fileUrlToRemove));
+  const handleCancel = () => {
+    newFiles.forEach((fileObj) => {
+      if (fileObj.previewUrl) {
+        URL.revokeObjectURL(fileObj.previewUrl);
+      }
+    });
+    onCancel();
   };
 
   const handleRemoveNewFile = (indexToRemove) => {
@@ -226,24 +236,61 @@ function ReviewEdit({ review, onSave, onCancel }) {
     });
   };
 
-  const handleCancel = () => {
-    newFiles.forEach((fileObj) => {
-      if (fileObj.previewUrl) {
-        URL.revokeObjectURL(fileObj.previewUrl);
-      }
+  const handleRemoveExistingFile = (fileUrlToRemove) => {
+    console.log("=== 기존 파일 삭제 시도 ===");
+    console.log("File URL to remove:", fileUrlToRemove);
+
+    const fileName = getFileNameFromUrl(fileUrlToRemove);
+    console.log("Extracted file name for deletion:", fileName);
+
+    setDeleteFileNames((prev) => {
+      const newDeleteList = [...prev, fileName];
+      console.log("Updated delete file names:", newDeleteList);
+      return newDeleteList;
     });
-    onCancel();
+
+    setExistingFiles((prev) => prev.filter((url) => url !== fileUrlToRemove));
+  };
+
+  const normalizeFileName = (fileName) => {
+    // URL 디코딩
+    let normalized = decodeURIComponent(fileName);
+
+    // 추가 정규화 (필요시)
+    normalized = normalized
+      .replace(/\s+/g, " ") // 연속 공백을 하나로
+      .trim(); // 앞뒤 공백 제거
+
+    console.log("Normalized filename:", normalized);
+    return normalized;
   };
 
   const getFileNameFromUrl = (fileUrl) => {
     try {
+      console.log("=== 파일명 추출 ===");
+      console.log("Original URL:", fileUrl);
+
       const url = new URL(fileUrl);
       const pathSegments = url.pathname.split("/");
       const fileNameWithQuery = pathSegments[pathSegments.length - 1];
-      return fileNameWithQuery.split("?")[0];
+      const encodedFileName = fileNameWithQuery.split("?")[0];
+
+      // ✨ 정규화 적용
+      const fileName = normalizeFileName(encodedFileName);
+
+      console.log("Encoded filename:", encodedFileName);
+      console.log("Final filename:", fileName);
+      return fileName;
     } catch (error) {
       console.error("Invalid URL:", fileUrl, error);
-      return "알 수 없는 파일";
+
+      const segments = fileUrl.split("/");
+      const lastSegment = segments[segments.length - 1];
+      const encodedFileName = lastSegment.split("?")[0];
+      const fileName = normalizeFileName(encodedFileName);
+
+      console.log("Fallback normalized filename:", fileName);
+      return fileName;
     }
   };
 
