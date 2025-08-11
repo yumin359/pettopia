@@ -1,6 +1,6 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
-import FilterGroup from "./FilterGroup.jsx"; // 새로운 통합 컴포넌트
+import FilterGroup from "./FilterGroup.jsx";
 import SearchInput from "./SearchInput.jsx";
 
 const FilterPanel = ({
@@ -28,6 +28,15 @@ const FilterPanel = ({
 }) => {
   const { user } = useContext(AuthenticationContext);
 
+  // 🆕 지역 변경 감지 및 디버깅
+  useEffect(() => {
+    console.log("📍 FilterPanel - 지역 변경 감지:", selectedRegion);
+  }, [selectedRegion]);
+
+  useEffect(() => {
+    console.log("🏘️ FilterPanel - 시군구 변경 감지:", selectedSigungu);
+  }, [selectedSigungu]);
+
   const handleSearch = (query = null) => {
     onSearch(query || searchQuery);
   };
@@ -49,6 +58,12 @@ const FilterPanel = ({
       </div>
 
       <div className="flex-grow-1 overflow-auto" style={{ minHeight: 0 }}>
+        {/* 🆕 디버깅 정보 추가 (임시) */}
+        <div style={{ fontSize: "9px", color: "#666", marginBottom: "8px" }}>
+          현재 지역: {selectedRegion || "없음"} / 시군구:{" "}
+          {selectedSigungu || "없음"}
+        </div>
+
         {/* 통합된 FilterGroup 사용 */}
         <FilterGroup
           title="📍 지역"

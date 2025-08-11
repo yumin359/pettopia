@@ -72,9 +72,11 @@ export const fetchRegions = () => get("/pet_facilities/regions");
 export const fetchCategories2 = () =>
   get("/pet_facilities/categories/category2");
 
-// 시군구 목록 조회
-export const fetchSigungus = (region) =>
-  get("/pet_facilities/sigungu", { region });
+// 시군구 목록 조회 - 파라미터명 수정
+export const fetchSigungus = (region) => {
+  console.log("🔍 시군구 API 호출, 지역:", region);
+  return get("/pet_facilities/sigungu", { sidoName: region });
+};
 
 // 시설 검색
 export const searchFacilities = (params) =>

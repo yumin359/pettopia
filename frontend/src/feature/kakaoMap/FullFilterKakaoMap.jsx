@@ -23,7 +23,7 @@ const FullFilterKakaoMap = () => {
   // 검색어 상태 추가
   const [searchQuery, setSearchQuery] = useState("");
 
-  // 🆕 지도 범위 검색 관련 상태만 추가
+  // 지도 범위 검색 관련 상태만 추가
   const [isMapBoundsSearch, setIsMapBoundsSearch] = useState(false);
 
   const [facilities, setFacilities] = useState([]);
@@ -79,9 +79,10 @@ const FullFilterKakaoMap = () => {
     currentPage,
   ]);
 
-  // 🆕 지도 범위 검색 핸들러만 추가
-  const handleBoundsSearch = useCallback((boundsResults) => {
+  // 지도 범위 검색 핸들러 (지역 정보 포함하도록 수정)
+  const handleBoundsSearch = useCallback((boundsResults, locationInfo) => {
     console.log("지도 범위 검색 결과:", boundsResults);
+    console.log("지역 정보:", locationInfo);
 
     // 검색 결과를 시설 목록에 설정
     setFacilities(boundsResults);
@@ -93,13 +94,6 @@ const FullFilterKakaoMap = () => {
     setIsShowingFavorites(false);
     setCurrentPage(0);
   }, []);
-
-  // 🆕 전체 검색으로 전환 핸들러만 추가
-  const handleSwitchToFullSearch = () => {
-    setIsMapBoundsSearch(false);
-    setHasSearched(true);
-    setCurrentPage(0);
-  };
 
   // 시설 데이터 로드 - 기존 코드에 isMapBoundsSearch 조건만 추가
   const loadFacilities = useCallback(async () => {
@@ -156,7 +150,7 @@ const FullFilterKakaoMap = () => {
     hasSearched,
     isShowingFavorites,
     isMapBoundsSearch,
-  ]); // 🆕 isMapBoundsSearch 의존성 추가
+  ]);
 
   // 찜 목록 로드 핸들러에 isMapBoundsSearch 리셋만 추가
   const handleLoadFavorites = async () => {
@@ -182,7 +176,7 @@ const FullFilterKakaoMap = () => {
     ? favoriteMarkers.length
     : totalElements;
 
-  // 🆕 지도 범위 검색일 때는 페이지네이션 비활성화
+  // 지도 범위 검색일 때는 페이지네이션 비활성화
   const totalPages = isMapBoundsSearch
     ? 1
     : Math.ceil(totalDataCount / ITEMS_PER_PAGE);
@@ -220,15 +214,17 @@ const FullFilterKakaoMap = () => {
               isShowingFavorites={isShowingFavorites}
               categoryColors={CATEGORY_COLORS}
               setError={setError}
-              onBoundsSearch={handleBoundsSearch} // 🆕 지도 범위 검색 핸들러 전달
-              searchQuery={searchQuery} // 🆕 검색어 전달
-              // 🆕 필터 상태들 전달
-              selectedRegion={selectedRegion}
-              selectedSigungu={selectedSigungu}
+              onBoundsSearch={handleBoundsSearch}
+              searchQuery={searchQuery}
+              isMapBoundsSearch={isMapBoundsSearch}
+              // 실제 사용하는 필터 상태들만 전달 (지역은 제외)
               selectedCategories2={selectedCategories2}
               selectedPetSizes={selectedPetSizes}
               parkingFilter={parkingFilter}
               facilityType={facilityType}
+              // 지역 설정 함수들 전달
+              setSelectedRegion={filterSetters.setSelectedRegion}
+              setSelectedSigungu={filterSetters.setSelectedSigungu}
             />
           </div>
         </div>
@@ -257,22 +253,7 @@ const FullFilterKakaoMap = () => {
 
           {/* 리스트 Column */}
           <div className="col-12 col-md-8 list-column-container">
-            {/* 🆕 지도 범위 검색 모드 표시만 추가 */}
-            {isMapBoundsSearch && (
-              <div
-                className="alert alert-info mb-2 p-2 d-flex justify-content-between align-items-center"
-                style={{ fontSize: "11px" }}
-              >
-                <span>📍 현재 지도 화면 기준 검색 결과입니다.</span>
-                <button
-                  className="btn btn-sm btn-outline-primary"
-                  onClick={handleSwitchToFullSearch}
-                  style={{ fontSize: "10px", padding: "2px 8px" }}
-                >
-                  전체 검색으로 전환
-                </button>
-              </div>
-            )}
+            {/* 🚫 지도 범위 검색 알림 메시지 제거 - 이제 지도 안에서 표시 */}
 
             <SearchResultList
               facilities={facilities}

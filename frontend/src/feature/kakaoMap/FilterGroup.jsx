@@ -9,8 +9,20 @@ const FilterGroup = ({
   onChange,
   categoryColors,
   disabled = false,
-  placeholder,
 }) => {
+  // 🆕 디버깅을 위한 로그 (select 타입일 때만)
+  if (
+    type === "select" &&
+    (title.includes("지역") || title.includes("시군구"))
+  ) {
+    console.log(`🔍 ${title} FilterGroup 상태:`, {
+      selectedValue,
+      options: options.slice(0, 5), // 처음 5개만 보기
+      optionsLength: options.length,
+      isSelected: options.includes(selectedValue),
+    });
+  }
+
   // Checkbox 렌더링
   const renderCheckbox = () => (
     <div className="d-flex flex-wrap gap-1">
@@ -75,21 +87,37 @@ const FilterGroup = ({
   );
 
   // Select 드롭다운 렌더링
-  const renderSelect = () => (
-    <select
-      className="form-select form-select-sm"
-      value={selectedValue}
-      onChange={(e) => onChange(e.target.value)}
-      style={{ fontSize: "11px" }}
-      disabled={disabled}
-    >
-      {options.map((option) => (
-        <option key={option} value={option}>
-          {option}
-        </option>
-      ))}
-    </select>
-  );
+  const renderSelect = () => {
+    // 🆕 selectedValue가 options에 없으면 경고 표시
+    const isValidSelection = options.includes(selectedValue);
+
+    return (
+      <div>
+        <select
+          className="form-select form-select-sm"
+          value={isValidSelection ? selectedValue : "전체"} // 🆕 유효하지 않으면 "전체"로 fallback
+          onChange={(e) => onChange(e.target.value)}
+          style={{
+            fontSize: "11px",
+            borderColor: isValidSelection ? undefined : "red", // 🆕 매칭 안 되면 빨간 테두리
+          }}
+          disabled={disabled}
+        >
+          {options.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+        {/* 🆕 매칭 안 될 때 경고 메시지 */}
+        {!isValidSelection && selectedValue && selectedValue !== "전체" && (
+          <div style={{ fontSize: "9px", color: "red", marginTop: "2px" }}>
+            ⚠️ "{selectedValue}"이 옵션에 없음
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
     <div className="mb-2">
