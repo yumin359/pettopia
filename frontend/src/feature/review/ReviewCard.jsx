@@ -306,7 +306,7 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
           <Button
             variant="link"
             size="sm"
-            className="p-0 mt-2 text-decoration-none"
+            className="p-0 mt-2 text-secondary text-decoration-underline"
             onClick={() => setShowFullReview(!showFullReview)}
           >
             {showFullReview ? "간략히 보기" : "더보기"}
