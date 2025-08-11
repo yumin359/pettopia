@@ -15,6 +15,43 @@ import java.util.Set;
 @Repository
 public interface PetFacilityRepository extends JpaRepository<PetFacility, Long> {
 
+    // 🆕 필터가 적용된 위치 기반 검색 (현재 화면 범위 내 + 모든 필터 조건)
+    @Query(value = """
+            SELECT pf FROM PetFacility pf WHERE
+            pf.latitude BETWEEN :southWestLat AND :northEastLat
+            AND pf.longitude BETWEEN :southWestLng AND :northEastLng
+            AND (:searchQuery IS NULL OR
+                 lower(pf.name) LIKE lower(concat('%', :searchQuery, '%')) OR
+                 lower(pf.category2) LIKE lower(concat('%', :searchQuery, '%')) OR
+                 lower(pf.category3) LIKE lower(concat('%', :searchQuery, '%')) OR
+                 lower(pf.roadAddress) LIKE lower(concat('%', :searchQuery, '%')) OR
+                 lower(pf.jibunAddress) LIKE lower(concat('%', :searchQuery, '%')) OR
+                 lower(pf.allowedPetSize) LIKE lower(concat('%', :searchQuery, '%')))
+            AND (:sidoName IS NULL OR lower(pf.sidoName) LIKE lower(concat('%', :sidoName, '%')))
+            AND (:sigunguName IS NULL OR lower(pf.sigunguName) LIKE lower(concat('%', :sigunguName, '%')))
+            AND (:category2 IS NULL OR pf.category2 IN :category2)
+            AND (:allowedPetSize IS NULL OR pf.allowedPetSize IN :allowedPetSize)
+            AND (:parkingAvailable IS NULL OR lower(pf.parkingAvailable) LIKE lower(concat('%', :parkingAvailable, '%')))
+            AND (:indoorFacility IS NULL OR lower(pf.indoorFacility) LIKE lower(concat('%', :indoorFacility, '%')))
+            AND (:outdoorFacility IS NULL OR lower(pf.outdoorFacility) LIKE lower(concat('%', :outdoorFacility, '%')))
+            ORDER BY pf.name
+            """)
+    List<PetFacility> findFacilitiesInBoundsWithFilters(
+            @Param("southWestLat") double southWestLat,
+            @Param("northEastLat") double northEastLat,
+            @Param("southWestLng") double southWestLng,
+            @Param("northEastLng") double northEastLng,
+            @Param("searchQuery") String searchQuery,
+            @Param("sidoName") String sidoName,
+            @Param("sigunguName") String sigunguName,
+            @Param("category2") Set<String> category2,
+            @Param("allowedPetSize") Set<String> allowedPetSize,
+            @Param("parkingAvailable") String parkingAvailable,
+            @Param("indoorFacility") String indoorFacility,
+            @Param("outdoorFacility") String outdoorFacility,
+            Pageable pageable
+    );
+
     // 검색어를 포함한 통합 필터 검색 쿼리 (수정됨)
     @Query(value = """
             SELECT pf FROM PetFacility pf WHERE
