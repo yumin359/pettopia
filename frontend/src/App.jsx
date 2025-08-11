@@ -21,6 +21,7 @@ import { MyReview } from "./feature/review/MyReview.jsx";
 import { KakaoCallback } from "./feature/member/KakaoCallback.jsx";
 import { AdminPage } from "./AdminPage.jsx";
 import ReviewReportList from "./feature/report/ReviewReportList.jsx";
+import { PetopiaHomepage } from "./common/PetopiaHomepage.jsx";
 
 function App() {
   return (
@@ -29,6 +30,8 @@ function App() {
         <Routes>
           <Route path="/" element={<MainLayout />}>
             <Route index element={<BoardLayout />} />
+
+            <Route path="/home" element={<PetopiaHomepage />} />
 
             <Route path="/board/add" element={<BoardAdd />} />
             <Route path="/board/list" element={<BoardList />} />
