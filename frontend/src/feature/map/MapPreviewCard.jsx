@@ -110,13 +110,6 @@ const MapPreviewCard = ({ facility }) => {
                 <i className="bi bi-signpost-2-fill me-2"></i>
                 카카오맵에서 길찾기
               </a>
-
-              <div className="alert alert-info mb-0 py-2">
-                <small className="d-flex align-items-center justify-content-center mb-0">
-                  <i className="bi bi-info-circle me-2"></i>
-                  클릭하면 카카오맵 앱이나 웹에서 열립니다
-                </small>
-              </div>
             </div>
 
             <div className="mt-3 p-3 bg-light rounded">
