@@ -185,11 +185,14 @@ export function ReviewAdd({ facility, onSave, onCancel }) {
         formData.append("tagNames", tag.value);
       });
 
-      await axios.post("/api/review/add", formData, {
+      const response = await axios.post("/api/review/add", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
+      // 새로 생성된 리뷰 ID를 가져옴
+      const reviewId = response.data.id;
+      console.log("생성된 리뷰 id : " + reviewId);
 
       toast.success("리뷰가 저장되었습니다.");
 
@@ -198,7 +201,8 @@ export function ReviewAdd({ facility, onSave, onCancel }) {
       setFiles([]);
       setSelectedTags([]);
 
-      onSave?.();
+      // 새로 생성된 reivewId 인자로 전달
+      onSave?.(reviewId);
     } catch (error) {
       console.error("리뷰 저장 실패:", error);
       const errorMessage =
@@ -266,9 +270,7 @@ export function ReviewAdd({ facility, onSave, onCancel }) {
             components={{
               MultiValueLabel: ({ data }) => (
                 <span>
-                  {data.label.startsWith("#")
-                    ? data.label
-                    : `#${data.label}`}
+                  {data.label.startsWith("#") ? data.label : `#${data.label}`}
                 </span>
               ),
             }}

@@ -9,7 +9,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 @RestController
@@ -22,10 +24,17 @@ public class ReviewController {
     // 리뷰 등록
     @PostMapping("/add")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<String> addReview(@ModelAttribute ReviewFormDto dto, Authentication authentication) {
+    public ResponseEntity<?> addReview(@ModelAttribute ReviewFormDto dto, Authentication authentication) {
         dto.setMemberEmail(authentication.getName());
-        reviewService.save(dto);
-        return ResponseEntity.ok("리뷰가 등록되었습니다.");
+        // 새 리뷰 id 리턴
+        Integer reviewId = reviewService.save(dto);
+        // 응답 데이터 받아서 보내기
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "리뷰가 등록되었습니다.");
+        response.put("id", reviewId);
+
+        // Map 객체를 ResponseEntity에 담아 응답
+        return ResponseEntity.ok(response);
     }
 
     // 특정 시설 리뷰 조회 - 정렬방식과 페이징 옵션 추가

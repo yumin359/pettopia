@@ -192,7 +192,7 @@ public class ReviewService {
     }
 
     // 리뷰 저장
-    public void save(ReviewFormDto dto) {
+    public Integer save(ReviewFormDto dto) {
         Member member = memberRepository.findByEmail(dto.getMemberEmail())
                 .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없습니다: " + dto.getMemberEmail()));
 
@@ -210,8 +210,10 @@ public class ReviewService {
         Set<Tag> tags = processTags(dto.getTagNames());
         review.setTags(tags);
 
-        reviewRepository.save(review);
+        Review savedReview = reviewRepository.save(review);
         saveFiles(review, dto.getFiles());
+        // 포커스 옮기기 위한 새 리뷰 id 리턴
+        return savedReview.getId();
     }
 
     // 리뷰 수정

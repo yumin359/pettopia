@@ -151,11 +151,11 @@ function ReviewEdit({ review, onSave, onCancel }) {
           timeout: 30000,
         },
       );
-
+      const reviewId = review.id;
       toast.success("수정 완료!");
 
       if (onSave) {
-        onSave();
+        onSave(reviewId);
       }
     } catch (error) {
       console.error("수정 실패:", error);
