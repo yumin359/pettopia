@@ -248,14 +248,14 @@ export function AppNavBar() {
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="mx-auto">
               <NavLink
-                to="/home"
+                to="/about"
                 style={({ isActive }) =>
                   isActive
                     ? { ...navLinkStyle, ...activeLinkStyle }
                     : navLinkStyle
                 }
               >
-                HOME
+                ABOUT
               </NavLink>
               <NavLink
                 to="/kakaoMap"

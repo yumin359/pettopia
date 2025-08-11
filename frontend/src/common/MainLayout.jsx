@@ -1,16 +1,10 @@
 import { Outlet } from "react-router";
 import { AppNavBar } from "./AppNavBar.jsx";
-import { Card, Container, Button } from "react-bootstrap";
+import { Card, Container } from "react-bootstrap";
 import { AppFooter } from "./AppFooter.jsx";
 import { ChatButton } from "./ChatButton.jsx";
-import { useContext } from "react";
-import { AuthenticationContext } from "./AuthenticationContextProvider.jsx";
-import { useNavigate } from "react-router";
 
 export function MainLayout() {
-  const { isAdmin } = useContext(AuthenticationContext);
-  const navigate = useNavigate();
-
   return (
     <div
       className="min-vh-100"

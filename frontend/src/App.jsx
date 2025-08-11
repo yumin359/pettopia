@@ -31,7 +31,7 @@ function App() {
           <Route path="/" element={<MainLayout />}>
             <Route index element={<BoardLayout />} />
 
-            <Route path="/home" element={<PetopiaHomepage />} />
+            <Route path="/about" element={<PetopiaHomepage />} />
 
             <Route path="/board/add" element={<BoardAdd />} />
             <Route path="/board/list" element={<BoardList />} />
