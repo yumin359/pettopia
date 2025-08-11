@@ -296,7 +296,7 @@ export function MapDetail() {
                   </div>
                   <p className="mt-3 text-muted">사진을 불러오는 중...</p>
                 </div>
-              ) : allImagesAndNickNameFromReviews.length === 0 ? ( // 이게 되려나 객체인데
+              ) : allImagesAndNickNameFromReviews.length === 0 ? (
                 <div className="text-center py-5">
                   <i className="bi bi-images text-muted display-4"></i>
                   <h5 className="mt-3 text-muted">
@@ -346,7 +346,10 @@ export function MapDetail() {
                     <select
                       id="sortSelect"
                       value={sortBy}
-                      onChange={(e) => setSortBy(e.target.value)}
+                      onChange={(e) => {
+                        setSearchParams({ focusReviewId: "" });
+                        setSortBy(e.target.value);
+                      }}
                       className="form-select form-select-sm"
                       style={{ width: "auto" }}
                     >
