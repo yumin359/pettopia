@@ -35,10 +35,10 @@ export default function ServiceListPage() {
 
   if (loading) {
     return (
-      <div className="text-center my-4">
-        <Spinner animation="border" />
-        <div>불러오는 중...</div>
-      </div>
+        <div className="text-center my-4">
+          <Spinner animation="border" />
+          <div>불러오는 중...</div>
+        </div>
     );
   }
 
@@ -51,37 +51,53 @@ export default function ServiceListPage() {
   }
 
   return (
-    <div style={{ padding: "2rem" }}>
-      <h2 className="mb-4">문의 내역 목록</h2>
-      <Table striped bordered hover>
-        <thead>
-        <tr>
-          <th>#</th>
-          <th>이메일</th>
-          <th>제목</th>
-          <th>내용</th>
-          <th>접수일</th>
-        </tr>
-        </thead>
-        <tbody>
-        {services.map(({ id, email, title, content, inserted_at }, idx) => (
-          <tr key={id ?? idx}>
-            <td>{idx + 1}</td>
-            <td
-              style={{ cursor: "pointer", color: "blue", textDecoration: "underline" }}
-              onClick={() => navigate(`/member?email=${encodeURIComponent(email)}`)}
-            >
-              {email}
-            </td>
-            <td>{title}</td>
-            <td style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
-              {content.length > 100 ? content.substring(0, 50) + "..." : content}
-            </td>
-            <td>{new Date(inserted_at).toLocaleString()}</td>
+      <div style={{ padding: "2rem" }}>
+        <h2 className="mb-4">문의 내역 목록</h2>
+        <Table striped bordered hover>
+          <thead>
+          <tr>
+            <th>#</th>
+            <th>이메일</th>
+            <th>제목</th>
+            <th>내용</th>
+            <th>접수일</th>
           </tr>
-        ))}
-        </tbody>
-      </Table>
-    </div>
+          </thead>
+          <tbody>
+          {services.map(({ id, email, title, content, inserted_at }, idx) => (
+              <tr key={id ?? idx}>
+                <td>{idx + 1}</td>
+                <td
+                    style={{
+                      whiteSpace: "pre-wrap",
+                      overflowWrap: "break-word",
+                      wordBreak: "break-word",
+                      cursor: "pointer",
+                      color: "blue",
+                      textDecoration: "underline",
+                      maxWidth: "220px",
+                    }}
+                    onClick={() => navigate(`/member?email=${encodeURIComponent(email)}`)}
+                    title={email}
+                >
+                  {email}
+                </td>
+                <td>{title}</td>
+                <td
+                    style={{
+                      whiteSpace: "pre-wrap",
+                      overflowWrap: "break-word",
+                      wordBreak: "break-word",
+                      maxWidth: "400px",
+                    }}
+                >
+                  {content}
+                </td>
+                <td>{new Date(inserted_at).toLocaleString()}</td>
+              </tr>
+          ))}
+          </tbody>
+        </Table>
+      </div>
   );
 }
