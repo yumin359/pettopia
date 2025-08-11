@@ -1,4 +1,4 @@
-// ReviewCarousel.jsx (이미지 레이아웃 LatestReviewsList 스타일로 적용)
+// ReviewCarousel.jsx (부트스트랩 기반 간소화)
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import {
@@ -12,7 +12,6 @@ import {
 } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import {
-  BsImages,
   BsGeoAltFill,
   BsHash,
   BsChevronLeft,
@@ -24,16 +23,6 @@ export const ReviewCarousel = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-
-  const arrowStyle = {
-    color: "#333",
-    borderRadius: "50%",
-    padding: "6px",
-    fontSize: "1.8rem",
-    filter: "drop-shadow(0 0 3px rgba(0,0,0,0.4))",
-    cursor: "pointer",
-    userSelect: "none",
-  };
 
   useEffect(() => {
     const fetchLatestReviews = async () => {
@@ -64,10 +53,7 @@ export const ReviewCarousel = () => {
 
   if (loading)
     return (
-      <div
-        className="d-flex justify-content-center align-items-center"
-        style={{ height: "200px" }}
-      >
+      <div className="d-flex justify-content-center align-items-center p-5">
         <Spinner animation="border" size="sm" className="me-2" />
         <span>로딩 중...</span>
       </div>
@@ -79,208 +65,206 @@ export const ReviewCarousel = () => {
     return <Alert variant="info">등록된 리뷰가 없습니다.</Alert>;
 
   return (
-    <Carousel
-      indicators={false}
-      interval={5000}
-      className="shadow-sm"
-      prevIcon={<BsChevronLeft style={arrowStyle} />}
-      nextIcon={<BsChevronRight style={arrowStyle} />}
-    >
-      {reviews.map((review) => {
-        const imageFiles = review.files?.filter(isImageFile) || [];
-        const totalImages = imageFiles.length;
+    <>
+      {/* 고정 높이를 위한 CSS */}
+      <style>
+        {`
+          .review-card-fixed {
+            height: 220px !important;
+          }
+          .review-image-area {
+            height: 220px;
+          }
+          .review-content-area {
+            height: 220px;
+          }
+          .review-author-area {
+            min-height: 32px;
+          }
+          .review-tag-area {
+            min-height: 28px;
+            max-height: 28px;
+          }
+          .review-text-area {
+            min-height: 60px;
+            max-height: 80px;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            line-height: 1.4;
+          }
+          .review-bottom-area {
+            min-height: 40px;
+          }
+          .review-image-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 2px;
+            width: 100%;
+            height: 100%;
+          }
+          .review-image-overlay {
+            background-color: rgba(0,0,0,0.5);
+            color: white;
+            font-weight: bold;
+            font-size: 1.5rem;
+          }
+        `}
+      </style>
 
-        return (
-          <Carousel.Item key={review.id}>
-            <Card
-              className="h-100 border-0 shadow-sm"
-              role="button"
-              onClick={() =>
-                navigate(
-                  `/facility/${review.petFacility.id}?focusReviewId=${review.id}`,
-                )
-              }
-              style={{ background: "lightgoldenrodyellow", cursor: "pointer" }}
-            >
-              <Row className="g-0 h-100">
-                {/* 이미지 영역 */}
-                <Col
-                  xs={4}
-                  className="bg-light d-flex align-items-center justify-content-center p-2"
-                >
-                  {totalImages === 0 && (
-                    <img
-                      src="/PETOPIA-Photoroom.png"
-                      alt="이미지 없음"
-                      style={{
-                        maxWidth: "80%",
-                        maxHeight: "80%",
-                        objectFit: "contain",
-                      }}
-                    />
-                  )}
+      <Carousel
+        indicators={false}
+        interval={5000}
+        className="shadow-sm"
+        prevIcon={<BsChevronLeft className="text-dark fs-1" />}
+        nextIcon={<BsChevronRight className="text-dark fs-1" />}
+      >
+        {reviews.map((review) => {
+          const imageFiles = review.files?.filter(isImageFile) || [];
+          const totalImages = imageFiles.length;
 
-                  {totalImages === 1 && (
-                    <img
-                      src={imageFiles[0]}
-                      alt=""
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
-                        borderRadius: "6px",
-                      }}
-                    />
-                  )}
-
-                  {(totalImages === 2 ||
-                    totalImages === 3 ||
-                    totalImages >= 4) && (
-                    <div
-                      style={{
-                        display: "grid",
-                        gridTemplateColumns: "1fr 1fr",
-                        gridTemplateRows: "1fr 1fr",
-                        gap: "2px",
-                        width: "100%",
-                        height: "100%",
-                        borderRadius: "6px",
-                        overflow: "hidden",
-                      }}
-                    >
-                      {imageFiles.slice(0, 3).map((img, i) => (
-                        <div key={i} style={{ overflow: "hidden" }}>
-                          <img
-                            src={img}
-                            alt=""
-                            style={{
-                              width: "100%",
-                              height: "100%",
-                              objectFit: "cover",
-                            }}
-                          />
-                        </div>
-                      ))}
-                      {totalImages >= 4 && (
-                        <div
-                          style={{
-                            backgroundColor: "rgba(0,0,0,0.5)",
-                            color: "white",
-                            fontWeight: "bold",
-                            fontSize: "1.5rem",
-                            display: "flex",
-                            justifyContent: "center",
-                            alignItems: "center",
-                          }}
-                        >
-                          +{totalImages - 3}
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </Col>
-
-                {/* 본문 영역 */}
-                <Col xs={8}>
-                  <Card.Body className="p-3 d-flex flex-column h-100">
-                    {/* 작성자 */}
-                    <div className="d-flex align-items-center mb-2">
+          return (
+            <Carousel.Item key={review.id}>
+              <Card
+                className="border-0 shadow-sm review-card-fixed bg-warning bg-opacity-25"
+                role="button"
+                onClick={() =>
+                  navigate(
+                    `/facility/${review.petFacility.id}?focusReviewId=${review.id}`,
+                  )
+                }
+                style={{ cursor: "pointer" }}
+              >
+                <Row className="g-0 h-100">
+                  {/* 이미지 영역 */}
+                  <Col
+                    xs={4}
+                    className="bg-light d-flex align-items-center justify-content-center p-2 review-image-area"
+                  >
+                    {totalImages === 0 && (
                       <img
-                        src={review.profileImageUrl || "/user.png"}
-                        alt=""
-                        className="rounded-circle me-2"
-                        style={{
-                          width: "24px",
-                          height: "24px",
-                          objectFit: "cover",
-                        }}
+                        src="/PETOPIA-Photoroom.png"
+                        alt="이미지 없음"
+                        className="w-75 h-75"
+                        style={{ objectFit: "contain" }}
                       />
-                      <div className="small">
-                        <div className="fw-semibold">
-                          {review.memberEmailNickName}
-                        </div>
-                        <div
-                          className="text-muted"
-                          style={{ fontSize: "0.75rem" }}
-                        >
-                          {formatDate(review.insertedAt)}
-                        </div>
-                      </div>
-                    </div>
+                    )}
 
-                    {/* 태그 */}
-                    {review.tags?.length > 0 && (
-                      <div className="mb-2 d-flex flex-wrap gap-1">
-                        {review.tags.slice(0, 3).map((tag, i) => (
-                          <Badge
-                            key={tag.id || i}
-                            bg="secondary"
-                            className="fw-normal"
-                            style={{
-                              fontSize: "0.7rem",
-                              padding: "0.2rem 0.4rem",
-                            }}
-                          >
-                            <BsHash size={10} className="me-0" />
-                            {tag.name.replace(/#/g, "")}
-                          </Badge>
+                    {totalImages === 1 && (
+                      <img
+                        src={imageFiles[0]}
+                        alt=""
+                        className="w-100 h-100 rounded"
+                        style={{ objectFit: "cover" }}
+                      />
+                    )}
+
+                    {totalImages >= 2 && (
+                      <div className="review-image-grid rounded overflow-hidden">
+                        {imageFiles.slice(0, 3).map((img, i) => (
+                          <div key={i} className="overflow-hidden">
+                            <img
+                              src={img}
+                              alt=""
+                              className="w-100 h-100"
+                              style={{ objectFit: "cover" }}
+                            />
+                          </div>
                         ))}
-                        {review.tags.length > 3 && (
-                          <Badge
-                            bg="light"
-                            text="dark"
-                            className="fw-normal"
-                            style={{
-                              fontSize: "0.7rem",
-                              padding: "0.2rem 0.4rem",
-                            }}
-                          >
-                            +{review.tags.length - 3}
-                          </Badge>
+                        {totalImages >= 4 && (
+                          <div className="review-image-overlay d-flex justify-content-center align-items-center">
+                            +{totalImages - 3}
+                          </div>
                         )}
                       </div>
                     )}
+                  </Col>
 
-                    {/* 리뷰 내용 */}
-                    <p
-                      className="small mb-auto"
-                      style={{
-                        display: "-webkit-box",
-                        WebkitLineClamp: review.tags?.length > 0 ? 2 : 3,
-                        WebkitBoxOrient: "vertical",
-                        overflow: "hidden",
-                        lineHeight: 1.4,
-                        fontSize: "0.85rem",
-                      }}
-                    >
-                      {review.review}
-                    </p>
+                  {/* 본문 영역 */}
+                  <Col xs={8}>
+                    <Card.Body className="p-3 d-flex flex-column review-content-area">
+                      {/* 작성자 정보 */}
+                      <div className="d-flex align-items-center mb-2 review-author-area">
+                        <img
+                          src={review.profileImageUrl || "/user.png"}
+                          alt=""
+                          className="rounded-circle me-2"
+                          width="24"
+                          height="24"
+                          style={{ objectFit: "cover" }}
+                        />
+                        <div className="small">
+                          <div className="fw-semibold">
+                            {review.memberEmailNickName}
+                          </div>
+                          <div
+                            className="text-muted"
+                            style={{ fontSize: "0.75rem" }}
+                          >
+                            {formatDate(review.insertedAt)}
+                          </div>
+                        </div>
+                      </div>
 
-                    {/* 별점 + 시설명 */}
-                    <div className="mt-2">
-                      <div className="text-warning small mb-1">
-                        {"★".repeat(review.rating)}
-                        <span className="text-muted">
-                          {"★".repeat(5 - review.rating)}
-                        </span>
+                      {/* 태그 영역 */}
+                      <div className="mb-2 review-tag-area overflow-hidden">
+                        {review.tags?.length > 0 && (
+                          <div className="d-flex flex-wrap gap-1">
+                            {review.tags.slice(0, 3).map((tag, i) => (
+                              <Badge
+                                key={tag.id || i}
+                                bg="secondary"
+                                className="fw-normal small"
+                              >
+                                <BsHash size={10} className="me-0" />
+                                {tag.name.replace(/#/g, "")}
+                              </Badge>
+                            ))}
+                            {review.tags.length > 3 && (
+                              <Badge
+                                bg="light"
+                                text="dark"
+                                className="fw-normal small"
+                              >
+                                +{review.tags.length - 3}
+                              </Badge>
+                            )}
+                          </div>
+                        )}
                       </div>
-                      <div
-                        className="d-flex align-items-center text-muted"
-                        style={{ fontSize: "0.75rem" }}
-                      >
-                        <BsGeoAltFill size={10} className="me-1" />
-                        <span className="text-truncate">
-                          {review.petFacility.name}
-                        </span>
+
+                      {/* 리뷰 내용 */}
+                      <div className="flex-grow-1 d-flex align-items-start">
+                        <p className="small mb-0 review-text-area">
+                          {review.review}
+                        </p>
                       </div>
-                    </div>
-                  </Card.Body>
-                </Col>
-              </Row>
-            </Card>
-          </Carousel.Item>
-        );
-      })}
-    </Carousel>
+
+                      {/* 별점 + 시설명 */}
+                      <div className="mt-auto review-bottom-area">
+                        <div className="text-warning small mb-1">
+                          {"★".repeat(review.rating)}
+                          <span className="text-muted">
+                            {"★".repeat(5 - review.rating)}
+                          </span>
+                        </div>
+                        <div className="d-flex align-items-center text-muted small">
+                          <BsGeoAltFill size={10} className="me-1" />
+                          <span className="text-truncate">
+                            {review.petFacility.name}
+                          </span>
+                        </div>
+                      </div>
+                    </Card.Body>
+                  </Col>
+                </Row>
+              </Card>
+            </Carousel.Item>
+          );
+        })}
+      </Carousel>
+    </>
   );
 };
