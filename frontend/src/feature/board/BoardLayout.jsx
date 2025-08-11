@@ -1,7 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { Button, Carousel, Col, Row } from "react-bootstrap";
-import { useContext } from "react";
-import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
+import { Carousel, Col, Row } from "react-bootstrap";
 
 import img1 from "../../assets/event1.jpg";
 import img2 from "../../assets/event2.jpg";
@@ -11,7 +9,7 @@ import { ReviewCarousel } from "../main/ReviewCarousel.jsx";
 
 export function BoardLayout() {
   const navigate = useNavigate();
-  const { isAdmin } = useContext(AuthenticationContext);
+  // const { isAdmin } = useContext(AuthenticationContext); // 안쓰는?
 
   const slides = [
     { id: 17, img: img1, title: "유기견 입양 안내" },
@@ -23,6 +21,7 @@ export function BoardLayout() {
     <div className="container mt-5">
       <Row className="align-items-center">
         <Col xs={12} md={12}>
+          {/* 캐루셀 */}
           <Carousel style={{ maxWidth: "1280px", margin: "0 auto" }}>
             {slides.map(({ id, img, title }, idx) => (
               <Carousel.Item
@@ -96,6 +95,9 @@ export function BoardLayout() {
           <ReviewCarousel />
         </Col>
       </Row>
+
+      {/* 추가 섹션을 위한 여백 */}
+      <div className="py-4"></div>
     </div>
   );
 }
