@@ -12,15 +12,13 @@ const KakaoMapComponent = ({
   categoryColors,
   favoriteMarkers,
   isShowingFavorites,
-  onBoundsSearch, // 🆕 추가된 prop
-  searchQuery, // 🆕 추가된 prop
-  isMapBoundsSearch, // 🆕 지도 범위 검색 모드 상태
-  // 🆕 필터 상태들 (지역 제외, 실제 사용하는 것들만)
+  onBoundsSearch,
+  searchQuery,
+  isMapBoundsSearch,
   selectedCategories2,
   selectedPetSizes,
   parkingFilter,
   facilityType,
-  // 🆕 지역 설정 함수들 추가 (optional)
   setSelectedRegion,
   setSelectedSigungu,
 }) => {
@@ -79,7 +77,7 @@ const KakaoMapComponent = ({
     [categoryColors],
   );
 
-  // 🆕 카카오 지역명을 백엔드 지역명으로 매핑하는 함수
+  // 카카오 지역명을 백엔드 지역명으로 매핑하는 함수
   const mapKakaoToBackendRegion = useCallback((kakaoRegion) => {
     if (!kakaoRegion) return null;
 
@@ -137,15 +135,13 @@ const KakaoMapComponent = ({
     return regionMappings[kakaoRegion] || kakaoRegion;
   }, []);
 
-  // 🆕 시군구명 정리 함수
+  // 시군구명 정리 함수
   const cleanSigunguName = useCallback((sigungu) => {
     if (!sigungu) return null;
 
-    // "구", "시", "군" 등이 이미 포함되어 있으면 그대로 반환
-    // 필요시 추가 정리 로직 구현
     return sigungu;
   }, []);
-  // 🆕 카카오 지오코딩으로 좌표 → 주소 변환 (새로 추가)
+  // 카카오 지오코딩으로 좌표 → 주소 변환 (새로 추가)
   const getAddressFromCoords = useCallback(
     (lat, lng) => {
       return new Promise((resolve) => {
@@ -170,20 +166,6 @@ const KakaoMapComponent = ({
               const mappedSido = mapKakaoToBackendRegion(rawSido);
               const cleanedSigungu = cleanSigunguName(rawSigungu);
 
-              console.log("🗺️ 주소 변환 결과:");
-              console.log(
-                "  원본 지역:",
-                rawSido,
-                "→ 매핑된 지역:",
-                mappedSido,
-              );
-              console.log(
-                "  원본 시군구:",
-                rawSigungu,
-                "→ 정리된 시군구:",
-                cleanedSigungu,
-              );
-
               resolve({
                 sido: mappedSido,
                 sigungu: cleanedSigungu,
@@ -205,7 +187,6 @@ const KakaoMapComponent = ({
       return;
     }
 
-    console.log("🗺️ 현재 화면 검색 시작...");
     setIsSearchingBounds(true);
 
     try {
@@ -214,38 +195,23 @@ const KakaoMapComponent = ({
       const southWest = bounds.getSouthWest();
       const northEast = bounds.getNorthEast();
 
-      // 🆕 지도 중심점의 주소 가져오기
+      // 지도 중심점의 주소 가져오기
       const center = mapInstance.current.getCenter();
       const { sido, sigungu } = await getAddressFromCoords(
         center.getLat(),
         center.getLng(),
       );
 
-      console.log("📍 현재 지도 위치:", { sido, sigungu });
-
-      // 🆕 지역 자동 설정 (순차적으로 처리)
-      console.log("🔍 설정하려는 값:");
-      console.log("  sido:", sido);
-      console.log("  sigungu:", sigungu);
-
       if (sido && setSelectedRegion) {
-        console.log("🔄 지역 설정 시도:", sido);
         setSelectedRegion(sido);
-        console.log("✅ setSelectedRegion 호출 완료");
 
-        // 🆕 지역 설정 후 시군구 설정 (딜레이)
         if (sigungu && setSelectedSigungu) {
           setTimeout(() => {
-            console.log("🔄 시군구 설정 시도 (딜레이 후):", sigungu);
             setSelectedSigungu(sigungu);
-            console.log("✅ setSelectedSigungu 호출 완료 (딜레이 후)");
           }, 100); // 100ms 딜레이
         }
       } else if (sigungu && setSelectedSigungu) {
-        // 지역 설정이 없는 경우에만 바로 시군구 설정
-        console.log("🔄 시군구 설정 시도:", sigungu);
         setSelectedSigungu(sigungu);
-        console.log("✅ setSelectedSigungu 호출 완료");
       }
 
       // URLSearchParams로 파라미터 구성 (배열 문제 해결)
@@ -261,7 +227,7 @@ const KakaoMapComponent = ({
         urlParams.append("searchQuery", searchQuery.trim());
       }
 
-      // 🆕 자동 설정된 지역 사용 (우선적으로 적용)
+      // 자동 설정된 지역 사용 (우선적으로 적용)
       if (sido) {
         urlParams.append("sidoName", sido);
       }
@@ -366,24 +332,20 @@ const KakaoMapComponent = ({
           const { latitude: lat, longitude: lng } = position.coords;
           setMyLocation({ lat, lng });
 
-          // 🆕 내 위치의 주소도 자동으로 필터에 설정
+          // 내 위치의 주소도 자동으로 필터에 설정
           try {
             const { sido, sigungu } = await getAddressFromCoords(lat, lng);
-            console.log("📍 내 위치:", { sido, sigungu });
 
             if (sido && setSelectedRegion) {
-              console.log("🔄 내 위치 지역 설정:", sido);
               setSelectedRegion(sido);
 
-              // 🆕 지역 설정 후 시군구 설정 (딜레이)
+              // 지역 설정 후 시군구 설정 (딜레이)
               if (sigungu && setSelectedSigungu) {
                 setTimeout(() => {
-                  console.log("🔄 내 위치 시군구 설정 (딜레이 후):", sigungu);
                   setSelectedSigungu(sigungu);
                 }, 100);
               }
             } else if (sigungu && setSelectedSigungu) {
-              console.log("🔄 내 위치 시군구 설정:", sigungu);
               setSelectedSigungu(sigungu);
             }
 
