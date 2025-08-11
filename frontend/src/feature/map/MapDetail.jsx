@@ -280,7 +280,7 @@ export function MapDetail() {
               <div className="d-flex align-items-center">
                 <i className="bi bi-camera-fill me-3 fs-4"></i>
                 <div>
-                  <h4 className="card-title mb-0">사진 & 영상</h4>
+                  <h4 className="card-title mb-0">사진 ▪ 영상</h4>
                   <small className="opacity-75">
                     Photos & Videos from Reviews
                   </small>
