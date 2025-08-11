@@ -126,12 +126,27 @@ const FullFilterKakaoMap = () => {
 
   // 검색 버튼 핸들러에 isMapBoundsSearch 리셋만 추가
   const handleSearch = (query = "") => {
+    // 검색어가 입력되었을 때
+    if (query && query.trim()) {
+      // 지역 필터를 "전체"로 자동 리셋
+      filterSetters.setSelectedRegion("전체");
+      filterSetters.setSelectedSigungu("전체");
+
+      // 사용자에게 알림 (선택사항)
+      toast.info("🔍 전체 지역에서 검색합니다", {
+        autoClose: 1500,
+        position: "top-center",
+        hideProgressBar: true,
+      });
+    }
+
     if (query !== undefined && query !== searchQuery) {
       setSearchQuery(query);
     }
+
     setHasSearched(true);
     setIsShowingFavorites(false);
-    setIsMapBoundsSearch(false); // 🆕 일반 검색 시 지도 범위 검색 모드 해제
+    setIsMapBoundsSearch(false);
     setCurrentPage(0);
   };
 
