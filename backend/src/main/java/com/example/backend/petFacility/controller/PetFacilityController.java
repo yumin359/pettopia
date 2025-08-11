@@ -108,7 +108,7 @@ public class PetFacilityController {
         ));
     }
 
-    // 📍 새로 추가: 간단한 검색 제안 엔드포인트
+    // 간단한 검색 제안 엔드포인트
     @GetMapping("/search/suggestions")
     public List<PetFacilitySimpleDto> getSearchSuggestions(
             @RequestParam String query,
@@ -133,7 +133,7 @@ public class PetFacilityController {
                 .collect(Collectors.toList());
     }
 
-    // 📍 새로 추가: 현재 지도 화면 범위 내 시설 검색
+    // 현재 지도 화면 범위 내 시설 검색
     @GetMapping("/search/bounds")
     public List<PetFacilitySearchDto> searchFacilitiesInBounds(
             @RequestParam double southWestLat,

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useCallback, useState } from "react";
 import axios from "axios";
 import { createInfoWindowContent } from "./MapUtils.jsx";
-import { FaMapMarkerAlt } from "react-icons/fa";
+import { FaMapMarkerAlt, FaSearch } from "react-icons/fa"; // 🆕 FaSearch 아이콘 추가
 import { toast } from "react-toastify";
 
 const KakaoMapComponent = ({
@@ -12,6 +12,8 @@ const KakaoMapComponent = ({
   categoryColors,
   favoriteMarkers,
   isShowingFavorites,
+  onBoundsSearch, // 🆕 추가된 prop
+  searchQuery, // 🆕 추가된 prop
 }) => {
   // --- Refs: 지도와 관련된 인스턴스 및 요소 참조 ---
   const mapContainer = useRef(null);
@@ -22,8 +24,9 @@ const KakaoMapComponent = ({
 
   // --- State: 컴포넌트의 상태 관리 ---
   const [myLocation, setMyLocation] = useState(null);
+  const [isSearchingBounds, setIsSearchingBounds] = useState(false); // 🆕 추가된 상태
 
-  // --- 콜백 함수: 마커, 인포윈도우 등 생성 로직 ---
+  // --- 콜백 함수: 마커, 인포윈도우 등 생성 로직 (기존 코드 그대로) ---
   const createStyledInfoWindow = useCallback((content) => {
     return `
       <div class="p-2 bg-white rounded shadow-sm" style="max-width: 350px; white-space: normal; word-break: break-word; box-sizing: border-box;">
@@ -67,6 +70,54 @@ const KakaoMapComponent = ({
     [categoryColors],
   );
 
+  // 🆕 지도 범위 검색 함수만 추가
+  const searchCurrentMapBounds = useCallback(async () => {
+    if (!mapInstance.current) {
+      toast.warn("지도가 준비되지 않았습니다.");
+      return;
+    }
+
+    setIsSearchingBounds(true);
+
+    try {
+      // 현재 지도 범위 가져오기
+      const bounds = mapInstance.current.getBounds();
+      const southWest = bounds.getSouthWest();
+      const northEast = bounds.getNorthEast();
+
+      const params = {
+        southWestLat: southWest.getLat(),
+        northEastLat: northEast.getLat(),
+        southWestLng: southWest.getLng(),
+        northEastLng: northEast.getLng(),
+        limit: 50, // 최대 50개
+      };
+
+      // 검색어가 있으면 추가
+      if (searchQuery && searchQuery.trim()) {
+        params.searchQuery = searchQuery.trim();
+      }
+
+      console.log("지도 범위 검색 요청:", params);
+
+      const response = await axios.get("/api/pet_facilities/search/bounds", {
+        params,
+      });
+
+      const facilities = response.data || [];
+
+      // 부모 컴포넌트로 결과 전달
+      if (onBoundsSearch) {
+        onBoundsSearch(facilities);
+      }
+    } catch (error) {
+      console.error("지도 범위 검색 실패:", error);
+      toast.error("현재 화면 검색에 실패했습니다.");
+    } finally {
+      setIsSearchingBounds(false);
+    }
+  }, [searchQuery, onBoundsSearch]);
+
   const handleGetMyLocation = useCallback(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -85,7 +136,7 @@ const KakaoMapComponent = ({
     }
   }, []);
 
-  // --- useEffect 훅: 사이드 이펙트 처리 ---
+  // --- useEffect 훅: 사이드 이펙트 처리 (기존 코드 그대로) ---
 
   // 1. 지도 초기화 (최초 1회 실행)
   useEffect(() => {
@@ -249,14 +300,39 @@ const KakaoMapComponent = ({
   return (
     <div ref={mapContainer} className="w-100 h-100 position-relative">
       {isMapReady && (
-        <button
-          onClick={handleGetMyLocation}
-          className="btn btn-light position-absolute shadow"
-          style={{ zIndex: 10, top: "10px", left: "10px" }}
-          title="내 위치 보기"
-        >
-          <FaMapMarkerAlt />
-        </button>
+        <>
+          {/* 기존 내 위치 버튼 */}
+          <button
+            onClick={handleGetMyLocation}
+            className="btn btn-light position-absolute shadow"
+            style={{ zIndex: 10, top: "10px", left: "10px" }}
+            title="내 위치 보기"
+          >
+            <FaMapMarkerAlt />
+          </button>
+
+          {/* 🆕 현재 화면 검색 버튼만 추가 */}
+          <button
+            onClick={searchCurrentMapBounds}
+            disabled={isSearchingBounds}
+            className="btn btn-primary position-absolute shadow"
+            style={{
+              zIndex: 10,
+              top: "10px",
+              right: "10px",
+              fontSize: "12px",
+              padding: "8px 12px",
+            }}
+            title="현재 화면에서 검색"
+          >
+            {isSearchingBounds ? (
+              <span className="spinner-border spinner-border-sm me-1" />
+            ) : (
+              <FaSearch className="me-1" />
+            )}
+            현재 화면 검색
+          </button>
+        </>
       )}
     </div>
   );
