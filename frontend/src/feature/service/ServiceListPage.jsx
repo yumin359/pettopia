@@ -72,13 +72,11 @@ export default function ServiceListPage() {
                       whiteSpace: "pre-wrap",
                       overflowWrap: "break-word",
                       wordBreak: "break-word",
-                      cursor: "pointer",
-                      color: "blue",
-                      textDecoration: "underline",
                       maxWidth: "220px",
+                      color: "inherit",
+                      cursor: "default",
+                      textDecoration: "none",
                     }}
-                    onClick={() => navigate(`/member?email=${encodeURIComponent(email)}`)}
-                    title={email}
                 >
                   {email}
                 </td>
