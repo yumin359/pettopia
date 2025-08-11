@@ -11,7 +11,7 @@ import ReviewAdd from "../review/ReviewAdd.jsx";
 export function MapDetail() {
   const { id } = useParams();
   const { user } = useContext(AuthenticationContext);
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const [facility, setFacility] = useState(null);
   const [reviews, setReviews] = useState([]);
@@ -68,6 +68,8 @@ export function MapDetail() {
         data: { email: user.email },
       });
       alert("삭제 완료");
+      // 리뷰 삭제 시 focusReviewId는 ""로
+      setSearchParams({ focusReviewId: "" });
       fetchReviews();
     } catch (err) {
       console.error("리뷰 삭제 실패:", err);
@@ -77,10 +79,18 @@ export function MapDetail() {
 
   // 리뷰 작성 모드 토글
   const handleGoToWrite = () => setIsWriting(true);
-  const handleReviewSaved = () => {
+
+  // 리뷰 작성 저장 버튼
+  const handleReviewSaved = (reviewId) => {
+    // 리뷰 작성 모드 닫기
     setIsWriting(false);
+    // 리뷰 목록 가져오기
     fetchReviews();
+    // 리뷰 생성시 id가 focusid로
+    setSearchParams({ focusReviewId: reviewId });
   };
+
+  // 리뷰 작성 취소
   const handleReviewCancel = () => setIsWriting(false);
 
   // 신고 모달 열기/닫기
