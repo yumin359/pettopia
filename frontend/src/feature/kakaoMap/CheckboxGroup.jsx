@@ -1,6 +1,5 @@
 import React from "react";
 
-// 카테고리와 반려동물 종류만
 const CheckboxGroup = ({
   title,
   options,

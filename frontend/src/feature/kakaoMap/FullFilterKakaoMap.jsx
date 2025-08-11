@@ -1,7 +1,7 @@
 // src/map/FullFilterKakaoMap.js
 import React, { useCallback, useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import FilterPanel from "../map/FilterPanel.jsx";
+import FilterPanel from "./FilterPanel.jsx";
 import SearchResultList from "./SearchResultList.jsx";
 import KakaoMapComponent from "./KakaoMapComponent.jsx";
 import { useFilters } from "./data/UseFilters.jsx";
