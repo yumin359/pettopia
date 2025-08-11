@@ -138,8 +138,12 @@ export function MapDetail() {
     return ["jpg", "jpeg", "png", "gif", "webp"].includes(ext.toLowerCase());
   };
 
-  const allImagesFromReviews = reviews.flatMap((review) =>
-    (review.files || []).filter(isImageFile),
+  const allImagesAndNickNameFromReviews = reviews.flatMap((review) =>
+    (review.files || []).filter(isImageFile).map((fileUrl) => ({
+      url: fileUrl,
+      nickName: review.memberEmailNickName, // 닉네임 정보 추가
+      profileImageUrl: review.profileImageUrl || "/user.png", // 프로필사진 추가
+    })),
   );
 
   const sortedReviews = [...reviews];
@@ -292,7 +296,7 @@ export function MapDetail() {
                   </div>
                   <p className="mt-3 text-muted">사진을 불러오는 중...</p>
                 </div>
-              ) : allImagesFromReviews.length === 0 ? (
+              ) : allImagesAndNickNameFromReviews.length === 0 ? ( // 이게 되려나 객체인데
                 <div className="text-center py-5">
                   <i className="bi bi-images text-muted display-4"></i>
                   <h5 className="mt-3 text-muted">
@@ -304,7 +308,7 @@ export function MapDetail() {
                 </div>
               ) : (
                 <ReviewCard
-                  review={{ files: allImagesFromReviews }}
+                  review={{ files: allImagesAndNickNameFromReviews }}
                   showOnlyImages={true}
                 />
               )}
