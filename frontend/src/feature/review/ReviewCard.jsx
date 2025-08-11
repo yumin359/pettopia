@@ -331,13 +331,7 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
                   cursor: "pointer",
                   transition: "transform 0.2s",
                 }}
-                onClick={() =>
-                  handleImageClick({
-                    url: fileUrl,
-                    nickName: review.memberEmailNickName,
-                    // 이미지 없는데 왜 잘되지? 일반 모드라 그런가?
-                  })
-                }
+                onClick={() => handleImageClick(fileUrl)} // 모달이 아래 같이 있어서 리뷰이미지들만 넘겨도 됨
                 onMouseOver={(e) => (e.target.style.transform = "scale(1.05)")}
                 onMouseOut={(e) => (e.target.style.transform = "scale(1)")}
               />
