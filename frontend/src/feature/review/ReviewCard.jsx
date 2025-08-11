@@ -139,19 +139,23 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
         </div>
 
         {/* 사진 눌렀을 때 확대 모달 */}
-        {/* Bootstrap 기본 스타일을 활용하도록 수정 */}
+        {/* 이미지 확대 모달 - Bootstrap 기본 스타일을 활용하도록 수정 */}
         <Modal
           show={showImageModal}
           onHide={handleCloseImageModal}
-          dialogClassName="fullscreen-modal"
           centered
-          fullscreen
+          size="xl"
         >
-          <Modal.Header closeButton className="border-0" />
+          <Modal.Header
+            closeButton
+            style={{ backgroundColor: "transparent", border: "none" }}
+          />
           <Modal.Body
-            className="d-flex justify-content-center align-items-center bg-black"
-            onClick={handleCloseImageModal}
-            style={{ cursor: "zoom-out" }}
+            className="d-flex justify-content-center align-items-center p-0"
+            style={{
+              backgroundColor: "transparent",
+              minHeight: "400px",
+            }}
           >
             <Image
               src={modalImageUrl}
@@ -159,7 +163,7 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
               alt="확대 이미지"
               style={{
                 maxHeight: "80vh",
-                maxWidth: "80%",
+                maxWidth: "100%",
                 objectFit: "contain",
               }}
             />
