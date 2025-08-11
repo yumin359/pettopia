@@ -67,13 +67,8 @@ export function MyReview() {
                 {/* 상단: 시설명 + 별점 */}
                 <div className="d-flex justify-content-between align-items-center mb-2">
                   <div
-                    className="fw-semibold hover-underline-on-hover"
+                    className="fw-semibold"
                     style={{ color: "#5a3600", cursor: "pointer" }}
-                    // onClick={() =>
-                    //   navigate(
-                    //     `/facility/${encodeURIComponent(r.facilityName)}`,
-                    //   )
-                    // }
                   >
                     {r.petFacility.name}
                   </div>
@@ -150,18 +145,6 @@ export function MyReview() {
           })}
         </div>
       </Col>
-
-      <style>{`
-        .line-clamp {
-          display: -webkit-box;
-          -webkit-line-clamp: 3;
-          -webkit-box-orient: vertical;
-          overflow: hidden;
-        }
-        .hover-underline-on-hover:hover {
-          text-decoration: underline !important;
-        }
-      `}</style>
     </Row>
   );
 }
