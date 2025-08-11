@@ -11,7 +11,13 @@ import {
   Badge,
 } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { BsImages, BsGeoAltFill, BsHash, BsChevronLeft, BsChevronRight } from "react-icons/bs";
+import {
+  BsImages,
+  BsGeoAltFill,
+  BsHash,
+  BsChevronLeft,
+  BsChevronRight,
+} from "react-icons/bs";
 
 export const ReviewCarousel = () => {
   const [reviews, setReviews] = useState([]);
@@ -50,12 +56,18 @@ export const ReviewCarousel = () => {
   const formatDate = (isoString) => {
     if (!isoString) return "";
     const date = new Date(isoString);
-    return date.toLocaleDateString("ko-KR").replace(/\. /g, ".").replace(".", "");
+    return date
+      .toLocaleDateString("ko-KR")
+      .replace(/\. /g, ".")
+      .replace(".", "");
   };
 
   if (loading)
     return (
-      <div className="d-flex justify-content-center align-items-center" style={{ height: "200px" }}>
+      <div
+        className="d-flex justify-content-center align-items-center"
+        style={{ height: "200px" }}
+      >
         <Spinner animation="border" size="sm" className="me-2" />
         <span>로딩 중...</span>
       </div>
@@ -63,7 +75,8 @@ export const ReviewCarousel = () => {
 
   if (error) return <Alert variant="danger">{error}</Alert>;
 
-  if (reviews.length === 0) return <Alert variant="info">등록된 리뷰가 없습니다.</Alert>;
+  if (reviews.length === 0)
+    return <Alert variant="info">등록된 리뷰가 없습니다.</Alert>;
 
   return (
     <Carousel
@@ -83,18 +96,27 @@ export const ReviewCarousel = () => {
               className="h-100 border-0 shadow-sm"
               role="button"
               onClick={() =>
-                navigate(`/facility/${review.petFacility.id}?focusReviewId=${review.id}`)
+                navigate(
+                  `/facility/${review.petFacility.id}?focusReviewId=${review.id}`,
+                )
               }
               style={{ background: "lightgoldenrodyellow", cursor: "pointer" }}
             >
               <Row className="g-0 h-100">
                 {/* 이미지 영역 */}
-                <Col xs={4} className="bg-light d-flex align-items-center justify-content-center p-2">
+                <Col
+                  xs={4}
+                  className="bg-light d-flex align-items-center justify-content-center p-2"
+                >
                   {totalImages === 0 && (
                     <img
                       src="/PETOPIA-Photoroom.png"
                       alt="이미지 없음"
-                      style={{ maxWidth: "80%", maxHeight: "80%", objectFit: "contain" }}
+                      style={{
+                        maxWidth: "80%",
+                        maxHeight: "80%",
+                        objectFit: "contain",
+                      }}
                     />
                   )}
 
@@ -111,7 +133,9 @@ export const ReviewCarousel = () => {
                     />
                   )}
 
-                  {(totalImages === 2 || totalImages === 3 || totalImages >= 4) && (
+                  {(totalImages === 2 ||
+                    totalImages === 3 ||
+                    totalImages >= 4) && (
                     <div
                       style={{
                         display: "grid",
@@ -129,7 +153,11 @@ export const ReviewCarousel = () => {
                           <img
                             src={img}
                             alt=""
-                            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              objectFit: "cover",
+                            }}
                           />
                         </div>
                       ))}
@@ -161,13 +189,20 @@ export const ReviewCarousel = () => {
                         src={review.profileImageUrl || "/user.png"}
                         alt=""
                         className="rounded-circle me-2"
-                        style={{ width: "24px", height: "24px", objectFit: "cover" }}
+                        style={{
+                          width: "24px",
+                          height: "24px",
+                          objectFit: "cover",
+                        }}
                       />
                       <div className="small">
                         <div className="fw-semibold">
-                          {review.memberNickname || review.memberEmail}
+                          {review.memberEmailNickName}
                         </div>
-                        <div className="text-muted" style={{ fontSize: "0.75rem" }}>
+                        <div
+                          className="text-muted"
+                          style={{ fontSize: "0.75rem" }}
+                        >
                           {formatDate(review.insertedAt)}
                         </div>
                       </div>
@@ -181,7 +216,10 @@ export const ReviewCarousel = () => {
                             key={tag.id || i}
                             bg="secondary"
                             className="fw-normal"
-                            style={{ fontSize: "0.7rem", padding: "0.2rem 0.4rem" }}
+                            style={{
+                              fontSize: "0.7rem",
+                              padding: "0.2rem 0.4rem",
+                            }}
                           >
                             <BsHash size={10} className="me-0" />
                             {tag.name.replace(/#/g, "")}
@@ -192,7 +230,10 @@ export const ReviewCarousel = () => {
                             bg="light"
                             text="dark"
                             className="fw-normal"
-                            style={{ fontSize: "0.7rem", padding: "0.2rem 0.4rem" }}
+                            style={{
+                              fontSize: "0.7rem",
+                              padding: "0.2rem 0.4rem",
+                            }}
                           >
                             +{review.tags.length - 3}
                           </Badge>
@@ -223,9 +264,14 @@ export const ReviewCarousel = () => {
                           {"★".repeat(5 - review.rating)}
                         </span>
                       </div>
-                      <div className="d-flex align-items-center text-muted" style={{ fontSize: "0.75rem" }}>
+                      <div
+                        className="d-flex align-items-center text-muted"
+                        style={{ fontSize: "0.75rem" }}
+                      >
                         <BsGeoAltFill size={10} className="me-1" />
-                        <span className="text-truncate">{review.petFacility.name}</span>
+                        <span className="text-truncate">
+                          {review.petFacility.name}
+                        </span>
                       </div>
                     </div>
                   </Card.Body>
