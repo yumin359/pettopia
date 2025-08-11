@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useCallback, useState } from "react";
 import axios from "axios";
 import { createInfoWindowContent } from "./MapUtils.jsx";
-import { FaMapMarkerAlt, FaSearch } from "react-icons/fa"; // 🆕 FaSearch 아이콘 추가
+import { FaMapMarkerAlt, FaSearch } from "react-icons/fa";
 import { toast } from "react-toastify";
 
 const KakaoMapComponent = ({
@@ -14,6 +14,13 @@ const KakaoMapComponent = ({
   isShowingFavorites,
   onBoundsSearch, // 🆕 추가된 prop
   searchQuery, // 🆕 추가된 prop
+  // 🆕 필터 상태들 추가 (optional로 처리)
+  selectedRegion,
+  selectedSigungu,
+  selectedCategories2,
+  selectedPetSizes,
+  parkingFilter,
+  facilityType,
 }) => {
   // --- Refs: 지도와 관련된 인스턴스 및 요소 참조 ---
   const mapContainer = useRef(null);
@@ -24,7 +31,7 @@ const KakaoMapComponent = ({
 
   // --- State: 컴포넌트의 상태 관리 ---
   const [myLocation, setMyLocation] = useState(null);
-  const [isSearchingBounds, setIsSearchingBounds] = useState(false); // 🆕 추가된 상태
+  const [isSearchingBounds, setIsSearchingBounds] = useState(false);
 
   // --- 콜백 함수: 마커, 인포윈도우 등 생성 로직 (기존 코드 그대로) ---
   const createStyledInfoWindow = useCallback((content) => {
@@ -70,27 +77,34 @@ const KakaoMapComponent = ({
     [categoryColors],
   );
 
-  // 🆕 지도 범위 검색 함수만 추가
+  // 🆕 개선된 지도 범위 검색 함수 (기존 함수 대체)
   const searchCurrentMapBounds = useCallback(async () => {
     if (!mapInstance.current) {
-      toast.warn("지도가 준비되지 않았습니다.");
+      toast.warn("지도가 준부되지 않았습니다.");
       return;
     }
 
+    console.log("🗺️ 현재 화면 검색 시작...");
     setIsSearchingBounds(true);
 
     try {
-      // 현재 지도 범위 가져오기
+      // 현재 지도 범위 가져오기 (실시간)
       const bounds = mapInstance.current.getBounds();
       const southWest = bounds.getSouthWest();
       const northEast = bounds.getNorthEast();
 
+      console.log("📍 현재 지도 범위:", {
+        southWest: { lat: southWest.getLat(), lng: southWest.getLng() },
+        northEast: { lat: northEast.getLat(), lng: northEast.getLng() },
+      });
+
+      // 기본 파라미터 (위치 범위)
       const params = {
         southWestLat: southWest.getLat(),
         northEastLat: northEast.getLat(),
         southWestLng: southWest.getLng(),
         northEastLng: northEast.getLng(),
-        limit: 50, // 최대 50개
+        limit: 100,
       };
 
       // 검색어가 있으면 추가
@@ -98,25 +112,101 @@ const KakaoMapComponent = ({
         params.searchQuery = searchQuery.trim();
       }
 
-      console.log("지도 범위 검색 요청:", params);
+      // 🆕 필터 조건들 추가 (있는 경우에만)
+      if (selectedRegion && selectedRegion !== "전체") {
+        params.sidoName = selectedRegion;
+      }
+      if (selectedSigungu && selectedSigungu !== "전체") {
+        params.sigunguName = selectedSigungu;
+      }
+      if (selectedCategories2 && selectedCategories2.size > 0) {
+        selectedCategories2.forEach((cat) => {
+          if (cat !== "전체") {
+            if (!params.category2) params.category2 = [];
+            if (typeof params.category2 === "string") {
+              params.category2 = [params.category2];
+            }
+            params.category2.push(cat);
+          }
+        });
+      }
+      if (selectedPetSizes && selectedPetSizes.size > 0) {
+        selectedPetSizes.forEach((size) => {
+          if (size !== "전체") {
+            if (!params.allowedPetSize) params.allowedPetSize = [];
+            if (typeof params.allowedPetSize === "string") {
+              params.allowedPetSize = [params.allowedPetSize];
+            }
+            params.allowedPetSize.push(size);
+          }
+        });
+      }
+      if (parkingFilter && parkingFilter !== "전체") {
+        params.parkingAvailable = parkingFilter;
+      }
+      if (facilityType === "실내") {
+        params.indoorFacility = "Y";
+      } else if (facilityType === "실외") {
+        params.outdoorFacility = "Y";
+      }
 
-      const response = await axios.get("/api/pet_facilities/search/bounds", {
-        params,
-      });
+      console.log("📡 API 요청 파라미터:", params);
+
+      // 🆕 먼저 필터 적용된 API 시도, 실패하면 기본 API 사용
+      let response;
+      try {
+        response = await axios.get(
+          "/api/pet_facilities/search/bounds/filtered",
+          {
+            params,
+          },
+        );
+        console.log("✅ 필터 적용된 범위 검색 성공");
+      } catch (error) {
+        if (error.response?.status === 404) {
+          console.log("⚠️ 필터 API가 없어서 기본 범위 검색 사용");
+          // 기본 파라미터만으로 재시도
+          const basicParams = {
+            southWestLat: southWest.getLat(),
+            northEastLat: northEast.getLat(),
+            southWestLng: southWest.getLng(),
+            northEastLng: northEast.getLng(),
+            limit: 100,
+          };
+          if (searchQuery && searchQuery.trim()) {
+            basicParams.searchQuery = searchQuery.trim();
+          }
+          response = await axios.get("/api/pet_facilities/search/bounds", {
+            params: basicParams,
+          });
+        } else {
+          throw error;
+        }
+      }
 
       const facilities = response.data || [];
+      console.log("✅ 검색 결과:", facilities.length + "개");
 
       // 부모 컴포넌트로 결과 전달
       if (onBoundsSearch) {
         onBoundsSearch(facilities);
       }
     } catch (error) {
-      console.error("지도 범위 검색 실패:", error);
+      console.error("❌ 지도 범위 검색 실패:", error);
       toast.error("현재 화면 검색에 실패했습니다.");
     } finally {
       setIsSearchingBounds(false);
     }
-  }, [searchQuery, onBoundsSearch]);
+  }, [
+    searchQuery,
+    onBoundsSearch,
+    selectedRegion,
+    selectedSigungu,
+    selectedCategories2,
+    selectedPetSizes,
+    parkingFilter,
+    facilityType,
+  ]);
 
   const handleGetMyLocation = useCallback(() => {
     if (navigator.geolocation) {
@@ -311,7 +401,7 @@ const KakaoMapComponent = ({
             <FaMapMarkerAlt />
           </button>
 
-          {/* 🆕 현재 화면 검색 버튼만 추가 */}
+          {/* 현재 화면 검색 버튼 */}
           <button
             onClick={searchCurrentMapBounds}
             disabled={isSearchingBounds}
@@ -323,7 +413,7 @@ const KakaoMapComponent = ({
               fontSize: "12px",
               padding: "8px 12px",
             }}
-            title="현재 화면에서 검색"
+            title="현재 화면에서 검색 (필터 적용)"
           >
             {isSearchingBounds ? (
               <span className="spinner-border spinner-border-sm me-1" />

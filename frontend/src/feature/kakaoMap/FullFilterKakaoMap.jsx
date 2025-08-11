@@ -222,6 +222,13 @@ const FullFilterKakaoMap = () => {
               setError={setError}
               onBoundsSearch={handleBoundsSearch} // 🆕 지도 범위 검색 핸들러 전달
               searchQuery={searchQuery} // 🆕 검색어 전달
+              // 🆕 필터 상태들 전달
+              selectedRegion={selectedRegion}
+              selectedSigungu={selectedSigungu}
+              selectedCategories2={selectedCategories2}
+              selectedPetSizes={selectedPetSizes}
+              parkingFilter={parkingFilter}
+              facilityType={facilityType}
             />
           </div>
         </div>

@@ -429,4 +429,82 @@ public class PetFacilityController {
         }
         return false;
     }
+
+    // PetFacilityController.java에 추가할 메서드
+
+    // 🆕 필터가 적용된 지도 화면 범위 내 시설 검색
+    @GetMapping("/search/bounds/filtered")
+    public List<PetFacilitySearchDto> searchFacilitiesInBoundsWithFilters(
+            @RequestParam double southWestLat,
+            @RequestParam double northEastLat,
+            @RequestParam double southWestLng,
+            @RequestParam double northEastLng,
+            @RequestParam(required = false) String searchQuery,
+            @RequestParam(required = false) String sidoName,
+            @RequestParam(required = false) String sigunguName,
+            @RequestParam(required = false) Set<String> category2,
+            @RequestParam(required = false) Set<String> allowedPetSize,
+            @RequestParam(required = false) String parkingAvailable,
+            @RequestParam(required = false) String indoorFacility,
+            @RequestParam(required = false) String outdoorFacility,
+            @RequestParam(defaultValue = "100") int limit
+    ) {
+        System.out.println("=== 필터 적용된 범위 검색 ===");
+        System.out.println("범위: " + southWestLat + "~" + northEastLat + ", " + southWestLng + "~" + northEastLng);
+        System.out.println("검색어: " + searchQuery);
+        System.out.println("지역: " + sidoName + " / " + sigunguName);
+        System.out.println("카테고리: " + category2);
+        System.out.println("펫사이즈: " + allowedPetSize);
+
+        if (category2 != null && category2.isEmpty()) category2 = null;
+
+        Set<String> originalPetSizesToSearch = null;
+        if (allowedPetSize != null && !allowedPetSize.isEmpty()) {
+            originalPetSizesToSearch = mapToOriginalPetSizes(allowedPetSize);
+        }
+
+        String processedSearchQuery = (searchQuery != null && !searchQuery.trim().isEmpty())
+                ? searchQuery.trim() : null;
+
+        List<PetFacility> facilities = petFacilityRepository.findFacilitiesInBoundsWithFilters(
+                southWestLat, northEastLat, southWestLng, northEastLng,
+                processedSearchQuery,
+                sidoName,
+                sigunguName,
+                category2,
+                originalPetSizesToSearch,
+                parkingAvailable,
+                indoorFacility,
+                outdoorFacility,
+                PageRequest.of(0, limit)
+        );
+
+        System.out.println("결과: " + facilities.size() + "개");
+
+        return facilities.stream()
+                .map(facility -> new PetFacilitySearchDto(
+                        facility.getId(),
+                        facility.getName(),
+                        facility.getLatitude(),
+                        facility.getLongitude(),
+                        facility.getCategory2(),
+                        facility.getRoadAddress(),
+                        facility.getCategory3(),
+                        facility.getSidoName(),
+                        facility.getSigunguName(),
+                        facility.getRoadName(),
+                        facility.getBunji(),
+                        facility.getJibunAddress(),
+                        facility.getPhoneNumber(),
+                        facility.getHoliday(),
+                        facility.getOperatingHours(),
+                        facility.getParkingAvailable(),
+                        facility.getPetFriendlyInfo(),
+                        facility.getAllowedPetSize(),
+                        facility.getPetRestrictions(),
+                        facility.getIndoorFacility(),
+                        facility.getOutdoorFacility()
+                ))
+                .collect(Collectors.toList());
+    }
 }
