@@ -58,12 +58,6 @@ const FilterPanel = ({
       </div>
 
       <div className="flex-grow-1 overflow-auto" style={{ minHeight: 0 }}>
-        {/* 🆕 디버깅 정보 추가 (임시) */}
-        <div style={{ fontSize: "9px", color: "#666", marginBottom: "8px" }}>
-          현재 지역: {selectedRegion || "없음"} / 시군구:{" "}
-          {selectedSigungu || "없음"}
-        </div>
-
         {/* 통합된 FilterGroup 사용 */}
         <FilterGroup
           title="📍 지역"
