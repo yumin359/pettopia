@@ -60,6 +60,13 @@ export function MapDetail() {
     }
   };
 
+  // 리뷰 수정 시
+  const handleUpdate = (reviewId) => {
+    fetchReviews();
+    // focusReviewId 변경
+    setSearchParams({ focusReviewId: reviewId });
+  };
+
   // 리뷰 삭제
   const handleDelete = async (reviewId) => {
     if (!window.confirm("정말 삭제하시겠습니까?")) return;
@@ -481,7 +488,7 @@ export function MapDetail() {
                       <ReviewCard
                         key={review.id}
                         review={review}
-                        onUpdate={fetchReviews}
+                        onUpdate={handleUpdate}
                         onDelete={handleDelete}
                         showOnlyImages={false}
                       />

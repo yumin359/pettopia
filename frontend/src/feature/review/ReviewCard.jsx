@@ -53,10 +53,11 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
     setIsEditing(true);
   };
 
-  const handleEditSave = () => {
+  const handleEditSave = (reviewId) => {
     setIsEditing(false);
     if (onUpdate) {
-      onUpdate();
+      // 수정한 리뷰 id를 mapDetail로 보냄
+      onUpdate(reviewId);
     }
   };
 
