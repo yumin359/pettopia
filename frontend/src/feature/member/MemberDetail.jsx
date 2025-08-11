@@ -168,7 +168,11 @@ export function MemberDetail() {
                 readOnly
                 value={member.email}
                 className="bg-light border-0"
-                style={{ userSelect: "text", boxShadow: "none", outline: "none" }}
+                style={{
+                  userSelect: "text",
+                  boxShadow: "none",
+                  outline: "none",
+                }}
                 onFocus={(e) => e.target.blur()}
               />
             </FormGroup>
@@ -179,7 +183,11 @@ export function MemberDetail() {
                 readOnly
                 value={member.nickName}
                 className="bg-light border-0"
-                style={{ userSelect: "text", boxShadow: "none", outline: "none" }}
+                style={{
+                  userSelect: "text",
+                  boxShadow: "none",
+                  outline: "none",
+                }}
                 onFocus={(e) => e.target.blur()}
               />
             </FormGroup>
@@ -208,7 +216,11 @@ export function MemberDetail() {
                 readOnly
                 value={formattedInsertedAt}
                 className="bg-light border-0"
-                style={{ userSelect: "text", boxShadow: "none", outline: "none" }}
+                style={{
+                  userSelect: "text",
+                  boxShadow: "none",
+                  outline: "none",
+                }}
                 onFocus={(e) => e.target.blur()}
               />
             </FormGroup>
@@ -247,51 +259,6 @@ export function MemberDetail() {
             )}
           </Card.Body>
         </Card>
-
-        {/* 내가 쓴 리뷰 목록 */}
-        <h4 className="mt-4 mb-3">{member.nickName}님의 작성 리뷰</h4>
-
-        {!reviews && (
-          <div className="text-center my-3">
-            <Spinner animation="border" size="sm" /> 리뷰 로딩중...
-          </div>
-        )}
-
-        {reviews && reviews.length === 0 && (
-          <div className="text-muted my-3">작성한 리뷰가 없습니다.</div>
-        )}
-
-        {reviews && reviews.length > 0 && (
-          <div className="d-flex flex-column gap-3">
-            {reviews.map((r) => (
-              <Card
-                key={r.id}
-                className="shadow-sm border-0 p-3"
-                style={{ backgroundColor: "#fffdf7", cursor: "pointer" }}
-                onClick={() =>
-                  navigate(`/facility/${r.petFacility.id}?focusReviewId=${r.id}`)
-                }
-              >
-                <div className="d-flex justify-content-between align-items-center mb-2">
-                  <div
-                    className="fw-semibold hover-underline-on-hover"
-                    style={{ color: "#5a3600" }}
-                  >
-                    {r.petFacility.name}
-                  </div>
-                  <div className="small d-flex align-items-center">
-                    <span style={{ color: "#f0ad4e", fontSize: "1.1rem" }}>
-                      {"★".repeat(r.rating)}
-                    </span>
-                    <span className="ms-2 text-dark fw-semibold">{r.rating}</span>
-                  </div>
-                </div>
-                <hr className="mt-1 border-gray-300" />
-                <div>{r.review}</div>
-              </Card>
-            ))}
-          </div>
-        )}
 
         {/* 탈퇴 확인 모달 */}
         <Modal show={modalShow} onHide={() => setModalShow(false)} centered>
