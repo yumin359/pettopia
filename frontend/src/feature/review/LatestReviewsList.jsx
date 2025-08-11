@@ -72,10 +72,11 @@ export function LatestReviewsList() {
     setDisplayCount((prev) => Math.min(prev + 12, filteredReviews.length));
   };
 
-  const filteredReviews = reviews?.filter((r) => {
-    if (!tagFilter.trim()) return true;
-    return r.tags?.some((tag) => tag.name.includes(tagFilter.trim()));
-  }) || [];
+  const filteredReviews =
+    reviews?.filter((r) => {
+      if (!tagFilter.trim()) return true;
+      return r.tags?.some((tag) => tag.name.includes(tagFilter.trim()));
+    }) || [];
 
   if (!reviews) {
     return (
@@ -89,7 +90,9 @@ export function LatestReviewsList() {
     <Container className="my-4 p-4 bg-light rounded shadow">
       <h2 className="text-center mb-4 fw-bold">
         📝 최신 리뷰
-        <span className="ms-2 fs-6 text-muted">({filteredReviews.length}개)</span>
+        <span className="ms-2 fs-6 text-muted">
+          ({filteredReviews.length}개)
+        </span>
       </h2>
 
       <Form className="mb-4">
@@ -124,11 +127,12 @@ export function LatestReviewsList() {
                   {/* 1. 시설명 */}
                   <div
                     className="fw-semibold text-truncate text-secondary mb-1"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (facilityInfo?.id)
-                        navigate(`/facility/${facilityInfo.id}`);
-                    }}
+                    // 시설명 누르면 포커스 없음. 나중에 확정으로 안 쓰게 된다면 지우기. 주석으로 둘게여
+                    // onClick={(e) => {
+                    //   e.stopPropagation();
+                    //   if (facilityInfo?.id)
+                    //     navigate(`/facility/${facilityInfo.id}`);
+                    // }}
                   >
                     📍 {facilityInfo?.name || "정보 없음"}
                   </div>
@@ -367,7 +371,8 @@ export function LatestReviewsList() {
                 {reportLoading ? "신고 중..." : "신고하기"}
               </Button>
             </div>
-          </div>제
+          </div>
+          제
         </div>
       )}
     </Container>
