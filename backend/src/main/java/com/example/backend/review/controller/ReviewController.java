@@ -48,14 +48,28 @@ public class ReviewController {
     }
 
     // 리뷰 수정
-    @PutMapping("/update/{id}")
+    @PostMapping("/update/{id}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<String> updateReview(@PathVariable Integer id,
                                                @ModelAttribute ReviewFormDto dto,
                                                Authentication authentication) {
+        System.out.println("=== 리뷰 수정 요청 받음 ===");
+        System.out.println("Review ID: " + id);
+        System.out.println("Delete file names: " + dto.getDeleteFileNames());
+        System.out.println("New files count: " + (dto.getFiles() != null ? dto.getFiles().size() : 0));
+        System.out.println("Authentication: " + authentication.getName());
+
         dto.setMemberEmail(authentication.getName());
-        reviewService.update(id, dto);
-        return ResponseEntity.ok("리뷰가 수정되었습니다.");
+
+        try {
+            reviewService.update(id, dto);
+            System.out.println("리뷰 수정 성공");
+            return ResponseEntity.ok("리뷰가 수정되었습니다.");
+        } catch (Exception e) {
+            System.out.println("리뷰 수정 실패: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("수정 실패: " + e.getMessage());
+        }
     }
 
     // 리뷰 삭제

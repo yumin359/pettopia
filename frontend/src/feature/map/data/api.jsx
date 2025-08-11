@@ -6,8 +6,7 @@ const api = axios.create({
   withCredentials: true,
 });
 
-// ✨✨✨ 요청 인터셉터 추가 (가장 중요한 부분) ✨✨✨
-// 이 코드는 API 요청을 보내기 직전에 가로채서, localStorage에 저장된 토큰을 Authorization 헤더에 담아줍니다.
+// 요청 인터셉터 추가
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
@@ -32,6 +31,28 @@ const get = async (endpoint, params) => {
   }
 };
 
+// ✨ POST 메서드 추가
+const post = async (endpoint, data, config) => {
+  try {
+    const response = await api.post(endpoint, data, config);
+    return response.data;
+  } catch (error) {
+    console.error(`API Error POST ${endpoint}:`, error);
+    throw error;
+  }
+};
+
+// ✨ PUT 메서드 추가 (리뷰 수정용)
+const put = async (endpoint, data, config) => {
+  try {
+    const response = await api.put(endpoint, data, config);
+    return response.data;
+  } catch (error) {
+    console.error(`API Error PUT ${endpoint}:`, error);
+    throw error;
+  }
+};
+
 const del = async (endpoint, params) => {
   try {
     const response = await api.delete(endpoint, { params });
@@ -42,7 +63,7 @@ const del = async (endpoint, params) => {
   }
 };
 
-export { get, del };
+export { get, post, put, del, api };
 
 // 지역 목록 조회
 export const fetchRegions = () => get("/pet_facilities/regions");

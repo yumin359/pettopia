@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Form, ListGroup, Spinner } from "react-bootstrap";
 import { FaSave, FaTimes, FaTrashAlt } from "react-icons/fa";
 import Select from "react-select/creatable";
@@ -110,20 +110,46 @@ function ReviewEdit({ review, onSave, onCancel }) {
     try {
       const formData = new FormData();
 
+      formData.append("facilityId", review.petFacility.id || review.facilityId);
       formData.append("review", content.trim());
       formData.append("rating", rating);
       formData.append("facilityName", review.facilityName);
       formData.append("memberEmail", review.memberEmail);
 
-      deleteFileNames.forEach((name) =>
-        formData.append("deleteFileNames", name),
-      );
-      newFiles.forEach((fileObj) => formData.append("files", fileObj.file));
+      console.log("=== FormData 구성 ===");
+      console.log("Delete file names:", deleteFileNames);
+      console.log("New files count:", newFiles.length);
+
+      deleteFileNames.forEach((name) => {
+        console.log("Adding to FormData - deleteFileNames:", name);
+        formData.append("deleteFileNames", name);
+      });
+
+      newFiles.forEach((fileObj) => {
+        console.log("Adding to FormData - files:", fileObj.file.name);
+        formData.append("files", fileObj.file);
+      });
+
       selectedTags.forEach((tag) => formData.append("tagNames", tag.value));
 
-      await axios.put(
+      // FormData 내용 확인
+      console.log("=== FormData 최종 확인 ===");
+      for (let pair of formData.entries()) {
+        console.log(pair[0], pair[1]);
+      }
+
+      await axios.post(
+        //  <- 이렇게 post로 변경하세요.
         `http://localhost:8080/api/review/update/${review.id}`,
         formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          withCredentials: true,
+          timeout: 30000,
+        },
       );
 
       toast.success("수정 완료!");
@@ -133,7 +159,6 @@ function ReviewEdit({ review, onSave, onCancel }) {
       }
     } catch (error) {
       console.error("수정 실패:", error);
-      // 401 에러인 경우 로그인 페이지로 리다이렉트
       if (error.response?.status === 401) {
         toast.error("로그인이 필요합니다.");
       } else {
@@ -146,8 +171,26 @@ function ReviewEdit({ review, onSave, onCancel }) {
     }
   };
 
+  // ReviewEdit.jsx의 handleFileChange 함수에 추가할 검증 로직
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
+
+    // 전체 파일 개수 체크 (기존 + 새로운 파일)
+    const totalFileCount =
+      existingFiles.length + newFiles.length + selectedFiles.length;
+    if (totalFileCount > 15) {
+      // 적절한 제한값 설정
+      toast.warning(
+        `전체 파일은 최대 15개까지만 업로드할 수 있습니다. 현재: ${totalFileCount}개`,
+      );
+      return;
+    }
+
+    // 새로 추가할 파일만 체크
+    if (newFiles.length + selectedFiles.length > 10) {
+      toast.warning(`새로 추가할 파일은 최대 10개까지만 가능합니다.`);
+      return;
+    }
 
     const validFiles = selectedFiles.filter((file) => {
       const isValidType =
@@ -176,10 +219,13 @@ function ReviewEdit({ review, onSave, onCancel }) {
     e.target.value = null;
   };
 
-  const handleRemoveExistingFile = (fileUrlToRemove) => {
-    const fileName = getFileNameFromUrl(fileUrlToRemove);
-    setDeleteFileNames((prev) => [...prev, fileName]);
-    setExistingFiles((prev) => prev.filter((url) => url !== fileUrlToRemove));
+  const handleCancel = () => {
+    newFiles.forEach((fileObj) => {
+      if (fileObj.previewUrl) {
+        URL.revokeObjectURL(fileObj.previewUrl);
+      }
+    });
+    onCancel();
   };
 
   const handleRemoveNewFile = (indexToRemove) => {
@@ -192,24 +238,45 @@ function ReviewEdit({ review, onSave, onCancel }) {
     });
   };
 
-  const handleCancel = () => {
-    newFiles.forEach((fileObj) => {
-      if (fileObj.previewUrl) {
-        URL.revokeObjectURL(fileObj.previewUrl);
-      }
+  const handleRemoveExistingFile = (fileUrlToRemove) => {
+    console.log("=== 기존 파일 삭제 시도 ===");
+    console.log("File URL to remove:", fileUrlToRemove);
+
+    const fileName = getFileNameFromUrl(fileUrlToRemove);
+    console.log("Extracted file name for deletion:", fileName);
+
+    setDeleteFileNames((prev) => {
+      const newDeleteList = [...prev, fileName];
+      console.log("Updated delete file names:", newDeleteList);
+      return newDeleteList;
     });
-    onCancel();
+
+    setExistingFiles((prev) => prev.filter((url) => url !== fileUrlToRemove));
   };
 
   const getFileNameFromUrl = (fileUrl) => {
     try {
+      console.log("=== 파일명 추출 ===");
+      console.log("Original URL from state:", fileUrl);
+
       const url = new URL(fileUrl);
       const pathSegments = url.pathname.split("/");
-      const fileNameWithQuery = pathSegments[pathSegments.length - 1];
-      return fileNameWithQuery.split("?")[0];
+      const encodedFileName = pathSegments[pathSegments.length - 1];
+
+      console.log("Encoded filename from URL object:", encodedFileName);
+
+      // 인코딩된 파일명(예: %ED%99%94)을 원래의 한글/특수문자로 되돌립니다.
+      const decodedFileName = decodeURIComponent(encodedFileName);
+
+      console.log("Decoded filename to be sent:", decodedFileName);
+      return decodedFileName;
     } catch (error) {
-      console.error("Invalid URL:", fileUrl, error);
-      return "알 수 없는 파일";
+      console.error("Invalid URL, using fallback:", fileUrl, error);
+      const segments = fileUrl.split("/");
+      const lastSegment = segments[segments.length - 1];
+      const encodedFileName = lastSegment.split("?")[0];
+
+      return decodeURIComponent(encodedFileName);
     }
   };
 
