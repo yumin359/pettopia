@@ -1,9 +1,11 @@
 package com.example.backend.petFacility.controller;
 
 import com.example.backend.petFacility.dto.PetFacilitySearchDto;
+import com.example.backend.petFacility.dto.PetFacilitySimpleDto;
 import com.example.backend.petFacility.repository.PetFacilityRepository;
 import com.example.backend.petFacility.entity.PetFacility;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -13,10 +15,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/pet_facilities")
-//@CrossOrigin(origins = "http://localhost:5173")
 public class PetFacilityController {
 
     private final PetFacilityRepository petFacilityRepository;
@@ -45,9 +47,10 @@ public class PetFacilityController {
         this.petFacilityRepository = petFacilityRepository;
     }
 
-    // 통합검색엔드포인트
+    // 통합검색엔드포인트 (검색어 파라미터 추가)
     @GetMapping("/search")
     public Page<PetFacilitySearchDto> searchPetFacilities(
+            @RequestParam(required = false) String searchQuery, // 새로 추가된 검색어 파라미터
             @RequestParam(required = false) String sidoName,
             @RequestParam(required = false) String sigunguName,
             @RequestParam(required = false) Set<String> category2,
@@ -64,13 +67,17 @@ public class PetFacilityController {
             originalPetSizesToSearch = mapToOriginalPetSizes(allowedPetSize);
         }
 
+        // 검색어 처리 - null 이거나 빈 문자열인 경우 null로 설정
+        String processedSearchQuery = (searchQuery != null && !searchQuery.trim().isEmpty())
+                ? searchQuery.trim() : null;
+
         Page<PetFacility> facilityPage = petFacilityRepository.findFacilitiesByFilters(
+                processedSearchQuery, // 검색어 추가
                 sidoName,
                 sigunguName,
                 category2,
                 originalPetSizesToSearch,
                 parkingAvailable,
-
                 indoorFacility,
                 outdoorFacility,
                 pageable
@@ -99,6 +106,77 @@ public class PetFacilityController {
                 facility.getIndoorFacility(),
                 facility.getOutdoorFacility()
         ));
+    }
+
+    // 📍 새로 추가: 간단한 검색 제안 엔드포인트
+    @GetMapping("/search/suggestions")
+    public List<PetFacilitySimpleDto> getSearchSuggestions(
+            @RequestParam String query,
+            @RequestParam(defaultValue = "10") int limit
+    ) {
+        if (query == null || query.trim().length() < 2) {
+            return List.of();
+        }
+
+        List<PetFacility> suggestions = petFacilityRepository.findSearchSuggestions(
+                query.trim(),
+                PageRequest.of(0, limit)
+        );
+
+        return suggestions.stream()
+                .map(facility -> PetFacilitySimpleDto.builder()
+                        .id(facility.getId())
+                        .name(facility.getName())
+                        .sidoName(facility.getSidoName())
+                        .sigunguName(facility.getSigunguName())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    // 📍 새로 추가: 현재 지도 화면 범위 내 시설 검색
+    @GetMapping("/search/bounds")
+    public List<PetFacilitySearchDto> searchFacilitiesInBounds(
+            @RequestParam double southWestLat,
+            @RequestParam double northEastLat,
+            @RequestParam double southWestLng,
+            @RequestParam double northEastLng,
+            @RequestParam(required = false) String searchQuery,
+            @RequestParam(defaultValue = "100") int limit
+    ) {
+        String processedSearchQuery = (searchQuery != null && !searchQuery.trim().isEmpty())
+                ? searchQuery.trim() : null;
+
+        List<PetFacility> facilities = petFacilityRepository.findFacilitiesInBounds(
+                southWestLat, northEastLat, southWestLng, northEastLng,
+                processedSearchQuery,
+                PageRequest.of(0, limit)
+        );
+
+        return facilities.stream()
+                .map(facility -> new PetFacilitySearchDto(
+                        facility.getId(),
+                        facility.getName(),
+                        facility.getLatitude(),
+                        facility.getLongitude(),
+                        facility.getCategory2(),
+                        facility.getRoadAddress(),
+                        facility.getCategory3(),
+                        facility.getSidoName(),
+                        facility.getSigunguName(),
+                        facility.getRoadName(),
+                        facility.getBunji(),
+                        facility.getJibunAddress(),
+                        facility.getPhoneNumber(),
+                        facility.getHoliday(),
+                        facility.getOperatingHours(),
+                        facility.getParkingAvailable(),
+                        facility.getPetFriendlyInfo(),
+                        facility.getAllowedPetSize(),
+                        facility.getPetRestrictions(),
+                        facility.getIndoorFacility(),
+                        facility.getOutdoorFacility()
+                ))
+                .collect(Collectors.toList());
     }
 
     // 기존 단일 조회 엔드포인트들 (유지)

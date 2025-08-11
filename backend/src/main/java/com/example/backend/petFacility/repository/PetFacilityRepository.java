@@ -15,10 +15,21 @@ import java.util.Set;
 @Repository
 public interface PetFacilityRepository extends JpaRepository<PetFacility, Long> {
 
-    // 간소화된 필터 검색 쿼리
+    // 검색어를 포함한 통합 필터 검색 쿼리 (수정됨)
     @Query(value = """
             SELECT pf FROM PetFacility pf WHERE
-            (:sidoName IS NULL OR lower(pf.sidoName) LIKE lower(concat('%', :sidoName, '%')))
+            (:searchQuery IS NULL OR 
+             lower(pf.name) LIKE lower(concat('%', :searchQuery, '%')) OR
+             lower(pf.category2) LIKE lower(concat('%', :searchQuery, '%')) OR
+             lower(pf.category3) LIKE lower(concat('%', :searchQuery, '%')) OR
+             lower(pf.roadAddress) LIKE lower(concat('%', :searchQuery, '%')) OR
+             lower(pf.jibunAddress) LIKE lower(concat('%', :searchQuery, '%')) OR
+             lower(pf.bunji) LIKE lower(concat('%', :searchQuery, '%')) OR
+             lower(pf.roadName) LIKE lower(concat('%', :searchQuery, '%')) OR
+             lower(pf.allowedPetSize) LIKE lower(concat('%', :searchQuery, '%')) OR
+             lower(pf.description) LIKE lower(concat('%', :searchQuery, '%'))
+            )
+            AND (:sidoName IS NULL OR lower(pf.sidoName) LIKE lower(concat('%', :sidoName, '%')))
             AND (:sigunguName IS NULL OR lower(pf.sigunguName) LIKE lower(concat('%', :sigunguName, '%')))
             AND (:category2 IS NULL OR pf.category2 IN :category2)
             AND (:allowedPetSize IS NULL OR pf.allowedPetSize IN :allowedPetSize)
@@ -28,7 +39,18 @@ public interface PetFacilityRepository extends JpaRepository<PetFacility, Long> 
             """,
             countQuery = """
                     SELECT COUNT(pf) FROM PetFacility pf WHERE
-                    (:sidoName IS NULL OR lower(pf.sidoName) LIKE lower(concat('%', :sidoName, '%')))
+                    (:searchQuery IS NULL OR 
+                     lower(pf.name) LIKE lower(concat('%', :searchQuery, '%')) OR
+                     lower(pf.category2) LIKE lower(concat('%', :searchQuery, '%')) OR
+                     lower(pf.category3) LIKE lower(concat('%', :searchQuery, '%')) OR
+                     lower(pf.roadAddress) LIKE lower(concat('%', :searchQuery, '%')) OR
+                     lower(pf.jibunAddress) LIKE lower(concat('%', :searchQuery, '%')) OR
+                     lower(pf.bunji) LIKE lower(concat('%', :searchQuery, '%')) OR
+                     lower(pf.roadName) LIKE lower(concat('%', :searchQuery, '%')) OR
+                     lower(pf.allowedPetSize) LIKE lower(concat('%', :searchQuery, '%')) OR
+                     lower(pf.description) LIKE lower(concat('%', :searchQuery, '%'))
+                    )
+                    AND (:sidoName IS NULL OR lower(pf.sidoName) LIKE lower(concat('%', :sidoName, '%')))
                     AND (:sigunguName IS NULL OR lower(pf.sigunguName) LIKE lower(concat('%', :sigunguName, '%')))
                     AND (:category2 IS NULL OR pf.category2 IN :category2)
                     AND (:allowedPetSize IS NULL OR pf.allowedPetSize IN :allowedPetSize)
@@ -38,6 +60,7 @@ public interface PetFacilityRepository extends JpaRepository<PetFacility, Long> 
                     """
     )
     Page<PetFacility> findFacilitiesByFilters(
+            @Param("searchQuery") String searchQuery, // 새로 추가된 검색어 파라미터
             @Param("sidoName") String sidoName,
             @Param("sigunguName") String sigunguName,
             @Param("category2") Set<String> category2,
@@ -48,12 +71,50 @@ public interface PetFacilityRepository extends JpaRepository<PetFacility, Long> 
             Pageable pageable
     );
 
-    // 단일 필드 검색용
+    // 📍 새로 추가: 검색 제안을 위한 쿼리
+    @Query(value = """
+            SELECT pf FROM PetFacility pf WHERE
+            lower(pf.name) LIKE lower(concat('%', :query, '%')) OR
+            lower(pf.category2) LIKE lower(concat('%', :query, '%')) OR
+            lower(pf.roadAddress) LIKE lower(concat('%', :query, '%')) OR
+            lower(pf.jibunAddress) LIKE lower(concat('%', :query, '%'))
+            ORDER BY 
+            CASE 
+                WHEN lower(pf.name) LIKE lower(concat(:query, '%')) THEN 1
+                WHEN lower(pf.name) LIKE lower(concat('%', :query, '%')) THEN 2
+                WHEN lower(pf.category2) LIKE lower(concat(:query, '%')) THEN 3
+                ELSE 4
+            END,
+            pf.name
+            """)
+    List<PetFacility> findSearchSuggestions(@Param("query") String query, Pageable pageable);
+
+    // 📍 새로 추가: 위치 기반 검색 (현재 화면 범위 내 검색)
+    @Query(value = """
+            SELECT pf FROM PetFacility pf WHERE
+            pf.latitude BETWEEN :southWestLat AND :northEastLat
+            AND pf.longitude BETWEEN :southWestLng AND :northEastLng
+            AND (:searchQuery IS NULL OR 
+                 lower(pf.name) LIKE lower(concat('%', :searchQuery, '%')) OR
+                 lower(pf.category2) LIKE lower(concat('%', :searchQuery, '%')) OR
+                 lower(pf.category3) LIKE lower(concat('%', :searchQuery, '%')))
+            ORDER BY pf.name
+            """)
+    List<PetFacility> findFacilitiesInBounds(
+            @Param("southWestLat") double southWestLat,
+            @Param("northEastLat") double northEastLat,
+            @Param("southWestLng") double southWestLng,
+            @Param("northEastLng") double northEastLng,
+            @Param("searchQuery") String searchQuery,
+            Pageable pageable
+    );
+
+    // 단일 필드 검색용 (기존 유지)
     List<PetFacility> findByCategory2ContainingIgnoreCase(String category2);
 
     List<PetFacility> findBySidoNameContainingIgnoreCase(String sidoName);
 
-    // DISTINCT 조회용
+    // DISTINCT 조회용 (기존 유지)
     @Query("SELECT DISTINCT pf.category2 FROM PetFacility pf WHERE pf.category2 IS NOT NULL AND pf.category2 != '' ORDER BY pf.category2")
     List<String> findDistinctCategory2();
 

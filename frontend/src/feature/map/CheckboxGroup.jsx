@@ -1,5 +1,6 @@
 import React from "react";
 
+// 카테고리와 반려동물 종류만
 const CheckboxGroup = ({
   title,
   options,
@@ -7,30 +8,6 @@ const CheckboxGroup = ({
   setFunction,
   categoryColors,
 }) => {
-  const handleSetFilter = (currentSet, setFunction) => (value) => {
-    const newSet = new Set(currentSet);
-
-    if (value === "전체") {
-      if (newSet.has("전체") && newSet.size === 1) {
-        newSet.clear();
-      } else {
-        newSet.clear();
-        newSet.add("전체");
-      }
-    } else {
-      newSet.delete("전체");
-      if (newSet.has(value)) {
-        newSet.delete(value);
-      } else {
-        newSet.add(value);
-      }
-      if (newSet.size === 0) {
-        newSet.add("전체");
-      }
-    }
-    setFunction(newSet);
-  };
-
   return (
     <div className="mb-2">
       <label className="form-label small fw-bold mb-1">{title}</label>
@@ -52,15 +29,14 @@ const CheckboxGroup = ({
                 fontSize: "10px",
                 padding: "2px 6px",
                 color: isChecked ? "white" : bgColor,
+                cursor: "pointer",
               }}
             >
               <input
                 type="checkbox"
-                className="btn-check"
+                className="visually-hidden"
                 checked={isChecked}
-                onChange={() =>
-                  handleSetFilter(selectedSet, setFunction)(option)
-                }
+                onChange={() => setFunction(option)}
                 autoComplete="off"
               />
               {option}

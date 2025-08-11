@@ -1,15 +1,15 @@
 // src/map/FullFilterKakaoMap.js
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import FilterPanel from "./FilterPanel.jsx";
 import SearchResultList from "./SearchResultList";
 import KakaoMapComponent from "./KakaoMapComponent";
 import { useFilters } from "./data/UseFilters";
-import { searchFacilities, fetchMyFavorites } from "./data/api.jsx";
+import { fetchMyFavorites, searchFacilities } from "./data/api.jsx";
 import {
+  CATEGORY_COLORS,
   ITEMS_PER_PAGE,
   PET_SIZE_OPTIONS,
-  CATEGORY_COLORS,
   RESPONSIVE_STYLES,
 } from "./data/config.jsx";
 
@@ -19,6 +19,9 @@ const FullFilterKakaoMap = () => {
   const [isDataLoading, setIsDataLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [isShowingFavorites, setIsShowingFavorites] = useState(false);
+
+  // 검색어 상태 추가
+  const [searchQuery, setSearchQuery] = useState("");
 
   const [facilities, setFacilities] = useState([]);
   const [totalElements, setTotalElements] = useState(0);
@@ -35,9 +38,15 @@ const FullFilterKakaoMap = () => {
     facilityType,
   } = filterStates;
 
-  // 검색 쿼리 파라미터 생성
+  // 검색 쿼리 파라미터 생성 (검색어 포함)
   const buildFilterQuery = useCallback(() => {
     const params = new URLSearchParams();
+
+    // 검색어 추가
+    if (searchQuery && searchQuery.trim()) {
+      params.append("searchQuery", searchQuery.trim());
+    }
+
     if (selectedRegion !== "전체") params.append("sidoName", selectedRegion);
     if (selectedSigungu !== "전체")
       params.append("sigunguName", selectedSigungu);
@@ -57,6 +66,7 @@ const FullFilterKakaoMap = () => {
     params.append("size", ITEMS_PER_PAGE.toString());
     return params;
   }, [
+    searchQuery, // 검색어 의존성 추가
     selectedRegion,
     selectedSigungu,
     selectedCategories2,
@@ -90,13 +100,31 @@ const FullFilterKakaoMap = () => {
     }
   }, [hasSearched, isShowingFavorites, currentPage, loadFacilities]);
 
-  // 검색 버튼 핸들러
-  const handleSearch = () => {
+  // 검색어 변경 핸들러
+  const handleSearchQueryChange = (query) => {
+    setSearchQuery(query);
+  };
+
+  // 검색 버튼 핸들러 (검색어 파라미터 추가)
+  const handleSearch = (query = "") => {
+    if (query !== undefined && query !== searchQuery) {
+      setSearchQuery(query);
+    }
     setHasSearched(true);
     setIsShowingFavorites(false);
-    setCurrentPage(0); // 검색 시 첫 페이지로 리셋
-    loadFacilities(); // 즉시 로드
+    setCurrentPage(0);
   };
+
+  // 검색어 변경 시 자동으로 검색 실행 (디바운스 적용)
+  useEffect(() => {
+    if (!hasSearched || isShowingFavorites) return;
+
+    const timeoutId = setTimeout(() => {
+      loadFacilities();
+    }, 300); // 300ms 디바운스
+
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery, loadFacilities, hasSearched, isShowingFavorites]);
 
   // 찜 목록 로드 핸들러
   const handleLoadFavorites = async () => {
@@ -104,19 +132,19 @@ const FullFilterKakaoMap = () => {
     try {
       const data = await fetchMyFavorites();
       setFavoriteMarkers(data || []);
-      setHasSearched(false); // 검색 상태 초기화
-      setIsShowingFavorites(true); // 찜 목록 표시 모드
-      setFacilities([]); // 기존 시설 목록 초기화
+      setHasSearched(false);
+      setIsShowingFavorites(true);
+      setFacilities([]);
       setTotalElements(data?.length || 0);
+      setSearchQuery(""); // 찜 목록 로드 시 검색어 초기화
     } catch (error) {
-      toast.error("찜 목록을 불러오지 못했습니다.");
+      toast.error("찜 목록을 불러오지 못했습니다.", error.message);
       setFavoriteMarkers([]);
     } finally {
       setIsDataLoading(false);
     }
   };
 
-  const displayData = isShowingFavorites ? favoriteMarkers : facilities;
   const totalDataCount = isShowingFavorites
     ? favoriteMarkers.length
     : totalElements;
@@ -150,9 +178,9 @@ const FullFilterKakaoMap = () => {
               isMapReady={isMapReady}
               setIsMapReady={setIsMapReady}
               isDataLoading={isDataLoading}
-              facilities={facilities} // 👈 검색 결과 전달
-              favoriteMarkers={favoriteMarkers} // 👈 찜 목록 전달
-              isShowingFavorites={isShowingFavorites} // 👈 현재 모드 전달
+              facilities={facilities}
+              favoriteMarkers={favoriteMarkers}
+              isShowingFavorites={isShowingFavorites}
               categoryColors={CATEGORY_COLORS}
               setError={setError}
             />
@@ -176,14 +204,16 @@ const FullFilterKakaoMap = () => {
               categoryColors={CATEGORY_COLORS}
               onSearch={handleSearch}
               onLoadFavorites={handleLoadFavorites}
+              searchQuery={searchQuery} // 검색어 상태 전달
+              onSearchQueryChange={handleSearchQueryChange} // 검색어 변경 핸들러 전달
             />
           </div>
 
           {/* 리스트 Column */}
           <div className="col-12 col-md-8 list-column-container">
             <SearchResultList
-              facilities={facilities} // 👈 검색 결과는 facilities로 전달
-              favoriteMarkers={favoriteMarkers} // 👈 찜 목록은 favoriteMarkers로 별도 전달 (이것이 누락되었음)
+              facilities={facilities}
+              favoriteMarkers={favoriteMarkers}
               totalElements={totalDataCount}
               isDataLoading={isDataLoading}
               currentPage={currentPage}
@@ -193,6 +223,7 @@ const FullFilterKakaoMap = () => {
               ITEMS_PER_PAGE={ITEMS_PER_PAGE}
               hasSearched={hasSearched || isShowingFavorites}
               isShowingFavorites={isShowingFavorites}
+              searchQuery={searchQuery} // 검색어 전달
             />
           </div>
         </div>

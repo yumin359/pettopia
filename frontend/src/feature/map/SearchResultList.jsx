@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { createInfoWindowContent } from "./MapUtils.jsx";
@@ -167,7 +167,6 @@ const FacilityCard = React.memo(({ facility, categoryColors, onClick }) => {
 });
 
 // --- 메인 컴포넌트 ---
-
 const SearchResultList = ({
   facilities,
   totalElements,

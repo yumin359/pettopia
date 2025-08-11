@@ -1,52 +1,7 @@
-import React, { useContext } from "react"; // 👈 useContext 추가
-import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx"; // 👈 로그인 정보 경로 (프로젝트에 맞게 확인)
-
-const CheckboxGroup = ({
-  title,
-  options,
-  selectedSet,
-  setFunction,
-  categoryColors,
-}) => {
-  return (
-    <div className="mb-2">
-      <label className="form-label small fw-bold mb-1">{title}</label>
-      <div className="d-flex flex-wrap gap-1">
-        {options.map((option) => {
-          const isChecked = selectedSet.has(option);
-          const bgColor =
-            option === "전체"
-              ? "#6c757d"
-              : categoryColors?.[option] || "#0d6efd";
-
-          return (
-            <label
-              key={option}
-              className={`btn ${isChecked ? "text-white" : "btn-outline-secondary"} btn-sm`}
-              style={{
-                backgroundColor: isChecked ? bgColor : "white",
-                borderColor: bgColor,
-                fontSize: "10px",
-                padding: "2px 6px",
-                color: isChecked ? "white" : bgColor,
-                cursor: "pointer",
-              }}
-            >
-              <input
-                type="checkbox"
-                className="visually-hidden"
-                checked={isChecked}
-                onChange={() => setFunction(option)}
-                autoComplete="off"
-              />
-              {option}
-            </label>
-          );
-        })}
-      </div>
-    </div>
-  );
-};
+import React, { useContext, useState } from "react";
+import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
+import CheckboxGroup from "./CheckboxGroup.jsx";
+import SearchInput from "./SearchInput.jsx";
 
 const FilterPanel = ({
   selectedRegion,
@@ -68,17 +23,34 @@ const FilterPanel = ({
   categoryColors,
   onSearch,
   onLoadFavorites,
+  searchQuery, // 부모 컴포넌트에서 전달받은 검색어
+  onSearchQueryChange, // 부모 컴포넌트의 검색어 변경 핸들러
 }) => {
-  // 👈 로그인 정보를 가져옵니다.
   const { user } = useContext(AuthenticationContext);
+
+  // 검색 실행 핸들러
+  const handleSearch = (query = null) => {
+    onSearch(query || searchQuery);
+  };
 
   return (
     <div
       className="h-100 d-flex flex-column bg-white rounded shadow-sm p-3"
       style={{ fontSize: "12px" }}
     >
+      {/* 검색창 */}
+      <div className="mb-3">
+        <label className="form-label small fw-bold mb-1">🔍 검색</label>
+        <SearchInput
+          searchQuery={searchQuery}
+          onSearchQueryChange={onSearchQueryChange}
+          onSearch={handleSearch}
+          placeholder="시설명, 주소, 카테고리로 검색..."
+        />
+      </div>
+
       <div className="flex-grow-1 overflow-auto" style={{ minHeight: 0 }}>
-        {/* 지역, 시군구 등 다른 필터 UI는 여기에 그대로 위치 */}
+        {/* 지역 */}
         <div className="mb-2">
           <label className="form-label small fw-bold mb-1">📍 지역</label>
           <select
@@ -95,6 +67,7 @@ const FilterPanel = ({
           </select>
         </div>
 
+        {/* 시군구 */}
         <div className="mb-2">
           <label className="form-label small fw-bold mb-1">🏘️ 시군구</label>
           <select
@@ -121,12 +94,13 @@ const FilterPanel = ({
         />
 
         <CheckboxGroup
-          title="🐕 반려동물 크기"
+          title="🐕 반려동물 종류"
           options={petSizes}
           selectedSet={selectedPetSizes}
           setFunction={setSelectedPetSizes}
         />
 
+        {/* 주차 */}
         <div className="mb-2">
           <label className="form-label small fw-bold mb-1">🅿️ 주차</label>
           <div className="btn-group w-100" role="group">
@@ -158,6 +132,7 @@ const FilterPanel = ({
           </div>
         </div>
 
+        {/* 유형 */}
         <div className="mb-3">
           <label className="form-label small fw-bold mb-1">🏢 유형</label>
           <div className="btn-group w-100" role="group">
@@ -195,12 +170,11 @@ const FilterPanel = ({
         <button
           className="btn btn-danger w-100 btn-sm"
           onClick={onLoadFavorites}
-          disabled={!user} // 👈 user가 없으면(비로그인 상태) 버튼 비활성화
+          disabled={!user}
           style={{ fontSize: "12px" }}
         >
           즐겨찾기
         </button>
-        {/* 👈 비로그인 사용자에게 안내 메시지 표시 */}
         {!user && (
           <div className="form-text text-center" style={{ fontSize: "9px" }}>
             로그인 후 이용 가능합니다.
@@ -212,7 +186,7 @@ const FilterPanel = ({
       <div className="flex-shrink-0 mt-1">
         <button
           className="btn btn-primary w-100 btn-sm"
-          onClick={onSearch}
+          onClick={() => handleSearch()}
           style={{ fontSize: "12px" }}
         >
           검색하기
