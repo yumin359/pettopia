@@ -40,12 +40,25 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
 
   // 리뷰 내용 더보기 처리
   const REVIEW_PREVIEW_LENGTH = 150; // 글자 수 제한
+  const REVIEW_PREVIEW_LINES = 5; // 줄 수 제한
   const reviewText = review.review || "";
-  const isLongReview = reviewText.length > REVIEW_PREVIEW_LENGTH;
-  const displayedReview =
-    showFullReview || !isLongReview
-      ? reviewText
-      : reviewText.substring(0, REVIEW_PREVIEW_LENGTH) + "...";
+
+  // 글자 수 또는 줄 수 기준으로 긴 리뷰 판단
+  const lines = reviewText.split("\n");
+  const isLongByLength = reviewText.length > REVIEW_PREVIEW_LENGTH;
+  const isLongByLines = lines.length > REVIEW_PREVIEW_LINES;
+  const isLongReview = isLongByLength || isLongByLines;
+
+  let displayedReview;
+  if (showFullReview || !isLongReview) {
+    displayedReview = reviewText;
+  } else if (isLongByLines) {
+    // 줄 수가 많은 경우: 처음 5줄만 표시
+    displayedReview = lines.slice(0, REVIEW_PREVIEW_LINES).join("\n") + "\n...";
+  } else {
+    // 글자 수가 많은 경우: 처음 150자만 표시
+    displayedReview = reviewText.substring(0, REVIEW_PREVIEW_LENGTH) + "...";
+  }
 
   const handleImageClick = (imageUrl) => {
     setModalImageUrl(imageUrl);
