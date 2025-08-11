@@ -1,5 +1,6 @@
 package com.example.backend.petFacility.controller;
 
+import com.example.backend.petFacility.dto.PetFacilitySearchDto;
 import com.example.backend.petFacility.repository.PetFacilityRepository;
 import com.example.backend.petFacility.entity.PetFacility;
 import org.springframework.data.domain.Page;
@@ -44,9 +45,9 @@ public class PetFacilityController {
         this.petFacilityRepository = petFacilityRepository;
     }
 
-    // 통합 검색 엔드포인트 (수정 없음)
+    // 통합검색엔드포인트
     @GetMapping("/search")
-    public Page<PetFacility> searchPetFacilities(
+    public Page<PetFacilitySearchDto> searchPetFacilities(
             @RequestParam(required = false) String sidoName,
             @RequestParam(required = false) String sigunguName,
             @RequestParam(required = false) Set<String> category2,
@@ -63,16 +64,41 @@ public class PetFacilityController {
             originalPetSizesToSearch = mapToOriginalPetSizes(allowedPetSize);
         }
 
-        return petFacilityRepository.findFacilitiesByFilters(
+        Page<PetFacility> facilityPage = petFacilityRepository.findFacilitiesByFilters(
                 sidoName,
                 sigunguName,
                 category2,
                 originalPetSizesToSearch,
                 parkingAvailable,
+
                 indoorFacility,
                 outdoorFacility,
                 pageable
         );
+
+        return facilityPage.map(facility -> new PetFacilitySearchDto(
+                facility.getId(),
+                facility.getName(),
+                facility.getLatitude(),
+                facility.getLongitude(),
+                facility.getCategory2(),
+                facility.getRoadAddress(),
+                facility.getCategory3(),
+                facility.getSidoName(),
+                facility.getSigunguName(),
+                facility.getRoadName(),
+                facility.getBunji(),
+                facility.getJibunAddress(),
+                facility.getPhoneNumber(),
+                facility.getHoliday(),
+                facility.getOperatingHours(),
+                facility.getParkingAvailable(),
+                facility.getPetFriendlyInfo(),
+                facility.getAllowedPetSize(),
+                facility.getPetRestrictions(),
+                facility.getIndoorFacility(),
+                facility.getOutdoorFacility()
+        ));
     }
 
     // 기존 단일 조회 엔드포인트들 (유지)
@@ -125,14 +151,35 @@ public class PetFacilityController {
         return SIMPLIFIED_PET_SIZES;
     }
 
-    @GetMapping("/detail")
-    public ResponseEntity<PetFacility> getFacilityByName(@RequestParam String name) {
-        return petFacilityRepository.findByName(name)
+    // ID로 시설 조회
+    @GetMapping("/{id}")
+    public ResponseEntity<PetFacility> getFacilityById(@PathVariable Long id) {
+        return petFacilityRepository.findById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // --- 수정된 매핑 로직 ---
+    // 이름과 지역으로 정확한 시설 조회
+    @GetMapping("/detail")
+    public ResponseEntity<PetFacility> getFacilityByNameAndLocation(
+            @RequestParam String name,
+            @RequestParam(required = false) String sidoName,
+            @RequestParam(required = false) String sigunguName
+    ) {
+        List<PetFacility> facilities = petFacilityRepository
+                .findByNameAndSidoNameAndSigunguName(name, sidoName, sigunguName);
+
+        if (facilities.size() == 1) {
+            return ResponseEntity.ok(facilities.get(0));
+        } else if (facilities.size() > 1) {
+            // 여러 개면 첫 번째 반환 (또는 에러)
+            return ResponseEntity.ok(facilities.get(0));
+        }
+
+        return ResponseEntity.notFound().build();
+    }
+
+    // --- 수정된 펫 사이즈 매핑 로직 ---
     private Set<String> mapToOriginalPetSizes(Set<String> simplifiedSizes) {
         Set<String> originalSizes = new HashSet<>();
         List<String> allDbSizes = petFacilityRepository.findDistinctAllowedPetSize();

@@ -114,7 +114,6 @@ const KakaoMapComponent = ({
   useEffect(() => {
     if (!mapInstance.current || !isMapReady) return;
 
-    // 기존 마커 제거
     markersRef.current.forEach((marker) => marker.setMap(null));
     markersRef.current = [];
 
@@ -154,9 +153,11 @@ const KakaoMapComponent = ({
           mapInstance.current.panTo(marker.getPosition());
 
           try {
-            const res = await axios.get("/api/review/list", {
-              params: { facilityName: facility.name },
-            });
+            const facilityId = facility.id || facility.facilityId;
+            if (!facilityId) return;
+
+            const res = await axios.get(`/api/review/facility/${facilityId}`);
+
             const reviews = res.data || [];
             const reviewCount = reviews.length;
             const averageRating =
@@ -165,6 +166,7 @@ const KakaoMapComponent = ({
                     reviews.reduce((acc, r) => acc + r.rating, 0) / reviewCount
                   ).toFixed(1)
                 : "평가 없음";
+
             const finalContent = createInfoWindowContent(
               facility,
               categoryColors,
@@ -172,7 +174,28 @@ const KakaoMapComponent = ({
             );
             infowindow.setContent(createStyledInfoWindow(finalContent));
           } catch (err) {
-            console.error("리뷰 조회 실패:", err);
+            if (err.response && err.response.status === 404) {
+              const finalContent = createInfoWindowContent(
+                facility,
+                categoryColors,
+                {
+                  reviewCount: 0,
+                  averageRating: "평가 없음",
+                },
+              );
+              infowindow.setContent(createStyledInfoWindow(finalContent));
+            } else {
+              console.error("리뷰 조회 실패:", err);
+              const finalContent = createInfoWindowContent(
+                facility,
+                categoryColors,
+                {
+                  reviewCount: -1,
+                  averageRating: "-",
+                },
+              );
+              infowindow.setContent(createStyledInfoWindow(finalContent));
+            }
           }
         });
         return marker;

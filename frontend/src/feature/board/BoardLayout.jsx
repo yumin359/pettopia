@@ -1,13 +1,13 @@
 import { useNavigate } from "react-router-dom";
-import { Carousel, Col, Row, Button } from "react-bootstrap";
+import { Button, Carousel, Col, Row } from "react-bootstrap";
 import { useContext } from "react";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
 
 import img1 from "../../assets/event1.jpg";
 import img2 from "../../assets/event2.jpg";
 import img3 from "../../assets/event3.jpg";
-import { BoardListMini } from "./BoardListMini.jsx";
-import { ReviewList } from "../review/ReviewList.jsx"; // 리뷰 리스트 임포트 추가
+import { BoardListMini } from "../main/BoardListMini.jsx";
+import { ReviewCarousel } from "../main/ReviewCarousel.jsx";
 
 export function BoardLayout() {
   const navigate = useNavigate();
@@ -91,35 +91,11 @@ export function BoardLayout() {
           <BoardListMini fontSize="1.25rem" iconSize={18} />
         </Col>
 
-        <Col md={6} style={{ overflowY: "auto" }}>
+        <Col md={6}>
           <h5 style={{ fontSize: "1.5rem", fontWeight: "600" }}>최신 리뷰</h5>
-          <ReviewList />
+          <ReviewCarousel />
         </Col>
       </Row>
-
-      {/*/!* 관리자 버튼 영역 *!/*/}
-      {/*{isAdmin() && (*/}
-      {/*  <Row className="mt-4">*/}
-      {/*    <Col className="d-flex justify-content-center gap-3">*/}
-      {/*      <Button*/}
-      {/*        variant="outline-warning"*/}
-      {/*        size="sm"*/}
-      {/*        onClick={() => navigate("/member/list")}*/}
-      {/*        style={{ minWidth: "120px" }}*/}
-      {/*      >*/}
-      {/*        회원목록 (관리자)*/}
-      {/*      </Button>*/}
-      {/*      <Button*/}
-      {/*        variant="outline-danger"*/}
-      {/*        size="sm"*/}
-      {/*        onClick={() => navigate("/support/list")}*/}
-      {/*        style={{ minWidth: "120px" }}*/}
-      {/*      >*/}
-      {/*        문의내역보기 (관리자)*/}
-      {/*      </Button>*/}
-      {/*    </Col>*/}
-      {/*  </Row>*/}
-      {/*)}*/}
     </div>
   );
 }

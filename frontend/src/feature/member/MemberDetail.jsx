@@ -5,8 +5,6 @@ import {
   FormControl,
   FormGroup,
   FormLabel,
-  ListGroup,
-  ListGroupItem,
   Modal,
   Row,
   Spinner,
@@ -16,12 +14,11 @@ import axios from "axios";
 import { useNavigate, useSearchParams } from "react-router";
 import { toast } from "react-toastify";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
-import { FaDownload, FaUserCircle } from "react-icons/fa";
 import { FiUser } from "react-icons/fi";
-import { GrFavorite } from "react-icons/gr";
 
 export function MemberDetail() {
   const [member, setMember] = useState(null);
+  const [reviews, setReviews] = useState(null); // 내 리뷰 목록 상태 추가
   const [modalShow, setModalShow] = useState(false);
   const [password, setPassword] = useState("");
   const [tempCode, setTempCode] = useState("");
@@ -34,6 +31,16 @@ export function MemberDetail() {
       .get(`/api/member?email=${params.get("email")}`)
       .then((res) => {
         setMember(res.data);
+        if (res.data?.id) {
+          // 회원 정보 불러오면, 그 회원이 쓴 리뷰 목록도 같이 요청
+          axios
+            .get(`/api/review/myReview/${res.data.id}`)
+            .then((res2) => setReviews(res2.data))
+            .catch((err) => {
+              console.error("리뷰 목록 로드 실패:", err);
+              setReviews([]);
+            });
+        }
       })
       .catch((err) => {
         console.error(err);
@@ -61,12 +68,10 @@ export function MemberDetail() {
   }
 
   function handleModalButtonClick() {
-    // 카카오 사용자 일 때만 임시코드 요청
     if (isKakao) {
       axios
         .post("/api/member/withdrawalCode", { email: member.email })
         .then((res) => {
-          // 임시코드 받고 모달 열리게
           setTempCode(res.data.tempCode);
           setModalShow(true);
         })
@@ -76,7 +81,6 @@ export function MemberDetail() {
         })
         .finally(() => setPassword(""));
     } else {
-      // 일반 회원은 바로 모달 열기
       setModalShow(true);
     }
   }
@@ -101,14 +105,14 @@ export function MemberDetail() {
     : "";
 
   // 프로필 이미지 URL 찾기
-  // 이미지 확장자를 가진 파일 중 첫 번째를 프로필 이미지로 간주합니다.
   const profileImageUrl = member.files?.find((file) =>
     /\.(jpg|jpeg|png|gif|webp)$/i.test(file),
   );
 
-  // member.authNames 배열에 admin 확인
+  // 관리자 여부 확인
   const isAdmin = member.authNames?.includes("admin");
 
+  // 카카오 회원 여부
   const isKakao = member.provider?.includes("kakao");
 
   return (
@@ -127,39 +131,35 @@ export function MemberDetail() {
 
         <Card className="shadow-sm border-0 rounded-3">
           <Card.Body>
-            {/* 프로필 이미지 미리보기 */}
             <div className="mb-4 d-flex justify-content-center">
               {profileImageUrl ? (
-                // 이미지가 있을 경우
                 <img
                   src={profileImageUrl}
                   alt="프로필 이미지"
-                  className="shadow rounded-circle" // 원형 스타일
+                  className="shadow rounded-circle"
                   style={{
-                    width: "120px", // 원하는 크기로 조절
-                    height: "120px", // 원하는 크기로 조절
-                    objectFit: "cover", // 이미지가 잘리지 않게 채움
-                    border: "2px solid #ddd", // 테두리 (선택 사항)
+                    width: "120px",
+                    height: "120px",
+                    objectFit: "cover",
+                    border: "2px solid #ddd",
                   }}
                 />
               ) : (
-                // 이미지가 없을 경우 사용자 아이콘 표시
                 <div
                   className="shadow rounded-circle d-flex justify-content-center align-items-center"
                   style={{
-                    width: "120px", // 이미지와 동일한 크기
-                    height: "120px", // 이미지와 동일한 크기
-                    backgroundColor: "#e9ecef", // 배경색 (회색 계열)
-                    border: "2px solid #ddd", // 테두리
-                    color: "#6c757d", // 아이콘 색상
+                    width: "120px",
+                    height: "120px",
+                    backgroundColor: "#e9ecef",
+                    border: "2px solid #ddd",
+                    color: "#6c757d",
                   }}
                 >
-                  <FiUser size={80} /> {/* 아이콘 크기 조절 */}
+                  <FiUser size={80} />
                 </div>
               )}
             </div>
 
-            {/* 프로필 이미지가 없는 경우를 대비한 여백 (선택 사항) */}
             {!profileImageUrl && <br />}
 
             <FormGroup controlId="email1" className="mb-3">
@@ -250,7 +250,7 @@ export function MemberDetail() {
                 </Button>
                 <Button
                   variant="outline-success"
-                  onClick={() => navigate("/review/my")}
+                  onClick={() => navigate(`/review/my/${member.id}`)}
                   className="d-flex align-items-center gap-1"
                 >
                   내가 쓴 리뷰

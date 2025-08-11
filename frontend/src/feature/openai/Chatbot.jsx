@@ -26,8 +26,8 @@ export function Chatbot() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "claude-3-opus-20240229",
-        max_tokens: 1024,
+        model: "claude-3-5-sonnet-20241022",
+        max_tokens: 512,
         temperature: 0.7,
         system: "당신은 정중한 말투로 한국어로만 대답하는 친절한 챗봇입니다.",
         messages: [
