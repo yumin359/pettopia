@@ -2,7 +2,7 @@ import React from "react";
 import { Container, Row, Col, Button, Card, Badge } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
-export function PetopiaHomepage() {
+export function About() {
   const navigate = useNavigate();
 
   const categories = [
