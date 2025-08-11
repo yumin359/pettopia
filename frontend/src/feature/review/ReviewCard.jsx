@@ -9,9 +9,14 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
   const { user } = useContext(AuthenticationContext);
   const [isEditing, setIsEditing] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
+  // 모달 state
   const [modalImageUrl, setModalImageUrl] = useState("");
+  const [modalNickName, setModalNickName] = useState("");
+  const [modalProfileImageUrl, setModalProfileImageUrl] = useState("");
+
   const [showAllImages, setShowAllImages] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+
   const [isHoverd, setIsHoverd] = useState(false);
   const [showFullReview, setShowFullReview] = useState(false); // 더보기 상태 추가
 
@@ -26,7 +31,24 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
       .padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}`;
   };
 
-  const isImageFile = (fileUrl) => {
+  // 이미지 정보가 URL 문자열일 수도, 객체일 수도 있으므로 확인 후 처리
+  const getImageUrl = (fileInfo) => {
+    return typeof fileInfo === "string" ? fileInfo : fileInfo.url;
+  };
+
+  const getImageNickName = (fileInfo) => {
+    return typeof fileInfo === "string" ? null : fileInfo.nickName;
+  };
+
+  const getProfileImageUrl = (fileInfo) => {
+    return typeof fileInfo === "string" ? null : fileInfo.profileImageUrl;
+  };
+
+  // URL 문자열을 받아서 이미지 파일인지 확인하는 함수
+  const isImageUrl = (fileUrl) => {
+    if (typeof fileUrl !== "string" || !fileUrl) {
+      return false;
+    }
     const extension = fileUrl.split(".").pop().split("?")[0];
     return ["jpg", "jpeg", "png", "gif", "webp"].includes(
       extension.toLowerCase(),
@@ -35,7 +57,11 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
 
   // 모든 이미지 파일을 컴포넌트 상단에서 한 번만 필터링
   const allImages = Array.isArray(review.files)
-    ? review.files.filter(isImageFile)
+    ? review.files.filter((fileInfo) => {
+        // fileInfo가 객체일 경우 url 속성으로 URL을 가져와서 검사
+        const fileUrl = getImageUrl(fileInfo);
+        return isImageUrl(fileUrl);
+      })
     : [];
 
   // 리뷰 내용 더보기 처리
@@ -60,8 +86,15 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
     displayedReview = reviewText.substring(0, REVIEW_PREVIEW_LENGTH) + "...";
   }
 
-  const handleImageClick = (imageUrl) => {
+  const handleImageClick = (imageInfo) => {
+    // imageInfo는 URL 문자열이거나 { url, nickName, profileImageUrl } 객체일 수 있음
+    const imageUrl = getImageUrl(imageInfo);
+    const imageNickName = getImageNickName(imageInfo);
+    const imageProfileImageUrl = getProfileImageUrl(imageInfo);
+
     setModalImageUrl(imageUrl);
+    setModalNickName(imageNickName);
+    setModalProfileImageUrl(imageProfileImageUrl);
     setShowImageModal(true);
   };
 
@@ -77,6 +110,7 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
   const handleEditSave = (reviewId) => {
     setIsEditing(false);
     if (onUpdate) {
+      // 수정한 리뷰 id를 mapDetail로 보냄
       onUpdate(reviewId);
     }
   };
@@ -109,10 +143,10 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
     return (
       <>
         <div className="d-flex flex-wrap gap-2">
-          {imagesToShow.map((fileUrl, idx) => (
+          {imagesToShow.map((imageInfo, idx) => (
             <Image
               key={idx}
-              src={fileUrl}
+              src={getImageUrl(imageInfo)} // 사진을 가져옴
               alt={`첨부 이미지 ${idx + 1}`}
               className="shadow rounded"
               width="150"
@@ -121,7 +155,7 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
                 objectFit: "cover",
                 cursor: "pointer",
               }}
-              onClick={() => handleImageClick(fileUrl)}
+              onClick={() => handleImageClick(imageInfo)} // 객체 자체를 전달하고
             />
           ))}
           {hasMoreImages && !showAllImages && (
@@ -169,6 +203,26 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
               }}
             />
           </Modal.Body>
+          <Modal.Footer className="d-flex justify-content-start">
+            {modalProfileImageUrl && (
+              <Image
+                roundedCircle
+                src={modalProfileImageUrl}
+                alt={`${modalNickName} 프로필 이미지`}
+                style={{
+                  width: "40px",
+                  height: "40px",
+                  objectFit: "cover",
+                  border: "2px solid #e9ecef",
+                }}
+              />
+            )}
+            {modalNickName && (
+              <div className="text-muted">
+                <strong>{modalNickName}</strong>
+              </div>
+            )}
+          </Modal.Footer>
         </Modal>
       </>
     );
@@ -277,7 +331,13 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
                   cursor: "pointer",
                   transition: "transform 0.2s",
                 }}
-                onClick={() => handleImageClick(fileUrl)}
+                onClick={() =>
+                  handleImageClick({
+                    url: fileUrl,
+                    nickName: review.memberEmailNickName,
+                    // 이미지 없는데 왜 잘되지? 일반 모드라 그런가?
+                  })
+                }
                 onMouseOver={(e) => (e.target.style.transform = "scale(1.05)")}
                 onMouseOut={(e) => (e.target.style.transform = "scale(1)")}
               />
@@ -288,12 +348,12 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
 
       {/* PDF 파일 표시 */}
       {Array.isArray(review.files) &&
-        review.files.filter((f) => !isImageFile(f)).length > 0 && (
+        review.files.filter((f) => !isImageUrl(f)).length > 0 && (
           <div className="mb-3">
             <div className="small text-muted mb-2">📎 첨부 파일</div>
             <div className="d-flex flex-wrap gap-2">
               {review.files
-                .filter((f) => !isImageFile(f))
+                .filter((f) => !isImageUrl(f))
                 .map((fileUrl, idx) => {
                   const fileName = fileUrl.split("/").pop().split("?")[0];
                   return (
@@ -335,6 +395,22 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
             }}
           />
         </Modal.Body>
+        <Modal.Footer className="d-flex justify-content-start">
+          <Image
+            roundedCircle
+            src={review.profileImageUrl || defaultProfileImage}
+            alt={`${review.memberEmailNickName ?? "익명"} 프로필`}
+            style={{
+              width: "40px",
+              height: "40px",
+              objectFit: "cover",
+              border: "2px solid #e9ecef",
+            }}
+          />
+          <div className="text-muted">
+            <strong>{review.memberEmailNickName}</strong>
+          </div>
+        </Modal.Footer>
       </Modal>
 
       {/* 삭제 확인 모달 */}
