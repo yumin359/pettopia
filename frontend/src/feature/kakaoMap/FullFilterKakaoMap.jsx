@@ -1,10 +1,10 @@
 // src/map/FullFilterKakaoMap.js
 import React, { useCallback, useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import FilterPanel from "./FilterPanel.jsx";
-import SearchResultList from "./SearchResultList";
-import KakaoMapComponent from "./KakaoMapComponent";
-import { useFilters } from "./data/UseFilters";
+import FilterPanel from "../map/FilterPanel.jsx";
+import SearchResultList from "./SearchResultList.jsx";
+import KakaoMapComponent from "./KakaoMapComponent.jsx";
+import { useFilters } from "./data/UseFilters.jsx";
 import { fetchMyFavorites, searchFacilities } from "./data/api.jsx";
 import {
   CATEGORY_COLORS,

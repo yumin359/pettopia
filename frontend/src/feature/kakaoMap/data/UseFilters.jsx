@@ -4,7 +4,7 @@ import {
   fallbackCategories2,
   fallbackRegions,
   fallbackSigunguData,
-} from "./fallbackSigunguData";
+} from "./fallbackSigunguData.jsx";
 
 export const useFilters = () => {
   const [regions, setRegions] = useState([]);

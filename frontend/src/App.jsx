@@ -12,7 +12,7 @@ import { MemberEdit } from "./feature/member/MemberEdit.jsx";
 import { MemberLogin } from "./feature/member/MemberLogin.jsx";
 import { AuthenticationContextProvider } from "./common/AuthenticationContextProvider.jsx";
 import { MapDetail } from "./feature/map/MapDetail.jsx";
-import FullFilterKakaoMap from "./feature/map/FullFilterKakaoMap";
+import FullFilterKakaoMap from "./feature/kakaoMap/FullFilterKakaoMap.jsx";
 import { Chatbot } from "./feature/openai/Chatbot";
 import { LatestReviewsList } from "./feature/review/LatestReviewsList.jsx";
 import ServicePage from "./feature/service/ServicePage.jsx";

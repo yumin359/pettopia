@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
-import CheckboxGroup from "./CheckboxGroup.jsx";
+import CheckboxGroup from "../kakaoMap/CheckboxGroup.jsx";
 import SearchInput from "./SearchInput.jsx";
 
 const FilterPanel = ({
