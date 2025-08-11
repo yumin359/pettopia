@@ -35,7 +35,7 @@ public class PetFacilityController {
 
     // 개 카테고리에 해당하는 모든 키워드
     private static final Set<String> DOG_KEYWORDS = Set.of(
-            "개", "kg", "소형", "중형", "대형", "특수견"
+            "개", "kg", "소형", "중형", "대형", "특수견", "주말", "평일", "이하", "공휴일"
     );
 
     // 모두가능 카테고리에 해당하는 키워드
@@ -257,70 +257,172 @@ public class PetFacilityController {
         return ResponseEntity.notFound().build();
     }
 
-    // --- 수정된 펫 사이즈 매핑 로직 ---
+    // 펫 사이즈 매핑 로직
     private Set<String> mapToOriginalPetSizes(Set<String> simplifiedSizes) {
         Set<String> originalSizes = new HashSet<>();
         List<String> allDbSizes = petFacilityRepository.findDistinctAllowedPetSize();
 
+        System.out.println("=== 펫 사이즈 매핑 디버깅 ===");
+        System.out.println("선택된 간소화 사이즈: " + simplifiedSizes);
+
         for (String dbSize : allDbSizes) {
             Set<String> categories = classifyPetSizeToMultipleCategories(dbSize);
+
+            // 🔍 특정 텍스트만 디버깅
+            if (dbSize.contains("주말") || dbSize.contains("15kg")) {
+                System.out.println("📍 디버깅: '" + dbSize + "' → 분류 결과: " + categories);
+            }
 
             // 분류된 카테고리들 중 사용자가 선택한 조건과 일치하는 것이 하나라도 있다면 추가
             for (String category : categories) {
                 if (simplifiedSizes.contains(category)) {
                     originalSizes.add(dbSize);
+                    if (dbSize.contains("주말") || dbSize.contains("15kg")) {
+                        System.out.println("✅ 매칭됨: '" + dbSize + "' (카테고리: " + category + ")");
+                    }
                     break; // 하나라도 일치하면 추가하고 다음 dbSize로
                 }
             }
         }
+
+        System.out.println("최종 originalSizes 개수: " + originalSizes.size());
         return originalSizes;
     }
 
-    // 하나의 DB 사이즈를 여러 카테고리로 분류할 수 있도록 수정
+    // 하나의 DB 사이즈를 여러 카테고리로 분류
     private Set<String> classifyPetSizeToMultipleCategories(String dbSize) {
         Set<String> categories = new HashSet<>();
 
+        if (dbSize == null || dbSize.trim().isEmpty()) {
+            return categories;
+        }
+
+        // 🔧 따옴표 제거 및 정규화
+        String normalizedDbSize = dbSize.trim()
+                .replaceAll("[\"\']", "")  // 따옴표 제거
+                .toLowerCase();
+
+        System.out.println("🔍 분류 대상: '" + dbSize + "' → 정규화: '" + normalizedDbSize + "'");
+
         // 1. 모두가능 카테고리 체크
-        if (ALL_AVAILABLE_KEYWORDS.stream().anyMatch(dbSize::contains)) {
+        if (ALL_AVAILABLE_KEYWORDS.stream().anyMatch(keyword ->
+                normalizedDbSize.contains(keyword.toLowerCase()))) {
             categories.add("모두가능");
+            System.out.println("  → 모두가능 분류");
         }
 
         // 2. 고양이 카테고리 체크
-        if (dbSize.contains("고양이")) {
+        if (normalizedDbSize.contains("고양이") || normalizedDbSize.contains("cat")) {
             categories.add("고양이");
+            System.out.println("  → 고양이 분류");
         }
 
-        // 3. 개 카테고리 체크
-        if (DOG_KEYWORDS.stream().anyMatch(dbSize::contains)) {
+        // 3. 개 카테고리 체크 (수정됨)
+        boolean isDogCategory = false;
+
+        // kg 패턴 체크 (숫자 + kg)
+        if (normalizedDbSize.matches(".*\\d+\\s*kg.*")) {
+            isDogCategory = true;
+            System.out.println("  → 개 분류 (kg 패턴)");
+        }
+
+        // 개 관련 키워드 체크
+        String[] dogKeywords = {"개", "강아지", "소형", "중형", "대형", "특수견"};
+        for (String keyword : dogKeywords) {
+            if (normalizedDbSize.contains(keyword)) {
+                isDogCategory = true;
+                System.out.println("  → 개 분류 (키워드: " + keyword + ")");
+                break;
+            }
+        }
+
+        // 시간 관련 키워드가 있으면서 kg가 있으면 개로 분류
+        String[] timeKeywords = {"주말", "평일", "공휴일", "금요일", "토요일", "일요일"};
+        boolean hasTimeKeyword = false;
+        for (String timeKeyword : timeKeywords) {
+            if (normalizedDbSize.contains(timeKeyword)) {
+                hasTimeKeyword = true;
+                System.out.println("  → 시간 키워드 발견: " + timeKeyword);
+                break;
+            }
+        }
+
+        if (hasTimeKeyword && normalizedDbSize.contains("kg")) {
+            isDogCategory = true;
+            System.out.println("  → 개 분류 (시간 + kg 패턴)");
+        }
+
+        if (isDogCategory) {
             categories.add("개");
         }
 
         // 4. 기타 카테고리 체크 (정확한 단어 매칭)
         if (containsExactOtherPetKeyword(dbSize)) {
             categories.add("기타");
+            System.out.println("  → 기타 분류");
         }
 
+        System.out.println("🔍 최종 분류 결과: " + categories);
         return categories;
     }
 
-    // 기타 동물 키워드를 정확하게 매칭하는 메서드
+    // 기타 동물 키워드 매칭 메서드
     private boolean containsExactOtherPetKeyword(String dbSize) {
+        if (dbSize == null) return false;
+
+        // 🔧 따옴표 제거 및 정규화
+        String normalizedDbSize = dbSize.trim()
+                .replaceAll("[\"\']", "")
+                .toLowerCase();
+
+        // 🚨 kg가 포함된 텍스트는 기타 분류에서 제외 (개 전용)
+        if (normalizedDbSize.matches(".*\\d+\\s*kg.*")) {
+            System.out.println("  → 기타 분류 제외 (kg 패턴 감지): " + dbSize);
+            return false;
+        }
+
+        // 🚨 시간 관련 키워드가 있으면 기타 분류에서 제외
+        String[] timeKeywords = {"주말", "평일", "공휴일", "금요일", "토요일", "일요일"};
+        for (String timeKeyword : timeKeywords) {
+            if (normalizedDbSize.contains(timeKeyword)) {
+                System.out.println("  → 기타 분류 제외 (시간 키워드 감지): " + timeKeyword);
+                return false;
+            }
+        }
+
         for (String keyword : OTHER_PET_KEYWORDS) {
-            // "소"의 경우 단독으로 나타나거나 특정 패턴으로 나타날 때만 매칭
-            if (keyword.equals("소")) {
-                // "소"가 단독으로 있거나, "소," "소 " ",소" 형태로 구분되어 있을 때만 매칭
-                if (dbSize.matches(".*[^가-힣]소[^가-힣].*") ||
-                        dbSize.matches(".*[,\\s]소[,\\s].*") ||
-                        dbSize.startsWith("소,") ||
-                        dbSize.startsWith("소 ") ||
-                        dbSize.endsWith(",소") ||
-                        dbSize.endsWith(" 소") ||
-                        dbSize.equals("소")) {
+            String lowerKeyword = keyword.toLowerCase();
+
+            // "소"의 경우 특별 처리 (기존과 동일)
+            if (lowerKeyword.equals("소")) {
+                if (normalizedDbSize.matches(".*[^가-힣]소[^가-힣].*") ||
+                        normalizedDbSize.matches(".*[,\\s]소[,\\s].*") ||
+                        normalizedDbSize.startsWith("소,") ||
+                        normalizedDbSize.startsWith("소 ") ||
+                        normalizedDbSize.endsWith(",소") ||
+                        normalizedDbSize.endsWith(" 소") ||
+                        normalizedDbSize.equals("소")) {
+                    System.out.println("  → 기타 분류 (키워드: 소)");
+                    return true;
+                }
+            }
+            // "새"의 경우 특별 처리 (단독으로 나타날 때만)
+            else if (lowerKeyword.equals("새")) {
+                if (normalizedDbSize.matches(".*[^가-힣]새[^가-힣].*") ||
+                        normalizedDbSize.matches(".*[,\\s]새[,\\s].*") ||
+                        normalizedDbSize.startsWith("새,") ||
+                        normalizedDbSize.startsWith("새 ") ||
+                        normalizedDbSize.endsWith(",새") ||
+                        normalizedDbSize.endsWith(" 새") ||
+                        normalizedDbSize.equals("새") ||
+                        normalizedDbSize.contains("새(")) {
+                    System.out.println("  → 기타 분류 (키워드: 새)");
                     return true;
                 }
             } else {
-                // 다른 키워드들은 기존 방식대로 contains 사용
-                if (dbSize.contains(keyword)) {
+                // 다른 키워드들은 기존 방식대로 (단, 정확한 매칭)
+                if (normalizedDbSize.contains(lowerKeyword)) {
+                    System.out.println("  → 기타 분류 (키워드: " + lowerKeyword + ")");
                     return true;
                 }
             }

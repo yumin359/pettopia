@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
 import CheckboxGroup from "./CheckboxGroup.jsx";
 import SearchInput from "./SearchInput.jsx";
@@ -39,7 +39,7 @@ const FilterPanel = ({
       style={{ fontSize: "12px" }}
     >
       {/* 검색창 */}
-      <div className="mb-3">
+      <div className="mb-2">
         <label className="form-label small fw-bold mb-1">🔍 검색</label>
         <SearchInput
           searchQuery={searchQuery}

@@ -18,7 +18,7 @@ public interface PetFacilityRepository extends JpaRepository<PetFacility, Long> 
     // 검색어를 포함한 통합 필터 검색 쿼리 (수정됨)
     @Query(value = """
             SELECT pf FROM PetFacility pf WHERE
-            (:searchQuery IS NULL OR 
+            (:searchQuery IS NULL OR
              lower(pf.name) LIKE lower(concat('%', :searchQuery, '%')) OR
              lower(pf.category2) LIKE lower(concat('%', :searchQuery, '%')) OR
              lower(pf.category3) LIKE lower(concat('%', :searchQuery, '%')) OR
@@ -39,7 +39,7 @@ public interface PetFacilityRepository extends JpaRepository<PetFacility, Long> 
             """,
             countQuery = """
                     SELECT COUNT(pf) FROM PetFacility pf WHERE
-                    (:searchQuery IS NULL OR 
+                    (:searchQuery IS NULL OR
                      lower(pf.name) LIKE lower(concat('%', :searchQuery, '%')) OR
                      lower(pf.category2) LIKE lower(concat('%', :searchQuery, '%')) OR
                      lower(pf.category3) LIKE lower(concat('%', :searchQuery, '%')) OR
@@ -78,8 +78,8 @@ public interface PetFacilityRepository extends JpaRepository<PetFacility, Long> 
             lower(pf.category2) LIKE lower(concat('%', :query, '%')) OR
             lower(pf.roadAddress) LIKE lower(concat('%', :query, '%')) OR
             lower(pf.jibunAddress) LIKE lower(concat('%', :query, '%'))
-            ORDER BY 
-            CASE 
+            ORDER BY
+            CASE
                 WHEN lower(pf.name) LIKE lower(concat(:query, '%')) THEN 1
                 WHEN lower(pf.name) LIKE lower(concat('%', :query, '%')) THEN 2
                 WHEN lower(pf.category2) LIKE lower(concat(:query, '%')) THEN 3
@@ -94,7 +94,7 @@ public interface PetFacilityRepository extends JpaRepository<PetFacility, Long> 
             SELECT pf FROM PetFacility pf WHERE
             pf.latitude BETWEEN :southWestLat AND :northEastLat
             AND pf.longitude BETWEEN :southWestLng AND :northEastLng
-            AND (:searchQuery IS NULL OR 
+            AND (:searchQuery IS NULL OR
                  lower(pf.name) LIKE lower(concat('%', :searchQuery, '%')) OR
                  lower(pf.category2) LIKE lower(concat('%', :searchQuery, '%')) OR
                  lower(pf.category3) LIKE lower(concat('%', :searchQuery, '%')))

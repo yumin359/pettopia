@@ -294,6 +294,12 @@ SHOW CREATE TABLE review_like;
 SHOW CREATE TABLE review_report;
 SHOW CREATE TABLE favorite;
 SHOW CREATE TABLE tags;
+
+SELECT DISTINCT allowed_pet_size
+FROM pet_facility
+WHERE allowed_pet_size LIKE '%주말%'
+   OR allowed_pet_size LIKE '%kg%'
+   OR allowed_pet_size LIKE '%공휴일%';
 # ---------------------------------------------------------------------------------
 # UPDATE review r
 #     JOIN pet_facility pf ON TRIM(r.facility_name) = TRIM(pf.name)
