@@ -1,0 +1,401 @@
+/* === Google Fonts Import === */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+
+/* === CSS Variables (Color Palette & Fonts) === */
+:root {
+    --primary-red: #f86666;
+    --active-red: #fe6262;
+    --dark-text: #2e2e2e;
+    --light-text: #a0a0a0;
+    --main-bg: #f8eee8;
+    --page-bg: #fdfdfd;
+    --border-color: #000000;
+    --border-dark: #000000;
+    --white: #ffffff;
+    --blue-accent: #6c8bfa;
+    --font-family: 'Poppins', sans-serif;
+
+    --primary-coral: #FF6B6B;
+    --coral-light: #FFE5E5;
+    --coral-dark: #FF5252;
+    --cream-bg: #FFF5F0;
+    --pure-white: #FFFFFF;
+    --text-black: #000000;
+    --text-gray: #8B8B8B;
+    --border-light: #F5F5F5;
+
+    --shadow-brutal: 3px 3px 0px 0px #000000;
+    --shadow-brutal-hover: 5px 5px 0px 0px #000000;
+}
+
+/* === Global Resets & Body Styling === */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/*🎨 배경 색상 */
+body {
+    background: #fcdcdc;
+    background: linear-gradient(0deg, rgba(252, 220, 220, 1) 0%, rgba(255, 255, 255, 1) 100%);
+
+}
+
+
+/* === Main Layout (From MainLayout.jsx) === */
+.main-layout {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 2rem;
+}
+
+/* 🎨 박스 색상과 박스 크기 */
+.main-container {
+    width: 100%;
+    max-width: 1200px;
+    background-color: var(--main-bg);
+    border-style: solid;
+    border-color: black;
+    border-width: 1px;
+    box-shadow: 5px 5px 1px 1px black;
+    overflow: hidden;
+}
+
+/* === Navigation Bar (From AppNavBar.jsx) === */
+
+/* Logo Styles */
+.navbar-brand {
+    text-decoration: none;
+}
+
+.logo-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.logo-text-doc, .logo-text-pet {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--dark-text);
+}
+
+.logo-dots {
+    display: flex;
+    gap: 3px;
+    padding-top: 8px; /* To align with the bottom of the text */
+}
+
+.logo-dot {
+    width: 5px;
+    height: 5px;
+    background-color: var(--primary-red);
+    border-radius: 50%;
+}
+
+/* 네브바 */
+.navbar {
+    width: 100%;
+    padding: 1rem 3rem;
+    border-bottom: 1px solid black;
+}
+
+.navbar-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.navbar-right-group {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.nav-menu {
+    display: flex;
+    align-items: center;
+    list-style: none;
+    gap: 1rem;
+}
+
+.nav-actions {
+    display: flex;
+    align-items: center;
+}
+
+.nav-link {
+    font-family: var(--font-family), serif;
+    text-decoration: none;
+    color: var(--light-text);
+    font-size: 1rem;
+    font-weight: 500;
+    padding: 10px 20px;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+/* Active NavLink Style*/
+.nav-link.active {
+    background-color: var(--active-red);
+    color: var(--white);
+}
+
+.nav-link:hover:not(.active) {
+    color: var(--dark-text);
+}
+
+
+/* 기존 Sign In 버튼 스타일 */
+.signin-btn {
+    text-decoration: none;
+    font-family: var(--font-family), serif;
+    color: var(--dark-text);
+    font-weight: 600;
+    font-size: 1rem;
+    border: 2px solid var(--border-dark);
+    padding: 12px 24px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.signin-btn:hover {
+    background-color: var(--dark-text);
+    color: var(--white);
+    border-color: var(--dark-text);
+}
+
+/* ===== 로그인 후 사용자 정보 버튼 스타일 (아름답게) ===== */
+.user-dropdown-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background-color: transparent;
+    border: 2px solid var(--border-dark);
+    border-radius: 12px;
+    padding: 6px 16px 6px 8px; /* 패딩 조절 */
+    cursor: pointer;
+    font-family: var(--font-family), serif;
+    font-weight: 600;
+    color: var(--dark-text);
+    transition: all 0.3s ease;
+}
+
+.user-dropdown-btn:hover {
+    background-color: var(--dark-text);
+    color: var(--white);
+}
+
+.user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: var(--primary-red);
+    color: var(--white);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+
+/* Mobile styles - you can refine these further if needed */
+.mobile-menu-toggle {
+    display: none; /* Hide by default on desktop */
+}
+
+@media (max-width: 1024px) {
+    .nav-menu {
+        display: none; /* Hide menu on mobile */
+    }
+
+    .mobile-menu-toggle {
+        display: block; /* Show hamburger icon */
+    }
+
+    .nav-menu.active {
+        display: flex; /* Show menu when active */
+        flex-direction: column;
+        position: absolute;
+        top: 120px;
+        left: 0;
+        width: 100%;
+        background: var(--main-bg);
+        padding: 2rem;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+    }
+}
+
+
+/* === Example: Hero Section & Services Section CSS === */
+/* 아래 클래스들은 <Outlet />을 통해 렌더링될 페이지(예: HomePage.jsx)의
+  컴포넌트에 직접 적용해야 합니다. 디자인을 똑같이 만들기 위한 가이드입니다.
+*/
+
+/* --- Hero Section (Top part of the page) --- */
+.hero-section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    padding: 4rem 0;
+}
+
+.hero-content {
+    flex-basis: 50%;
+}
+
+.hero-content h1 {
+    font-size: 5rem;
+    font-weight: 800;
+    line-height: 1.1;
+    color: var(--dark-text);
+    margin-bottom: 1.5rem;
+}
+
+/* Style for the "PETS" word */
+.hero-content .text-highlight {
+    color: var(--primary-red);
+}
+
+.hero-content p {
+    font-size: 1.1rem;
+    color: var(--light-text);
+    line-height: 1.6;
+    max-width: 450px;
+    margin-bottom: 2.5rem;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 1rem;
+}
+
+/* Base Button Styles */
+.btn {
+    font-family: var(--font-family), serif;
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 16px 32px;
+    border-radius: 14px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+/* "Register Your Pet" Button Style */
+.btn-register {
+    background-color: var(--primary-red);
+    color: var(--white);
+}
+
+.btn-register:hover {
+    opacity: 0.9;
+}
+
+/* "Our Services" Button Style */
+.btn-services {
+    background-color: var(--white);
+    color: var(--dark-text);
+    border: 2px solid var(--border-dark);
+}
+
+.btn-services:hover {
+    background-color: var(--dark-text);
+    color: var(--white);
+    border-color: var(--dark-text);
+}
+
+.hero-image {
+    flex-basis: 50%;
+}
+
+.hero-image img {
+    width: 100%;
+    max-width: 600px;
+    height: auto;
+}
+
+
+/* --- Services Section (Bottom part of the page) --- */
+.services-section {
+    padding: 2rem 0;
+    display: flex;
+    align-items: center;
+    gap: 4rem;
+}
+
+.services-content {
+    flex-basis: 40%;
+}
+
+/* "OUR SERVICES" label */
+.section-label {
+    color: var(--light-text);
+    font-weight: 600;
+    letter-spacing: 2px;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+.services-content h2 {
+    font-size: 3rem;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.services-cards {
+    flex-basis: 60%;
+    display: flex;
+    gap: 1.5rem;
+}
+
+.service-card {
+    background-color: var(--white);
+    border: 2px solid var(--border-color);
+    border-radius: 20px;
+    padding: 2rem;
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.service-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+}
+
+.service-card .icon {
+    padding: 1rem;
+    border-radius: 14px;
+    font-size: 2rem; /* If using icon font */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.service-card .icon.red {
+    background-color: #ffe4e4;
+    color: var(--primary-red);
+}
+
+.service-card .icon.blue {
+    background-color: #e3e9ff;
+    color: var(--blue-accent);
+}
+
+.service-card h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--dark-text);
+}

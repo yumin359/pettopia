@@ -1,9 +1,7 @@
-// ==================== AppNavBar.jsx ====================
 import { Link, NavLink } from "react-router-dom";
 import { useContext, useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { AuthenticationContext } from "./AuthenticationContextProvider.jsx";
-import { FaUserCircle } from "react-icons/fa";
 import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
 
@@ -56,9 +54,9 @@ export function AppNavBar() {
   const userDropdownTitle = (
     <>
       <div className="user-avatar">
-        {user?.nickName?.charAt(0).toUpperCase()}
+        {user?.nickName?.charAt(0)?.toUpperCase() || "U"}
       </div>
-      <span>{user?.nickName}</span>
+      <span>{user?.nickName || "사용자"}</span>
     </>
   );
 
@@ -107,114 +105,107 @@ export function AppNavBar() {
           {/* Logo */}
           <Link to="/" className="navbar-brand">
             <div className="logo-wrapper">
-              <span className="logo-text-doc">DOC</span>
-              <div className="logo-separator"></div>
-              <span className="logo-text-pet">PET</span>
+              <span className="logo-text-doc">PET</span>
+              <div className="logo-dots">
+                <span className="logo-dot"></span>
+              </div>
+              <span className="logo-text-pet">TOPIA</span>
             </div>
           </Link>
 
           {/* Navigation Menu */}
-          <ul className={`nav-menu ${showMobileMenu ? "active" : ""}`}>
-            <li className="nav-item">
-              <NavLink
-                to="/"
-                className={({ isActive }) =>
-                  `nav-link ${isActive ? "active" : ""}`
-                }
-                onClick={() => setShowMobileMenu(false)}
-              >
-                Home
-              </NavLink>
-            </li>
-            <li className="nav-item">
-              <NavLink
-                to="/kakaoMap"
-                className={({ isActive }) =>
-                  `nav-link ${isActive ? "active" : ""}`
-                }
-                onClick={() => setShowMobileMenu(false)}
-              >
-                Services
-              </NavLink>
-            </li>
-            <li className="nav-item">
-              <NavLink
-                to="/review/latest"
-                className={({ isActive }) =>
-                  `nav-link ${isActive ? "active" : ""}`
-                }
-                onClick={() => setShowMobileMenu(false)}
-              >
-                Training
-              </NavLink>
-            </li>
-            <li className="nav-item">
-              <NavLink
-                to="/board/list"
-                className={({ isActive }) =>
-                  `nav-link ${isActive ? "active" : ""}`
-                }
-                onClick={() => setShowMobileMenu(false)}
-              >
-                Blog
-              </NavLink>
-            </li>
-            <li className="nav-item">
-              <NavLink
-                to="/about"
-                className={({ isActive }) =>
-                  `nav-link ${isActive ? "active" : ""}`
-                }
-                onClick={() => setShowMobileMenu(false)}
-              >
-                About us
-              </NavLink>
-            </li>
-            <li className="nav-item">
-              <NavLink
-                to="/support"
-                className={({ isActive }) =>
-                  `nav-link ${isActive ? "active" : ""}`
-                }
-                onClick={() => setShowMobileMenu(false)}
-              >
-                Contact
-              </NavLink>
-            </li>
-            {isAdmin() && (
+          <div className="navbar-right-group">
+            <ul className={`nav-menu ${showMobileMenu ? "active" : ""}`}>
               <li className="nav-item">
                 <NavLink
-                  to="/admin"
+                  to="/kakaoMap"
                   className={({ isActive }) =>
                     `nav-link ${isActive ? "active" : ""}`
                   }
                   onClick={() => setShowMobileMenu(false)}
                 >
-                  관리자
+                  시설 찾기
                 </NavLink>
               </li>
-            )}
-          </ul>
-
-          {/* User Actions */}
-          <div className="nav-actions">
-            {user ? (
-              <div className="user-dropdown">
-                <button
-                  className="user-dropdown-btn"
-                  onClick={handleDropdownToggle}
+              <li className="nav-item">
+                <NavLink
+                  to="/review/latest"
+                  className={({ isActive }) =>
+                    `nav-link ${isActive ? "active" : ""}`
+                  }
+                  onClick={() => setShowMobileMenu(false)}
                 >
-                  {userDropdownTitle}
-                </button>
-                <CustomDropdown />
-              </div>
-            ) : (
-              <Link to="/login" className="signin-btn">
-                SIGN IN 👋
-              </Link>
-            )}
+                  최신 리뷰
+                </NavLink>
+              </li>
+              <li className="nav-item">
+                <NavLink
+                  to="/board/list"
+                  className={({ isActive }) =>
+                    `nav-link ${isActive ? "active" : ""}`
+                  }
+                  onClick={() => setShowMobileMenu(false)}
+                >
+                  공지사항
+                </NavLink>
+              </li>
+              <li className="nav-item">
+                <NavLink
+                  to="/about"
+                  className={({ isActive }) =>
+                    `nav-link ${isActive ? "active" : ""}`
+                  }
+                  onClick={() => setShowMobileMenu(false)}
+                >
+                  About us
+                </NavLink>
+              </li>
+              <li className="nav-item">
+                <NavLink
+                  to="/support"
+                  className={({ isActive }) =>
+                    `nav-link ${isActive ? "active" : ""}`
+                  }
+                  onClick={() => setShowMobileMenu(false)}
+                >
+                  Contact
+                </NavLink>
+              </li>
+              {isAdmin() && (
+                <li className="nav-item">
+                  <NavLink
+                    to="/admin"
+                    className={({ isActive }) =>
+                      `nav-link ${isActive ? "active" : ""}`
+                    }
+                    onClick={() => setShowMobileMenu(false)}
+                  >
+                    관리자
+                  </NavLink>
+                </li>
+              )}
+            </ul>
 
-            {/* Mobile menu toggle */}
+            {/* User Actions */}
+            <div className="nav-actions">
+              {user ? (
+                <div className="user-dropdown">
+                  <button
+                    className="user-dropdown-btn"
+                    onClick={handleDropdownToggle}
+                  >
+                    {userDropdownTitle}
+                  </button>
+                  <CustomDropdown />
+                </div>
+              ) : (
+                <Link to="/login" className="signin-btn">
+                  SIGN IN <span className="signin-icon">👋</span>
+                </Link>
+              )}
+            </div>
+
+            {/* Mobile menu toggle (위치 이동) */}
             <button
               className="mobile-menu-toggle"
               onClick={handleMobileMenuToggle}

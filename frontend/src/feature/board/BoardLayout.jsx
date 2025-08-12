@@ -18,7 +18,7 @@ export function BoardLayout() {
   ];
 
   return (
-    <div className="container mt-5">
+    <div className="container mt-1">
       <Row className="align-items-center">
         <Col xs={12} md={12}>
           {/* 캐루셀 */}
@@ -97,40 +97,7 @@ export function BoardLayout() {
       </Row>
 
       {/* 추가 섹션을 위한 여백 */}
-      <div className="py-4">
-        {/* CTA 섹션 */}
-        <Card className="border-0 bg-dark text-white shadow-sm">
-          <Card.Body className="p-5 text-center">
-            <h4 className="fw-bold mb-3">
-              <i className="bi bi-rocket-takeoff me-2"></i>
-              이제 디자인을 할 시간입니다 여러분
-            </h4>
-            <p className="mb-4 opacity-90">
-              귀여운 레퍼런스를 많이 찾아주세용 화요일에 모두 회의하여 정하기로
-              합시다.
-            </p>
-            <div className="d-flex gap-3 justify-content-center flex-wrap">
-              <Button
-                variant="warning"
-                size="lg"
-                className="px-4 py-3 fw-bold"
-                onClick={() => navigate("/map")}
-              >
-                <i className="bi bi-geo-alt-fill me-2"></i>내 주변 찾기 할까?
-              </Button>
-              <Button
-                variant="outline-light"
-                size="lg"
-                className="px-4 py-3"
-                onClick={() => navigate("/register")}
-              >
-                <i className="bi bi-person-plus me-2"></i>
-                그냥 버튼
-              </Button>
-            </div>
-          </Card.Body>
-        </Card>
-      </div>
+      <div className="py-4"></div>
     </div>
   );
 }
