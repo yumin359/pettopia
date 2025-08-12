@@ -2,54 +2,33 @@ import { Outlet } from "react-router";
 import { AppNavBar } from "./AppNavBar.jsx";
 import { AppFooter } from "./AppFooter.jsx";
 import { ChatButton } from "./ChatButton.jsx";
-import { useState, useEffect, useRef } from "react";
 
 export function MainLayout() {
-  const [isSticky, setSticky] = useState(false);
-  const mainContainerRef = useRef(null);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 50) {
-        setSticky(true);
-      } else {
-        setSticky(false);
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
-
   return (
-    <>
-      {/* Sticky 네비게이션 - 똑같은 AppNavBar 사용 */}
-      {isSticky && (
-        <div className="sticky-navbar-wrapper">
-          <AppNavBar />
-        </div>
-      )}
+    <div className="main-layout">
+      {/* 큰 흰색 카드 컨테이너 - 그림자 있음 */}
+      <div className="main-container">
+        {/* 기본 네비게이션 바 - 카드 상단에 위치 */}
+        <AppNavBar />
 
-      <div className="main-layout">
-        {/* 큰 흰색 카드 컨테이너 - 그림자 있음 */}
-        <div className="main-container" ref={mainContainerRef}>
-          {/* 기본 네비게이션 바 - 카드 상단에 위치 */}
-          <AppNavBar />
-
+        {/* 메인 콘텐츠와 푸터를 flex로 감싸기 */}
+        <div className="main-content-wrapper">
           {/* 메인 콘텐츠 영역 */}
-          <Outlet />
-
-          {/* 플로팅 채팅 버튼 - 우측 하단 고정 */}
-          <div className="chat-button-container">
-            <ChatButton />
+          <div className="content-area">
+            <Outlet />
           </div>
 
-          {/* 푸터 - 카드 하단 */}
-          <AppFooter />
+          {/* 푸터 - 항상 맨 아래 */}
+          <div className="footer-area p-0 mx-0">
+            <AppFooter />
+          </div>
+        </div>
+
+        {/* 플로팅 채팅 버튼 - 우측 하단 고정 */}
+        <div className="chat-button-container">
+          <ChatButton />
         </div>
       </div>
-    </>
+    </div>
   );
 }

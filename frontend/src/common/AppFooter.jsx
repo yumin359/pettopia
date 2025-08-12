@@ -3,7 +3,7 @@ import { Container } from "react-bootstrap";
 
 export function AppFooter() {
   return (
-    <footer className="border-top bg-dark py-3 mt-auto">
+    <footer className="border-top bg-dark py-3">
       <Container>
         <div className="row align-items-center">
           {/* 왼쪽: 프로젝트 정보 */}
@@ -14,8 +14,7 @@ export function AppFooter() {
               <span className="text-light ms-2 small">Portfolio Project</span>
             </div>
             <div className="text-light ms-2" style={{ fontSize: "0.75rem" }}>
-              TEL:02-313-1711 / FAX:02-393-9218 / 중앙정보처리학원 /
-              중앙정보기술인재개발원
+              TEL:02-313-1711 / FAX:02-393-9218 / 중앙정보기술인재개발원
             </div>
           </div>
 

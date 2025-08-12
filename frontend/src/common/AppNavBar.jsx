@@ -253,6 +253,12 @@ export function AppNavBar() {
         <Container>
           {/* 로고와 브랜드 이름 */}
           <Navbar.Brand as={Link} to="/" className="d-flex align-items-center">
+            {/*<img*/}
+            {/*  src={logo}*/}
+            {/*  alt="PETOPIA logo"*/}
+            {/*  style={{ width: "7vh" }}*/}
+            {/*  className="ms-2 ms-md-3"*/}
+            {/*/>*/}
             <span
               className="ms-2 ms-md-3"
               style={{

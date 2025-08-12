@@ -198,7 +198,7 @@ const FullFilterKakaoMap = () => {
 
   if (error) {
     return (
-      <div className="container-fluid vh-100 d-flex align-items-center justify-content-center">
+      <div className="container-fluid h-100 d-flex align-items-center justify-content-center">
         <div className="alert alert-danger text-center">
           <h5>오류 발생</h5>
           <p>{error}</p>
@@ -216,7 +216,7 @@ const FullFilterKakaoMap = () => {
   return (
     <>
       <style>{RESPONSIVE_STYLES}</style>
-      <div className="container-fluid vh-100 d-flex flex-column bg-light-subtle">
+      <div className="container-fluid h-100 d-flex flex-column bg-light-subtle">
         {/* --- 1. 지도 Row --- */}
         <div className="row map-row-container">
           <div className="col-12 h-100 p-0">
@@ -268,8 +268,6 @@ const FullFilterKakaoMap = () => {
 
           {/* 리스트 Column */}
           <div className="col-12 col-md-8 list-column-container">
-            {/* 🚫 지도 범위 검색 알림 메시지 제거 - 이제 지도 안에서 표시 */}
-
             <SearchResultList
               facilities={facilities}
               favoriteMarkers={favoriteMarkers}
@@ -282,7 +280,7 @@ const FullFilterKakaoMap = () => {
               ITEMS_PER_PAGE={ITEMS_PER_PAGE}
               hasSearched={hasSearched || isShowingFavorites}
               isShowingFavorites={isShowingFavorites}
-              searchQuery={searchQuery} // 검색어 전달
+              searchQuery={searchQuery}
             />
           </div>
         </div>
