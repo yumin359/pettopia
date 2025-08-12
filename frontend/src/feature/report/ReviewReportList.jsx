@@ -1,7 +1,7 @@
 import { useEffect, useState, useContext } from "react";
 import { Table, Alert, Spinner } from "react-bootstrap";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 export default function ReviewReportList() {
@@ -9,6 +9,7 @@ export default function ReviewReportList() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const { isAdmin } = useContext(AuthenticationContext);
+  const navigate = useNavigate();
 
   // 관리자 권한 체크
   if (!(typeof isAdmin === "function" ? isAdmin() : isAdmin)) {
@@ -69,7 +70,13 @@ export default function ReviewReportList() {
         {reports.map(({ id, reporterEmail, reviewId, reason, reportedAt }, idx) => (
           <tr key={id ?? idx}>
             <td>{idx + 1}</td>
-            <td>{reporterEmail}</td>
+            <td
+              style={{ cursor: "pointer", color: "blue", textDecoration: "underline" }}
+              onClick={() => navigate(`/member?email=${encodeURIComponent(reporterEmail)}`)}
+              title="멤버 상세보기"
+            >
+              {reporterEmail}
+            </td>
             <td>{reviewId}</td>
             <td style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
               {reason.length > 100 ? reason.substring(0, 100) + "..." : reason}
