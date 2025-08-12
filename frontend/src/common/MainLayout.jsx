@@ -41,13 +41,13 @@ export function MainLayout() {
           {/* 메인 콘텐츠 영역 */}
           <Outlet />
 
-          {/* 푸터 - 카드 하단 */}
-          <AppFooter />
-
           {/* 플로팅 채팅 버튼 - 우측 하단 고정 */}
           <div className="chat-button-container">
             <ChatButton />
           </div>
+
+          {/* 푸터 - 카드 하단 */}
+          <AppFooter />
         </div>
       </div>
     </>

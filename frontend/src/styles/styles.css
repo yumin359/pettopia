@@ -52,12 +52,13 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
+    min-height: 100dvh;
     padding: 2rem;
 }
 
 /* 🎨 박스 색상과 박스 크기 */
 .main-container {
+    height: 91.4vh;
     width: 100%;
     max-width: 1200px;
     background-color: white;
@@ -65,7 +66,8 @@ body {
     border-color: black;
     border-width: 2px;
     box-shadow: 5px 5px 1px 1px black;
-    overflow: hidden;
+    overflow-y: auto; /* 세로 스크롤 허용 */
+    overflow-x: hidden; /* 가로 스크롤은 숨김 */
 }
 
 /* ========================================
@@ -148,6 +150,9 @@ body {
     padding: 0 !important;
     min-height: 72px;
     overflow: visible;
+    position: sticky;
+    top: 0;
+    z-index: 10;
 }
 
 .navbar-nav .nav-link {
@@ -408,29 +413,6 @@ button:active,
     border: 2px solid black;
     box-shadow: 4px 4px 0px 0px black;
 }
-
-/* ========================================
-   도트 패턴 스크롤바 (대안 2)
-   ======================================== */
-
-/*.dotted-scrollbar::-webkit-scrollbar {*/
-/*    width: 18px;*/
-/*}*/
-
-/*.dotted-scrollbar::-webkit-scrollbar-track {*/
-/*    background-image: radial-gradient(circle, black 1px, transparent 1px);*/
-/*    background-size: 4px 4px;*/
-/*    background-color: #f6ece6;*/
-/*    border: 2px solid black;*/
-/*}*/
-
-/*.dotted-scrollbar::-webkit-scrollbar-thumb {*/
-/*    background: black;*/
-/*    border: 2px solid black;*/
-/*    box-shadow: 4px 4px 0px 0px black,*/
-/*    inset 0 0 0 2px #f6ece6,*/
-/*    inset 0 0 0 4px black;*/
-/*}*/
 
 /* ========================================
    애니메이션 (선택사항)

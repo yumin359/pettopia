@@ -36,7 +36,8 @@ const KakaoMapComponent = ({
   // --- 콜백 함수: 마커, 인포윈도우 등 생성 로직 (기존 코드 그대로) ---
   const createStyledInfoWindow = useCallback((content) => {
     return `
-      <div class="p-2 bg-white rounded shadow-sm" style="max-width: 350px; white-space: normal; word-break: break-word; box-sizing: border-box;">
+      <div class="p-2 bg-white" style="white-space: normal; word-break: break-word; box-sizing: border-box; border: solid 1px black;
+          box-shadow: 5px 5px 1px 1px black;">
         ${content}
       </div>
     `;
@@ -141,6 +142,7 @@ const KakaoMapComponent = ({
 
     return sigungu;
   }, []);
+
   // 카카오 지오코딩으로 좌표 → 주소 변환 (새로 추가)
   const getAddressFromCoords = useCallback(
     (lat, lng) => {
@@ -259,8 +261,6 @@ const KakaoMapComponent = ({
         urlParams.append("outdoorFacility", "Y");
       }
 
-      console.log("📡 API 요청 파라미터:", Object.fromEntries(urlParams));
-
       // API 호출
       let response;
       try {
@@ -273,7 +273,6 @@ const KakaoMapComponent = ({
         console.log("✅ 필터 적용된 범위 검색 성공");
       } catch (error) {
         if (error.response?.status === 404) {
-          console.log("⚠️ 필터 API가 없어서 기본 범위 검색 사용");
           // 기본 파라미터만으로 재시도
           const basicParams = {
             southWestLat: southWest.getLat(),
@@ -294,7 +293,6 @@ const KakaoMapComponent = ({
       }
 
       const facilities = response.data || [];
-      console.log("✅ 검색 결과:", facilities.length + "개");
 
       // 부모 컴포넌트로 결과 전달
       if (onBoundsSearch) {
@@ -544,7 +542,7 @@ const KakaoMapComponent = ({
                 fontSize: "11px",
                 padding: "8px 12px",
                 margin: 0,
-                maxWidth: "400px",
+                maxWidth: "700px",
                 textAlign: "center",
               }}
             >

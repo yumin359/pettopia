@@ -18,7 +18,7 @@ import { FiUser } from "react-icons/fi";
 
 export function MemberDetail() {
   const [member, setMember] = useState(null);
-  const [reviews, setReviews] = useState(null); // 내 리뷰 목록 상태 추가
+  const [, setReviews] = useState(null); // 내 리뷰 목록 상태 추가
   const [modalShow, setModalShow] = useState(false);
   const [password, setPassword] = useState("");
   const [tempCode, setTempCode] = useState("");
