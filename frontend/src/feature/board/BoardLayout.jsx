@@ -18,11 +18,11 @@ export function BoardLayout() {
   ];
 
   return (
-    <div className="container mt-1">
+    <div>
       <Row className="align-items-center">
         <Col xs={12} md={12}>
           {/* 캐루셀 */}
-          <Carousel style={{ maxWidth: "1280px", margin: "0 auto" }}>
+          <Carousel style={{ maxWidth: "auto", margin: "0 auto" }}>
             {slides.map(({ id, img, title }, idx) => (
               <Carousel.Item
                 key={id}
@@ -82,22 +82,23 @@ export function BoardLayout() {
           </Carousel>
         </Col>
       </Row>
+      <div className="container">
+        {/* 공지사항과 리뷰 리스트를 반씩 나눠서 배치 */}
+        <Row className="mt-4" style={{ maxHeight: "400px" }}>
+          <Col md={6} style={{ overflowY: "auto" }}>
+            <h5 style={{ fontSize: "1.5rem", fontWeight: "600" }}>공지사항</h5>
+            <BoardListMini fontSize="1.25rem" iconSize={18} />
+          </Col>
 
-      {/* 공지사항과 리뷰 리스트를 반씩 나눠서 배치 */}
-      <Row className="mt-4" style={{ maxHeight: "400px" }}>
-        <Col md={6} style={{ overflowY: "auto" }}>
-          <h5 style={{ fontSize: "1.5rem", fontWeight: "600" }}>공지사항</h5>
-          <BoardListMini fontSize="1.25rem" iconSize={18} />
-        </Col>
+          <Col md={6}>
+            <h5 style={{ fontSize: "1.5rem", fontWeight: "600" }}>최신 리뷰</h5>
+            <ReviewCarousel />
+          </Col>
+        </Row>
 
-        <Col md={6}>
-          <h5 style={{ fontSize: "1.5rem", fontWeight: "600" }}>최신 리뷰</h5>
-          <ReviewCarousel />
-        </Col>
-      </Row>
-
-      {/* 추가 섹션을 위한 여백 */}
-      <div className="py-4"></div>
+        {/* 추가 섹션을 위한 여백 */}
+        <div className="py-4"></div>
+      </div>
     </div>
   );
 }

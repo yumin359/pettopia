@@ -36,12 +36,11 @@
 }
 
 /*🎨 배경 색상 */
+/* 현재 body 스타일은 그대로 유지합니다. */
 body {
     background: #fcdcdc;
     background: linear-gradient(0deg, rgba(252, 220, 220, 1) 0%, rgba(255, 255, 255, 1) 100%);
-
 }
-
 
 /* === Main Layout (From MainLayout.jsx) === */
 .main-layout {
@@ -56,7 +55,7 @@ body {
 .main-container {
     width: 100%;
     max-width: 1200px;
-    background-color: var(--main-bg);
+    background-color: white;
     border-style: solid;
     border-color: black;
     border-width: 1px;
@@ -101,6 +100,7 @@ body {
     width: 100%;
     padding: 1rem 3rem;
     border-bottom: 1px solid black;
+    background-color: #f6ece6;
 }
 
 .navbar-inner {
@@ -147,7 +147,6 @@ body {
 .nav-link:hover:not(.active) {
     color: var(--dark-text);
 }
-
 
 /* 기존 Sign In 버튼 스타일 */
 .signin-btn {

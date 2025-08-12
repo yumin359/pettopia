@@ -13,6 +13,10 @@ export function AppFooter() {
               <span className="fw-bold text-light fs-6">PETOPIA</span>
               <span className="text-light ms-2 small">Portfolio Project</span>
             </div>
+            <div className="text-light ms-2" style={{ fontSize: "0.75rem" }}>
+              TEL:02-313-1711 / FAX:02-393-9218 / 중앙정보처리학원 /
+              중앙정보기술인재개발원
+            </div>
           </div>
 
           {/* 오른쪽: 팀원 & 저작권 */}
