@@ -32,8 +32,9 @@ export function ReviewText({ text }) {
             border: "none",
             background: "none",
             padding: 0,
-            color: "#d2691e",
+            color: "#cccccc",
             cursor: "pointer",
+            fontWeight: "bold",
           }}
         >
           {expanded ? "간략히" : "더보기"}
