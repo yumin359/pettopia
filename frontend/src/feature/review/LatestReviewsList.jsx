@@ -136,7 +136,7 @@ export function LatestReviewsList() {
                           src={imageFiles[0]}
                           style={{
                             objectFit: "cover",
-                            height: "150px",
+                            height: "100px",
                             borderRadius: "6px",
                             marginBottom: "8px",
                           }}
@@ -152,7 +152,7 @@ export function LatestReviewsList() {
                             gridTemplateColumns: "1fr 1fr",
                             gridTemplateRows: "1fr 1fr",
                             gap: "4px",
-                            height: "150px",
+                            height: "100px",
                             borderRadius: "6px",
                             overflow: "hidden",
                             marginBottom: "8px",
