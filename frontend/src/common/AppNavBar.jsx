@@ -8,13 +8,15 @@ import { createPortal } from "react-dom";
 
 export function AppNavBar() {
   const { user, logout, isAdmin } = useContext(AuthenticationContext);
+  const navigate = useNavigate();
+
+  // --- 1. 모든 상태(State)와 참조(Ref) 선언 ---
   const [showDropdown, setShowDropdown] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState({
     top: 0,
     right: 0,
   });
   const dropdownRef = useRef(null);
-  const navigate = useNavigate();
 
   // 드롭다운 위치 계산
   const handleDropdownToggle = (event) => {
@@ -175,7 +177,7 @@ export function AppNavBar() {
           }
         `}
       </style>
-      <Navbar expand="lg" className="px-4 shadow-sm" sticky="top">
+      <Navbar expand="lg" className="px-4 shadow-sm">
         <Container>
           {/* 로고와 브랜드 이름 */}
           <Navbar.Brand as={Link} to="/" className="d-flex align-items-center">
