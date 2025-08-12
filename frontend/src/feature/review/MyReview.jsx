@@ -6,6 +6,7 @@ import { useParams } from "react-router";
 import { FaChevronRight } from "react-icons/fa";
 import "./Review.css";
 import "../../common/Carousel.css";
+import { ReviewText } from "../../common/ReviewText.jsx";
 
 export function MyReview() {
   const [reviews, setReviews] = useState(null);
@@ -152,7 +153,7 @@ export function MyReview() {
                     className="text-muted mb-2"
                     style={{ whiteSpace: "pre-wrap" }}
                   >
-                    {r.review}
+                    <ReviewText text={r.review} />
                   </div>
 
                   {/* 4. 태그 */}
