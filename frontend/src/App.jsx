@@ -22,6 +22,7 @@ import { KakaoCallback } from "./feature/member/KakaoCallback.jsx";
 import { AdminPage } from "./AdminPage.jsx";
 import ReviewReportList from "./feature/report/ReviewReportList.jsx";
 import { About } from "./common/About.jsx";
+import "";
 
 function App() {
   return (
