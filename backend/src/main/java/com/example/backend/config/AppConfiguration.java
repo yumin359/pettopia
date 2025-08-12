@@ -96,7 +96,8 @@ public class AppConfiguration {
                         "/api/reviewlike/review/**",
                         "/api/facility/**",
                         "/api/facility/detail",
-                        "/api/favorite/{facilityName}"
+                        "/api/favorite/{facilityName}",
+                        "/api/support/**"
                 ).permitAll()
                 .requestMatchers(
                         "/api/review/add",

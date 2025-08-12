@@ -71,9 +71,10 @@ export default function ReviewReportList() {
           <tr key={id ?? idx}>
             <td>{idx + 1}</td>
             <td
-              style={{ cursor: "pointer", color: "blue", textDecoration: "underline" }}
+              style={{ cursor: "pointer" }}
               onClick={() => navigate(`/member?email=${encodeURIComponent(reporterEmail)}`)}
               title="멤버 상세보기"
+              className="text-dark"
             >
               {reporterEmail}
             </td>

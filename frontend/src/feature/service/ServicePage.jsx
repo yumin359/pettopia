@@ -11,7 +11,7 @@ export default function ServicePage() {
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
 
-  // 추가: 폼 오류 상태
+  // 필드별 에러 상태
   const [formErrors, setFormErrors] = useState({
     email: "",
     subject: "",
@@ -19,7 +19,6 @@ export default function ServicePage() {
   });
 
   const validateEmail = (email) => {
-    // 간단한 이메일 정규식 검사
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return re.test(email);
   };
@@ -27,80 +26,80 @@ export default function ServicePage() {
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    // 길이 제한 적용
+    // 길이 제한
     if (name === "subject" && value.length > 20) return;
     if (name === "message" && value.length > 100) return;
 
     setForm((prev) => ({ ...prev, [name]: value }));
 
-    // 유효성 검사 후 에러 상태 업데이트
+    // 입력 중 유효성 검사 업데이트
     setFormErrors((prev) => {
       const newErrors = { ...prev };
-
       if (name === "email") {
-        if (!validateEmail(value)) {
-          newErrors.email = "올바른 이메일 형식을 입력하세요.";
-        } else {
-          newErrors.email = "";
-        }
+        newErrors.email = validateEmail(value) ? "" : "올바른 이메일 형식을 입력하세요.";
       } else if (name === "subject") {
         newErrors.subject = value.length > 20 ? "제목은 20자 이하로 작성해주세요." : "";
       } else if (name === "message") {
         newErrors.message = value.length > 100 ? "문의 내용은 100자 이하로 작성해주세요." : "";
       }
-
       return newErrors;
     });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
 
-    // 제출 전 최종 유효성 검사
+    // 제출 전 유효성 검사
+    const errors = { email: "", subject: "", message: "" };
+    let hasError = false;
+
     if (!validateEmail(form.email)) {
-      setErrorMsg("올바른 이메일 형식을 입력하세요.");
-      return;
+      errors.email = "올바른 이메일 형식을 입력하세요.";
+      hasError = true;
     }
     if (form.subject.length === 0 || form.subject.length > 20) {
-      setErrorMsg("제목은 1자 이상 20자 이하로 작성해주세요.");
-      return;
+      errors.subject = "제목은 1자 이상 20자 이하로 작성해주세요.";
+      hasError = true;
     }
     if (form.message.length === 0 || form.message.length > 100) {
-      setErrorMsg("문의 내용은 1자 이상 100자 이하로 작성해주세요.");
-      return;
+      errors.message = "문의 내용은 1자 이상 100자 이하로 작성해주세요.";
+      hasError = true;
     }
 
-    setLoading(true);
-    setSuccessMsg("");
+    if (hasError) {
+      setFormErrors(errors);
+      return; // 에러 있으면 제출 중단
+    }
+
+    // 에러 없으면 초기화
+    setFormErrors({ email: "", subject: "", message: "" });
     setErrorMsg("");
+    setSuccessMsg("");
+    setLoading(true);
 
-    try {
-      const response = await fetch("/api/support", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: form.email,
-          subject: form.subject,
-          message: form.message,
-        }),
-      });
+    // 비동기 요청
+    (async () => {
+      try {
+        const response = await fetch("/api/support", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(form),
+        });
 
-      if (!response.ok) {
-        throw new Error("서버 오류");
+        if (!response.ok) {
+          throw new Error("서버 오류");
+        }
+
+        const data = await response.text();
+
+        setSuccessMsg(data);
+        setForm({ email: "", subject: "", message: "" });
+      } catch {
+        setErrorMsg("문의 접수 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+      } finally {
+        setLoading(false);
       }
-
-      const data = await response.text();
-
-      setSuccessMsg(data);
-      setForm({ email: "", subject: "", message: "" });
-      setFormErrors({ email: "", subject: "", message: "" });
-    } catch (err) {
-      setErrorMsg("문의 접수 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
-    } finally {
-      setLoading(false);
-    }
+    })();
   };
 
   return (
@@ -147,7 +146,7 @@ export default function ServicePage() {
             isInvalid={!!formErrors.message}
             maxLength={100}
             required
-            style={{ resize: "none" }}  // 여기 추가
+            style={{ resize: "none" }}
           />
           <Form.Control.Feedback type="invalid">{formErrors.message}</Form.Control.Feedback>
           <div className="text-end text-muted" style={{ fontSize: "0.8rem" }}>
