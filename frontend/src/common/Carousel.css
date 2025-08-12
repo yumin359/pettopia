@@ -1,0 +1,17 @@
+/* 이미지 숫자 표시 */
+.carousel-counter {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background-color: rgba(0, 0, 0, 0.6); /* 반투명 배경 */
+    color: white;
+    padding: 5px 8px;
+    border-radius: 5px;
+    font-size: 0.8rem;
+    z-index: 10; /* 이미지를 가리지 않도록 */
+}
+
+/* 막대바 같은 거 지우기 */
+.carousel-indicators {
+    display: none;
+}
