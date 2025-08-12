@@ -54,7 +54,6 @@ export function MapDetail() {
         params: { sort: sortBy },
       });
       setReviews(response.data || []);
-      console.log(response.data);
     } catch (err) {
       console.error("리뷰 목록 조회 실패:", err);
       setReviews([]);
