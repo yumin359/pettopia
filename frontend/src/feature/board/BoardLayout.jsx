@@ -23,13 +23,14 @@ export function BoardLayout() {
             firstImageUrl: slide.firstImageUrl,
             hasImage: !!slide.firstImageUrl,
             isEmptyString: slide.firstImageUrl === "",
-            type: typeof slide.firstImageUrl
+            type: typeof slide.firstImageUrl,
           });
         });
 
         // 이미지가 있는 게시글만 필터링
-        const slidesWithImages = res.data.filter(slide => {
-          const hasValidImage = slide.firstImageUrl &&
+        const slidesWithImages = res.data.filter((slide) => {
+          const hasValidImage =
+            slide.firstImageUrl &&
             slide.firstImageUrl.trim() !== "" &&
             slide.firstImageUrl !== "null" &&
             slide.firstImageUrl !== "undefined";
@@ -49,11 +50,19 @@ export function BoardLayout() {
   }, []);
 
   if (loading) {
-    return <div style={{ padding: "2rem", textAlign: "center" }}>최신 게시글 로딩 중...</div>;
+    return (
+      <div style={{ padding: "2rem", textAlign: "center" }}>
+        최신 게시글 로딩 중...
+      </div>
+    );
   }
 
   if (slides.length === 0) {
-    return <div style={{ padding: "2rem", textAlign: "center" }}>이미지가 있는 최신 게시글이 없습니다.</div>;
+    return (
+      <div style={{ padding: "2rem", textAlign: "center" }}>
+        이미지가 있는 최신 게시글이 없습니다.
+      </div>
+    );
   }
 
   return (
@@ -61,7 +70,13 @@ export function BoardLayout() {
       <Row className="align-items-center">
         <Col xs={12} md={12}>
           {/* 캐러셀 */}
-          <Carousel style={{ maxWidth: "auto", margin: "0 auto" }}>
+          <Carousel
+            style={{
+              maxWidth: "auto",
+              margin: "0 auto",
+              borderBottom: "1px solid black",
+            }}
+          >
             {slides.map(({ id, title, firstImageUrl }, idx) => (
               <Carousel.Item
                 key={id}
@@ -75,7 +90,7 @@ export function BoardLayout() {
                   loading="lazy"
                   onError={(e) => {
                     // 이미지 로드 실패시 기본 이미지로 대체
-                    e.target.src = '/images/default-placeholder.jpg';
+                    e.target.src = "/images/default-placeholder.jpg";
                   }}
                   style={{
                     width: "100%",
@@ -140,14 +155,22 @@ export function BoardLayout() {
             지금 바로 시작해보세요!
           </h4>
           <p className="cta-description">
-            우리 아이와 함께 할 수 있는 특별한 장소들이 여러분을 기다리고 있습니다.
+            우리 아이와 함께 할 수 있는 특별한 장소들이 여러분을 기다리고
+            있습니다.
           </p>
           <div className="cta-buttons">
-            <button className="cta-button primary" onClick={() => navigate("/map")}>
+            <button
+              className="cta-button primary"
+              onClick={() => navigate("/map")}
+            >
               <i className="bi bi-geo-alt-fill me-2"></i>내 주변 찾기
             </button>
-            <button className="cta-button secondary" onClick={() => navigate("/register")}>
-              <i className="bi bi-person-plus me-2"></i>회원가입하기
+            <button
+              className="cta-button secondary"
+              onClick={() => navigate("/register")}
+            >
+              <i className="bi bi-person-plus me-2"></i>
+              회원가입하기
             </button>
           </div>
         </div>
