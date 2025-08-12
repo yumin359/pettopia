@@ -53,13 +53,15 @@ export default function ReportModal({ reviewId, onClose }) {
                                 신고 사유
                             </label>
                             <textarea
-                                id="reportReason"
-                                className="form-control"
-                                rows={4}
-                                value={reason}
-                                onChange={(e) => setReason(e.target.value)}
-                                placeholder="신고 사유를 자세히 작성해주세요."
+                              id="reportReason"
+                              className="form-control"
+                              rows={4}
+                              maxLength={100}                // 100자 제한
+                              value={reason}
+                              onChange={(e) => setReason(e.target.value)}
+                              placeholder="신고 사유를 자세히 작성해주세요. (최대 100자)"
                             />
+                            <small className="text-muted">{reason.length} / 100자</small>
                         </div>
                     </div>
 
