@@ -73,13 +73,14 @@ export function MyReview() {
             </span>
           </div>
         </div>
-        <hr className="hr-color-hotpink" />
 
         {reviews.map((r, index) => {
           const reviewImages = r.files?.filter(isImageFile) || [];
 
           return (
-            <div key={r.id} className="review-item pt-4">
+            <div key={r.id} className="review-item mb-3">
+              {/* 처음에 구분선 추가 */}
+              <hr className="hr-color-hotpink review-separator" />
               <div className={reviewImages.length > 0 ? "mb-3" : ""}>
                 {/* 이미지가 있을 때만 컨테이너 렌더링 */}
                 {reviewImages.length > 0 && (
@@ -139,7 +140,7 @@ export function MyReview() {
                   {/*  </span>*/}
                   {/*</div>*/}
                 </div>
-                <hr className="my-2 hr-color-pink" />
+                <hr className="my-2 hr-color-hotpink" />
 
                 {/* 3. 본문 */}
                 <div
@@ -173,9 +174,6 @@ export function MyReview() {
                 {/* 6. 좋아요 */}
                 <ReviewLikeContainer reviewId={r.id} />
               </div>
-
-              {/* 마지막에 구분선 추가 */}
-              <hr className="hr-color-hotpink" />
             </div>
           );
         })}
