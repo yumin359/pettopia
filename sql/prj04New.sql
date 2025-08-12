@@ -95,31 +95,6 @@ CREATE TABLE `member_file`
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 # ---------------------------------------------------------------------------------
-CREATE TABLE `notice`
-(
-    `id`          int(11)        NOT NULL AUTO_INCREMENT,
-    `title`       varchar(300)   NOT NULL,
-    `content`     varchar(10000) NOT NULL,
-    `author`      varchar(255)   NOT NULL,
-    `is_private`  tinyint(1)     NOT NULL DEFAULT 0,
-    `inserted_at` datetime       NOT NULL DEFAULT current_timestamp(),
-    PRIMARY KEY (`id`),
-    KEY `author` (`author`),
-    CONSTRAINT `notice_ibfk_1` FOREIGN KEY (`author`) REFERENCES `member` (`email`) ON DELETE CASCADE
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4
-  COLLATE = utf8mb4_unicode_ci;
-# ---------------------------------------------------------------------------------
-CREATE TABLE `notice_file`
-(
-    `notice_id` int(11)      NOT NULL,
-    `name`      varchar(300) NOT NULL,
-    PRIMARY KEY (`notice_id`, `name`),
-    CONSTRAINT `notice_file_ibfk_1` FOREIGN KEY (`notice_id`) REFERENCES `notice` (`id`) ON DELETE CASCADE
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4
-  COLLATE = utf8mb4_unicode_ci;
-# ---------------------------------------------------------------------------------
 CREATE TABLE `pet_facility`
 (
     `name`                      varchar(255) DEFAULT NULL,

@@ -36,7 +36,6 @@
 }
 
 /*🎨 배경 색상 */
-/* 현재 body 스타일은 그대로 유지합니다. */
 body {
     background: #fcdcdc;
     background: linear-gradient(0deg, rgba(252, 220, 220, 1) 0%, rgba(255, 255, 255, 1) 100%);
@@ -61,147 +60,6 @@ body {
     border-width: 1px;
     box-shadow: 5px 5px 1px 1px black;
     overflow: hidden;
-}
-
-/* === Navigation Bar (From AppNavBar.jsx) === */
-
-/* Logo Styles */
-.navbar-brand {
-    text-decoration: none;
-}
-
-.logo-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
-
-.logo-text-doc, .logo-text-pet {
-    font-size: 1.8rem;
-    font-weight: 800;
-    color: var(--dark-text);
-}
-
-.logo-dots {
-    display: flex;
-    gap: 3px;
-    padding-top: 8px; /* To align with the bottom of the text */
-}
-
-.logo-dot {
-    width: 5px;
-    height: 5px;
-    background-color: var(--primary-red);
-    border-radius: 50%;
-}
-
-/* 네브바 */
-.navbar {
-    width: 100%;
-    padding: 1rem 3rem;
-    border-bottom: 1px solid black;
-    background-color: #f6ece6;
-}
-
-.navbar-inner {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.navbar-right-group {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-}
-
-.nav-menu {
-    display: flex;
-    align-items: center;
-    list-style: none;
-    gap: 1rem;
-}
-
-.nav-actions {
-    display: flex;
-    align-items: center;
-}
-
-.nav-link {
-    font-family: var(--font-family), serif;
-    text-decoration: none;
-    color: var(--light-text);
-    font-size: 1rem;
-    font-weight: 500;
-    padding: 10px 20px;
-    border-radius: 12px;
-    transition: all 0.3s ease;
-}
-
-/* Active NavLink Style*/
-.nav-link.active {
-    background-color: var(--active-red);
-    color: var(--white);
-}
-
-.nav-link:hover:not(.active) {
-    color: var(--dark-text);
-}
-
-/* 기존 Sign In 버튼 스타일 */
-.signin-btn {
-    text-decoration: none;
-    font-family: var(--font-family), serif;
-    color: var(--dark-text);
-    font-weight: 600;
-    font-size: 1rem;
-    border: 2px solid var(--border-dark);
-    padding: 12px 24px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: all 0.3s ease;
-}
-
-.signin-btn:hover {
-    background-color: var(--dark-text);
-    color: var(--white);
-    border-color: var(--dark-text);
-}
-
-/* ===== 로그인 후 사용자 정보 버튼 스타일 ===== */
-.user-dropdown-btn {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    background-color: transparent;
-    border: 2px solid var(--border-dark);
-    border-radius: 12px;
-    padding: 6px 16px 6px 8px; /* 패딩 조절 */
-    cursor: pointer;
-    font-family: var(--font-family), serif;
-    font-weight: 600;
-    color: var(--dark-text);
-    transition: all 0.3s ease;
-}
-
-.user-dropdown-btn:hover {
-    background-color: var(--dark-text);
-    color: var(--white);
-}
-
-.user-avatar {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background-color: var(--primary-red);
-    color: var(--white);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 1rem;
-    font-weight: 700;
 }
 
 /* ======BoardLayout.jsx 의 아래 ================*/
@@ -298,28 +156,42 @@ body {
     display: none; /* Hide by default on desktop */
 }
 
-@media (max-width: 1024px) {
-    .nav-menu {
-        display: none; /* Hide menu on mobile */
-    }
-
-    .mobile-menu-toggle {
-        display: block; /* Show hamburger icon */
-    }
-
-    .nav-menu.active {
-        display: flex; /* Show menu when active */
-        flex-direction: column;
-        position: absolute;
-        top: 120px;
-        left: 0;
-        width: 100%;
-        background: var(--main-bg);
-        padding: 2rem;
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
-    }
+/* 네브바 전체 스타일 (사용자님의 스타일 반영) */
+.navbar {
+    background-color: #f6ece6 !important;
+    border-bottom: 1px solid black !important;
+    padding: 0 !important;
+    min-height: 72px;
+    overflow: visible;
 }
 
+/* 네비게이션 링크 (기존 .navbar-right-group의 gap 반영) */
+.navbar-collapse {
+    flex-grow: 0; /* 불필요하게 공간을 차지하지 않도록 설정 */
+}
+
+.navbar-nav {
+    gap: 1rem; /* 간격 조절 */
+}
+
+.navbar-nav .nav-link {
+    text-decoration: none;
+    font-family: var(--font-family), serif;
+    color: var(--dark-text, #333);
+    font-weight: 600;
+    padding: 8px 12px !important;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.navbar-nav .nav-link:hover {
+    background-color: rgba(0, 0, 0, 0.05); /* 배경색에 어울리게 살짝 어두운 호버 효과 */
+}
+
+.navbar-nav .nav-link.active {
+    color: var(--primary-red, #d9534f);
+    font-weight: 700;
+}
 
 /* === Example: Hero Section & Services Section CSS === */
 /* 아래 클래스들은 <Outlet />을 통해 렌더링될 페이지(예: HomePage.jsx)의
