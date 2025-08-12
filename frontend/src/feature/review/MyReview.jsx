@@ -80,44 +80,40 @@ export function MyReview() {
           return (
             <div key={r.id} className="review-item pt-4">
               <div className={reviewImages.length > 0 ? "mb-3" : ""}>
-                {/* 1. 사진: 캐러셀로 여러 장 표시 한장이면 이미지만 */}
-                <div style={{ maxWidth: "400px", margin: "0 auto" }}>
-                  {reviewImages.length === 1 && (
-                    <img
-                      src={reviewImages[0]}
-                      alt="리뷰 이미지"
-                      className="d-block w-100 rounded" // w-100 클래스 추가
-                      style={{
-                        height: "400px",
-                        objectFit: "cover",
-                      }}
-                    />
-                  )}
-                </div>
-
-                {reviewImages.length > 1 && (
-                  <Carousel
-                    className="rounded"
-                    interval={null}
-                    style={{ maxWidth: "400px", margin: "0 auto" }}
-                  >
-                    {reviewImages.map((image, i) => (
-                      <Carousel.Item key={i}>
-                        <img
-                          src={image}
-                          alt={`리뷰 이미지 ${i + 1}`}
-                          className="d-block w-100" // w-100 클래스 추가
-                          style={{
-                            height: "400px",
-                            objectFit: "cover",
-                          }}
-                        />
-                        <div className="carousel-counter">
-                          {i + 1} / {reviewImages.length}
-                        </div>
-                      </Carousel.Item>
-                    ))}
-                  </Carousel>
+                {/* 이미지가 있을 때만 컨테이너 렌더링 */}
+                {reviewImages.length > 0 && (
+                  <div style={{ maxWidth: "400px", margin: "0 auto" }}>
+                    {reviewImages.length === 1 ? (
+                      // 이미지가 1개일 때
+                      <img
+                        src={reviewImages[0]}
+                        alt="리뷰 이미지"
+                        className="d-block w-100 rounded"
+                        style={{ height: "400px", objectFit: "cover" }}
+                      />
+                    ) : (
+                      // 이미지가 2개 이상일 때
+                      <Carousel
+                        className="rounded"
+                        interval={null}
+                        indicators={false}
+                      >
+                        {reviewImages.map((image, i) => (
+                          <Carousel.Item key={i}>
+                            <img
+                              src={image}
+                              alt={`리뷰 이미지 ${i + 1}`}
+                              className="d-block w-100"
+                              style={{ height: "400px", objectFit: "cover" }}
+                            />
+                            <div className="carousel-counter">
+                              {i + 1} / {reviewImages.length}
+                            </div>
+                          </Carousel.Item>
+                        ))}
+                      </Carousel>
+                    )}
+                  </div>
                 )}
               </div>
 
