@@ -9,10 +9,6 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
   const { user } = useContext(AuthenticationContext);
   const [isEditing, setIsEditing] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
-  // 모달 state
-  const [modalImageUrl, setModalImageUrl] = useState("");
-  const [modalNickName, setModalNickName] = useState("");
-  const [modalProfileImageUrl, setModalProfileImageUrl] = useState("");
 
   const [showAllImages, setShowAllImages] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -20,6 +16,7 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
   const [isHoverd, setIsHoverd] = useState(false);
   const [showFullReview, setShowFullReview] = useState(false); // 더보기 상태 추가
 
+  // 이미지 캐루셀 index
   const [modalImageIndex, setModalImageIndex] = useState(0);
 
   const navigate = useNavigate();
@@ -44,6 +41,14 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
 
   const getProfileImageUrl = (fileInfo) => {
     return typeof fileInfo === "string" ? null : fileInfo.profileImageUrl;
+  };
+
+  const getCountMemberReview = (fileInfo) => {
+    return typeof fileInfo === "string" ? null : fileInfo.countMemberReview;
+  };
+
+  const getMemberAverageRating = (fileInfo) => {
+    return typeof fileInfo === "string" ? null : fileInfo.memberAverageRating;
   };
 
   // URL 문자열을 받아서 이미지 파일인지 확인하는 함수
@@ -89,21 +94,12 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
   }
 
   const handleImageClick = (imageInfo, index) => {
-    // imageInfo는 URL 문자열이거나 { url, nickName, profileImageUrl } 객체일 수 있음
-    const imageUrl = getImageUrl(imageInfo);
-    const imageNickName = getImageNickName(imageInfo);
-    const imageProfileImageUrl = getProfileImageUrl(imageInfo);
-
-    setModalImageUrl(imageUrl);
-    setModalNickName(imageNickName);
-    setModalProfileImageUrl(imageProfileImageUrl);
     setModalImageIndex(index);
     setShowImageModal(true);
   };
 
   const handleCloseImageModal = () => {
     setShowImageModal(false);
-    setModalImageUrl("");
   };
 
   const handleEditStart = () => {
@@ -222,15 +218,22 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
                     <Image
                       roundedCircle
                       src={getProfileImageUrl(imageInfo)}
+                      alt={`${getImageNickName(imageInfo)} 프로필 사진`}
                       style={{
                         width: "40px",
                         height: "40px",
                         objectFit: "cover",
                       }}
-                      className="me-2"
                     />
-                    <div className="text-white">
-                      <strong>{getImageNickName(imageInfo)}</strong>
+                    <div className="d-flex flex-column ms-2 text-start">
+                      <strong className="text-white">
+                        {getImageNickName(imageInfo)}
+                      </strong>
+                      <span className="small text-white text-opacity-75">
+                        리뷰 <strong>{getCountMemberReview(imageInfo)}</strong>{" "}
+                        평균 평점{" "}
+                        <strong>{getMemberAverageRating(imageInfo)}</strong>
+                      </span>
                     </div>
                   </Carousel.Caption>
                 </Carousel.Item>
@@ -259,14 +262,21 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
             style={{ objectFit: "cover" }}
           />
           <div>
-            <div
-              className={`fw-medium text-dark ${isHoverd ? "text-decoration-underline" : ""}`}
-              style={{ cursor: "pointer" }}
-              onMouseOver={() => setIsHoverd(true)}
-              onMouseOut={() => setIsHoverd(false)}
-              onClick={() => navigate(`/review/my/${review.memberId}`)}
-            >
-              {review.memberEmailNickName || "알 수 없음"}
+            <div className="d-flex align-items-center">
+              <div
+                className={`fw-bold text-dark ${isHoverd ? "text-decoration-underline" : ""}`}
+                style={{ cursor: "pointer" }}
+                onMouseOver={() => setIsHoverd(true)}
+                onMouseOut={() => setIsHoverd(false)}
+                onClick={() => navigate(`/review/my/${review.memberId}`)}
+              >
+                {review.memberEmailNickName || "알 수 없음"}
+              </div>
+              <div className="small text-muted ms-2">
+                {" "}
+                리뷰 {review.countMemberReview} 평균 평점{" "}
+                {review.memberAverageRating}
+              </div>
             </div>
             <div className="small text-muted">
               {formatDate(review.insertedAt)}
@@ -427,8 +437,14 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
                       // border: "2px solid #e9ecef",
                     }}
                   />
-                  <div className="text-white">
-                    <strong>{review.memberEmailNickName}</strong>
+                  <div className="d-flex flex-column ms-3 text-start">
+                    <strong className="text-white">
+                      {review.memberEmailNickName || "알 수 없음"}
+                    </strong>
+                    <span className="small text-white text-opacity-75">
+                      리뷰 <strong>{review.countMemberReview}</strong> 평균 평점{" "}
+                      <strong>{review.memberAverageRating ?? 0.0}</strong>
+                    </span>
                   </div>
                 </Carousel.Caption>
               </Carousel.Item>
