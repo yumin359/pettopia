@@ -1,0 +1,20 @@
+/* hr 스타일 ? */
+.hr-color {
+    color: hotpink;
+}
+
+.facility-link {
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.facility-link:hover {
+    color: #d2691e; /* 살짝 강조 */
+}
+
+.facility-link svg {
+    transition: transform 0.2s ease;
+}
+
+.facility-link:hover svg {
+    transform: translateX(3px); /* 오른쪽으로 살짝 이동 */
+}
