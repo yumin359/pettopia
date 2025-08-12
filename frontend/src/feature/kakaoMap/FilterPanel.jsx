@@ -43,8 +43,12 @@ const FilterPanel = ({
 
   return (
     <div
-      className="h-100 d-flex flex-column bg-white rounded shadow-sm p-3"
-      style={{ fontSize: "12px" }}
+      className="h-100 d-flex flex-column bg-white p-3"
+      style={{
+        fontSize: "12px",
+        border: "solid 1px black",
+        boxShadow: "5px 5px 1px 1px black",
+      }}
     >
       {/* 검색창 */}
       <div className="mb-2">

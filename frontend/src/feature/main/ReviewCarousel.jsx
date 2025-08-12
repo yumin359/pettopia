@@ -117,9 +117,13 @@ export const ReviewCarousel = () => {
       <Carousel
         indicators={false}
         interval={5000}
-        className="shadow-sm"
+        className="mb-auto"
         prevIcon={<BsChevronLeft className="text-dark fs-1" />}
         nextIcon={<BsChevronRight className="text-dark fs-1" />}
+        style={{
+          border: "solid 1px black",
+          boxShadow: "5px 5px 1px 1px black",
+        }}
       >
         {reviews.map((review) => {
           const imageFiles = review.files?.filter(isImageFile) || [];
@@ -128,20 +132,20 @@ export const ReviewCarousel = () => {
           return (
             <Carousel.Item key={review.id}>
               <Card
-                className="border-0 shadow-sm review-card-fixed bg-warning bg-opacity-25"
+                className="border-0 review-card-fixed"
                 role="button"
                 onClick={() =>
                   navigate(
                     `/facility/${review.petFacility.id}?focusReviewId=${review.id}`,
                   )
                 }
-                style={{ cursor: "pointer" }}
+                style={{ cursor: "pointer", background: "#f6ece6" }}
               >
                 <Row className="g-0 h-100">
                   {/* 이미지 영역 */}
                   <Col
                     xs={4}
-                    className="bg-light d-flex align-items-center justify-content-center p-2 review-image-area"
+                    className="bg-light d-flex align-items-center justify-content-center review-image-area"
                   >
                     {totalImages === 0 && (
                       <img
@@ -156,7 +160,7 @@ export const ReviewCarousel = () => {
                       <img
                         src={imageFiles[0]}
                         alt=""
-                        className="w-100 h-100 rounded"
+                        className="w-100 h-100"
                         style={{ objectFit: "cover" }}
                       />
                     )}

@@ -57,14 +57,14 @@ body {
     background-color: white;
     border-style: solid;
     border-color: black;
-    border-width: 1px;
+    border-width: 2px;
     box-shadow: 5px 5px 1px 1px black;
     overflow: hidden;
 }
 
 /* ======BoardLayout.jsx 의 아래 ================*/
 .cta-section {
-    background: #F4E9E3;
+    background: #f6ece6;
     padding: 40px 20px;
     text-align: center;
     border-top-width: 1px;
@@ -131,31 +131,6 @@ body {
     margin-right: 8px;
 }
 
-/*!* 반응형 디자인 (선택 사항) *!*/
-/*@media (max-width: 768px) {*/
-/*    .cta-title {*/
-/*        font-size: 1.75rem;*/
-/*    }*/
-
-/*    .cta-description {*/
-/*        font-size: 1.0rem;*/
-/*    }*/
-
-/*    .cta-buttons {*/
-/*        flex-direction: column;*/
-/*        align-items: center;*/
-/*    }*/
-
-/*    .cta-button {*/
-/*        width: 100%;*/
-/*    }*/
-/*}*/
-
-/*!* Mobile styles - you can refine these further if needed *!*/
-/*.mobile-menu-toggle {*/
-/*    display: none; !* Hide by default on desktop *!*/
-/*}*/
-
 /* 네브바 전체 스타일 (사용자님의 스타일 반영) */
 .navbar {
     background-color: #f6ece6 !important;
@@ -214,7 +189,7 @@ body {
 /* 스티키 상태일 때 본문에 여백 추가 */
 /* 네브바가 고정되면서 콘텐츠가 갑자기 올라가는 것을 방지 */
 body.has-sticky-nav {
-    padding-top: 60px; /* 네브바 높이만큼 조정 - 실제 네브바 높이에 맞게 수정하세요 */
+    padding-top: 60px;
 }
 
 /* 스티키 네브바만의 특별한 스타일 (선택사항) */

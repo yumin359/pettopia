@@ -146,7 +146,6 @@ const FacilityCard = React.memo(({ facility, categoryColors, onClick }) => {
     fetchReviews();
   }, [facilityId]);
 
-  // createInfoWindowContent 함수가 reviewData를 올바르게 처리하는지 확인 필요
   const fullInfoWindowHtml = createInfoWindowContent(
     facility,
     categoryColors,
@@ -214,29 +213,28 @@ const SearchResultList = ({
     }
 
     return (
-      <>
-        <div className="flex-grow-1 overflow-auto" style={{ minHeight: 0 }}>
-          {listData.map((facility, index) => (
-            <FacilityCard
-              // ✨ key를 facility.id 또는 facility.facilityId로 설정
-              key={facility.id || facility.facilityId || index}
-              facility={facility}
-              categoryColors={categoryColors}
-              onClick={handleListItemClick}
-            />
-          ))}
-        </div>
-        {!isShowingFavorites && (
-          <div className="flex-shrink-0">
-            <Pagination {...{ currentPage, totalPages, handlePageChange }} />
-          </div>
-        )}
-      </>
+      <div className="flex-grow-1 overflow-auto" style={{ minHeight: 0 }}>
+        {listData.map((facility, index) => (
+          <FacilityCard
+            key={facility.id || facility.facilityId || index}
+            facility={facility}
+            categoryColors={categoryColors}
+            onClick={handleListItemClick}
+          />
+        ))}
+      </div>
     );
   };
 
   return (
-    <div className="h-100 d-flex flex-column bg-white rounded shadow-sm p-3">
+    <div
+      className="h-100 d-flex flex-column bg-white p-3"
+      style={{
+        border: "solid 1px black",
+        boxShadow: "5px 5px 1px 1px black",
+      }}
+    >
+      {/* 헤더 영역 */}
       <div className="d-flex justify-content-between align-items-center mb-2 flex-shrink-0">
         <h6 className="mb-0 small fw-bold">
           {isShowingFavorites ? "찜 목록" : "검색 결과"}
@@ -252,7 +250,16 @@ const SearchResultList = ({
           </span>
         )}
       </div>
+
+      {/* 컨텐츠 영역 - 리스트가 없을 때도 flex-grow-1 유지 */}
       {renderContent()}
+
+      {/* 페이지네이션 영역 - 항상 하단에 고정, 데이터가 있을 때만 표시 */}
+      {!isShowingFavorites && facilities.length > 0 && (
+        <div className="flex-shrink-0">
+          <Pagination {...{ currentPage, totalPages, handlePageChange }} />
+        </div>
+      )}
     </div>
   );
 };

@@ -75,7 +75,13 @@ export function LatestReviewsList() {
         </span>
       </h2>
 
-      <Form className="mb-4">
+      <Form
+        className="mb-4"
+        style={{
+          border: "solid 1px black",
+          boxShadow: "5px 5px 1px 1px black",
+        }}
+      >
         <Form.Control
           type="text"
           placeholder="#태그 검색"
@@ -93,7 +99,7 @@ export function LatestReviewsList() {
           return (
             <Col key={r.id} xs={12} sm={6} md={4} lg={3}>
               <Card
-                className="h-100 border shadow-sm position-relative"
+                className="h-100 position-relative"
                 onClick={() => {
                   if (!facilityInfo || !facilityInfo.id) return;
                   const url = `/facility/${facilityInfo.id}`;
@@ -101,7 +107,11 @@ export function LatestReviewsList() {
                   params.append("focusReviewId", r.id);
                   navigate(`${url}?${params.toString()}`);
                 }}
-                style={{ cursor: "pointer" }}
+                style={{
+                  cursor: "pointer",
+                  border: "solid 1px black",
+                  boxShadow: "5px 5px 1px 1px black",
+                }}
               >
                 <Card.Body className="d-flex flex-column">
                   {/* 시설명 */}
