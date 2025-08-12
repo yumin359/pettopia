@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-import { Badge, Image, Modal, Button } from "react-bootstrap";
+import { Badge, Image, Modal, Button, Carousel } from "react-bootstrap";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
 import ReviewEdit from "./ReviewEdit.jsx";
@@ -19,6 +19,8 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
 
   const [isHoverd, setIsHoverd] = useState(false);
   const [showFullReview, setShowFullReview] = useState(false); // 더보기 상태 추가
+
+  const [modalImageIndex, setModalImageIndex] = useState(0);
 
   const navigate = useNavigate();
   const defaultProfileImage = "/user.png";
@@ -86,7 +88,7 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
     displayedReview = reviewText.substring(0, REVIEW_PREVIEW_LENGTH) + "...";
   }
 
-  const handleImageClick = (imageInfo) => {
+  const handleImageClick = (imageInfo, index) => {
     // imageInfo는 URL 문자열이거나 { url, nickName, profileImageUrl } 객체일 수 있음
     const imageUrl = getImageUrl(imageInfo);
     const imageNickName = getImageNickName(imageInfo);
@@ -95,6 +97,7 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
     setModalImageUrl(imageUrl);
     setModalNickName(imageNickName);
     setModalProfileImageUrl(imageProfileImageUrl);
+    setModalImageIndex(index);
     setShowImageModal(true);
   };
 
@@ -155,7 +158,7 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
                 objectFit: "cover",
                 cursor: "pointer",
               }}
-              onClick={() => handleImageClick(imageInfo)} // 객체 자체를 전달하고
+              onClick={() => handleImageClick(imageInfo, idx)} // 객체 자체를 전달하고
             />
           ))}
           {hasMoreImages && !showAllImages && (
@@ -192,37 +195,48 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
             className="d-flex justify-content-center align-items-center p-0 bg-transparent"
             style={{ minHeight: "400px" }}
           >
-            <Image
-              src={modalImageUrl}
-              fluid
-              alt="확대 이미지"
-              style={{
-                maxHeight: "80vh",
-                maxWidth: "100%",
-                objectFit: "contain",
-              }}
-            />
+            <Carousel
+              activeIndex={modalImageIndex}
+              onSelect={setModalImageIndex}
+              interval={null}
+              slide={false}
+            >
+              {allImages.map((imageInfo, idx) => (
+                <Carousel.Item key={idx}>
+                  <Image
+                    src={getImageUrl(imageInfo)}
+                    alt={`확대 이미지 ${idx + 1}`}
+                    fluid
+                    style={{
+                      maxHeight: "80vh",
+                      maxWidth: "100%",
+                      objectFit: "contain",
+                      margin: "0 auto", // 중앙 정렬
+                    }}
+                  />
+                  {/* 캐러셀 캡션으로 작성자 정보 푸터처럼 표시 */}
+                  <Carousel.Caption
+                    className="d-flex align-items-center justify-content-start p-3 bg-dark bg-opacity-75"
+                    style={{ left: 0, right: 0, bottom: 0, padding: "1rem" }}
+                  >
+                    <Image
+                      roundedCircle
+                      src={getProfileImageUrl(imageInfo)}
+                      style={{
+                        width: "40px",
+                        height: "40px",
+                        objectFit: "cover",
+                      }}
+                      className="me-2"
+                    />
+                    <div className="text-white">
+                      <strong>{getImageNickName(imageInfo)}</strong>
+                    </div>
+                  </Carousel.Caption>
+                </Carousel.Item>
+              ))}
+            </Carousel>
           </Modal.Body>
-          <Modal.Footer className="d-flex justify-content-start">
-            {modalProfileImageUrl && (
-              <Image
-                roundedCircle
-                src={modalProfileImageUrl}
-                alt={`${modalNickName} 프로필 이미지`}
-                style={{
-                  width: "40px",
-                  height: "40px",
-                  objectFit: "cover",
-                  border: "2px solid #e9ecef",
-                }}
-              />
-            )}
-            {modalNickName && (
-              <div className="text-muted">
-                <strong>{modalNickName}</strong>
-              </div>
-            )}
-          </Modal.Footer>
         </Modal>
       </>
     );
@@ -378,33 +392,49 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
           className="d-flex justify-content-center align-items-center p-0 bg-transparent"
           style={{ minHeight: "400px" }}
         >
-          <Image
-            src={modalImageUrl}
-            fluid
-            alt="확대 이미지"
-            style={{
-              maxHeight: "80vh",
-              maxWidth: "100%",
-              objectFit: "contain",
-            }}
-          />
+          <Carousel
+            activeIndex={modalImageIndex}
+            onSelect={setModalImageIndex}
+            interval={null}
+            slide={false}
+          >
+            {allImages.map((imageInfo, idx) => (
+              <Carousel.Item key={idx}>
+                <Image
+                  src={getImageUrl(imageInfo)}
+                  alt={`확대 이미지 ${idx + 1}`}
+                  fluid
+                  style={{
+                    maxHeight: "80vh",
+                    maxWidth: "100%",
+                    objectFit: "contain",
+                    margin: "0 auto", // 중앙 정렬
+                  }}
+                />
+                {/* 캐러셀 캡션으로 작성자 정보 푸터처럼 표시 */}
+                <Carousel.Caption
+                  className="d-flex align-items-center justify-content-start p-3 bg-dark bg-opacity-75"
+                  style={{ left: 0, right: 0, bottom: 0, padding: "1rem" }}
+                >
+                  <Image
+                    roundedCircle
+                    src={review.profileImageUrl || defaultProfileImage}
+                    alt={`${review.memberEmailNickName ?? "익명"} 프로필`}
+                    style={{
+                      width: "40px",
+                      height: "40px",
+                      objectFit: "cover",
+                      // border: "2px solid #e9ecef",
+                    }}
+                  />
+                  <div className="text-white">
+                    <strong>{review.memberEmailNickName}</strong>
+                  </div>
+                </Carousel.Caption>
+              </Carousel.Item>
+            ))}
+          </Carousel>
         </Modal.Body>
-        <Modal.Footer className="d-flex justify-content-start">
-          <Image
-            roundedCircle
-            src={review.profileImageUrl || defaultProfileImage}
-            alt={`${review.memberEmailNickName ?? "익명"} 프로필`}
-            style={{
-              width: "40px",
-              height: "40px",
-              objectFit: "cover",
-              border: "2px solid #e9ecef",
-            }}
-          />
-          <div className="text-muted">
-            <strong>{review.memberEmailNickName}</strong>
-          </div>
-        </Modal.Footer>
       </Modal>
 
       {/* 삭제 확인 모달 */}
