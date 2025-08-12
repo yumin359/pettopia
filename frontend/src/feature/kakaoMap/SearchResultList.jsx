@@ -227,13 +227,7 @@ const SearchResultList = ({
   };
 
   return (
-    <div
-      className="h-100 d-flex flex-column bg-white p-3"
-      style={{
-        border: "solid 1px black",
-        boxShadow: "5px 5px 1px 1px black",
-      }}
-    >
+    <div className="h-100 d-flex flex-column bg-white p-3">
       {/* 헤더 영역 */}
       <div className="d-flex justify-content-between align-items-center mb-2 flex-shrink-0">
         <h6 className="mb-0 small fw-bold">

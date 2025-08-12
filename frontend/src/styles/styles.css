@@ -1,7 +1,9 @@
 /* === Google Fonts Import === */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
 
-/* === CSS Variables (Color Palette & Fonts) === */
+/* ========================================
+   색상 팔레트 및 재료
+   ======================================== */
 :root {
     --primary-red: #f86666;
     --active-red: #fe6262;
@@ -28,7 +30,9 @@
     --shadow-brutal-hover: 5px 5px 0px 0px #000000;
 }
 
-/* === Global Resets & Body Styling === */
+/* ========================================
+   바탕화면
+   ======================================== */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -41,7 +45,9 @@ body {
     background: linear-gradient(0deg, rgba(252, 220, 220, 1) 0%, rgba(255, 255, 255, 1) 100%);
 }
 
-/* === Main Layout (From MainLayout.jsx) === */
+/* ========================================
+   MainLayout.jsx
+   ======================================== */
 .main-layout {
     display: flex;
     justify-content: center;
@@ -62,7 +68,9 @@ body {
     overflow: hidden;
 }
 
-/* ======BoardLayout.jsx 의 아래 ================*/
+/* ========================================
+   BoardLayout.jsx cta 디자인
+   ======================================== */
 .cta-section {
     background: #f6ece6;
     padding: 40px 20px;
@@ -131,7 +139,9 @@ body {
     margin-right: 8px;
 }
 
-/* 네브바 전체 스타일 (사용자님의 스타일 반영) */
+/* ========================================
+   네브바 디자인
+   ======================================== */
 .navbar {
     background-color: #f6ece6 !important;
     border-bottom: 1px solid black !important;
@@ -150,7 +160,9 @@ body {
     transition: all 0.2s ease;
 }
 
-/* ===== 스크롤 시 고정되는 네비게이션 바 스타일 ===== */
+/* ========================================
+   스크롤 시 고정되는 네브바
+   ======================================== */
 .sticky-navbar-wrapper {
     position: fixed;
     top: 0;
@@ -201,4 +213,262 @@ body.has-sticky-nav {
 .sticky-navbar-wrapper .navbar-brand img {
     height: 40px; /* 원래보다 작게 */
     transition: height 0.3s ease;
+}
+
+/* ========================================
+   레트로 스타일 스크롤바
+   ======================================== */
+
+/* 웹킷 기반 브라우저 (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+    width: 16px; /* 세로 스크롤바 너비 */
+    height: 16px; /* 가로 스크롤바 높이 */
+}
+
+::-webkit-scrollbar-track {
+    background: #f6ece6; /* 베이지 배경 */
+    border: 2px solid black;
+    box-shadow: inset 2px 2px 0px rgba(0, 0, 0, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+    background: black; /* 검은색 썸 */
+    border: 2px solid black;
+    box-shadow: 2px 2px 0px 0px black, /* 레트로 그림자 효과 */ inset -1px -1px 0px rgba(255, 255, 255, 0.3); /* 약간의 하이라이트 */
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #333; /* 호버시 약간 밝게 */
+    box-shadow: 3px 3px 0px 0px black,
+    inset -1px -1px 0px rgba(255, 255, 255, 0.4);
+}
+
+/* 스크롤바 버튼 (위/아래 화살표) */
+::-webkit-scrollbar-button {
+    background: #f6ece6;
+    border: 2px solid black;
+    height: 16px;
+    box-shadow: 1px 1px 0px 0px black;
+}
+
+::-webkit-scrollbar-button:hover {
+    background: #fff;
+    box-shadow: 2px 2px 0px 0px black;
+}
+
+/* 위 화살표 */
+::-webkit-scrollbar-button:vertical:decrement {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8"><path d="M4 2L1 5h6z" fill="black"/></svg>');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-color: #f6ece6;
+}
+
+/* 아래 화살표 */
+::-webkit-scrollbar-button:vertical:increment {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8"><path d="M4 6L7 3H1z" fill="black"/></svg>');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-color: #f6ece6;
+}
+
+/* 스크롤바 코너 */
+::-webkit-scrollbar-corner {
+    background: #f6ece6;
+    border: 2px solid black;
+}
+
+/* Firefox용 스크롤바 스타일 */
+* {
+    scrollbar-width: auto;
+    scrollbar-color: black #f6ece6;
+}
+
+/* ========================================
+   레트로 픽셀 스타일 커서
+   ======================================== */
+
+/* 기본 커서 - 픽셀 화살표 */
+* {
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><path d="M4 4v12l4-4h3v-3l4 4v-9z" fill="black"/><path d="M5 5v9l3-3h3v-3l3 3v-6z" fill="white"/></svg>') 4 4, auto;
+}
+
+/* 링크/버튼 호버 커서 - 손가락 모양 */
+a,
+button,
+[role="button"],
+.clickable,
+.btn {
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><rect x="6" y="10" width="4" height="8" fill="black"/><rect x="10" y="6" width="4" height="12" fill="black"/><rect x="14" y="8" width="4" height="10" fill="black"/><rect x="18" y="10" width="4" height="8" fill="black"/><rect x="6" y="18" width="16" height="4" fill="black"/><rect x="7" y="11" width="2" height="6" fill="white"/><rect x="11" y="7" width="2" height="10" fill="white"/><rect x="15" y="9" width="2" height="8" fill="white"/><rect x="19" y="11" width="2" height="6" fill="white"/></svg>') 12 6, pointer;
+}
+
+/* 텍스트 선택 커서 - I빔 */
+input,
+textarea,
+[contenteditable="true"] {
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="20" viewBox="0 0 16 20"><rect x="2" y="2" width="12" height="2" fill="black"/><rect x="7" y="2" width="2" height="16" fill="black"/><rect x="2" y="16" width="12" height="2" fill="black"/></svg>') 8 10, text;
+}
+
+/* 드래그 가능한 요소 - 십자 화살표 */
+.draggable,
+[draggable="true"] {
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 4v16M4 12h16" stroke="black" stroke-width="2"/><path d="M12 2l3 4h-6zM12 22l-3-4h6zM2 12l4-3v6zM22 12l-4 3v-6z" fill="black"/></svg>') 12 12, move;
+}
+
+/* 로딩 커서 - 모래시계 */
+.loading,
+.processing,
+.wait {
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="24" viewBox="0 0 20 24"><rect x="4" y="2" width="12" height="2" fill="black"/><rect x="4" y="20" width="12" height="2" fill="black"/><path d="M6 4v6l4 2-4 2v6h8v-6l-4-2 4-2V4z" fill="black"/><path d="M7 5v4l3 2-3 2v5h6v-5l-3-2 3-2V5z" fill="white"/><rect x="8" y="6" width="4" height="2" fill="black"/></svg>') 10 12, wait;
+}
+
+/* 비활성화 커서 - X 표시 */
+:disabled,
+.disabled,
+[aria-disabled="true"] {
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" fill="none" stroke="black" stroke-width="2"/><path d="M6 6l8 8M14 6l-8 8" stroke="black" stroke-width="2"/></svg>') 10 10, not-allowed;
+}
+
+/* 리사이즈 커서 */
+.resize,
+.resizable {
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><path d="M4 16h12v-12" fill="none" stroke="black" stroke-width="2"/><path d="M8 16l8-8" stroke="black" stroke-width="2"/></svg>') 10 10, nwse-resize;
+}
+
+/* ========================================
+   버튼/링크 호버 효과 (레트로 스타일에 맞게)
+   ======================================== */
+
+/* 버튼 호버시 커서와 함께 스타일 변경 */
+button:hover,
+.btn:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 6px 6px 1px 1px black;
+}
+
+button:active,
+.btn:active {
+    transform: translate(1px, 1px);
+    box-shadow: 3px 3px 1px 1px black;
+}
+
+/* ========================================
+   선택 영역 스타일링
+   ======================================== */
+
+::selection {
+    background: black;
+    color: #f6ece6;
+}
+
+::-moz-selection {
+    background: black;
+    color: #f6ece6;
+}
+
+/* ========================================
+   포커스 스타일 (접근성)
+   ======================================== */
+
+:focus-visible {
+    outline: 2px dashed black;
+    outline-offset: 2px;
+}
+
+/* ========================================
+   픽셀 아트 스타일 스크롤바 (대안)
+   ======================================== */
+
+.pixel-scrollbar::-webkit-scrollbar {
+    width: 20px;
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+}
+
+.pixel-scrollbar::-webkit-scrollbar-track {
+    background: repeating-linear-gradient(
+            90deg,
+            #f6ece6 0px,
+            #f6ece6 2px,
+            black 2px,
+            black 4px
+    );
+    border: 2px solid black;
+}
+
+.pixel-scrollbar::-webkit-scrollbar-thumb {
+    background: repeating-linear-gradient(
+            45deg,
+            black 0px,
+            black 2px,
+            white 2px,
+            white 4px
+    );
+    border: 2px solid black;
+    box-shadow: 4px 4px 0px 0px black;
+}
+
+/* ========================================
+   도트 패턴 스크롤바 (대안 2)
+   ======================================== */
+
+/*.dotted-scrollbar::-webkit-scrollbar {*/
+/*    width: 18px;*/
+/*}*/
+
+/*.dotted-scrollbar::-webkit-scrollbar-track {*/
+/*    background-image: radial-gradient(circle, black 1px, transparent 1px);*/
+/*    background-size: 4px 4px;*/
+/*    background-color: #f6ece6;*/
+/*    border: 2px solid black;*/
+/*}*/
+
+/*.dotted-scrollbar::-webkit-scrollbar-thumb {*/
+/*    background: black;*/
+/*    border: 2px solid black;*/
+/*    box-shadow: 4px 4px 0px 0px black,*/
+/*    inset 0 0 0 2px #f6ece6,*/
+/*    inset 0 0 0 4px black;*/
+/*}*/
+
+/* ========================================
+   애니메이션 (선택사항)
+   ======================================== */
+
+/* 레트로 깜빡임 효과 */
+@keyframes retro-blink {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.8;
+    }
+}
+
+.blink {
+    animation: retro-blink 1s step-start infinite;
+}
+
+/* 픽셀 이동 효과 */
+@keyframes pixel-move {
+    0% {
+        transform: translate(0, 0);
+    }
+    25% {
+        transform: translate(2px, 0);
+    }
+    50% {
+        transform: translate(2px, 2px);
+    }
+    75% {
+        transform: translate(0, 2px);
+    }
+    100% {
+        transform: translate(0, 0);
+    }
+}
+
+.pixel-animation:hover {
+    animation: pixel-move 0.5s step-start infinite;
 }

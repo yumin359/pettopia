@@ -267,7 +267,7 @@ const FullFilterKakaoMap = () => {
           </div>
 
           {/* 리스트 Column */}
-          <div className="col-12 col-md-8 mb-5 list-column-container">
+          <div className="col-12 col-md-8 list-column-container">
             {/* 🚫 지도 범위 검색 알림 메시지 제거 - 이제 지도 안에서 표시 */}
 
             <SearchResultList
