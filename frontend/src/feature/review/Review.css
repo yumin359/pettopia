@@ -1,6 +1,10 @@
 /* hr 스타일 ? */
-.hr-color {
+.hr-color-hotpink {
     color: hotpink;
+}
+
+.hr-color-pink {
+    color: pink;
 }
 
 .facility-link {

@@ -49,9 +49,10 @@ export function MyReview() {
 
   return (
     <Row className="justify-content-center mt-4">
-      <Col xs={12} md={9} lg={7} style={{ maxWidth: "900px" }}>
+      {/* Col의 최대 너비를 더 작게 설정하여 컨텐츠를 중앙으로 모으고 가독성 높이기 */}
+      <Col xs={12} md={9} lg={7}>
         {/* 간단 프로필 - 이 부분은 유지 */}
-        <div className="d-flex flex-row align-items-start">
+        <div className="d-flex flex-row align-items-start mb-4">
           <Image
             roundedCircle
             className="me-3"
@@ -64,126 +65,108 @@ export function MyReview() {
             }}
           />
           <div className="d-flex flex-column align-items-start">
-            <h3 className="fw-bold">{userNickName}</h3>
+            <h3 className="fw-bold mb-0">{userNickName}</h3>
             <span>
               리뷰 <strong>{userCountMemberReview}</strong> 평균 평점{" "}
               <strong>{userMemberAverageRating}</strong>
             </span>
           </div>
         </div>
-        <hr className="hr-color" />
+        <hr className="hr-color-hotpink" />
 
-        <div className="d-flex flex-column gap-4">
-          {reviews.map((r, index) => {
-            const reviewImages = r.files?.filter(isImageFile) || [];
+        {reviews.map((r, index) => {
+          const reviewImages = r.files?.filter(isImageFile) || [];
 
-            return (
-              <div key={r.id} className="review-item">
-                <div className={reviewImages.length > 0 ? "mb-3" : ""}>
-                  {/* 1. 사진: 캐러셀로 여러 장 표시 한장이면 이미지만 */}
-                  <div style={{ maxWidth: "300px", margin: "0 auto" }}>
-                    {reviewImages.length === 1 && (
-                      <img
-                        src={reviewImages[0]}
-                        alt="리뷰 이미지"
-                        className="d-block"
-                        style={{
-                          height: "400px",
-                          width: "300px",
-                          objectFit: "cover",
-                          margin: "0 auto",
-                        }}
-                      />
-                    )}
-                  </div>
-
-                  {reviewImages.length > 1 && (
-                    <Carousel
-                      className="rounded"
-                      interval={null}
-                      style={{ maxWidth: "300px", margin: "0 auto" }}
-                    >
-                      {reviewImages.map((image, i) => (
-                        <Carousel.Item key={i}>
-                          <img
-                            src={image}
-                            alt={`리뷰 이미지 ${i + 1}`}
-                            className="d-block"
-                            style={{
-                              height: "400px",
-                              width: "300px",
-                              objectFit: "cover",
-                              margin: "0 auto",
-                            }}
-                          />
-                          {reviewImages.length > 1 && (
-                            <div className="carousel-counter">
-                              {i + 1} / {reviewImages.length}
-                            </div>
-                          )}
-                        </Carousel.Item>
-                      ))}
-                    </Carousel>
+          return (
+            <div key={r.id} className="review-item pt-4">
+              <div className={reviewImages.length > 0 ? "mb-3" : ""}>
+                {/* 1. 사진: 캐러셀로 여러 장 표시 한장이면 이미지만 */}
+                <div style={{ maxWidth: "400px", margin: "0 auto" }}>
+                  {reviewImages.length === 1 && (
+                    <img
+                      src={reviewImages[0]}
+                      alt="리뷰 이미지"
+                      className="d-block w-100 rounded" // w-100 클래스 추가
+                      style={{
+                        height: "400px",
+                        objectFit: "cover",
+                      }}
+                    />
                   )}
                 </div>
 
-                <div className="p-1">
-                  {/* 2. 시설명 */}
-                  <div
-                    className="fw-semibold d-flex align-items-center facility-link"
-                    style={{ cursor: "pointer" }}
-                    onClick={() => navigate(`/facility/${r.petFacility.id}`)}
+                {reviewImages.length > 1 && (
+                  <Carousel
+                    className="rounded"
+                    interval={null}
+                    style={{ maxWidth: "400px", margin: "0 auto" }}
                   >
-                    {r.petFacility.name}
-                    <FaChevronRight className="ms-1" size={13} />
-                    {/*별점 표시 ㅎㄻㄹ*/}
-                    {/*<div className="small d-flex align-items-center">*/}
-                    {/*  <span style={{ color: "#f0ad4e", fontSize: "1.1rem" }}>*/}
-                    {/*    {"★".repeat(r.rating)}*/}
-                    {/*  </span>*/}
-                    {/*  <span className="ms-2 text-dark fw-semibold">*/}
-                    {/*    {r.rating}*/}
-                    {/*  </span>*/}
-                    {/*</div>*/}
-                  </div>
-
-                  {/* 3. 본문 */}
-                  <div
-                    className="text-muted mb-2"
-                    style={{ whiteSpace: "pre-wrap" }}
-                  >
-                    <ReviewText text={r.review} />
-                  </div>
-
-                  {/* 4. 태그 */}
-                  {Array.isArray(r.tags) && r.tags.length > 0 && (
-                    <div className="d-flex flex-wrap gap-2 mb-2">
-                      {r.tags.map((tag) => (
-                        <Badge
-                          key={tag.id}
-                          bg="light"
-                          text="dark"
-                          className="fw-normal border"
-                        >
-                          # {tag.name}
-                        </Badge>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* 5. 날짜 */}
-                  <div className="text-muted" style={{ fontSize: "0.85rem" }}>
-                    {r.insertedAt?.split("T")[0]}
-                  </div>
-                </div>
-
-                {/* 마지막 리뷰가 아니면 구분선 추가 */}
-                {index < reviews.length - 1 && <hr className="mb-2 hr-color" />}
+                    {reviewImages.map((image, i) => (
+                      <Carousel.Item key={i}>
+                        <img
+                          src={image}
+                          alt={`리뷰 이미지 ${i + 1}`}
+                          className="d-block w-100" // w-100 클래스 추가
+                          style={{
+                            height: "400px",
+                            objectFit: "cover",
+                          }}
+                        />
+                        <div className="carousel-counter">
+                          {i + 1} / {reviewImages.length}
+                        </div>
+                      </Carousel.Item>
+                    ))}
+                  </Carousel>
+                )}
               </div>
-            );
-          })}
-          <hr className="hr-color" />
-        </div>
+
+              <div className="p-1">
+                {/* 2. 시설명 */}
+                <div
+                  className="fw-semibold d-flex align-items-center facility-link mb-2"
+                  style={{ cursor: "pointer" }}
+                  onClick={() => navigate(`/facility/${r.petFacility.id}`)}
+                >
+                  {r.petFacility.name}
+                  <FaChevronRight className="ms-1" size={13} />
+                </div>
+                <hr className="my-2 hr-color-pink" />
+
+                {/* 3. 본문 */}
+                <div
+                  className="text-muted mb-1"
+                  style={{ whiteSpace: "pre-wrap" }}
+                >
+                  <ReviewText text={r.review} />
+                </div>
+
+                {/* 4. 태그 */}
+                {Array.isArray(r.tags) && r.tags.length > 0 && (
+                  <div className="d-flex flex-wrap gap-2 mb-2">
+                    {r.tags.map((tag) => (
+                      <Badge
+                        key={tag.id}
+                        bg="light"
+                        text="dark"
+                        className="fw-normal border"
+                      >
+                        # {tag.name}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+
+                {/* 5. 날짜 */}
+                <div className="text-muted" style={{ fontSize: "0.85rem" }}>
+                  {r.insertedAt?.split("T")[0]}
+                </div>
+              </div>
+
+              {index < reviews.length && <hr className="hr-color-hotpink" />}
+            </div>
+          );
+        })}
       </Col>
     </Row>
   );
