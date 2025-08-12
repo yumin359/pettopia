@@ -79,14 +79,29 @@ export function MyReview() {
             return (
               <div key={r.id} className="review-item">
                 <div className={reviewImages.length > 0 ? "mb-3" : ""}>
-                  {/* 1. 사진: 캐러셀로 여러 장 표시 */}
-                  {reviewImages.length > 0 && (
+                  {/* 1. 사진: 캐러셀로 여러 장 표시 한장이면 이미지만 */}
+                  <div style={{ maxWidth: "400px", margin: "0 auto" }}>
+                    {reviewImages.length === 1 && (
+                      <img
+                        src={reviewImages[0]}
+                        alt="리뷰 이미지"
+                        className="d-block"
+                        style={{
+                          height: "500px",
+                          width: "400px",
+                          objectFit: "cover",
+                          margin: "0 auto",
+                        }}
+                      />
+                    )}
+                  </div>
+
+                  {reviewImages.length > 1 && (
                     <Carousel
                       className="rounded"
                       interval={null}
                       slide={false}
                       style={{ maxWidth: "400px", margin: "0 auto" }}
-                      // indicators={false} // 아래 막대바 같은 거 지우기
                     >
                       {reviewImages.map((image, i) => (
                         <Carousel.Item key={i}>
