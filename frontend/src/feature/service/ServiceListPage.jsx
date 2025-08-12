@@ -51,51 +51,49 @@ export default function ServiceListPage() {
   }
 
   return (
-      <div style={{ padding: "2rem" }}>
-        <h2 className="mb-4">문의 내역 목록</h2>
-        <Table striped bordered hover>
-          <thead>
-          <tr>
-            <th>#</th>
-            <th>이메일</th>
-            <th>제목</th>
-            <th>내용</th>
-            <th>접수일</th>
+    <div style={{ padding: "2rem" }}>
+      <h2 className="mb-4">문의 내역 목록</h2>
+      <Table striped bordered hover>
+        <thead>
+        <tr>
+          <th>이메일</th>
+          <th>제목</th>
+          <th>내용</th>
+          <th>접수일</th>
+        </tr>
+        </thead>
+        <tbody>
+        {services.map(({ id, email, title, content, inserted_at }) => (
+          <tr key={id}>
+            <td
+              style={{
+                whiteSpace: "pre-wrap",
+                overflowWrap: "break-word",
+                wordBreak: "break-word",
+                maxWidth: "220px",
+                color: "inherit",
+                cursor: "default",
+                textDecoration: "none",
+              }}
+            >
+              {email}
+            </td>
+            <td>{title}</td>
+            <td
+              style={{
+                whiteSpace: "pre-wrap",
+                overflowWrap: "break-word",
+                wordBreak: "break-word",
+                maxWidth: "400px",
+              }}
+            >
+              {content}
+            </td>
+            <td>{new Date(inserted_at).toLocaleString()}</td>
           </tr>
-          </thead>
-          <tbody>
-          {services.map(({ id, email, title, content, inserted_at }, idx) => (
-              <tr key={id ?? idx}>
-                <td>{idx + 1}</td>
-                <td
-                    style={{
-                      whiteSpace: "pre-wrap",
-                      overflowWrap: "break-word",
-                      wordBreak: "break-word",
-                      maxWidth: "220px",
-                      color: "inherit",
-                      cursor: "default",
-                      textDecoration: "none",
-                    }}
-                >
-                  {email}
-                </td>
-                <td>{title}</td>
-                <td
-                    style={{
-                      whiteSpace: "pre-wrap",
-                      overflowWrap: "break-word",
-                      wordBreak: "break-word",
-                      maxWidth: "400px",
-                    }}
-                >
-                  {content}
-                </td>
-                <td>{new Date(inserted_at).toLocaleString()}</td>
-              </tr>
-          ))}
-          </tbody>
-        </Table>
-      </div>
+        ))}
+        </tbody>
+      </Table>
+    </div>
   );
 }

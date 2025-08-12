@@ -59,7 +59,6 @@ export default function ReviewReportList() {
       <Table striped bordered hover>
         <thead>
         <tr>
-          <th>#</th>
           <th>신고자 이메일</th>
           <th>리뷰 ID</th>
           <th>신고 사유</th>
@@ -67,9 +66,8 @@ export default function ReviewReportList() {
         </tr>
         </thead>
         <tbody>
-        {reports.map(({ id, reporterEmail, reviewId, reason, reportedAt }, idx) => (
-          <tr key={id ?? idx}>
-            <td>{idx + 1}</td>
+        {reports.map(({ id, reporterEmail, reviewId, reason, reportedAt }) => (
+          <tr key={id}>
             <td
               style={{ cursor: "pointer" }}
               onClick={() => navigate(`/member?email=${encodeURIComponent(reporterEmail)}`)}
