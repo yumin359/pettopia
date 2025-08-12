@@ -17,6 +17,7 @@ export function MyReview() {
       .get(`/api/review/myReview/${memberId}`)
       .then((res) => {
         setReviews(res.data);
+        console.log(res.data);
       })
       .catch((err) => {
         console.error("리뷰 불러오기 실패", err);
@@ -42,13 +43,38 @@ export function MyReview() {
     );
   }
 
-  // 첫번째 리뷰에서 닉네임 가져와서 제목으로 사용할 때
-  const userNickName = reviews[0].memberEmailNickName;
+  // 첫번째 리뷰에서 공통으로 가져올 것
+  const userNickName = reviews[0].memberEmailNickName ?? "알 수 없음";
+  const userProfileImage = reviews[0].profileImageUrl || "/user.png";
+  const userCountMemberReview = reviews[0].countMemberReview;
+  const userMemberAverageRating = reviews[0].memberAverageRating;
 
   return (
     <Row className="justify-content-center mt-4">
       <Col xs={12} md={10} lg={8} style={{ maxWidth: "900px" }}>
-        <h2 className="fw-bold mb-4">{userNickName}님이 쓴 리뷰</h2>
+        {/*간단 프로필*/}
+        <div className="d-flex flex-row align-items-start">
+          <Image
+            roundedCircle
+            className="me-2"
+            src={userProfileImage}
+            alt={`${userNickName} 프로필`}
+            style={{
+              width: "70px",
+              height: "70px",
+              objectFit: "cover",
+            }}
+          />
+          <div className="d-flex flex-column align-items-start">
+            <h3 className="fw-bold">{userNickName}</h3>
+            <span>
+              리뷰 <strong>{userCountMemberReview}</strong> 평균 평점{" "}
+              <strong>{userMemberAverageRating}</strong>
+            </span>
+          </div>
+        </div>
+        <hr />
+
         <div className="d-flex flex-column gap-3">
           {reviews.map((r) => {
             const firstImage = r.files?.find(isImageFile) || null;
