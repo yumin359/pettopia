@@ -120,7 +120,7 @@ export function MapDetail() {
       url: fileUrl,
       nickName: review.memberEmailNickName,
       profileImageUrl: review.profileImageUrl || "/user.png",
-      // countMemberReview: review.countMemberReview,
+      countMemberReview: review.countMemberReview,
     })),
   );
 

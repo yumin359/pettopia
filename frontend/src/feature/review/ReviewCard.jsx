@@ -9,10 +9,6 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
   const { user } = useContext(AuthenticationContext);
   const [isEditing, setIsEditing] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
-  // 모달 state
-  const [modalImageUrl, setModalImageUrl] = useState("");
-  const [modalNickName, setModalNickName] = useState("");
-  const [modalProfileImageUrl, setModalProfileImageUrl] = useState("");
 
   const [showAllImages, setShowAllImages] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -20,6 +16,7 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
   const [isHoverd, setIsHoverd] = useState(false);
   const [showFullReview, setShowFullReview] = useState(false); // 더보기 상태 추가
 
+  // 이미지 캐루셀 index
   const [modalImageIndex, setModalImageIndex] = useState(0);
 
   const navigate = useNavigate();
@@ -44,6 +41,10 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
 
   const getProfileImageUrl = (fileInfo) => {
     return typeof fileInfo === "string" ? null : fileInfo.profileImageUrl;
+  };
+
+  const getCountMemberReview = (fileInfo) => {
+    return typeof fileInfo === "string" ? null : fileInfo.countMemberReview;
   };
 
   // URL 문자열을 받아서 이미지 파일인지 확인하는 함수
@@ -89,21 +90,12 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
   }
 
   const handleImageClick = (imageInfo, index) => {
-    // imageInfo는 URL 문자열이거나 { url, nickName, profileImageUrl } 객체일 수 있음
-    const imageUrl = getImageUrl(imageInfo);
-    const imageNickName = getImageNickName(imageInfo);
-    const imageProfileImageUrl = getProfileImageUrl(imageInfo);
-
-    setModalImageUrl(imageUrl);
-    setModalNickName(imageNickName);
-    setModalProfileImageUrl(imageProfileImageUrl);
     setModalImageIndex(index);
     setShowImageModal(true);
   };
 
   const handleCloseImageModal = () => {
     setShowImageModal(false);
-    setModalImageUrl("");
   };
 
   const handleEditStart = () => {
@@ -222,15 +214,20 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
                     <Image
                       roundedCircle
                       src={getProfileImageUrl(imageInfo)}
+                      alt={`${getImageNickName(imageInfo)} 프로필 사진`}
                       style={{
                         width: "40px",
                         height: "40px",
                         objectFit: "cover",
                       }}
-                      className="me-2"
                     />
-                    <div className="text-white">
-                      <strong>{getImageNickName(imageInfo)}</strong>
+                    <div className="d-flex flex-column ms-2">
+                      <strong className="text-white">
+                        {getImageNickName(imageInfo)}
+                      </strong>
+                      <span className="small text-white text-opacity-75">
+                        리뷰 {getCountMemberReview(imageInfo)}
+                      </span>
                     </div>
                   </Carousel.Caption>
                 </Carousel.Item>
