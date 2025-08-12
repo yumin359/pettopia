@@ -70,7 +70,7 @@ body::before {
 
 /* 🎨 박스 색상과 박스 크기 */
 .main-container {
-    height: 94vh;
+    height: 94.5vh;
     width: 100vh;
     max-width: 1200px;
     background-color: white;

@@ -244,7 +244,7 @@ const FullFilterKakaoMap = () => {
           </div>
         </div>
 
-        <div style={{ height: "1rem" }}></div>
+        <div style={{ height: "1rem" }} />
 
         {/* --- 2. 컨텐츠 Row (필터 + 리스트) --- */}
         <div
