@@ -47,6 +47,10 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
     return typeof fileInfo === "string" ? null : fileInfo.countMemberReview;
   };
 
+  const getMemberAverageRating = (fileInfo) => {
+    return typeof fileInfo === "string" ? null : fileInfo.memberAverageRating;
+  };
+
   // URL 문자열을 받아서 이미지 파일인지 확인하는 함수
   const isImageUrl = (fileUrl) => {
     if (typeof fileUrl !== "string" || !fileUrl) {
@@ -221,12 +225,14 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
                         objectFit: "cover",
                       }}
                     />
-                    <div className="d-flex flex-column ms-2">
+                    <div className="d-flex flex-column ms-2 text-start">
                       <strong className="text-white">
                         {getImageNickName(imageInfo)}
                       </strong>
                       <span className="small text-white text-opacity-75">
-                        리뷰 {getCountMemberReview(imageInfo)}
+                        리뷰 <strong>{getCountMemberReview(imageInfo)}</strong>{" "}
+                        평균 평점{" "}
+                        <strong>{getMemberAverageRating(imageInfo)}</strong>
                       </span>
                     </div>
                   </Carousel.Caption>
@@ -268,7 +274,8 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
               </div>
               <div className="small text-muted ms-2">
                 {" "}
-                | 리뷰 {review.countMemberReview}
+                리뷰 {review.countMemberReview} 평균 평점{" "}
+                {review.memberAverageRating}
               </div>
             </div>
             <div className="small text-muted">
@@ -430,12 +437,13 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
                       // border: "2px solid #e9ecef",
                     }}
                   />
-                  <div className="d-flex flex-column ms-3">
+                  <div className="d-flex flex-column ms-3 text-start">
                     <strong className="text-white">
                       {review.memberEmailNickName || "알 수 없음"}
                     </strong>
                     <span className="small text-white text-opacity-75">
-                      리뷰 {review.countMemberReview}
+                      리뷰 <strong>{review.countMemberReview}</strong> 평균 평점{" "}
+                      <strong>{review.memberAverageRating ?? 0.0}</strong>
                     </span>
                   </div>
                 </Carousel.Caption>

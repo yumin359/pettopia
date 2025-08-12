@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ReviewRepository extends JpaRepository<Review, Integer> {
 
@@ -33,6 +34,11 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
                 ORDER BY COUNT(rl) DESC, r.insertedAt DESC
             """)
     Page<Review> findByPetFacilityIdOrderByLikesDesc(@Param("facilityId") Long facilityId, Pageable pageable);
-    
+
+    // 특정 회원의 리뷰수 구하기
     Long countByMemberEmail_Id(Long memberId);
+
+    // 특정 회원의 리뷰 평점 평균을 계산하는 JPQL 쿼리
+    @Query("SELECT AVG(r.rating) FROM Review r WHERE r.memberEmail.id = :memberId")
+    Optional<Double> findAverageRatingByMemberId(@Param("memberId") Long memberId);
 }

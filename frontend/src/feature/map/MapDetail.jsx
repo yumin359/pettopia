@@ -121,6 +121,7 @@ export function MapDetail() {
       nickName: review.memberEmailNickName,
       profileImageUrl: review.profileImageUrl || "/user.png",
       countMemberReview: review.countMemberReview,
+      memberAverageRating: review.memberAverageRating,
     })),
   );
 

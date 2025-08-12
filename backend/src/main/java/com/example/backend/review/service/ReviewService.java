@@ -337,6 +337,9 @@ public class ReviewService {
 
         Long memberId = review.getMemberEmail().getId();
         Long countMemberReview = reviewRepository.countByMemberEmail_Id(memberId);
+        Double memberAverageRating = reviewRepository.findAverageRatingByMemberId(memberId).orElse(0.0);
+        // 소수 첫째자리 까지 반올림
+        double roundedRating = Math.round(memberAverageRating * 10.0) / 10.0;
 
         return ReviewListDto.builder()
                 .id(review.getId())
@@ -352,6 +355,7 @@ public class ReviewService {
                 .tags(tagDtos)
                 .likesCount((long) (review.getLikes() != null ? review.getLikes().size() : 0))
                 .countMemberReview(countMemberReview)
+                .memberAverageRating(roundedRating)
                 .build();
     }
 
