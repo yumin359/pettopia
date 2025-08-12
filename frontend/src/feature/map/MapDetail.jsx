@@ -373,15 +373,19 @@ export function MapDetail() {
                                 showOnlyImages={false}
                             />
 
-                            {/* 액션 버튼 */}
                             <div className="d-flex align-items-center gap-3 mt-4 pt-3 border-top">
                               <ReviewLikeContainer reviewId={review.id} />
                               <button
-                                  onClick={() => openReportModal(review.id)}
-                                  className="btn btn-outline-danger btn-sm"
+                                onClick={() => {
+                                  if (!user) return; // 로그인 안 하면 동작 안 함
+                                  openReportModal(review.id);
+                                }}
+                                className="p-0 border-0 bg-transparent"
+                                style={{ cursor: user ? "pointer" : "not-allowed" }}
+                                disabled={!user}
+                                title={user ? "리뷰 신고하기" : "로그인 후 이용 가능"}
                               >
-                                <i className="bi bi-flag-fill me-1"></i>
-                                신고
+                                🚨
                               </button>
                             </div>
                           </div>
