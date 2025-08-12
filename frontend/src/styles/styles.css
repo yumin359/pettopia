@@ -170,7 +170,7 @@ body {
     border-color: var(--dark-text);
 }
 
-/* ===== 로그인 후 사용자 정보 버튼 스타일 (아름답게) ===== */
+/* ===== 로그인 후 사용자 정보 버튼 스타일 ===== */
 .user-dropdown-btn {
     display: flex;
     align-items: center;
@@ -204,6 +204,95 @@ body {
     font-weight: 700;
 }
 
+/* ======BoardLayout.jsx 의 아래 ================*/
+.cta-section {
+    background: #F4E9E3;
+    background: radial-gradient(circle, rgba(244, 233, 227, 1) 0%, rgba(242, 216, 199, 1) 100%);
+    padding: 40px 20px;
+    text-align: center;
+    border-top-width: 1px;
+    border-top-style: solid;
+    border-top-color: black;
+
+}
+
+.cta-content {
+    max-width: 960px;
+    margin: 0 auto;
+}
+
+.cta-title {
+    font-size: 2.0rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #343a40; /* 어두운 글씨색 */
+}
+
+.cta-description {
+    font-size: 1.1rem;
+    margin-bottom: 30px;
+    color: #6c757d; /* 중간 톤 글씨색 */
+}
+
+.cta-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.cta-button {
+    padding: 12px 24px;
+    font-size: 1.0rem;
+    font-weight: bold;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.cta-button.primary {
+    background-color: #ffc107; /* 노란색 계열 */
+    color: #212529; /* 어두운 글씨색 */
+}
+
+.cta-button.primary:hover {
+    background-color: #e0a800;
+}
+
+.cta-button.secondary {
+    background-color: #ffffff; /* 흰색 배경 */
+    color: #343a40; /* 어두운 글씨색 */
+    border: 1px solid #ced4da; /* 연한 테두리 */
+}
+
+.cta-button.secondary:hover {
+    background-color: #e9ecef;
+}
+
+.cta-button i {
+    margin-right: 8px;
+}
+
+/* 반응형 디자인 (선택 사항) */
+@media (max-width: 768px) {
+    .cta-title {
+        font-size: 1.75rem;
+    }
+
+    .cta-description {
+        font-size: 1.0rem;
+    }
+
+    .cta-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .cta-button {
+        width: 100%;
+    }
+}
 
 /* Mobile styles - you can refine these further if needed */
 .mobile-menu-toggle {

@@ -1,11 +1,12 @@
 import { useNavigate } from "react-router-dom";
-import { Button, Card, Carousel, Col, Row } from "react-bootstrap";
+import { Button, Carousel, Col, Row } from "react-bootstrap";
 
 import img1 from "../../assets/event1.jpg";
 import img2 from "../../assets/event2.jpg";
 import img3 from "../../assets/event3.jpg";
 import { BoardListMini } from "../main/BoardListMini.jsx";
 import { ReviewCarousel } from "../main/ReviewCarousel.jsx";
+import React from "react";
 
 export function BoardLayout() {
   const navigate = useNavigate();
@@ -95,9 +96,36 @@ export function BoardLayout() {
             <ReviewCarousel />
           </Col>
         </Row>
+        <div className="py-4" />
+      </div>
 
-        {/* 추가 섹션을 위한 여백 */}
-        <div className="py-4"></div>
+      {/* CTA 섹션 */}
+      <div className="cta-section">
+        <div className="cta-content">
+          <h4 className="cta-title">
+            <i className="bi bi-rocket-takeoff me-2"></i>
+            지금 바로 시작해보세요!
+          </h4>
+          <p className="cta-description">
+            우리 아이와 함께 할 수 있는 특별한 장소들이 여러분을 기다리고
+            있습니다.
+          </p>
+          <div className="cta-buttons">
+            <button
+              className="cta-button primary"
+              onClick={() => navigate("/map")}
+            >
+              <i className="bi bi-geo-alt-fill me-2"></i>내 주변 찾기
+            </button>
+            <button
+              className="cta-button secondary"
+              onClick={() => navigate("/register")}
+            >
+              <i className="bi bi-person-plus me-2"></i>
+              회원가입하기
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
