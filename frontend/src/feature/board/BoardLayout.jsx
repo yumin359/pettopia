@@ -1,49 +1,82 @@
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, Carousel, Col, Row } from "react-bootstrap";
-
-import img1 from "../../assets/event1.jpg";
-import img2 from "../../assets/event2.jpg";
-import img3 from "../../assets/event3.jpg";
+import { Carousel, Col, Row } from "react-bootstrap";
+import axios from "axios";
 import { BoardListMini } from "../main/BoardListMini.jsx";
 import { ReviewCarousel } from "../main/ReviewCarousel.jsx";
-import React from "react";
 
 export function BoardLayout() {
   const navigate = useNavigate();
-  // const { isAdmin } = useContext(AuthenticationContext); // 안쓰는?
+  const [slides, setSlides] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const slides = [
-    { id: 17, img: img1, title: "유기견 입양 안내" },
-    { id: 18, img: img2, title: "길고양이" },
-    { id: 19, img: img3, title: "특이한 반려동물" },
-  ];
+  useEffect(() => {
+    axios
+      .get("/api/board/latest3") // 백엔드 최신 3개 게시글 API
+      .then((res) => {
+        console.log("원본 데이터:", res.data); // 디버깅용
+
+        // 각 게시글의 firstImageUrl 확인
+        res.data.forEach((slide, index) => {
+          console.log(`게시글 ${slide.id} (인덱스 ${index}):`, {
+            title: slide.title,
+            firstImageUrl: slide.firstImageUrl,
+            hasImage: !!slide.firstImageUrl,
+            isEmptyString: slide.firstImageUrl === "",
+            type: typeof slide.firstImageUrl
+          });
+        });
+
+        // 이미지가 있는 게시글만 필터링
+        const slidesWithImages = res.data.filter(slide => {
+          const hasValidImage = slide.firstImageUrl &&
+            slide.firstImageUrl.trim() !== "" &&
+            slide.firstImageUrl !== "null" &&
+            slide.firstImageUrl !== "undefined";
+
+          console.log(`게시글 ${slide.id} 필터링 결과:`, hasValidImage);
+          return hasValidImage;
+        });
+
+        console.log("필터링된 데이터:", slidesWithImages);
+        setSlides(slidesWithImages);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("최신 게시글 로딩 실패", err);
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) {
+    return <div style={{ padding: "2rem", textAlign: "center" }}>최신 게시글 로딩 중...</div>;
+  }
+
+  if (slides.length === 0) {
+    return <div style={{ padding: "2rem", textAlign: "center" }}>이미지가 있는 최신 게시글이 없습니다.</div>;
+  }
 
   return (
     <div>
       <Row className="align-items-center">
         <Col xs={12} md={12}>
-          {/* 캐루셀 */}
+          {/* 캐러셀 */}
           <Carousel style={{ maxWidth: "auto", margin: "0 auto" }}>
-            {slides.map(({ id, img, title }, idx) => (
+            {slides.map(({ id, title, firstImageUrl }, idx) => (
               <Carousel.Item
                 key={id}
-                onClick={() => {
-                  if (id === 19) {
-                    window.open(
-                      "https://www.youtube.com/watch?v=0dQBxYc_8ZM",
-                      "_blank",
-                    );
-                  } else {
-                    navigate(`/board/${id}`);
-                  }
-                }}
+                onClick={() => navigate(`/board/${id}`)}
                 style={{ cursor: "pointer", position: "relative" }}
               >
                 <img
                   className="d-block w-100"
-                  src={img}
-                  alt={`${idx + 1}번째 슬라이드`}
+                  src={firstImageUrl}
+                  alt={`${title} (${idx + 1}번째 슬라이드)`}
                   loading="lazy"
+                  onError={(e) => {
+                    // 이미지 로드 실패시 기본 이미지로 대체
+                    e.target.src = '/images/default-placeholder.jpg';
+                  }}
                   style={{
                     width: "100%",
                     height: "420px",
@@ -107,22 +140,14 @@ export function BoardLayout() {
             지금 바로 시작해보세요!
           </h4>
           <p className="cta-description">
-            우리 아이와 함께 할 수 있는 특별한 장소들이 여러분을 기다리고
-            있습니다.
+            우리 아이와 함께 할 수 있는 특별한 장소들이 여러분을 기다리고 있습니다.
           </p>
           <div className="cta-buttons">
-            <button
-              className="cta-button primary"
-              onClick={() => navigate("/map")}
-            >
+            <button className="cta-button primary" onClick={() => navigate("/map")}>
               <i className="bi bi-geo-alt-fill me-2"></i>내 주변 찾기
             </button>
-            <button
-              className="cta-button secondary"
-              onClick={() => navigate("/register")}
-            >
-              <i className="bi bi-person-plus me-2"></i>
-              회원가입하기
+            <button className="cta-button secondary" onClick={() => navigate("/register")}>
+              <i className="bi bi-person-plus me-2"></i>회원가입하기
             </button>
           </div>
         </div>

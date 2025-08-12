@@ -6,7 +6,7 @@ import ReviewEdit from "./ReviewEdit.jsx";
 import { useNavigate } from "react-router";
 
 function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
-  const { user } = useContext(AuthenticationContext);
+  const { user, isAdmin } = useContext(AuthenticationContext);  // isAdmin 추가
   const [isEditing, setIsEditing] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
 
@@ -65,10 +65,10 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
   // 모든 이미지 파일을 컴포넌트 상단에서 한 번만 필터링
   const allImages = Array.isArray(review.files)
     ? review.files.filter((fileInfo) => {
-        // fileInfo가 객체일 경우 url 속성으로 URL을 가져와서 검사
-        const fileUrl = getImageUrl(fileInfo);
-        return isImageUrl(fileUrl);
-      })
+      // fileInfo가 객체일 경우 url 속성으로 URL을 가져와서 검사
+      const fileUrl = getImageUrl(fileInfo);
+      return isImageUrl(fileUrl);
+    })
     : [];
 
   // 리뷰 내용 더보기 처리
@@ -264,7 +264,9 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
           <div>
             <div className="d-flex align-items-center">
               <div
-                className={`fw-bold text-dark ${isHoverd ? "text-decoration-underline" : ""}`}
+                className={`fw-bold text-dark ${
+                  isHoverd ? "text-decoration-underline" : ""
+                }`}
                 style={{ cursor: "pointer" }}
                 onMouseOver={() => setIsHoverd(true)}
                 onMouseOut={() => setIsHoverd(false)}
@@ -278,14 +280,12 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
                 {review.memberAverageRating}
               </div>
             </div>
-            <div className="small text-muted">
-              {formatDate(review.insertedAt)}
-            </div>
+            <div className="small text-muted">{formatDate(review.insertedAt)}</div>
           </div>
         </div>
 
         {/* 수정/삭제 버튼 (오른쪽) */}
-        {user?.email === review.memberEmail && (
+        {(user?.email === review.memberEmail || isAdmin()) && (
           <div className="d-flex gap-2">
             <Button
               variant="outline-secondary"
@@ -320,10 +320,7 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
 
       {/* 리뷰 본문 - 더보기 기능 추가 */}
       <div className="mb-3 p-3 bg-light rounded">
-        <p
-          className="mb-0 lh-base text-dark"
-          style={{ whiteSpace: "pre-wrap" }}
-        >
+        <p className="mb-0 lh-base text-dark" style={{ whiteSpace: "pre-wrap" }}>
           {displayedReview}
         </p>
         {isLongReview && (
@@ -355,7 +352,7 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
                   cursor: "pointer",
                   transition: "transform 0.2s",
                 }}
-                onClick={() => handleImageClick(fileUrl)} // 모달이 아래 같이 있어서 리뷰이미지들만 넘겨도 됨
+                onClick={() => handleImageClick(fileUrl)}
                 onMouseOver={(e) => (e.target.style.transform = "scale(1.05)")}
                 onMouseOut={(e) => (e.target.style.transform = "scale(1)")}
               />
@@ -434,7 +431,6 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
                       width: "40px",
                       height: "40px",
                       objectFit: "cover",
-                      // border: "2px solid #e9ecef",
                     }}
                   />
                   <div className="d-flex flex-column ms-3 text-start">

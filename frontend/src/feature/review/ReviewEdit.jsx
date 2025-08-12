@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { Button, Form, ListGroup, Spinner } from "react-bootstrap";
 import { FaSave, FaTimes, FaTrashAlt } from "react-icons/fa";
 import Select from "react-select/creatable";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx"; // 경로 확인 필요
 
 function ReviewEdit({ review, onSave, onCancel }) {
   const [content, setContent] = useState(review.review);
@@ -22,6 +23,12 @@ function ReviewEdit({ review, onSave, onCancel }) {
     })),
   );
   const [inputValue, setInputValue] = useState("");
+
+  // 인증 정보 컨텍스트
+  const { user, isAdmin, hasAccess } = useContext(AuthenticationContext);
+
+  // 작성자거나 관리자면 수정 가능
+  const canEdit = user && (isAdmin() || hasAccess(review.memberEmail));
 
   // 태그 옵션 로드
   useEffect(() => {
@@ -98,8 +105,13 @@ function ReviewEdit({ review, onSave, onCancel }) {
     }
   };
 
-  // ReviewEdit.jsx에 인증 토큰 추가
+  // 저장 처리
   const handleSave = async () => {
+    if (!canEdit) {
+      toast.error("수정 권한이 없습니다.");
+      return;
+    }
+
     if (!content.trim()) {
       toast.warning("내용을 입력하세요.");
       return;
@@ -110,36 +122,23 @@ function ReviewEdit({ review, onSave, onCancel }) {
     try {
       const formData = new FormData();
 
-      formData.append("facilityId", review.petFacility.id || review.facilityId);
+      formData.append("facilityId", review.petFacility?.id || review.facilityId);
       formData.append("review", content.trim());
       formData.append("rating", rating);
       formData.append("facilityName", review.facilityName);
       formData.append("memberEmail", review.memberEmail);
 
-      console.log("=== FormData 구성 ===");
-      console.log("Delete file names:", deleteFileNames);
-      console.log("New files count:", newFiles.length);
-
       deleteFileNames.forEach((name) => {
-        console.log("Adding to FormData - deleteFileNames:", name);
         formData.append("deleteFileNames", name);
       });
 
       newFiles.forEach((fileObj) => {
-        console.log("Adding to FormData - files:", fileObj.file.name);
         formData.append("files", fileObj.file);
       });
 
       selectedTags.forEach((tag) => formData.append("tagNames", tag.value));
 
-      // FormData 내용 확인
-      console.log("=== FormData 최종 확인 ===");
-      for (let pair of formData.entries()) {
-        console.log(pair[0], pair[1]);
-      }
-
       await axios.post(
-        //  <- 이렇게 post로 변경하세요.
         `http://localhost:8080/api/review/update/${review.id}`,
         formData,
         {
@@ -151,11 +150,11 @@ function ReviewEdit({ review, onSave, onCancel }) {
           timeout: 30000,
         },
       );
-      const reviewId = review.id;
+
       toast.success("수정 완료!");
 
       if (onSave) {
-        onSave(reviewId);
+        onSave(review.id);
       }
     } catch (error) {
       console.error("수정 실패:", error);
@@ -171,15 +170,19 @@ function ReviewEdit({ review, onSave, onCancel }) {
     }
   };
 
-  // ReviewEdit.jsx의 handleFileChange 함수에 추가할 검증 로직
+  // 파일 변경 처리
   const handleFileChange = (e) => {
+    if (!canEdit) {
+      toast.error("파일 추가 권한이 없습니다.");
+      return;
+    }
+
     const selectedFiles = Array.from(e.target.files);
 
     // 전체 파일 개수 체크 (기존 + 새로운 파일)
     const totalFileCount =
       existingFiles.length + newFiles.length + selectedFiles.length;
     if (totalFileCount > 15) {
-      // 적절한 제한값 설정
       toast.warning(
         `전체 파일은 최대 15개까지만 업로드할 수 있습니다. 현재: ${totalFileCount}개`,
       );
@@ -229,6 +232,10 @@ function ReviewEdit({ review, onSave, onCancel }) {
   };
 
   const handleRemoveNewFile = (indexToRemove) => {
+    if (!canEdit) {
+      toast.error("파일 삭제 권한이 없습니다.");
+      return;
+    }
     setNewFiles((prev) => {
       const fileToRemove = prev[indexToRemove];
       if (fileToRemove?.previewUrl) {
@@ -239,43 +246,27 @@ function ReviewEdit({ review, onSave, onCancel }) {
   };
 
   const handleRemoveExistingFile = (fileUrlToRemove) => {
-    console.log("=== 기존 파일 삭제 시도 ===");
-    console.log("File URL to remove:", fileUrlToRemove);
+    if (!canEdit) {
+      toast.error("파일 삭제 권한이 없습니다.");
+      return;
+    }
 
     const fileName = getFileNameFromUrl(fileUrlToRemove);
-    console.log("Extracted file name for deletion:", fileName);
 
-    setDeleteFileNames((prev) => {
-      const newDeleteList = [...prev, fileName];
-      console.log("Updated delete file names:", newDeleteList);
-      return newDeleteList;
-    });
-
+    setDeleteFileNames((prev) => [...prev, fileName]);
     setExistingFiles((prev) => prev.filter((url) => url !== fileUrlToRemove));
   };
 
   const getFileNameFromUrl = (fileUrl) => {
     try {
-      console.log("=== 파일명 추출 ===");
-      console.log("Original URL from state:", fileUrl);
-
       const url = new URL(fileUrl);
       const pathSegments = url.pathname.split("/");
       const encodedFileName = pathSegments[pathSegments.length - 1];
-
-      console.log("Encoded filename from URL object:", encodedFileName);
-
-      // 인코딩된 파일명(예: %ED%99%94)을 원래의 한글/특수문자로 되돌립니다.
-      const decodedFileName = decodeURIComponent(encodedFileName);
-
-      console.log("Decoded filename to be sent:", decodedFileName);
-      return decodedFileName;
+      return decodeURIComponent(encodedFileName);
     } catch (error) {
-      console.error("Invalid URL, using fallback:", fileUrl, error);
       const segments = fileUrl.split("/");
       const lastSegment = segments[segments.length - 1];
       const encodedFileName = lastSegment.split("?")[0];
-
       return decodeURIComponent(encodedFileName);
     }
   };
@@ -304,7 +295,7 @@ function ReviewEdit({ review, onSave, onCancel }) {
           placeholder="태그를 입력하거나 선택하세요..."
           formatCreateLabel={(inputValue) => `"${inputValue}" 태그 추가`}
           noOptionsMessage={() => "태그가 없습니다"}
-          isDisabled={isProcessing}
+          isDisabled={isProcessing || !canEdit}
           className="react-select-container"
           classNamePrefix="react-select"
         />
@@ -318,7 +309,7 @@ function ReviewEdit({ review, onSave, onCancel }) {
           rows={4}
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          disabled={isProcessing}
+          disabled={isProcessing || !canEdit}
           maxLength={1000}
           placeholder="리뷰 내용을 입력하세요"
         />
@@ -335,14 +326,14 @@ function ReviewEdit({ review, onSave, onCancel }) {
               style={{
                 fontSize: "1.8rem",
                 color: star <= rating ? "#ffc107" : "#e4e5e9",
-                cursor: isProcessing ? "default" : "pointer",
+                cursor: isProcessing || !canEdit ? "default" : "pointer",
                 marginRight: "4px",
               }}
-              onClick={() => !isProcessing && setRating(star)}
+              onClick={() => !isProcessing && canEdit && setRating(star)}
               role="button"
               tabIndex={0}
               onKeyDown={(e) => {
-                if ((e.key === "Enter" || e.key === " ") && !isProcessing) {
+                if ((e.key === "Enter" || e.key === " ") && !isProcessing && canEdit) {
                   setRating(star);
                 }
               }}
@@ -386,7 +377,7 @@ function ReviewEdit({ review, onSave, onCancel }) {
                   size="sm"
                   variant="outline-danger"
                   onClick={() => handleRemoveExistingFile(fileUrl)}
-                  disabled={isProcessing}
+                  disabled={isProcessing || !canEdit}
                   aria-label={`${getFileNameFromUrl(fileUrl)} 삭제`}
                 >
                   <FaTrashAlt />
@@ -427,7 +418,7 @@ function ReviewEdit({ review, onSave, onCancel }) {
                   size="sm"
                   variant="outline-danger"
                   onClick={() => handleRemoveNewFile(idx)}
-                  disabled={isProcessing}
+                  disabled={isProcessing || !canEdit}
                   aria-label={`${fileObj.file.name} 삭제`}
                 >
                   <FaTrashAlt />
@@ -446,7 +437,7 @@ function ReviewEdit({ review, onSave, onCancel }) {
           multiple
           accept="image/*,.pdf"
           onChange={handleFileChange}
-          disabled={isProcessing}
+          disabled={isProcessing || !canEdit}
         />
         <Form.Text className="text-muted">
           이미지 파일 또는 PDF 파일만 업로드 가능 (최대 10MB)
@@ -465,7 +456,7 @@ function ReviewEdit({ review, onSave, onCancel }) {
         <Button
           variant="primary"
           onClick={handleSave}
-          disabled={isProcessing || !content.trim()}
+          disabled={isProcessing || !content.trim() || !canEdit}
         >
           {isProcessing && (
             <Spinner animation="border" size="sm" className="me-2" />
