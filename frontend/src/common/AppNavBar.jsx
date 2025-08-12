@@ -1,6 +1,6 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useContext, useEffect, useRef, useState } from "react";
-import { Button, Container, Nav, Navbar } from "react-bootstrap"; // React-Bootstrap 컴포넌트 import
+import { Button, Container, Nav, Navbar } from "react-bootstrap";
 import { AuthenticationContext } from "./AuthenticationContextProvider.jsx";
 import { toast } from "react-toastify";
 import { FaUserCircle } from "react-icons/fa";
@@ -10,13 +10,40 @@ export function AppNavBar() {
   const { user, logout, isAdmin } = useContext(AuthenticationContext);
   const navigate = useNavigate();
 
-  // --- 1. 모든 상태(State)와 참조(Ref) 선언 ---
+  // --- 상태(State)와 참조(Ref) 선언 ---
   const [showDropdown, setShowDropdown] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState({
     top: 0,
     right: 0,
   });
+  const [expanded, setExpanded] = useState(false); // 햄버거 메뉴 상태 추가
   const dropdownRef = useRef(null);
+  const navbarRef = useRef(null); // 네비바 전체 참조 추가
+  const hoverTimeoutRef = useRef(null); // 타임아웃 참조 추가
+
+  // 햄버거 메뉴 토글
+  const handleToggle = () => {
+    setExpanded(!expanded);
+  };
+
+  // 마우스가 네비바 영역에 들어왔을 때
+  const handleMouseEnter = () => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+      hoverTimeoutRef.current = null;
+    }
+  };
+
+  // 마우스가 네비바 영역을 벗어났을 때
+  const handleMouseLeave = () => {
+    // 모바일 크기(992px 이하)에서만 작동
+    if (window.innerWidth <= 992 && expanded) {
+      // 300ms 후에 메뉴 닫기
+      hoverTimeoutRef.current = setTimeout(() => {
+        setExpanded(false);
+      }, 300);
+    }
+  };
 
   // 드롭다운 위치 계산
   const handleDropdownToggle = (event) => {
@@ -30,7 +57,7 @@ export function AppNavBar() {
     setShowDropdown(!showDropdown);
   };
 
-  // 로그인 시 드롭다운 메뉴에 표시될 타이틀입니다.
+  // 로그인 시 드롭다운 메뉴에 표시될 타이틀
   const userDropdownTitle = (
     <span className="text-white fw-bold">
       <FaUserCircle size={24} className="me-2" />
@@ -118,9 +145,9 @@ export function AppNavBar() {
 
   // 활성화된 NavLink 스타일
   const activeLinkStyle = {
-    color: "#d9534f", // 포인트 색상으로 변경
+    color: "#d9534f",
     fontWeight: 700,
-    borderBottom: "1px solid #d9534f", // 하단에 라인 추가
+    borderBottom: "1px solid #d9534f",
   };
 
   // 외부 클릭 시 드롭다운 닫기
@@ -140,6 +167,44 @@ export function AppNavBar() {
     };
   }, [showDropdown]);
 
+  // 네비바 외부 클릭 시 햄버거 메뉴 닫기
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (navbarRef.current && !navbarRef.current.contains(event.target)) {
+        setExpanded(false);
+      }
+    };
+
+    if (expanded) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [expanded]);
+
+  // 컴포넌트 언마운트 시 타임아웃 정리
+  useEffect(() => {
+    return () => {
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  // 화면 크기 변경 시 메뉴 닫기
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 992) {
+        setExpanded(false);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   return (
     <>
       <style>
@@ -147,7 +212,7 @@ export function AppNavBar() {
           /* 드롭다운이 다른 요소를 밀어내지 않도록 절대 위치 설정 */
           .dropdown-menu {
             position: absolute !important;
-            z-index: 1050 !important; /* 더 높은 z-index로 설정 */
+            z-index: 1050 !important;
             top: 100% !important;
             right: 0 !important;
             left: auto !important;
@@ -158,7 +223,7 @@ export function AppNavBar() {
           /* 드롭다운 컨테이너의 위치 설정 */
           .nav-dropdown-container {
             position: relative;
-            z-index: 1051; /* 컨테이너도 높은 z-index */
+            z-index: 1051;
           }
           
           /* 네비바 콜랩스 부드러운 전환 */
@@ -177,7 +242,14 @@ export function AppNavBar() {
           }
         `}
       </style>
-      <Navbar expand="lg" className="px-4 shadow-sm">
+      <Navbar
+        expand="lg"
+        className="px-4 shadow-sm"
+        expanded={expanded}
+        ref={navbarRef}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
         <Container>
           {/* 로고와 브랜드 이름 */}
           <Navbar.Brand as={Link} to="/" className="d-flex align-items-center">
@@ -226,7 +298,7 @@ export function AppNavBar() {
                 </Button>
               )}
             </Nav>
-            <Navbar.Toggle aria-controls="main-nav" />
+            <Navbar.Toggle aria-controls="main-nav" onClick={handleToggle} />
           </div>
 
           {/* 접히는 메뉴 영역 */}
@@ -239,6 +311,7 @@ export function AppNavBar() {
                     ? { ...navLinkStyle, ...activeLinkStyle }
                     : navLinkStyle
                 }
+                onClick={() => setExpanded(false)}
               >
                 ABOUT
               </NavLink>
@@ -249,6 +322,7 @@ export function AppNavBar() {
                     ? { ...navLinkStyle, ...activeLinkStyle }
                     : navLinkStyle
                 }
+                onClick={() => setExpanded(false)}
               >
                 지도찾기
               </NavLink>
@@ -259,6 +333,7 @@ export function AppNavBar() {
                     ? { ...navLinkStyle, ...activeLinkStyle }
                     : navLinkStyle
                 }
+                onClick={() => setExpanded(false)}
               >
                 최신리뷰
               </NavLink>
@@ -269,6 +344,7 @@ export function AppNavBar() {
                     ? { ...navLinkStyle, ...activeLinkStyle }
                     : navLinkStyle
                 }
+                onClick={() => setExpanded(false)}
               >
                 공지사항
               </NavLink>
@@ -279,6 +355,7 @@ export function AppNavBar() {
                     ? { ...navLinkStyle, ...activeLinkStyle }
                     : navLinkStyle
                 }
+                onClick={() => setExpanded(false)}
               >
                 CONTACT
               </NavLink>
@@ -290,6 +367,7 @@ export function AppNavBar() {
                       ? { ...navLinkStyle, ...activeLinkStyle }
                       : navLinkStyle
                   }
+                  onClick={() => setExpanded(false)}
                 >
                   관리자
                 </NavLink>

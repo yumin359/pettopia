@@ -131,30 +131,30 @@ body {
     margin-right: 8px;
 }
 
-/* 반응형 디자인 (선택 사항) */
-@media (max-width: 768px) {
-    .cta-title {
-        font-size: 1.75rem;
-    }
+/*!* 반응형 디자인 (선택 사항) *!*/
+/*@media (max-width: 768px) {*/
+/*    .cta-title {*/
+/*        font-size: 1.75rem;*/
+/*    }*/
 
-    .cta-description {
-        font-size: 1.0rem;
-    }
+/*    .cta-description {*/
+/*        font-size: 1.0rem;*/
+/*    }*/
 
-    .cta-buttons {
-        flex-direction: column;
-        align-items: center;
-    }
+/*    .cta-buttons {*/
+/*        flex-direction: column;*/
+/*        align-items: center;*/
+/*    }*/
 
-    .cta-button {
-        width: 100%;
-    }
-}
+/*    .cta-button {*/
+/*        width: 100%;*/
+/*    }*/
+/*}*/
 
-/* Mobile styles - you can refine these further if needed */
-.mobile-menu-toggle {
-    display: none; /* Hide by default on desktop */
-}
+/*!* Mobile styles - you can refine these further if needed *!*/
+/*.mobile-menu-toggle {*/
+/*    display: none; !* Hide by default on desktop *!*/
+/*}*/
 
 /* 네브바 전체 스타일 (사용자님의 스타일 반영) */
 .navbar {
