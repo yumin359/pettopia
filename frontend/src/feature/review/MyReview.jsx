@@ -101,7 +101,6 @@ export function MyReview() {
                     <Carousel
                       className="rounded"
                       interval={null}
-                      slide={false}
                       style={{ maxWidth: "300px", margin: "0 auto" }}
                     >
                       {reviewImages.map((image, i) => (
