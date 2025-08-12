@@ -52,20 +52,20 @@ export function MyReview() {
       {/* Col의 최대 너비를 더 작게 설정하여 컨텐츠를 중앙으로 모으고 가독성 높이기 */}
       <Col xs={12} md={9} lg={7}>
         {/* 간단 프로필 - 이 부분은 유지 */}
-        <div className="d-flex flex-row align-items-start mb-4">
+        <div className="d-flex flex-row align-items-start mb-2">
           <Image
             roundedCircle
             className="me-3"
             src={userProfileImage}
             alt={`${userNickName} 프로필`}
             style={{
-              width: "70px",
-              height: "70px",
+              width: "67px",
+              height: "67px",
               objectFit: "cover",
             }}
           />
           <div className="d-flex flex-column align-items-start">
-            <h3 className="fw-bold mb-0">{userNickName}</h3>
+            <h3 className="fw-bold mb-1">{userNickName}</h3>
             <span>
               리뷰 <strong>{userCountMemberReview}</strong> 평균 평점{" "}
               <strong>{userMemberAverageRating}</strong>
