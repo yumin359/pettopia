@@ -316,3 +316,5 @@ WHERE allowed_pet_size LIKE '%주말%'
 # ---------------------------------------------------------------------------------
 
 TRUNCATE TABLE support;
+
+DELETE FROM prj04.board WHERE id = 17;
