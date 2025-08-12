@@ -122,14 +122,25 @@ export function MyReview() {
               </div>
 
               <div className="p-1">
-                {/* 2. 시설명 */}
-                <div
-                  className="fw-semibold d-flex align-items-center facility-link mb-2"
-                  style={{ cursor: "pointer" }}
-                  onClick={() => navigate(`/facility/${r.petFacility.id}`)}
-                >
-                  {r.petFacility.name}
-                  <FaChevronRight className="ms-1" size={13} />
+                {/* 2. 시설명 별점 */}
+                <div className="d-flex align-items-center justify-content-between">
+                  <div
+                    className="fw-semibold d-flex align-items-center facility-link mb-2"
+                    style={{ cursor: "pointer" }}
+                    onClick={() => navigate(`/facility/${r.petFacility.id}`)}
+                  >
+                    {r.petFacility.name}
+                    <FaChevronRight className="ms-1" size={13} />
+                  </div>
+                  {/* 별점 */}
+                  {/*<div className="small d-flex align-items-center">*/}
+                  {/*  <span style={{ color: "#f0ad4e", fontSize: "1.1rem" }}>*/}
+                  {/*    {"★".repeat(r.rating)}*/}
+                  {/*  </span>*/}
+                  {/*  <span className="ms-2 text-dark fw-semibold">*/}
+                  {/*    {r.rating}*/}
+                  {/*  </span>*/}
+                  {/*</div>*/}
                 </div>
                 <hr className="my-2 hr-color-pink" />
 
@@ -163,7 +174,8 @@ export function MyReview() {
                 </div>
               </div>
 
-              {index < reviews.length && <hr className="hr-color-hotpink" />}
+              {/* 마지막에 구분선 추가 */}
+              <hr className="hr-color-hotpink" />
             </div>
           );
         })}
