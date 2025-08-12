@@ -216,7 +216,7 @@ const FullFilterKakaoMap = () => {
   return (
     <>
       <style>{RESPONSIVE_STYLES}</style>
-      <div className="container-fluid vh-100 d-flex flex-column p-3 bg-light-subtle">
+      <div className="container-fluid vh-100 d-flex flex-column bg-light-subtle">
         {/* --- 1. 지도 Row --- */}
         <div className="row map-row-container">
           <div className="col-12 h-100 p-0">

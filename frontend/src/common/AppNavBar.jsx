@@ -176,7 +176,7 @@ export function AppNavBar() {
         `}
       </style>
       <Navbar expand="lg" className="px-4 shadow-sm" sticky="top">
-        <Container fluid>
+        <Container>
           {/* 로고와 브랜드 이름 */}
           <Navbar.Brand as={Link} to="/" className="d-flex align-items-center">
             <span
@@ -228,8 +228,8 @@ export function AppNavBar() {
           </div>
 
           {/* 접히는 메뉴 영역 */}
-          <Navbar.Collapse id="basic-navbar-nav">
-            <Nav className="mx-auto">
+          <Navbar.Collapse id="basic-navbar-nav" className="mt-2">
+            <Nav className="mx-auto mb-4 mt-3 gap-3">
               <NavLink
                 to="/about"
                 style={({ isActive }) =>

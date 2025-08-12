@@ -67,10 +67,12 @@ export function LatestReviewsList() {
   }
 
   return (
-    <Container className="my-4 p-4 bg-light rounded shadow">
+    <Container className="my-4 p-4">
       <h2 className="text-center mb-4 fw-bold">
         📝 최신 리뷰
-        <span className="ms-2 fs-6 text-muted">({filteredReviews.length}개)</span>
+        <span className="ms-2 fs-6 text-muted">
+          ({filteredReviews.length}개)
+        </span>
       </h2>
 
       <Form className="mb-4">
