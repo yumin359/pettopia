@@ -1,15 +1,14 @@
 import { Link, NavLink } from "react-router-dom";
-import { Navbar, Nav, Container, Button, NavDropdown } from "react-bootstrap";
 import { useContext, useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { AuthenticationContext } from "./AuthenticationContextProvider.jsx";
-import { FaUserCircle } from "react-icons/fa";
 import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
 
 export function AppNavBar() {
   const { user, logout, isAdmin } = useContext(AuthenticationContext);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState({
     top: 0,
     right: 0,
@@ -29,6 +28,11 @@ export function AppNavBar() {
     setShowDropdown(!showDropdown);
   };
 
+  // 모바일 메뉴 토글
+  const handleMobileMenuToggle = () => {
+    setShowMobileMenu(!showMobileMenu);
+  };
+
   // 외부 클릭 시 드롭다운 닫기
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -46,30 +50,14 @@ export function AppNavBar() {
     };
   }, [showDropdown]);
 
-  // 기본 NavLink 스타일
-  const navLinkStyle = {
-    color: "#555",
-    fontWeight: 500,
-    paddingBottom: "0.5rem",
-    margin: "0 1.2rem",
-    textDecoration: "none",
-    position: "relative",
-    transition: "color 0.3s ease-in-out",
-  };
-
-  // 활성화된 NavLink 스타일
-  const activeLinkStyle = {
-    color: "#ffffff", // 포인트 색상으로 변경
-    fontWeight: 700,
-    borderBottom: "2px solid #ffffff", // 하단에 라인 추가
-  };
-
-  // 로그인 시 드롭다운 메뉴에 표시될 타이틀입니다.
+  // 로그인 시 드롭다운 메뉴에 표시될 타이틀
   const userDropdownTitle = (
-    <span className="text-white fw-bold">
-      <FaUserCircle size={24} className="me-2" />
-      {user?.nickName}
-    </span>
+    <>
+      <div className="user-avatar">
+        {user?.nickName?.charAt(0)?.toUpperCase() || "U"}
+      </div>
+      <span>{user?.nickName || "사용자"}</span>
+    </>
   );
 
   // 커스텀 드롭다운 메뉴 (Portal 사용)
@@ -79,51 +67,23 @@ export function AppNavBar() {
     return createPortal(
       <div
         ref={dropdownRef}
+        className="dropdown-menu-custom show"
         style={{
           position: "absolute",
           top: dropdownPosition.top,
           right: dropdownPosition.right,
-          backgroundColor: "white",
-          borderRadius: "8px",
-          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
-          border: "none",
-          minWidth: "160px",
-          zIndex: 9999,
-          overflow: "hidden",
         }}
       >
         <Link
           to={`/member?email=${user.email}`}
-          className="dropdown-item"
-          style={{
-            display: "block",
-            padding: "8px 16px",
-            color: "#333",
-            textDecoration: "none",
-            borderBottom: "1px solid #eee",
-            transition: "background-color 0.2s",
-          }}
-          onMouseEnter={(e) => (e.target.style.backgroundColor = "#f8f9fa")}
-          onMouseLeave={(e) => (e.target.style.backgroundColor = "transparent")}
+          className="dropdown-item-custom"
           onClick={() => setShowDropdown(false)}
         >
           마이페이지
         </Link>
+        <div className="dropdown-divider"></div>
         <button
-          className="dropdown-item"
-          style={{
-            display: "block",
-            width: "100%",
-            padding: "8px 16px",
-            color: "red",
-            backgroundColor: "transparent",
-            border: "none",
-            textAlign: "left",
-            cursor: "pointer",
-            transition: "background-color 0.2s",
-          }}
-          onMouseEnter={(e) => (e.target.style.backgroundColor = "#f8f9fa")}
-          onMouseLeave={(e) => (e.target.style.backgroundColor = "transparent")}
+          className="dropdown-item-custom danger"
           onClick={() => {
             logout();
             navigate("/login");
@@ -139,85 +99,99 @@ export function AppNavBar() {
   };
 
   return (
-    <>
-      <style>
-        {`
-          /* 드롭다운이 다른 요소를 밀어내지 않도록 절대 위치 설정 */
-          .dropdown-menu {
-            position: absolute !important;
-            z-index: 1050 !important; /* 더 높은 z-index로 설정 */
-            top: 100% !important;
-            right: 0 !important;
-            left: auto !important;
-            transform: none !important;
-            border-radius: 8px !important;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-            border: none !important;
-          }
-          
-          /* 드롭다운 컨테이너의 위치 설정 */
-          .nav-dropdown-container {
-            position: relative;
-            z-index: 1051; /* 컨테이너도 높은 z-index */
-          }
-          
-          /* 네비바 콜랩스 부드러운 전환 */
-          .navbar-collapse {
-            transition: all 0.3s ease-in-out !important;
-          }
-          
-          /* 네비바 자체에도 부드러운 전환 효과 */
-          .navbar {
-            transition: all 0.3s ease-in-out !important;
-          }
-          
-          /* 콜랩스 내용이 나타날 때 부드러운 애니메이션 */
-          .navbar-collapse.collapsing {
-            transition: height 0.3s ease-in-out !important;
-          }
-        `}
-      </style>
-      <Navbar
-        sticky="top"
-        expand="lg"
-        variant="dark"
-        className="px-4 shadow-sm"
-        style={{
-          background: "linear-gradient(90deg, #FFB75E, #FF9900)",
-          minHeight: "80px",
-          borderRadius: "0 0 12px 12px",
-          overflow: "visible",
-        }}
-      >
-        <Container fluid>
-          {/* 로고와 브랜드 이름 */}
-          <Navbar.Brand as={Link} to="/" className="d-flex align-items-center">
-            <span
-              className="ms-2 ms-md-3" // 모바일에서는 ms-2, 중간 화면 이상에서는 ms-3
-              style={{
-                fontFamily: "'Fredoka One', cursive",
-                fontSize: "clamp(1.2rem, 4vw, 1.8rem)", // 반응형 폰트 크기
-                color: "white",
-                textShadow: "1px 1px 3px rgba(0,0,0,0.2)",
-              }}
-            >
-              PETOPIA
-            </span>
-          </Navbar.Brand>
+    <nav className="navbar">
+      <div className="navbar-container">
+        <div className="navbar-inner">
+          {/* Logo */}
+          <Link to="/" className="navbar-brand">
+            <div className="logo-wrapper">
+              <span className="logo-text-doc">PET</span>
+              <div className="logo-dots">
+                <span className="logo-dot"></span>
+              </div>
+              <span className="logo-text-pet">TOPIA</span>
+            </div>
+          </Link>
 
-          <div className="d-flex align-items-center order-lg-2">
-            {/* 로그인 상태에 따른 UI (오른쪽) */}
-            <Nav className="me-3">
+          {/* Navigation Menu */}
+          <div className="navbar-right-group">
+            <ul className={`nav-menu ${showMobileMenu ? "active" : ""}`}>
+              <li className="nav-item">
+                <NavLink
+                  to="/kakaoMap"
+                  className={({ isActive }) =>
+                    `nav-link ${isActive ? "active" : ""}`
+                  }
+                  onClick={() => setShowMobileMenu(false)}
+                >
+                  시설 찾기
+                </NavLink>
+              </li>
+              <li className="nav-item">
+                <NavLink
+                  to="/review/latest"
+                  className={({ isActive }) =>
+                    `nav-link ${isActive ? "active" : ""}`
+                  }
+                  onClick={() => setShowMobileMenu(false)}
+                >
+                  최신 리뷰
+                </NavLink>
+              </li>
+              <li className="nav-item">
+                <NavLink
+                  to="/board/list"
+                  className={({ isActive }) =>
+                    `nav-link ${isActive ? "active" : ""}`
+                  }
+                  onClick={() => setShowMobileMenu(false)}
+                >
+                  공지사항
+                </NavLink>
+              </li>
+              <li className="nav-item">
+                <NavLink
+                  to="/about"
+                  className={({ isActive }) =>
+                    `nav-link ${isActive ? "active" : ""}`
+                  }
+                  onClick={() => setShowMobileMenu(false)}
+                >
+                  About us
+                </NavLink>
+              </li>
+              <li className="nav-item">
+                <NavLink
+                  to="/support"
+                  className={({ isActive }) =>
+                    `nav-link ${isActive ? "active" : ""}`
+                  }
+                  onClick={() => setShowMobileMenu(false)}
+                >
+                  Contact
+                </NavLink>
+              </li>
+              {isAdmin() && (
+                <li className="nav-item">
+                  <NavLink
+                    to="/admin"
+                    className={({ isActive }) =>
+                      `nav-link ${isActive ? "active" : ""}`
+                    }
+                    onClick={() => setShowMobileMenu(false)}
+                  >
+                    관리자
+                  </NavLink>
+                </li>
+              )}
+            </ul>
+
+            {/* User Actions */}
+            <div className="nav-actions">
               {user ? (
-                <div className="nav-dropdown-container">
+                <div className="user-dropdown">
                   <button
-                    className="btn btn-link p-0"
-                    style={{
-                      border: "none",
-                      background: "transparent",
-                      color: "white",
-                      textDecoration: "none",
-                    }}
+                    className="user-dropdown-btn"
                     onClick={handleDropdownToggle}
                   >
                     {userDropdownTitle}
@@ -225,94 +199,26 @@ export function AppNavBar() {
                   <CustomDropdown />
                 </div>
               ) : (
-                <Button
-                  as={Link}
-                  to="/login"
-                  className="fw-bold"
-                  style={{
-                    backgroundColor: "#FF9D00",
-                    borderColor: "#FF9D00",
-                    borderRadius: "20px",
-                    padding: "0.5rem 1.5rem",
-                  }}
-                >
-                  LOGIN
-                </Button>
+                <Link to="/login" className="signin-btn">
+                  SIGN IN <span className="signin-icon">👋</span>
+                </Link>
               )}
-            </Nav>
-            <Navbar.Toggle aria-controls="main-nav" />
-          </div>
+            </div>
 
-          {/* 네비게이션 메뉴 (중앙) */}
-          {/*<Navbar.Toggle aria-controls="basic-navbar-nav" />*/}
-          <Navbar.Collapse id="basic-navbar-nav">
-            <Nav className="mx-auto">
-              <NavLink
-                to="/about"
-                style={({ isActive }) =>
-                  isActive
-                    ? { ...navLinkStyle, ...activeLinkStyle }
-                    : navLinkStyle
-                }
-              >
-                ABOUT
-              </NavLink>
-              <NavLink
-                to="/kakaoMap"
-                style={({ isActive }) =>
-                  isActive
-                    ? { ...navLinkStyle, ...activeLinkStyle }
-                    : navLinkStyle
-                }
-              >
-                MAP
-              </NavLink>
-              <NavLink
-                to="/review/latest"
-                style={({ isActive }) =>
-                  isActive
-                    ? { ...navLinkStyle, ...activeLinkStyle }
-                    : navLinkStyle
-                }
-              >
-                REVIEWS
-              </NavLink>
-              <NavLink
-                to="/board/list"
-                style={({ isActive }) =>
-                  isActive
-                    ? { ...navLinkStyle, ...activeLinkStyle }
-                    : navLinkStyle
-                }
-              >
-                NEWS
-              </NavLink>
-              <NavLink
-                to="/support"
-                style={({ isActive }) =>
-                  isActive
-                    ? { ...navLinkStyle, ...activeLinkStyle }
-                    : navLinkStyle
-                }
-              >
-                SUPPORT
-              </NavLink>
-              {isAdmin() && (
-                <NavLink
-                  to="/admin"
-                  style={({ isActive }) =>
-                    isActive
-                      ? { ...navLinkStyle, ...activeLinkStyle }
-                      : navLinkStyle
-                  }
-                >
-                  관리자
-                </NavLink>
-              )}
-            </Nav>
-          </Navbar.Collapse>
-        </Container>
-      </Navbar>
-    </>
+            {/* Mobile menu toggle (위치 이동) */}
+            <button
+              className="mobile-menu-toggle"
+              onClick={handleMobileMenuToggle}
+            >
+              <div className={`hamburger ${showMobileMenu ? "active" : ""}`}>
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+    </nav>
   );
 }
