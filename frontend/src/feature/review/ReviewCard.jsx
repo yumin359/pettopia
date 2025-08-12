@@ -4,6 +4,7 @@ import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
 import ReviewEdit from "./ReviewEdit.jsx";
 import { useNavigate } from "react-router";
+import { ReviewText } from "../../common/ReviewText.jsx";
 
 function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
   const { user, isAdmin } = useContext(AuthenticationContext);  // isAdmin 추가
@@ -14,7 +15,6 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const [isHoverd, setIsHoverd] = useState(false);
-  const [showFullReview, setShowFullReview] = useState(false); // 더보기 상태 추가
 
   // 이미지 캐루셀 index
   const [modalImageIndex, setModalImageIndex] = useState(0);
@@ -65,33 +65,11 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
   // 모든 이미지 파일을 컴포넌트 상단에서 한 번만 필터링
   const allImages = Array.isArray(review.files)
     ? review.files.filter((fileInfo) => {
-      // fileInfo가 객체일 경우 url 속성으로 URL을 가져와서 검사
-      const fileUrl = getImageUrl(fileInfo);
-      return isImageUrl(fileUrl);
-    })
+        // fileInfo가 객체일 경우 url 속성으로 URL을 가져와서 검사
+        const fileUrl = getImageUrl(fileInfo);
+        return isImageUrl(fileUrl);
+      })
     : [];
-
-  // 리뷰 내용 더보기 처리
-  const REVIEW_PREVIEW_LENGTH = 150; // 글자 수 제한
-  const REVIEW_PREVIEW_LINES = 5; // 줄 수 제한
-  const reviewText = review.review || "";
-
-  // 글자 수 또는 줄 수 기준으로 긴 리뷰 판단
-  const lines = reviewText.split("\n");
-  const isLongByLength = reviewText.length > REVIEW_PREVIEW_LENGTH;
-  const isLongByLines = lines.length > REVIEW_PREVIEW_LINES;
-  const isLongReview = isLongByLength || isLongByLines;
-
-  let displayedReview;
-  if (showFullReview || !isLongReview) {
-    displayedReview = reviewText;
-  } else if (isLongByLines) {
-    // 줄 수가 많은 경우: 처음 5줄만 표시
-    displayedReview = lines.slice(0, REVIEW_PREVIEW_LINES).join("\n") + "\n...";
-  } else {
-    // 글자 수가 많은 경우: 처음 150자만 표시
-    displayedReview = reviewText.substring(0, REVIEW_PREVIEW_LENGTH) + "...";
-  }
 
   const handleImageClick = (imageInfo, index) => {
     setModalImageIndex(index);
@@ -264,9 +242,7 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
           <div>
             <div className="d-flex align-items-center">
               <div
-                className={`fw-bold text-dark ${
-                  isHoverd ? "text-decoration-underline" : ""
-                }`}
+                className={`fw-bold text-dark ${isHoverd ? "text-decoration-underline" : ""}`}
                 style={{ cursor: "pointer" }}
                 onMouseOver={() => setIsHoverd(true)}
                 onMouseOut={() => setIsHoverd(false)}
@@ -318,21 +294,9 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
         </div>
       )}
 
-      {/* 리뷰 본문 - 더보기 기능 추가 */}
+      {/* 리뷰 본문 */}
       <div className="mb-3 p-3 bg-light rounded">
-        <p className="mb-0 lh-base text-dark" style={{ whiteSpace: "pre-wrap" }}>
-          {displayedReview}
-        </p>
-        {isLongReview && (
-          <Button
-            variant="link"
-            size="sm"
-            className="p-0 mt-2 text-secondary"
-            onClick={() => setShowFullReview(!showFullReview)}
-          >
-            {showFullReview ? "간략히 보기" : "더보기"}
-          </Button>
-        )}
+        <ReviewText text={review.review} />
       </div>
 
       {/* 첨부 이미지 */}
@@ -352,7 +316,7 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
                   cursor: "pointer",
                   transition: "transform 0.2s",
                 }}
-                onClick={() => handleImageClick(fileUrl)}
+                onClick={() => handleImageClick(fileUrl)} // 모달이 아래 같이 있어서 리뷰이미지들만 넘겨도 됨
                 onMouseOver={(e) => (e.target.style.transform = "scale(1.05)")}
                 onMouseOut={(e) => (e.target.style.transform = "scale(1)")}
               />

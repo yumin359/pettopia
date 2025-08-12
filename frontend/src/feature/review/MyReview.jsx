@@ -6,6 +6,7 @@ import { useParams } from "react-router";
 import { FaChevronRight } from "react-icons/fa";
 import "./Review.css";
 import "../../common/Carousel.css";
+import { ReviewText } from "../../common/ReviewText.jsx";
 
 export function MyReview() {
   const [reviews, setReviews] = useState(null);
@@ -80,15 +81,15 @@ export function MyReview() {
               <div key={r.id} className="review-item">
                 <div className={reviewImages.length > 0 ? "mb-3" : ""}>
                   {/* 1. 사진: 캐러셀로 여러 장 표시 한장이면 이미지만 */}
-                  <div style={{ maxWidth: "400px", margin: "0 auto" }}>
+                  <div style={{ maxWidth: "300px", margin: "0 auto" }}>
                     {reviewImages.length === 1 && (
                       <img
                         src={reviewImages[0]}
                         alt="리뷰 이미지"
                         className="d-block"
                         style={{
-                          height: "500px",
-                          width: "400px",
+                          height: "400px",
+                          width: "300px",
                           objectFit: "cover",
                           margin: "0 auto",
                         }}
@@ -101,7 +102,7 @@ export function MyReview() {
                       className="rounded"
                       interval={null}
                       slide={false}
-                      style={{ maxWidth: "400px", margin: "0 auto" }}
+                      style={{ maxWidth: "300px", margin: "0 auto" }}
                     >
                       {reviewImages.map((image, i) => (
                         <Carousel.Item key={i}>
@@ -110,8 +111,8 @@ export function MyReview() {
                             alt={`리뷰 이미지 ${i + 1}`}
                             className="d-block"
                             style={{
-                              height: "500px",
-                              width: "400px",
+                              height: "400px",
+                              width: "300px",
                               objectFit: "cover",
                               margin: "0 auto",
                             }}
@@ -152,7 +153,7 @@ export function MyReview() {
                     className="text-muted mb-2"
                     style={{ whiteSpace: "pre-wrap" }}
                   >
-                    {r.review}
+                    <ReviewText text={r.review} />
                   </div>
 
                   {/* 4. 태그 */}
