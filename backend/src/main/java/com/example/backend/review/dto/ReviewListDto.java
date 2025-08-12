@@ -27,4 +27,5 @@ public class ReviewListDto {
     private List<TagDto> tags;
 
     private Long likesCount; // ✨ 좋아요 수 필드 추가
+    private Long countMemberReview; // 회원 리뷰 수
 }

@@ -335,6 +335,9 @@ public class ReviewService {
                 .sigunguName(facility.getSigunguName())
                 .build();
 
+        Long memberId = review.getMemberEmail().getId();
+        Long countMemberReview = reviewRepository.countByMemberEmail_Id(memberId);
+
         return ReviewListDto.builder()
                 .id(review.getId())
                 .petFacility(facilityDto)
@@ -348,6 +351,7 @@ public class ReviewService {
                 .memberId(review.getMemberEmail().getId())
                 .tags(tagDtos)
                 .likesCount((long) (review.getLikes() != null ? review.getLikes().size() : 0))
+                .countMemberReview(countMemberReview)
                 .build();
     }
 

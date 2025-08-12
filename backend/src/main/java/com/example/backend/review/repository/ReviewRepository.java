@@ -26,11 +26,13 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
 
     // 좋아요 수 순 정렬 — 페이징 처리 포함 (Pageable 사용 권장)
     @Query("""
-    SELECT r FROM Review r
-    LEFT JOIN r.likes rl
-    WHERE r.petFacility.id = :facilityId
-    GROUP BY r.id, r.insertedAt, r.review, r.rating, r.memberEmail, r.petFacility
-    ORDER BY COUNT(rl) DESC, r.insertedAt DESC
-""")
+                SELECT r FROM Review r
+                LEFT JOIN r.likes rl
+                WHERE r.petFacility.id = :facilityId
+                GROUP BY r.id, r.insertedAt, r.review, r.rating, r.memberEmail, r.petFacility
+                ORDER BY COUNT(rl) DESC, r.insertedAt DESC
+            """)
     Page<Review> findByPetFacilityIdOrderByLikesDesc(@Param("facilityId") Long facilityId, Pageable pageable);
+    
+    Long countByMemberEmail_Id(Long memberId);
 }

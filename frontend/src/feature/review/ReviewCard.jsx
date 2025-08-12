@@ -259,14 +259,20 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
             style={{ objectFit: "cover" }}
           />
           <div>
-            <div
-              className={`fw-medium text-dark ${isHoverd ? "text-decoration-underline" : ""}`}
-              style={{ cursor: "pointer" }}
-              onMouseOver={() => setIsHoverd(true)}
-              onMouseOut={() => setIsHoverd(false)}
-              onClick={() => navigate(`/review/my/${review.memberId}`)}
-            >
-              {review.memberEmailNickName || "알 수 없음"}
+            <div className="d-flex align-items-center">
+              <div
+                className={`fw-bold text-dark ${isHoverd ? "text-decoration-underline" : ""}`}
+                style={{ cursor: "pointer" }}
+                onMouseOver={() => setIsHoverd(true)}
+                onMouseOut={() => setIsHoverd(false)}
+                onClick={() => navigate(`/review/my/${review.memberId}`)}
+              >
+                {review.memberEmailNickName || "알 수 없음"}
+              </div>
+              <div className="small text-muted ms-2">
+                {" "}
+                | 리뷰 {review.countMemberReview}
+              </div>
             </div>
             <div className="small text-muted">
               {formatDate(review.insertedAt)}
@@ -427,8 +433,13 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
                       // border: "2px solid #e9ecef",
                     }}
                   />
-                  <div className="text-white">
-                    <strong>{review.memberEmailNickName}</strong>
+                  <div className="d-flex flex-column ms-3">
+                    <strong className="text-white">
+                      {review.memberEmailNickName || "알 수 없음"}
+                    </strong>
+                    <span className="small text-white text-opacity-75">
+                      리뷰 {review.countMemberReview}
+                    </span>
                   </div>
                 </Carousel.Caption>
               </Carousel.Item>
