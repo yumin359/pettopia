@@ -207,7 +207,6 @@ body {
 /* ======BoardLayout.jsx 의 아래 ================*/
 .cta-section {
     background: #F4E9E3;
-    background: radial-gradient(circle, rgba(244, 233, 227, 1) 0%, rgba(242, 216, 199, 1) 100%);
     padding: 40px 20px;
     text-align: center;
     border-top-width: 1px;
