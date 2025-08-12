@@ -7,6 +7,7 @@ import { FaChevronRight } from "react-icons/fa";
 import "./Review.css";
 import "../../common/Carousel.css";
 import { ReviewText } from "../../common/ReviewText.jsx";
+import { ReviewLikeContainer } from "../like/ReviewLikeContainer.jsx";
 
 export function MyReview() {
   const [reviews, setReviews] = useState(null);
@@ -18,6 +19,7 @@ export function MyReview() {
       .get(`/api/review/myReview/${memberId}`)
       .then((res) => {
         setReviews(res.data);
+        console.log(res.data);
       })
       .catch((err) => {
         console.error("리뷰 불러오기 실패", err);
@@ -168,6 +170,9 @@ export function MyReview() {
                 <div className="text-muted" style={{ fontSize: "0.85rem" }}>
                   {r.insertedAt?.split("T")[0]}
                 </div>
+
+                {/* 6. 좋아요 */}
+                <ReviewLikeContainer reviewId={r.id} />
               </div>
 
               {/* 마지막에 구분선 추가 */}
