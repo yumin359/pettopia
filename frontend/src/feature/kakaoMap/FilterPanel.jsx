@@ -43,11 +43,9 @@ const FilterPanel = ({
 
   return (
     <div
-      className="h-100 d-flex flex-column bg-white p-3"
+      className="d-flex flex-column bg-dark text-light p-3"
       style={{
         fontSize: "12px",
-        border: "solid 1px black",
-        boxShadow: "5px 5px 1px 1px black",
       }}
     >
       {/* 검색창 */}
@@ -61,7 +59,8 @@ const FilterPanel = ({
         />
       </div>
 
-      <div className="flex-grow-1 overflow-auto" style={{ minHeight: 0 }}>
+      {/* 카테고리와 반려동물 종류*/}
+      <div className="flex-grow-1 overflow-auto mb-2" style={{ minHeight: 0 }}>
         {/* 통합된 FilterGroup 사용 */}
         <FilterGroup
           title="📍 지역"

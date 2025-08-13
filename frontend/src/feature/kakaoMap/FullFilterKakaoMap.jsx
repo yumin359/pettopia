@@ -244,15 +244,14 @@ const FullFilterKakaoMap = () => {
           </div>
         </div>
 
-        <div style={{ height: "1rem" }} />
-
+        {/*<div style={{ height: "1rem" }} />*/}
         {/* --- 2. 컨텐츠 Row (필터 + 리스트) --- */}
         <div
           className="row flex-grow-1 overflow-y-auto"
           style={{ minHeight: "0" }}
         >
           {/* 필터 Column */}
-          <div className="col-12 col-md-4 align-self-md-start mb-3 mb-md-0">
+          <div className="col-12 col-md-4 align-self-md-start mb-3 h-100 mb-md-0 bg-dark overflow-x-hidden">
             <FilterPanel
               {...filterStates}
               {...filterSetters}
