@@ -94,7 +94,7 @@ export function BoardLayout() {
                   }}
                   style={{
                     width: "100%",
-                    height: "420px",
+                    height: "450px",
                     objectFit: "cover",
                     objectPosition: "center center",
                   }}
@@ -133,18 +133,18 @@ export function BoardLayout() {
       </Row>
       <div className="container">
         {/* 공지사항과 리뷰 리스트를 반씩 나눠서 배치 */}
-        <Row className="mt-4" style={{ maxHeight: "400px" }}>
+        <Row className="mt-3" style={{ maxHeight: "280px" }}>
           <Col md={6} style={{ overflowY: "auto" }}>
-            <h5 style={{ fontSize: "1.5rem", fontWeight: "600" }}>공지사항</h5>
-            <BoardListMini fontSize="1.25rem" iconSize={18} />
+            <h5 style={{ fontSize: "1.3rem", fontWeight: "600" }}>공지사항</h5>
+            <BoardListMini fontSize="1rem" iconSize={16} />
           </Col>
 
           <Col md={6}>
-            <h5 style={{ fontSize: "1.5rem", fontWeight: "600" }}>최신 리뷰</h5>
+            <h5 style={{ fontSize: "1.3rem", fontWeight: "600" }}>최신 리뷰</h5>
             <ReviewCarousel />
           </Col>
         </Row>
-        <div className="py-4" />
+        <div className="py-3" />
       </div>
 
       {/* CTA 섹션 */}
