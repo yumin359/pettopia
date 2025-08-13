@@ -71,12 +71,10 @@ export function MapDetail() {
   };
 
   const handleDelete = async (reviewId) => {
-    if (!window.confirm("정말 삭제하시겠습니까?")) return;
     try {
       await axios.delete(`/api/review/delete/${reviewId}`, {
         data: { email: user.email },
       });
-      alert("삭제 완료");
       setSearchParams({ focusReviewId: "" });
       fetchReviews();
     } catch (err) {
@@ -118,12 +116,15 @@ export function MapDetail() {
     return (sum / reviews.length).toFixed(1);
   };
 
+  // 이것도 없애도 상관없을 것 같긴 한디
   const isImageFile = (fileUrl) => {
     const ext = fileUrl.split(".").pop().split("?")[0];
     return ["jpg", "jpeg", "png", "gif", "webp"].includes(ext.toLowerCase());
   };
 
   const allImagesAndNickNameFromReviews = reviews.flatMap((review) =>
+    // 없애면 이렇게 쓰면 됨
+    // (review.files || []).map((fileUrl) => ({
     (review.files || []).filter(isImageFile).map((fileUrl) => ({
       url: fileUrl,
       nickName: review.memberEmailNickName,
@@ -267,7 +268,9 @@ export function MapDetail() {
                 <i className="bi bi-camera-fill me-3 fs-4"></i>
                 <div>
                   <h4 className="card-title mb-0">사진 ▪ 영상</h4>
-                  <small className="opacity-75">Photos & Videos from Reviews</small>
+                  <small className="opacity-75">
+                    Photos & Videos from Reviews
+                  </small>
                 </div>
               </div>
             </div>
@@ -283,8 +286,12 @@ export function MapDetail() {
               ) : allImagesAndNickNameFromReviews.length === 0 ? (
                 <div className="text-center py-5">
                   <i className="bi bi-images text-muted display-4"></i>
-                  <h5 className="mt-3 text-muted">아직 업로드된 사진이 없습니다</h5>
-                  <small className="text-muted">첫 번째 사진을 공유해보세요!</small>
+                  <h5 className="mt-3 text-muted">
+                    아직 업로드된 사진이 없습니다
+                  </h5>
+                  <small className="text-muted">
+                    첫 번째 사진을 공유해보세요!
+                  </small>
                 </div>
               ) : (
                 <ReviewCard
@@ -312,7 +319,9 @@ export function MapDetail() {
                         {reviews.length}
                       </span>
                     </h4>
-                    <small className="opacity-75">User Reviews & Experiences</small>
+                    <small className="opacity-75">
+                      User Reviews & Experiences
+                    </small>
                   </div>
                 </div>
 
@@ -353,7 +362,9 @@ export function MapDetail() {
                   <h5 className="mt-3 fw-bold text-muted">
                     아직 작성된 리뷰가 없습니다
                   </h5>
-                  {user && <p className="text-muted">첫 번째 리뷰를 작성해보세요!</p>}
+                  {user && (
+                    <p className="text-muted">첫 번째 리뷰를 작성해보세요!</p>
+                  )}
                 </div>
               ) : (
                 <div className="list-group list-group-flush">

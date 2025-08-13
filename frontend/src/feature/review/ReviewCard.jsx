@@ -350,32 +350,6 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
         </div>
       )}
 
-      {/* PDF 파일 표시 */}
-      {Array.isArray(review.files) &&
-        review.files.filter((f) => !isImageUrl(f)).length > 0 && (
-          <div className="mb-3">
-            <div className="small text-muted mb-2">📎 첨부 파일</div>
-            <div className="d-flex flex-wrap gap-2">
-              {review.files
-                .filter((f) => !isImageUrl(f))
-                .map((fileUrl, idx) => {
-                  const fileName = fileUrl.split("/").pop().split("?")[0];
-                  return (
-                    <a
-                      key={idx}
-                      href={fileUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="btn btn-outline-secondary btn-sm text-decoration-none"
-                    >
-                      📄 {fileName}
-                    </a>
-                  );
-                })}
-            </div>
-          </div>
-        )}
-
       {/* 이미지 확대 모달 */}
       <Modal
         show={showImageModal}

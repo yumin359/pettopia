@@ -74,8 +74,7 @@ export function ReviewAdd({ facility, onSave, onCancel }) {
     const selectedFiles = Array.from(e.target.files);
 
     const validFiles = selectedFiles.filter((file) => {
-      const isValidType =
-        file.type.startsWith("image/") || file.type === "application/pdf";
+      const isValidType = file.type.startsWith("image/");
       const isValidSize = file.size <= 10 * 1024 * 1024;
 
       if (!isValidType) {
@@ -325,40 +324,37 @@ export function ReviewAdd({ facility, onSave, onCancel }) {
         {files.length > 0 && (
           <FormGroup className="mb-3">
             <Form.Label>첨부 파일</Form.Label>
-            <ListGroup>
-              {files.map((f, idx) => (
-                <ListGroup.Item
-                  key={idx}
-                  className="d-flex justify-content-between align-items-center"
-                >
-                  <div className="d-flex align-items-center">
-                    {f.previewUrl && (
-                      <img
-                        src={f.previewUrl}
-                        alt="미리보기"
-                        style={{
-                          width: 40,
-                          height: 40,
-                          objectFit: "cover",
-                          marginRight: "10px",
-                          borderRadius: "4px",
-                        }}
-                      />
-                    )}
-                    <span className="text-truncate">{f.file.name}</span>
-                  </div>
+            <div className="d-flex flex-wrap gap-2">
+              {files.map((fileObj, idx) => (
+                <div key={idx} className="position-relative">
+                  <img
+                    src={fileObj.previewUrl}
+                    alt="미리보기"
+                    style={{
+                      width: 100,
+                      height: 100,
+                      objectFit: "cover",
+                      borderRadius: "4px",
+                    }}
+                  />
+                  {/* 오버레이 X 버튼 */}
                   <Button
-                    size="sm"
-                    variant="outline-danger"
+                    variant="danger"
+                    className="position-absolute top-0 end-0 p-1"
+                    style={{
+                      borderRadius: "0 4px 0 4px",
+                      lineHeight: 1,
+                      opacity: 0.8,
+                    }}
                     onClick={() => handleFileRemove(idx)}
                     disabled={isProcessing}
-                    aria-label={`${f.file.name} 파일 삭제`}
+                    aria-label={`${fileObj.file.name} 삭제`}
                   >
-                    <FaTrashAlt />
+                    &times; {/* X 아이콘 */}
                   </Button>
-                </ListGroup.Item>
+                </div>
               ))}
-            </ListGroup>
+            </div>
           </FormGroup>
         )}
 
@@ -373,7 +369,7 @@ export function ReviewAdd({ facility, onSave, onCancel }) {
             disabled={isProcessing}
           />
           <Form.Text className="text-muted">
-            이미지 파일 또는 PDF 파일만 업로드 가능 (최대 10MB)
+            이미지 파일만 업로드 가능 (최대 10MB)
           </Form.Text>
         </FormGroup>
 
