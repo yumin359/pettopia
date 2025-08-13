@@ -21,7 +21,6 @@ import { MyReview } from "./feature/review/MyReview.jsx";
 import { KakaoCallback } from "./feature/member/KakaoCallback.jsx";
 import { AdminPage } from "./AdminPage.jsx";
 import ReviewReportList from "./feature/report/ReviewReportList.jsx";
-import GoogleCalendarReview from "./feature/calendar/GoogleCalendarReview.jsx";
 import { About } from "./common/About.jsx";
 import "./styles/styles.css";
 import "./styles/Carousel.css";
@@ -48,15 +47,14 @@ function App() {
             <Route path="/member" element={<MemberDetail />} />
             <Route path="/member/edit" element={<MemberEdit />} />
 
+            <Route path="/review/my/:memberId" element={<MyReview />} />
+            <Route path="/review/latest" element={<LatestReviewsList />} />
+
             <Route path="/auth/kakao/callback" element={<KakaoCallback />} />
+
             <Route path="/KakaoMap" element={<FullFilterKakaoMap />} />
 
             <Route path="/facility/:id" element={<MapDetail />} />
-
-            <Route path="/calendar" element={<GoogleCalendarReview />} />
-
-            <Route path="/review/my/:memberId" element={<MyReview />} />
-            <Route path="/review/latest" element={<LatestReviewsList />} />
 
             <Route path="/chatbot" element={<Chatbot />} />
 
