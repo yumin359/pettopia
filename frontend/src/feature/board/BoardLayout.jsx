@@ -134,13 +134,12 @@ export function BoardLayout() {
       <div className="container">
         {/* 공지사항과 리뷰 리스트를 반씩 나눠서 배치 */}
         <Row className="mt-3" style={{ maxHeight: "280px" }}>
-          <Col md={6} style={{ overflowY: "auto" }}>
-            <h5 style={{ fontSize: "1.3rem", fontWeight: "600" }}>공지사항</h5>
-            <BoardListMini fontSize="1rem" iconSize={16} />
+          <Col md={6}>
+            <h5 style={{ fontSize: "2rem", fontWeight: "600" }}>공지사항</h5>
+            <BoardListMini />
           </Col>
 
           <Col md={6}>
-            <h5 style={{ fontSize: "1.3rem", fontWeight: "600" }}>최신 리뷰</h5>
             <ReviewCarousel />
           </Col>
         </Row>
