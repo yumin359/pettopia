@@ -305,6 +305,17 @@ export function AppNavBar() {
           <Navbar.Collapse id="basic-navbar-nav" className="mt-2">
             <Nav className="mx-auto mb-4 mt-3 gap-3">
               <NavLink
+                to="/calendar"
+                style={({ isActive }) =>
+                  isActive
+                    ? { ...navLinkStyle, ...activeLinkStyle }
+                    : navLinkStyle
+                }
+                onClick={() => setExpanded(false)}
+              >
+                calendar
+              </NavLink>
+              <NavLink
                 to="/about"
                 style={({ isActive }) =>
                   isActive

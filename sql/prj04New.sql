@@ -166,7 +166,7 @@ CREATE TABLE `review`
     CONSTRAINT `FKg5515o0nnntje78uxpmiaq084` FOREIGN KEY (`facility_id`) REFERENCES `pet_facility` (`id`),
     CONSTRAINT `review_ibfk_1` FOREIGN KEY (`member_email`) REFERENCES `member` (`email`) ON DELETE CASCADE
 ) ENGINE = InnoDB
-  AUTO_INCREMENT = 65
+  AUTO_INCREMENT = 144
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 # ---------------------------------------------------------------------------------
@@ -275,6 +275,10 @@ FROM pet_facility
 WHERE allowed_pet_size LIKE '%주말%'
    OR allowed_pet_size LIKE '%kg%'
    OR allowed_pet_size LIKE '%공휴일%';
+
+-- 캘린더 추가합니다.
+ALTER TABLE `review`
+    ADD INDEX `idx_member_date` (`member_email`, `inserted_at`);
 # ---------------------------------------------------------------------------------
 # UPDATE review r
 #     JOIN pet_facility pf ON TRIM(r.facility_name) = TRIM(pf.name)
@@ -292,4 +296,6 @@ WHERE allowed_pet_size LIKE '%주말%'
 
 TRUNCATE TABLE support;
 
-DELETE FROM prj04.board WHERE id = 17;
+DELETE
+FROM prj04.board
+WHERE id = 17;
