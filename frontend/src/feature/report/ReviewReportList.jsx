@@ -11,7 +11,6 @@ export default function ReviewReportList() {
   const { isAdmin } = useContext(AuthenticationContext);
   const navigate = useNavigate();
 
-  // 관리자 권한 체크
   if (!(typeof isAdmin === "function" ? isAdmin() : isAdmin)) {
     return <Navigate to="/login" replace />;
   }
@@ -36,6 +35,15 @@ export default function ReviewReportList() {
     fetchReports();
   }, []);
 
+  function renderWithLineBreaks(text) {
+    return text.split('\n').map((line, i) => (
+      <span key={i}>
+        {line}
+        <br />
+      </span>
+    ));
+  }
+
   if (loading) {
     return (
       <div className="text-center my-4">
@@ -56,31 +64,39 @@ export default function ReviewReportList() {
   return (
     <div style={{ padding: "2rem" }}>
       <h2 className="mb-4">리뷰 신고 내역 목록</h2>
-      <Table striped bordered hover>
+      <Table striped bordered hover style={{ tableLayout: "fixed", width: "100%" }}>
         <thead>
-        <tr>
-          <th>신고자 이메일</th>
-          <th>리뷰 ID</th>
-          <th>신고 사유</th>
-          <th>신고일</th>
+        <tr style={{ cursor: "default" }}>
+          <th style={{ width: "25%", wordBreak: "break-word" }}>신고자 이메일</th>
+          <th style={{ width: "10%", wordBreak: "break-word" }}>리뷰 ID</th>
+          <th style={{ width: "45%", wordBreak: "break-word" }}>신고 사유</th>
+          <th style={{ width: "20%", wordBreak: "break-word" }}>신고일</th>
         </tr>
         </thead>
         <tbody>
-        {reports.map(({ id, reporterEmail, reviewId, reason, reportedAt }) => (
-          <tr key={id}>
-            <td
-              style={{ cursor: "pointer" }}
-              onClick={() => navigate(`/member?email=${encodeURIComponent(reporterEmail)}`)}
-              title="멤버 상세보기"
-              className="text-dark"
-            >
-              {reporterEmail}
-            </td>
-            <td>{reviewId}</td>
+        {reports.map(({ id, reporterEmail, reviewId, reason, reportedAt, reviewWriterId }) => (
+          <tr
+            key={id}
+            style={{ cursor: reviewWriterId ? "pointer" : "default" }}
+            onClick={() => {
+              if (reviewWriterId) {
+                navigate(`/review/my/${reviewWriterId}`);
+              } else {
+                alert("작성자 정보가 없습니다.");
+              }
+            }}
+            title={reviewWriterId ? "작성자 리뷰 보기" : undefined}
+          >
+            <td style={{ whiteSpace: "normal", wordBreak: "break-word" }}>{reporterEmail}</td>
+            <td style={{ whiteSpace: "normal", wordBreak: "break-word" }}>{reviewId}</td>
             <td style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
-              {reason.length > 100 ? reason.substring(0, 100) + "..." : reason}
+              {reason.length > 100
+                ? renderWithLineBreaks(reason.substring(0, 100)) + "..."
+                : renderWithLineBreaks(reason)}
             </td>
-            <td>{new Date(reportedAt).toLocaleString()}</td>
+            <td style={{ whiteSpace: "normal", wordBreak: "break-word" }}>
+              {new Date(reportedAt).toLocaleString()}
+            </td>
           </tr>
         ))}
         </tbody>
