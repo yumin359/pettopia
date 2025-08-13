@@ -219,7 +219,7 @@ export function MemberDetail() {
               />
             </FormGroup>
 
-            {(hasAccess(member.email) || isAdminFlag) && (
+            {(hasAccess(member.email)) && (
               <div className="d-flex justify-content-start gap-2">
                 <Button
                   variant="outline-danger"
@@ -237,7 +237,7 @@ export function MemberDetail() {
                 </Button>
 
                 {/* 관리자면 로그아웃 버튼 숨김 */}
-                {!isAdminFlag && (
+                {(
                   <Button
                     variant="outline-secondary"
                     onClick={handleLogoutClick}
