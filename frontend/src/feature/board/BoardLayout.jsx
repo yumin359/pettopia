@@ -137,7 +137,6 @@ export function BoardLayout() {
         </Col>
       </Row>
       <div className="container">
-        {/* 공지사항과 리뷰 리스트를 반씩 나눠서 배치 */}
         <Row className="mt-3" style={{ maxHeight: "280px" }}>
           <Col md={6}>
             <h5 style={{ fontSize: "2rem", fontWeight: "600" }}>공지사항</h5>
