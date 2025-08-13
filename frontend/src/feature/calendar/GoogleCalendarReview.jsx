@@ -9,6 +9,7 @@ import {
   Loader,
   AlertCircle,
 } from "lucide-react";
+import { Modal, Button, Card, Alert, Badge } from "react-bootstrap";
 
 // Google Calendar API 설정 - 환경변수에서 가져오기
 const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_API_KEY;
@@ -238,304 +239,368 @@ const GoogleCalendarReview = () => {
   const firstDay = getFirstDayOfMonth(currentDate);
 
   return (
-    <div className="max-w-5xl mx-auto p-6 bg-white rounded-lg shadow-lg">
+    <div className="container-fluid p-3 p-md-4">
       {/* 헤더 */}
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-2 flex items-center gap-2">
-          <Calendar className="w-6 h-6" />내 리뷰 캘린더
+      <div className="mb-4">
+        <h2 className="d-flex align-items-center gap-2 mb-2 fw-bold">
+          <Calendar size={28} /> 내 리뷰 캘린더
         </h2>
-        <p className="text-sm text-gray-600">
-          Google Calendar API로 한국 공휴일과 내 리뷰를 함께 확인하세요
+        <p className="text-muted">
+          Google Calendar API로 한국 공휴일과 내 리뷰를 함께 확인하세요.
         </p>
       </div>
 
       {/* API 상태 표시 */}
       {error && (
-        <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg flex items-center gap-2">
-          <AlertCircle className="w-5 h-5 text-yellow-600" />
+        <div
+          className="alert alert-warning d-flex align-items-center gap-2"
+          role="alert"
+        >
+          <AlertCircle size={20} />
           <div>
-            <p className="text-sm text-yellow-800">
+            <div className="fw-bold">
               공휴일 정보 로드 실패 (기본 데이터 사용중)
-            </p>
-            <p className="text-xs text-yellow-600 mt-1">{error}</p>
+            </div>
+            <small>{error}</small>
           </div>
         </div>
       )}
 
-      {/* 캘린더 네비게이션 */}
-      <div className="flex justify-between items-center mb-4">
-        <button
-          onClick={handlePrevMonth}
-          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-          aria-label="이전 달"
-        >
-          <ChevronLeft className="w-5 h-5" />
-        </button>
-
-        <div className="flex items-center gap-2">
-          <h3 className="text-xl font-semibold">
-            {currentDate.getFullYear()}년 {monthNames[currentDate.getMonth()]}
-          </h3>
-          {loading && <Loader className="w-4 h-4 animate-spin text-blue-500" />}
-        </div>
-
-        <button
-          onClick={handleNextMonth}
-          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-          aria-label="다음 달"
-        >
-          <ChevronRight className="w-5 h-5" />
-        </button>
-      </div>
-
-      {/* 범례 */}
-      <div className="flex gap-4 mb-4 text-sm">
-        <div className="flex items-center gap-1">
-          <div className="w-3 h-3 bg-red-100 border border-red-300 rounded"></div>
-          <span>공휴일</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <div className="w-3 h-3 bg-blue-100 border border-blue-300 rounded"></div>
-          <span>리뷰 작성일</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <div className="w-3 h-3 bg-purple-100 border border-purple-300 rounded"></div>
-          <span>공휴일 + 리뷰</span>
-        </div>
-      </div>
-
-      {/* 요일 헤더 */}
-      <div className="grid grid-cols-7 gap-1 mb-2">
-        {dayNames.map((day, index) => (
-          <div
-            key={day}
-            className={`text-center text-sm font-medium py-2 ${
-              index === 0
-                ? "text-red-500"
-                : index === 6
-                  ? "text-blue-500"
-                  : "text-gray-700"
-            }`}
-          >
-            {day}
-          </div>
-        ))}
-      </div>
-
-      {/* 캘린더 그리드 */}
-      <div className="grid grid-cols-7 gap-1">
-        {/* 빈 칸 */}
-        {Array(firstDay)
-          .fill(null)
-          .map((_, index) => (
-            <div key={`empty-${index}`} className="h-28"></div>
-          ))}
-
-        {/* 날짜 칸 */}
-        {Array(daysInMonth)
-          .fill(null)
-          .map((_, index) => {
-            const day = index + 1;
-            const { reviews: dayReviews, holiday } = getDataForDate(day);
-            const hasReviews = dayReviews.length > 0;
-            const dayOfWeek = getDayOfWeek(day);
-
-            let bgColor = "";
-            let borderColor = "border-gray-200";
-
-            if (holiday && hasReviews) {
-              bgColor = "bg-purple-50 hover:bg-purple-100";
-              borderColor = "border-purple-300";
-            } else if (holiday) {
-              bgColor = "bg-red-50 hover:bg-red-100";
-              borderColor = "border-red-200";
-            } else if (hasReviews) {
-              bgColor = "bg-blue-50 hover:bg-blue-100";
-              borderColor = "border-blue-200";
-            } else {
-              bgColor = "hover:bg-gray-50";
-            }
-
-            return (
-              <div
-                key={day}
-                onClick={() => handleDateClick(day)}
-                className={`
-                h-28 p-2 border rounded-lg cursor-pointer transition-all
-                ${bgColor} ${borderColor}
-              `}
-              >
+      <div className="card shadow-sm">
+        <div className="card-body">
+          {/* 캘린더 네비게이션 */}
+          <div className="d-flex justify-content-between align-items-center mb-4">
+            <button
+              onClick={handlePrevMonth}
+              className="btn btn-outline-secondary"
+              aria-label="이전 달"
+            >
+              <ChevronLeft size={20} />
+            </button>
+            <div className="d-flex align-items-center gap-2">
+              <h3 className="mb-0 fs-5 fw-semibold">
+                {currentDate.getFullYear()}년{" "}
+                {monthNames[currentDate.getMonth()]}
+              </h3>
+              {loading && (
                 <div
-                  className={`text-sm font-medium mb-1 ${
-                    dayOfWeek === 0 || holiday
-                      ? "text-red-500"
-                      : dayOfWeek === 6
-                        ? "text-blue-500"
-                        : "text-gray-700"
-                  }`}
+                  className="spinner-border spinner-border-sm text-primary"
+                  role="status"
                 >
-                  {day}
+                  <span className="visually-hidden">Loading...</span>
                 </div>
+              )}
+            </div>
+            <button
+              onClick={handleNextMonth}
+              className="btn btn-outline-secondary"
+              aria-label="다음 달"
+            >
+              <ChevronRight size={20} />
+            </button>
+          </div>
 
-                {/* 공휴일 표시 */}
-                {holiday && (
-                  <div className="text-xs font-medium text-red-600 mb-1 truncate">
-                    {holiday.name}
-                  </div>
-                )}
+          {/* 범례 */}
+          <div className="d-flex flex-wrap gap-3 mb-3 small">
+            <div className="d-flex align-items-center gap-2">
+              <span
+                style={{
+                  width: "12px",
+                  height: "12px",
+                  backgroundColor: "var(--bs-danger-bg-subtle)",
+                  borderRadius: "3px",
+                  border: "1px solid var(--bs-danger-border-subtle)",
+                }}
+              ></span>
+              공휴일
+            </div>
+            <div className="d-flex align-items-center gap-2">
+              <span
+                style={{
+                  width: "12px",
+                  height: "12px",
+                  backgroundColor: "var(--bs-primary-bg-subtle)",
+                  borderRadius: "3px",
+                  border: "1px solid var(--bs-primary-border-subtle)",
+                }}
+              ></span>
+              리뷰
+            </div>
+            <div className="d-flex align-items-center gap-2">
+              <span
+                style={{
+                  width: "12px",
+                  height: "12px",
+                  backgroundColor: "var(--bs-info-bg-subtle)",
+                  borderRadius: "3px",
+                  border: "1px solid var(--bs-info-border-subtle)",
+                }}
+              ></span>
+              공휴일+리뷰
+            </div>
+          </div>
 
-                {/* 리뷰 표시 */}
-                {hasReviews && (
-                  <div className="space-y-1">
-                    {dayReviews.slice(0, holiday ? 1 : 2).map((review, idx) => (
+          {/* 캘린더 그리드 */}
+          <div>
+            {/* 요일 헤더 */}
+            <div className="row g-1">
+              {dayNames.map((day, index) => (
+                <div key={day} className="col text-center fw-bold p-2 small">
+                  <span
+                    className={
+                      index === 0
+                        ? "text-danger"
+                        : index === 6
+                          ? "text-primary"
+                          : "text-dark"
+                    }
+                  >
+                    {day}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            {/* 날짜 그리드 */}
+            <div className="row g-1">
+              {/* 앞쪽 빈 칸 */}
+              {Array(firstDay)
+                .fill(null)
+                .map((_, index) => (
+                  <div key={`empty-${index}`} className="col"></div>
+                ))}
+
+              {/* 날짜 칸 */}
+              {Array(daysInMonth)
+                .fill(null)
+                .map((_, index) => {
+                  const day = index + 1;
+                  const { reviews: dayReviews, holiday } = getDataForDate(day);
+                  const hasReviews = dayReviews.length > 0;
+                  // [수정] getDayOfWeek 함수를 올바르게 사용합니다.
+                  const dayOfWeek = getDayOfWeek(day);
+
+                  let bgClass = "bg-light bg-opacity-50";
+                  if (holiday && hasReviews) bgClass = "bg-info-subtle";
+                  else if (holiday) bgClass = "bg-danger-subtle";
+                  else if (hasReviews) bgClass = "bg-primary-subtle";
+
+                  return (
+                    <div
+                      key={day}
+                      onClick={() => handleDateClick(day)}
+                      className="col p-2 border rounded"
+                      style={{
+                        minHeight: "120px",
+                        cursor: "pointer",
+                        transition:
+                          "transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out",
+                        backgroundColor: `var(--bs-${bgClass.split("-")[1]}-bg-subtle)`,
+                      }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.transform = "scale(1.05)";
+                        e.currentTarget.style.boxShadow =
+                          "var(--bs-box-shadow-lg)";
+                        e.currentTarget.style.zIndex = "10";
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.transform = "scale(1)";
+                        e.currentTarget.style.boxShadow = "none";
+                        e.currentTarget.style.zIndex = "1";
+                      }}
+                    >
                       <div
-                        key={idx}
-                        className="text-xs bg-blue-200 rounded px-1 py-0.5 truncate"
+                        className={`fw-bold small mb-1 ${dayOfWeek === 0 || holiday ? "text-danger" : dayOfWeek === 6 ? "text-primary" : "text-dark"}`}
                       >
-                        {review.placeName}
+                        {day}
                       </div>
-                    ))}
-                    {dayReviews.length > (holiday ? 1 : 2) && (
-                      <div className="text-xs text-blue-600">
-                        +{dayReviews.length - (holiday ? 1 : 2)}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-      </div>
-
-      {/* 상세 모달 */}
-      {showDetail && selectedDate && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-md w-full max-h-[80vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="flex justify-between items-center mb-4">
-                <div>
-                  <h3 className="text-lg font-semibold">
-                    {currentDate.getFullYear()}년 {currentDate.getMonth() + 1}월{" "}
-                    {selectedDate.day}일
-                  </h3>
-                  {selectedDate.holiday && (
-                    <div className="mt-1">
-                      <span className="text-sm text-red-600 font-medium">
-                        🎌 {selectedDate.holiday.name}
-                      </span>
-                      {selectedDate.holiday.description && (
-                        <p className="text-xs text-gray-600 mt-1">
-                          {selectedDate.holiday.description}
-                        </p>
+                      {holiday && (
+                        <div className="badge text-bg-danger text-wrap w-100 mb-1">
+                          {holiday.name}
+                        </div>
+                      )}
+                      {hasReviews &&
+                        dayReviews
+                          .slice(0, holiday ? 1 : 2)
+                          .map((review, idx) => (
+                            <div
+                              key={idx}
+                              className="badge text-bg-primary text-wrap w-100 mb-1"
+                            >
+                              {review.placeName}
+                            </div>
+                          ))}
+                      {dayReviews.length > (holiday ? 1 : 2) && (
+                        <div className="small text-primary text-center mt-1">
+                          +{dayReviews.length - (holiday ? 1 : 2)} more
+                        </div>
                       )}
                     </div>
-                  )}
-                </div>
-                <button
-                  onClick={() => setShowDetail(false)}
-                  className="text-gray-500 hover:text-gray-700 text-xl"
-                  aria-label="닫기"
-                >
-                  ✕
-                </button>
-              </div>
+                  );
+                })}
+              {/* 그리드 채우기 위한 빈 div 추가 */}
+              {Array((7 - ((firstDay + daysInMonth) % 7)) % 7)
+                .fill(null)
+                .map((_, index) => (
+                  <div key={`empty-end-${index}`} className="col"></div>
+                ))}
+            </div>
+          </div>
+        </div>
+      </div>
 
-              {selectedDate.reviews.length > 0 ? (
-                <div className="space-y-4">
-                  <h4 className="font-medium text-gray-700">📝 작성한 리뷰</h4>
-                  {selectedDate.reviews.map((review) => (
-                    <div key={review.id} className="border rounded-lg p-4">
-                      <div className="flex justify-between items-start mb-2">
-                        <h5 className="font-semibold">{review.placeName}</h5>
-                        <div className="flex gap-0.5">
-                          {Array(5)
-                            .fill(null)
-                            .map((_, i) => (
-                              <Star
-                                key={i}
-                                className={`w-4 h-4 ${
-                                  i < review.rating
-                                    ? "fill-yellow-400 text-yellow-400"
-                                    : "text-gray-300"
-                                }`}
-                              />
-                            ))}
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-1 text-sm text-gray-600 mb-2">
-                        <MapPin className="w-3 h-3" />
-                        {review.address}
-                      </div>
-                      <p className="text-gray-700 text-sm">{review.content}</p>
-                    </div>
-                  ))}
-                </div>
+      {/* 통계 섹션 (생략되었던 원본 코드 포함) */}
+      <div className="row g-3 mt-4">
+        <div className="col-md-6">
+          <div className="card h-100">
+            <div className="card-body">
+              <h5 className="card-title fs-6 fw-semibold text-muted">
+                📊 이달의 활동
+              </h5>
+              <p className="card-text">
+                작성한 리뷰:{" "}
+                <span className="fw-bold">
+                  {
+                    reviews.filter((r) =>
+                      r.date.startsWith(
+                        `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, "0")}`,
+                      ),
+                    ).length
+                  }
+                  개
+                </span>
+              </p>
+              <p className="card-text">
+                평균 평점: <span className="fw-bold">4.7점</span>
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="col-md-6">
+          <div className="card h-100">
+            <div className="card-body">
+              <h5 className="card-title fs-6 fw-semibold text-muted">
+                📅 이달의 공휴일
+              </h5>
+              {Object.entries(holidays).filter(([date]) =>
+                date.startsWith(
+                  `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, "0")}`,
+                ),
+              ).length > 0 ? (
+                Object.entries(holidays)
+                  .filter(([date]) =>
+                    date.startsWith(
+                      `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, "0")}`,
+                    ),
+                  )
+                  .map(([date, holiday]) => (
+                    <p key={date} className="card-text mb-1 small">
+                      {date.split("-")[2]}일:{" "}
+                      <span className="fw-semibold">{holiday.name}</span>
+                    </p>
+                  ))
               ) : (
-                <div className="text-center py-8 text-gray-500">
-                  <p>이 날짜에 작성한 리뷰가 없습니다</p>
-                </div>
+                <p className="text-muted small mt-2">
+                  이달에는 공휴일이 없습니다.
+                </p>
               )}
             </div>
           </div>
         </div>
-      )}
-
-      {/* 통계 섹션 */}
-      <div className="mt-6 grid grid-cols-2 gap-4">
-        <div className="p-4 bg-blue-50 rounded-lg">
-          <h3 className="font-semibold mb-2 text-gray-700">📊 이달의 활동</h3>
-          <div className="space-y-1 text-sm">
-            <p>
-              작성한 리뷰:{" "}
-              <span className="font-bold">
-                {
-                  reviews.filter((r) =>
-                    r.date.startsWith(
-                      `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, "0")}`,
-                    ),
-                  ).length
-                }
-                개
-              </span>
-            </p>
-            <p>
-              평균 평점: <span className="font-bold">4.7점</span>
-            </p>
-          </div>
-        </div>
-
-        <div className="p-4 bg-red-50 rounded-lg">
-          <h3 className="font-semibold mb-2 text-gray-700">📅 이달의 공휴일</h3>
-          <div className="space-y-1 text-sm">
-            {Object.entries(holidays)
-              .filter(([date]) => {
-                const [year, month] = date.split("-");
-                return (
-                  parseInt(year) === currentDate.getFullYear() &&
-                  parseInt(month) === currentDate.getMonth() + 1
-                );
-              })
-              .slice(0, 3)
-              .map(([date, holiday]) => (
-                <p key={date}>
-                  {date.split("-")[2]}일:{" "}
-                  <span className="font-medium">{holiday.name}</span>
-                </p>
-              ))}
-            {Object.entries(holidays).filter(([date]) => {
-              const [year, month] = date.split("-");
-              return (
-                parseInt(year) === currentDate.getFullYear() &&
-                parseInt(month) === currentDate.getMonth() + 1
-              );
-            }).length === 0 && (
-              <p className="text-sm text-gray-500">
-                이달에는 공휴일이 없습니다
-              </p>
-            )}
-          </div>
-        </div>
       </div>
+
+      {/* 상세 모달 (생략되었던 원본 코드 포함) */}
+      {showDetail && selectedDate && (
+        <div
+          className="modal fade show"
+          tabIndex="-1"
+          style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}
+        >
+          <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div className="modal-content">
+              <div className="modal-header">
+                <div>
+                  <h5 className="modal-title fw-bold">
+                    {currentDate.getFullYear()}년 {currentDate.getMonth() + 1}월{" "}
+                    {selectedDate.day}일
+                  </h5>
+                  {selectedDate.holiday && (
+                    <div className="mt-1">
+                      <span className="badge bg-danger">
+                        🎌 {selectedDate.holiday.name}
+                      </span>
+                    </div>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={() => setShowDetail(false)}
+                  aria-label="Close"
+                ></button>
+              </div>
+              <div className="modal-body">
+                {selectedDate.holiday?.description && (
+                  <p className="alert alert-danger-subtle small">
+                    {selectedDate.holiday.description}
+                  </p>
+                )}
+                {selectedDate.reviews.length > 0 ? (
+                  <>
+                    <h6 className="mb-3 fw-semibold">📝 작성한 리뷰</h6>
+                    {selectedDate.reviews.map((review) => (
+                      <div key={review.id} className="card mb-3">
+                        <div className="card-body">
+                          <div className="d-flex justify-content-between align-items-start mb-2">
+                            <h6 className="card-title fw-bold mb-0">
+                              {review.placeName}
+                            </h6>
+                            <div className="d-flex gap-1">
+                              {Array(5)
+                                .fill(null)
+                                .map((_, i) => (
+                                  <Star
+                                    key={i}
+                                    size={16}
+                                    fill={
+                                      i < review.rating ? "#ffc107" : "#e9ecef"
+                                    }
+                                    className={
+                                      i < review.rating
+                                        ? "text-warning"
+                                        : "text-light"
+                                    }
+                                  />
+                                ))}
+                            </div>
+                          </div>
+                          <div className="d-flex align-items-center gap-1 small text-muted mb-2">
+                            <MapPin size={14} /> {review.address}
+                          </div>
+                          <p className="card-text small">{review.content}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </>
+                ) : (
+                  <div className="text-center p-5 text-muted">
+                    <p>이 날짜에 작성한 리뷰가 없습니다.</p>
+                  </div>
+                )}
+              </div>
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => setShowDetail(false)}
+                >
+                  닫기
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
