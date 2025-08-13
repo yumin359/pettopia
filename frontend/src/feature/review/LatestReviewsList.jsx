@@ -13,7 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { ReviewLikeContainer } from "../like/ReviewLikeContainer.jsx";
 import ReportModal from "../report/ReportModal.jsx";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
-import { toast } from "react-toastify";  // 1. react-toastify import
+import { toast } from "react-toastify"; // 1. react-toastify import
 
 export function LatestReviewsList() {
   const { user } = useContext(AuthenticationContext);
@@ -79,7 +79,9 @@ export function LatestReviewsList() {
     <Container className="my-4 p-4">
       <h2 className="text-center mb-4 fw-bold">
         📝 최신 리뷰
-        <span className="ms-2 fs-6 text-muted">({filteredReviews.length}개)</span>
+        <span className="ms-2 fs-6 text-muted">
+          ({filteredReviews.length}개)
+        </span>
       </h2>
 
       <Form
@@ -115,9 +117,7 @@ export function LatestReviewsList() {
                   navigate(`${url}?${params.toString()}`);
                 }}
                 style={{
-                  cursor: "pointer",
                   border: "solid 1px black",
-                  boxShadow: "5px 5px 1px 1px black",
                 }}
               >
                 <Card.Body className="d-flex flex-column">
@@ -143,7 +143,7 @@ export function LatestReviewsList() {
                           src={imageFiles[0]}
                           style={{
                             objectFit: "cover",
-                            height: "100px",
+                            height: "200px",
                             borderRadius: "6px",
                             marginBottom: "8px",
                           }}
@@ -159,7 +159,7 @@ export function LatestReviewsList() {
                             gridTemplateColumns: "1fr 1fr",
                             gridTemplateRows: "1fr 1fr",
                             gap: "4px",
-                            height: "100px",
+                            height: "200px",
                             borderRadius: "6px",
                             overflow: "hidden",
                             marginBottom: "8px",
@@ -273,7 +273,7 @@ export function LatestReviewsList() {
                 {/* 신고 버튼 */}
                 <Button
                   size="sm"
-                  onClick={(e) => openReportModal(r, e)}  // 3. 리뷰 전체 객체 넘겨서 비교
+                  onClick={(e) => openReportModal(r, e)} // 3. 리뷰 전체 객체 넘겨서 비교
                   style={{
                     position: "absolute",
                     bottom: "10px",
