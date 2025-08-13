@@ -106,7 +106,8 @@ body::before {
    ======================================== */
 .cta-section {
     background: #f6ece6;
-    padding: 25px 20px;
+    padding: 18px;
+    margin-bottom: 0;
     text-align: center;
     border-top: 1px solid black;
 }

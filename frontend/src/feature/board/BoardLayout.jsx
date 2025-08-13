@@ -5,6 +5,10 @@ import axios from "axios";
 import { BoardListMini } from "../main/BoardListMini.jsx";
 import { ReviewCarousel } from "../main/ReviewCarousel.jsx";
 
+const sitelogo2 = "/sitelogo2.png";
+const sitelogo3 = "/sitelogo3.png";
+const sitelogo4 = "/sitelogo4.png";
+
 export function BoardLayout() {
   const navigate = useNavigate();
   const [slides, setSlides] = useState([]);
@@ -150,28 +154,59 @@ export function BoardLayout() {
       <div className="cta-section">
         <div className="cta-content">
           <h4 className="cta-title">
-            <i className="bi bi-rocket-takeoff me-2"></i>
+            <i className="bi bi-rocket-takeoff" />
             지금 바로 시작해보세요!
           </h4>
           <p className="cta-description">
             우리 아이와 함께 할 수 있는 특별한 장소들이 여러분을 기다리고
             있습니다.
           </p>
-          <div className="cta-buttons">
-            <button
-              className="cta-button primary"
-              onClick={() => navigate("/map")}
-            >
-              <i className="bi bi-geo-alt-fill me-2"></i>내 주변 찾기
-            </button>
-            <button
-              className="cta-button secondary"
-              onClick={() => navigate("/register")}
-            >
-              <i className="bi bi-person-plus me-2"></i>
-              회원가입하기
-            </button>
+          <div className="d-flex justify-content-evenly">
+            <h4>관련기관</h4>
+            <img
+              src={sitelogo2}
+              alt=""
+              style={{
+                width: "200px",
+                height: "60px",
+                objectFit: "contain",
+              }}
+            />
+            <img
+              src={sitelogo3}
+              alt=""
+              style={{
+                width: "200px",
+                height: "60px",
+                objectFit: "contain",
+              }}
+            />
+            <img
+              src={sitelogo4}
+              alt=""
+              style={{
+                width: "200px",
+                height: "60px",
+                objectFit: "contain",
+              }}
+            />
           </div>
+
+          {/*<div className="cta-buttons">*/}
+          {/*  <button*/}
+          {/*    className="cta-button primary"*/}
+          {/*    onClick={() => navigate("/map")}*/}
+          {/*  >*/}
+          {/*    <i className="bi bi-geo-alt-fill me-2" />내 주변 찾기*/}
+          {/*  </button>*/}
+          {/*  <button*/}
+          {/*    className="cta-button secondary"*/}
+          {/*    onClick={() => navigate("/register")}*/}
+          {/*  >*/}
+          {/*    <i className="bi bi-person-plus me-2" />*/}
+          {/*    회원가입하기*/}
+          {/*  </button>*/}
+          {/*</div>*/}
         </div>
       </div>
     </div>
