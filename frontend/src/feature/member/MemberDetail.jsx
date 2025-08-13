@@ -108,6 +108,7 @@ export function MemberDetail() {
 
   const isAdminFlag = isAdmin(); // 함수 호출
   const isKakao = member.provider?.includes("kakao");
+  const defaultImage = "/user.png";
 
   return (
     <Row className="justify-content-center my-4">
@@ -126,32 +127,17 @@ export function MemberDetail() {
         <Card className="shadow-sm border-0 rounded-3">
           <Card.Body>
             <div className="mb-4 d-flex justify-content-center">
-              {profileImageUrl ? (
-                <img
-                  src={profileImageUrl}
-                  alt="프로필 이미지"
-                  className="shadow rounded-circle"
-                  style={{
-                    width: "120px",
-                    height: "120px",
-                    objectFit: "cover",
-                    border: "2px solid #ddd",
-                  }}
-                />
-              ) : (
-                <div
-                  className="shadow rounded-circle d-flex justify-content-center align-items-center"
-                  style={{
-                    width: "120px",
-                    height: "120px",
-                    backgroundColor: "#e9ecef",
-                    border: "2px solid #ddd",
-                    color: "#6c757d",
-                  }}
-                >
-                  <FiUser size={80} />
-                </div>
-              )}
+              <img
+                src={profileImageUrl || defaultImage}
+                alt="프로필 이미지"
+                className="shadow rounded-circle"
+                style={{
+                  width: "120px",
+                  height: "120px",
+                  objectFit: "cover",
+                  border: "2px solid #ddd",
+                }}
+              />
             </div>
 
             {!profileImageUrl && <br />}
@@ -219,7 +205,7 @@ export function MemberDetail() {
               />
             </FormGroup>
 
-            {(hasAccess(member.email)) && (
+            {hasAccess(member.email) && (
               <div className="d-flex justify-content-start gap-2">
                 <Button
                   variant="outline-danger"
@@ -237,7 +223,7 @@ export function MemberDetail() {
                 </Button>
 
                 {/* 관리자면 로그아웃 버튼 숨김 */}
-                {(
+                {
                   <Button
                     variant="outline-secondary"
                     onClick={handleLogoutClick}
@@ -245,7 +231,7 @@ export function MemberDetail() {
                   >
                     로그아웃
                   </Button>
-                )}
+                }
 
                 <Button
                   variant="outline-success"
