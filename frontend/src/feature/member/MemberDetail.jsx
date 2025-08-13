@@ -8,6 +8,7 @@ import {
   Modal,
   Row,
   Spinner,
+  Container,
 } from "react-bootstrap";
 import { useContext, useEffect, useState } from "react";
 import axios from "axios";
@@ -15,6 +16,7 @@ import { useNavigate, useSearchParams } from "react-router";
 import { toast } from "react-toastify";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
 import { FiUser } from "react-icons/fi";
+import GoogleCalendarReview from "../calendar/GoogleCalendarReview.jsx";
 
 export function MemberDetail() {
   const [member, setMember] = useState(null);
@@ -110,195 +112,205 @@ export function MemberDetail() {
   const isKakao = member.provider?.includes("kakao");
 
   return (
-    <Row className="justify-content-center my-4">
-      <Col xs={12} md={8} lg={6}>
-        <div className="d-flex justify-content-between align-items-center mb-3">
-          <h3 className="fw-bold mb-0 text-dark">회원 정보</h3>
-          <small className="text-muted" style={{ fontSize: "0.85rem" }}>
-            {isAdminFlag ? (
-              <span className="badge bg-danger">관리자</span>
-            ) : (
-              <span className="badge bg-secondary">일반 사용자</span>
-            )}
-          </small>
-        </div>
-
-        <Card className="shadow-sm border-0 rounded-3">
-          <Card.Body>
-            <div className="mb-4 d-flex justify-content-center">
-              {profileImageUrl ? (
-                <img
-                  src={profileImageUrl}
-                  alt="프로필 이미지"
-                  className="shadow rounded-circle"
-                  style={{
-                    width: "120px",
-                    height: "120px",
-                    objectFit: "cover",
-                    border: "2px solid #ddd",
-                  }}
-                />
+    <Container fluid className="my-4">
+      <Row>
+        {/* 왼쪽 컬럼: 회원 정보 */}
+        <Col lg={5} md={12} className="mb-4 mb-lg-0">
+          <div className="d-flex justify-content-between align-items-center mb-3">
+            <h3 className="fw-bold mb-0 text-dark">회원 정보</h3>
+            <small className="text-muted" style={{ fontSize: "0.85rem" }}>
+              {isAdminFlag ? (
+                <span className="badge bg-danger">관리자</span>
               ) : (
-                <div
-                  className="shadow rounded-circle d-flex justify-content-center align-items-center"
-                  style={{
-                    width: "120px",
-                    height: "120px",
-                    backgroundColor: "#e9ecef",
-                    border: "2px solid #ddd",
-                    color: "#6c757d",
-                  }}
-                >
-                  <FiUser size={80} />
-                </div>
+                <span className="badge bg-secondary">일반 사용자</span>
               )}
-            </div>
+            </small>
+          </div>
 
-            {!profileImageUrl && <br />}
+          <Card className="shadow-sm border-0 rounded-3">
+            <Card.Body>
+              <div className="mb-4 d-flex justify-content-center">
+                {profileImageUrl ? (
+                  <img
+                    src={profileImageUrl}
+                    alt="프로필 이미지"
+                    className="shadow rounded-circle"
+                    style={{
+                      width: "120px",
+                      height: "120px",
+                      objectFit: "cover",
+                      border: "2px solid #ddd",
+                    }}
+                  />
+                ) : (
+                  <div
+                    className="shadow rounded-circle d-flex justify-content-center align-items-center"
+                    style={{
+                      width: "120px",
+                      height: "120px",
+                      backgroundColor: "#e9ecef",
+                      border: "2px solid #ddd",
+                      color: "#6c757d",
+                    }}
+                  >
+                    <FiUser size={80} />
+                  </div>
+                )}
+              </div>
 
-            <FormGroup controlId="email1" className="mb-3">
-              <FormLabel>이메일</FormLabel>
-              <FormControl
-                readOnly
-                value={member.email}
-                className="bg-light border-0"
-                style={{
-                  userSelect: "text",
-                  boxShadow: "none",
-                  outline: "none",
-                }}
-                onFocus={(e) => e.target.blur()}
-              />
-            </FormGroup>
+              {!profileImageUrl && <br />}
 
-            <FormGroup controlId="nickName1" className="mb-3">
-              <FormLabel>별명</FormLabel>
-              <FormControl
-                readOnly
-                value={member.nickName}
-                className="bg-light border-0"
-                style={{
-                  userSelect: "text",
-                  boxShadow: "none",
-                  outline: "none",
-                }}
-                onFocus={(e) => e.target.blur()}
-              />
-            </FormGroup>
+              <FormGroup controlId="email1" className="mb-3">
+                <FormLabel>이메일</FormLabel>
+                <FormControl
+                  readOnly
+                  value={member.email}
+                  className="bg-light border-0"
+                  style={{
+                    userSelect: "text",
+                    boxShadow: "none",
+                    outline: "none",
+                  }}
+                  onFocus={(e) => e.target.blur()}
+                />
+              </FormGroup>
 
-            <FormGroup controlId="info1" className="mb-3">
-              <FormLabel>자기소개</FormLabel>
-              <FormControl
-                as="textarea"
-                readOnly
-                value={member.info || ""}
-                className="bg-light border-0"
-                style={{
-                  minHeight: "120px",
-                  resize: "none",
-                  userSelect: "text",
-                  fontSize: "1rem",
-                  lineHeight: 1.5,
-                }}
-                onFocus={(e) => e.target.blur()}
-              />
-            </FormGroup>
+              <FormGroup controlId="nickName1" className="mb-3">
+                <FormLabel>별명</FormLabel>
+                <FormControl
+                  readOnly
+                  value={member.nickName}
+                  className="bg-light border-0"
+                  style={{
+                    userSelect: "text",
+                    boxShadow: "none",
+                    outline: "none",
+                  }}
+                  onFocus={(e) => e.target.blur()}
+                />
+              </FormGroup>
 
-            <FormGroup controlId="inserted1" className="mb-3">
-              <FormLabel>가입일시</FormLabel>
-              <FormControl
-                readOnly
-                value={formattedInsertedAt}
-                className="bg-light border-0"
-                style={{
-                  userSelect: "text",
-                  boxShadow: "none",
-                  outline: "none",
-                }}
-                onFocus={(e) => e.target.blur()}
-              />
-            </FormGroup>
+              <FormGroup controlId="info1" className="mb-3">
+                <FormLabel>자기소개</FormLabel>
+                <FormControl
+                  as="textarea"
+                  readOnly
+                  value={member.info || ""}
+                  className="bg-light border-0"
+                  style={{
+                    minHeight: "120px",
+                    resize: "none",
+                    userSelect: "text",
+                    fontSize: "1rem",
+                    lineHeight: 1.5,
+                  }}
+                  onFocus={(e) => e.target.blur()}
+                />
+              </FormGroup>
 
-            {(hasAccess(member.email)) && (
-              <div className="d-flex justify-content-start gap-2">
-                <Button
-                  variant="outline-danger"
-                  onClick={handleModalButtonClick}
-                  className="d-flex align-items-center gap-1"
-                >
-                  탈퇴
-                </Button>
-                <Button
-                  variant="outline-info"
-                  onClick={() => navigate(`/member/edit?email=${member.email}`)}
-                  className="d-flex align-items-center gap-1"
-                >
-                  수정
-                </Button>
+              <FormGroup controlId="inserted1" className="mb-3">
+                <FormLabel>가입일시</FormLabel>
+                <FormControl
+                  readOnly
+                  value={formattedInsertedAt}
+                  className="bg-light border-0"
+                  style={{
+                    userSelect: "text",
+                    boxShadow: "none",
+                    outline: "none",
+                  }}
+                  onFocus={(e) => e.target.blur()}
+                />
+              </FormGroup>
 
-                {/* 관리자면 로그아웃 버튼 숨김 */}
-                {(
+              {hasAccess(member.email) && (
+                <div className="d-flex justify-content-start gap-2">
                   <Button
-                    variant="outline-secondary"
-                    onClick={handleLogoutClick}
+                    variant="outline-danger"
+                    onClick={handleModalButtonClick}
                     className="d-flex align-items-center gap-1"
                   >
-                    로그아웃
+                    탈퇴
                   </Button>
-                )}
+                  <Button
+                    variant="outline-info"
+                    onClick={() =>
+                      navigate(`/member/edit?email=${member.email}`)
+                    }
+                    className="d-flex align-items-center gap-1"
+                  >
+                    수정
+                  </Button>
 
-                <Button
-                  variant="outline-success"
-                  onClick={() => navigate(`/review/my/${member.id}`)}
-                  className="d-flex align-items-center gap-1"
-                >
-                  내가 쓴 리뷰
-                </Button>
-              </div>
-            )}
-          </Card.Body>
-        </Card>
+                  {/* 관리자면 로그아웃 버튼 숨김 */}
+                  {
+                    <Button
+                      variant="outline-secondary"
+                      onClick={handleLogoutClick}
+                      className="d-flex align-items-center gap-1"
+                    >
+                      로그아웃
+                    </Button>
+                  }
 
-        {/* 탈퇴 확인 모달 */}
-        <Modal show={modalShow} onHide={() => setModalShow(false)} centered>
-          <Modal.Header closeButton>
-            <Modal.Title>
-              {isKakao ? "카카오 회원 탈퇴" : "회원 탈퇴 확인"}
-            </Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <FormGroup controlId="password1">
-              <FormLabel>
-                {isKakao
-                  ? `탈퇴를 원하시면 ${tempCode}를 아래에 작성하세요.`
-                  : "탈퇴를 원하시면 암호를 입력하세요"}
-              </FormLabel>
-              <FormControl
-                type={isKakao ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder={
-                  isKakao
-                    ? "탈퇴를 원하시면 위의 코드를 작성하세요."
-                    : "탈퇴를 원하시면 비밀번호를 입력하세요"
-                }
-                autoFocus
-              />
-            </FormGroup>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button
-              variant="outline-secondary"
-              onClick={() => setModalShow(false)}
-            >
-              취소
-            </Button>
-            <Button variant="danger" onClick={handleDeleteButtonClick}>
-              탈퇴
-            </Button>
-          </Modal.Footer>
-        </Modal>
-      </Col>
-    </Row>
+                  <Button
+                    variant="outline-success"
+                    onClick={() => navigate(`/review/my/${member.id}`)}
+                    className="d-flex align-items-center gap-1"
+                  >
+                    내가 쓴 리뷰
+                  </Button>
+                </div>
+              )}
+            </Card.Body>
+          </Card>
+        </Col>
+
+        {/* 오른쪽 컬럼: 리뷰 캘린더 */}
+        <Col lg={7} md={12}>
+          <GoogleCalendarReview />
+        </Col>
+      </Row>
+
+      {/* 탈퇴 확인 모달 */}
+      <Modal show={modalShow} onHide={() => setModalShow(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>
+            {isKakao ? "카카오 회원 탈퇴" : "회원 탈퇴 확인"}
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <FormGroup controlId="password1">
+            <FormLabel>
+              {isKakao
+                ? `탈퇴를 원하시면 ${tempCode}를 아래에 작성하세요.`
+                : "탈퇴를 원하시면 암호를 입력하세요"}
+            </FormLabel>
+            <FormControl
+              type={isKakao ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder={
+                isKakao
+                  ? "탈퇴를 원하시면 위의 코드를 작성하세요."
+                  : "탈퇴를 원하시면 비밀번호를 입력하세요"
+              }
+              autoFocus
+            />
+          </FormGroup>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="outline-secondary"
+            onClick={() => setModalShow(false)}
+          >
+            취소
+          </Button>
+          <Button variant="danger" onClick={handleDeleteButtonClick}>
+            탈퇴
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </Container>
   );
 }
