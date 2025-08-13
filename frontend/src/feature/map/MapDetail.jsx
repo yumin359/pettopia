@@ -116,12 +116,15 @@ export function MapDetail() {
     return (sum / reviews.length).toFixed(1);
   };
 
+  // 이것도 없애도 상관없을 것 같긴 한디
   const isImageFile = (fileUrl) => {
     const ext = fileUrl.split(".").pop().split("?")[0];
     return ["jpg", "jpeg", "png", "gif", "webp"].includes(ext.toLowerCase());
   };
 
   const allImagesAndNickNameFromReviews = reviews.flatMap((review) =>
+    // 없애면 이렇게 쓰면 됨
+    // (review.files || []).map((fileUrl) => ({
     (review.files || []).filter(isImageFile).map((fileUrl) => ({
       url: fileUrl,
       nickName: review.memberEmailNickName,
