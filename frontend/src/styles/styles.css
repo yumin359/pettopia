@@ -71,8 +71,9 @@ body::before {
 
 .main-container {
     width: 90%;
+    height: 120vh;
     max-width: 1400px;
-    min-height: 80vh;
+    max-height: 950px;
     background-color: white;
     border: 2px solid black;
     box-shadow: 5px 5px 1px 1px black;
@@ -105,11 +106,9 @@ body::before {
    ======================================== */
 .cta-section {
     background: #f6ece6;
-    padding: 40px 20px;
+    padding: 25px 20px;
     text-align: center;
-    border-top-width: 1px;
-    border-top-style: solid;
-    border-top-color: black;
+    border-top: 1px solid black;
 }
 
 .cta-content {
@@ -118,16 +117,16 @@ body::before {
 }
 
 .cta-title {
-    font-size: 2.0rem;
+    font-size: 1.75rem;
     font-weight: bold;
-    margin-bottom: 20px;
-    color: #343a40; /* 어두운 글씨색 */
+    margin-bottom: 15px;
+    color: #343a40;
 }
 
 .cta-description {
-    font-size: 1.1rem;
-    margin-bottom: 30px;
-    color: #6c757d; /* 중간 톤 글씨색 */
+    font-size: 1.0rem;
+    margin-bottom: 25px;
+    color: #6c757d;
 }
 
 .cta-buttons {
@@ -138,8 +137,8 @@ body::before {
 }
 
 .cta-button {
-    padding: 12px 24px;
-    font-size: 1.0rem;
+    padding: 10px 20px;
+    font-size: 0.95rem;
     font-weight: bold;
     border-radius: 8px;
     border: none;
