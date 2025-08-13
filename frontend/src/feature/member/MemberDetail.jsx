@@ -18,11 +18,11 @@ import { FiUser } from "react-icons/fi";
 
 export function MemberDetail() {
   const [member, setMember] = useState(null);
-  const [, setReviews] = useState(null); // 내 리뷰 목록 상태 추가
+  const [, setReviews] = useState(null);
   const [modalShow, setModalShow] = useState(false);
   const [password, setPassword] = useState("");
   const [tempCode, setTempCode] = useState("");
-  const { logout, hasAccess } = useContext(AuthenticationContext);
+  const { logout, hasAccess, isAdmin } = useContext(AuthenticationContext);
   const [params] = useSearchParams();
   const navigate = useNavigate();
 
@@ -32,7 +32,6 @@ export function MemberDetail() {
       .then((res) => {
         setMember(res.data);
         if (res.data?.id) {
-          // 회원 정보 불러오면, 그 회원이 쓴 리뷰 목록도 같이 요청
           axios
             .get(`/api/review/myReview/${res.data.id}`)
             .then((res2) => setReviews(res2.data))
@@ -99,20 +98,15 @@ export function MemberDetail() {
     );
   }
 
-  // 가입일시 포맷 통일
   const formattedInsertedAt = member.insertedAt
     ? member.insertedAt.replace("T", " ").substring(0, 16)
     : "";
 
-  // 프로필 이미지 URL 찾기
   const profileImageUrl = member.files?.find((file) =>
     /\.(jpg|jpeg|png|gif|webp)$/i.test(file),
   );
 
-  // 관리자 여부 확인
-  const isAdmin = member.authNames?.includes("admin");
-
-  // 카카오 회원 여부
+  const isAdminFlag = isAdmin(); // 함수 호출
   const isKakao = member.provider?.includes("kakao");
 
   return (
@@ -121,7 +115,7 @@ export function MemberDetail() {
         <div className="d-flex justify-content-between align-items-center mb-3">
           <h3 className="fw-bold mb-0 text-dark">회원 정보</h3>
           <small className="text-muted" style={{ fontSize: "0.85rem" }}>
-            {isAdmin ? (
+            {isAdminFlag ? (
               <span className="badge bg-danger">관리자</span>
             ) : (
               <span className="badge bg-secondary">일반 사용자</span>
@@ -225,7 +219,7 @@ export function MemberDetail() {
               />
             </FormGroup>
 
-            {hasAccess(member.email) && (
+            {(hasAccess(member.email) || isAdminFlag) && (
               <div className="d-flex justify-content-start gap-2">
                 <Button
                   variant="outline-danger"
@@ -241,13 +235,18 @@ export function MemberDetail() {
                 >
                   수정
                 </Button>
-                <Button
-                  variant="outline-secondary"
-                  onClick={handleLogoutClick}
-                  className="d-flex align-items-center gap-1"
-                >
-                  로그아웃
-                </Button>
+
+                {/* 관리자면 로그아웃 버튼 숨김 */}
+                {!isAdminFlag && (
+                  <Button
+                    variant="outline-secondary"
+                    onClick={handleLogoutClick}
+                    className="d-flex align-items-center gap-1"
+                  >
+                    로그아웃
+                  </Button>
+                )}
+
                 <Button
                   variant="outline-success"
                   onClick={() => navigate(`/review/my/${member.id}`)}

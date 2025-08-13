@@ -77,21 +77,10 @@ export default function ServiceListPage() {
         <tbody>
         {services.map(({ id, email, title, content, inserted_at }) => (
           <tr key={id}>
-            <td
-              style={{
-                whiteSpace: "pre-wrap",
-                overflowWrap: "break-word",
-                wordBreak: "break-word",
-                maxWidth: "220px",
-                color: "inherit",
-                cursor: "default",
-                textDecoration: "none",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              <span>{email}</span>
+            <td style={{ /* 이메일 + 삭제 버튼 flex 스타일 */ }}>
+    <span style={{ flexGrow: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+      {email}
+    </span>
               <button
                 onClick={() => handleDelete(id)}
                 style={{
@@ -102,6 +91,7 @@ export default function ServiceListPage() {
                   cursor: "pointer",
                   fontSize: "18px",
                   lineHeight: "1",
+                  padding: "0",
                   marginLeft: "8px",
                 }}
                 aria-label="삭제"
@@ -110,7 +100,18 @@ export default function ServiceListPage() {
                 ×
               </button>
             </td>
-            <td>{title}</td>
+            <td
+              style={{
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                maxWidth: "220px",
+                color: "inherit",
+                cursor: "default",
+              }}
+            >
+              {title}
+            </td>
             <td
               style={{
                 whiteSpace: "pre-wrap",
@@ -122,7 +123,6 @@ export default function ServiceListPage() {
               {content}
             </td>
             <td>{new Date(inserted_at).toLocaleString()}</td>
-            {/* 삭제 칼럼 자체는 삭제했습니다 */}
           </tr>
         ))}
         </tbody>
