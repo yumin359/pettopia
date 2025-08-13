@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal; // 👈 import 해주세요.
 import java.util.*;
 
 @RestController
@@ -19,7 +20,9 @@ public class CalendarController {
     public ResponseEntity<Map<String, Object>> getCalendarData(
             @RequestParam int year,
             @RequestParam(required = false) Integer month,
-            @RequestParam String email) {  // 프론트에서 이메일 전달
+            Principal principal) {
+
+        String email = principal.getName();
 
         Map<String, Object> data = calendarService.getCalendarData(email, year, month);
         return ResponseEntity.ok(data);

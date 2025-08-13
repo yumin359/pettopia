@@ -42,11 +42,11 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
     @Query("SELECT AVG(r.rating) FROM Review r WHERE r.memberEmail.id = :memberId")
     Optional<Double> findAverageRatingByMemberId(@Param("memberId") Long memberId);
 
-    // ReviewRepository.java - 쿼리 수정
-    @Query(value = "SELECT r.id, pf.name, r.rating, r.review, " +  // facility_name 대신 pf.name
+
+    @Query(value = "SELECT r.id, pf.name, r.rating, r.review, " +
             "DATE_FORMAT(r.inserted_at, '%Y-%m-%d') as date, r.facility_id " +
             "FROM review r " +
-            "JOIN pet_facility pf ON r.facility_id = pf.id " +  // JOIN 추가
+            "JOIN pet_facility pf ON r.facility_id = pf.id " +
             "WHERE r.member_email = :email " +
             "AND YEAR(r.inserted_at) = :year " +
             "ORDER BY r.inserted_at DESC",
@@ -54,10 +54,10 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
     List<Object[]> findReviewsByYear(@Param("email") String email,
                                      @Param("year") int year);
 
-    @Query(value = "SELECT r.id, pf.name, r.rating, r.review, " +  // facility_name 대신 pf.name
+    @Query(value = "SELECT r.id, pf.name, r.rating, r.review, " +
             "DATE_FORMAT(r.inserted_at, '%Y-%m-%d') as date, r.facility_id " +
             "FROM review r " +
-            "JOIN pet_facility pf ON r.facility_id = pf.id " +  // JOIN 추가
+            "JOIN pet_facility pf ON r.facility_id = pf.id " +
             "WHERE r.member_email = :email " +
             "AND YEAR(r.inserted_at) = :year " +
             "AND MONTH(r.inserted_at) = :month " +

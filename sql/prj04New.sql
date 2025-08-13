@@ -161,8 +161,8 @@ CREATE TABLE `review`
     `inserted_at`   datetime      NOT NULL DEFAULT current_timestamp(),
     `facility_id`   bigint(20)    NOT NULL,
     PRIMARY KEY (`id`),
-    KEY `member_email` (`member_email`),
     KEY `FKg5515o0nnntje78uxpmiaq084` (`facility_id`),
+    KEY `idx_member_date` (`member_email`, `inserted_at`),
     CONSTRAINT `FKg5515o0nnntje78uxpmiaq084` FOREIGN KEY (`facility_id`) REFERENCES `pet_facility` (`id`),
     CONSTRAINT `review_ibfk_1` FOREIGN KEY (`member_email`) REFERENCES `member` (`email`) ON DELETE CASCADE
 ) ENGINE = InnoDB

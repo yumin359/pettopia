@@ -22,11 +22,7 @@ public class CalendarService {
 
     public Map<String, Object> getCalendarData(String email, int year, Integer month) {
         Map<String, Object> result = new HashMap<>();
-
-        // 1. Google Calendar에서 공휴일 가져오기
         Map<String, Object> holidays = getKoreanHolidays(year);
-
-        // 2. DB에서 리뷰 가져오기
         List<Map<String, Object>> reviews = getUserReviews(email, year, month);
 
         result.put("holidays", holidays);
