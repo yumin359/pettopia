@@ -76,12 +76,12 @@ export function AppNavBar() {
           position: "absolute",
           top: dropdownPosition.top,
           right: dropdownPosition.right,
-          backgroundColor: "white",
-          borderRadius: "8px",
-          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
-          border: "none",
+          backgroundColor: "#f6ece6",
+          border: "1px solid black",
+          boxShadow: "5px 5px 1px 1px black",
           minWidth: "160px",
           zIndex: 9999,
+          color: "white",
           overflow: "hidden",
         }}
       >
@@ -91,12 +91,11 @@ export function AppNavBar() {
           style={{
             display: "block",
             padding: "8px 16px",
-            color: "#333",
+            color: "white",
             textDecoration: "none",
-            borderBottom: "1px solid #eee",
             transition: "background-color 0.2s",
           }}
-          onMouseEnter={(e) => (e.target.style.backgroundColor = "#f8f9fa")}
+          onMouseEnter={(e) => (e.target.style.backgroundColor = "black")}
           onMouseLeave={(e) => (e.target.style.backgroundColor = "transparent")}
           onClick={() => setShowDropdown(false)}
         >
@@ -115,7 +114,7 @@ export function AppNavBar() {
             cursor: "pointer",
             transition: "background-color 0.2s",
           }}
-          onMouseEnter={(e) => (e.target.style.backgroundColor = "#f8f9fa")}
+          onMouseEnter={(e) => (e.target.style.backgroundColor = "black")}
           onMouseLeave={(e) => (e.target.style.backgroundColor = "transparent")}
           onClick={() => {
             logout();
