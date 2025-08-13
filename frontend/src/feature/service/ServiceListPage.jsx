@@ -1,5 +1,5 @@
 import { useEffect, useState, useContext } from "react";
-import { Table, Alert, Spinner } from "react-bootstrap";
+import { Table, Alert, Spinner, Button } from "react-bootstrap";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
 import { Navigate, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -33,12 +33,24 @@ export default function ServiceListPage() {
     fetchServices();
   }, []);
 
+  // 삭제 함수
+  const handleDelete = async (id) => {
+    if (!window.confirm("정말 삭제하시겠습니까?")) return;
+    try {
+      await axios.delete(`/api/support/${id}`);
+      // 삭제 성공하면 리스트에서 해당 항목 제거
+      setServices((prev) => prev.filter((item) => item.id !== id));
+    } catch (err) {
+      alert("삭제 중 오류가 발생했습니다.");
+    }
+  };
+
   if (loading) {
     return (
-        <div className="text-center my-4">
-          <Spinner animation="border" />
-          <div>불러오는 중...</div>
-        </div>
+      <div className="text-center my-4">
+        <Spinner animation="border" />
+        <div>불러오는 중...</div>
+      </div>
     );
   }
 
@@ -74,9 +86,29 @@ export default function ServiceListPage() {
                 color: "inherit",
                 cursor: "default",
                 textDecoration: "none",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
               }}
             >
-              {email}
+              <span>{email}</span>
+              <button
+                onClick={() => handleDelete(id)}
+                style={{
+                  background: "none",
+                  border: "none",
+                  color: "red",
+                  fontWeight: "bold",
+                  cursor: "pointer",
+                  fontSize: "18px",
+                  lineHeight: "1",
+                  marginLeft: "8px",
+                }}
+                aria-label="삭제"
+                title="삭제"
+              >
+                ×
+              </button>
             </td>
             <td>{title}</td>
             <td
@@ -90,9 +122,11 @@ export default function ServiceListPage() {
               {content}
             </td>
             <td>{new Date(inserted_at).toLocaleString()}</td>
+            {/* 삭제 칼럼 자체는 삭제했습니다 */}
           </tr>
         ))}
         </tbody>
+
       </Table>
     </div>
   );

@@ -51,4 +51,12 @@ public class SupportService {
                 })
                 .collect(Collectors.toList());
     }
+
+
+    public void deleteSupport(Long id) {
+        if (!supportRepository.existsById(id)) {
+            throw new IllegalArgumentException("해당 문의가 존재하지 않습니다.");
+        }
+        supportRepository.deleteById(id);
+    }
 }
