@@ -15,7 +15,6 @@ import axios from "axios";
 import { useNavigate, useSearchParams } from "react-router";
 import { toast } from "react-toastify";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
-import { FiUser } from "react-icons/fi";
 import GoogleCalendarReview from "../calendar/GoogleCalendarReview.jsx";
 
 export function MemberDetail() {
@@ -110,6 +109,7 @@ export function MemberDetail() {
 
   const isAdminFlag = isAdmin(); // 함수 호출
   const isKakao = member.provider?.includes("kakao");
+  const defaultImage = "/user.png";
 
   return (
     <Container fluid className="my-4">
@@ -127,36 +127,21 @@ export function MemberDetail() {
             </small>
           </div>
 
-          <Card className="shadow-sm border-0 rounded-3">
-            <Card.Body>
-              <div className="mb-4 d-flex justify-content-center">
-                {profileImageUrl ? (
-                  <img
-                    src={profileImageUrl}
-                    alt="프로필 이미지"
-                    className="shadow rounded-circle"
-                    style={{
-                      width: "120px",
-                      height: "120px",
-                      objectFit: "cover",
-                      border: "2px solid #ddd",
-                    }}
-                  />
-                ) : (
-                  <div
-                    className="shadow rounded-circle d-flex justify-content-center align-items-center"
-                    style={{
-                      width: "120px",
-                      height: "120px",
-                      backgroundColor: "#e9ecef",
-                      border: "2px solid #ddd",
-                      color: "#6c757d",
-                    }}
-                  >
-                    <FiUser size={80} />
-                  </div>
-                )}
-              </div>
+        <Card className="shadow-sm border-0 rounded-3">
+          <Card.Body>
+            <div className="mb-4 d-flex justify-content-center">
+              <img
+                src={profileImageUrl || defaultImage}
+                alt="프로필 이미지"
+                className="shadow rounded-circle"
+                style={{
+                  width: "120px",
+                  height: "120px",
+                  objectFit: "cover",
+                  border: "2px solid #ddd",
+                }}
+              />
+            </div>
 
               {!profileImageUrl && <br />}
 
@@ -223,35 +208,33 @@ export function MemberDetail() {
                 />
               </FormGroup>
 
-              {hasAccess(member.email) && (
-                <div className="d-flex justify-content-start gap-2">
-                  <Button
-                    variant="outline-danger"
-                    onClick={handleModalButtonClick}
-                    className="d-flex align-items-center gap-1"
-                  >
-                    탈퇴
-                  </Button>
-                  <Button
-                    variant="outline-info"
-                    onClick={() =>
-                      navigate(`/member/edit?email=${member.email}`)
-                    }
-                    className="d-flex align-items-center gap-1"
-                  >
-                    수정
-                  </Button>
+            {hasAccess(member.email) && (
+              <div className="d-flex justify-content-start gap-2">
+                <Button
+                  variant="outline-danger"
+                  onClick={handleModalButtonClick}
+                  className="d-flex align-items-center gap-1"
+                >
+                  탈퇴
+                </Button>
+                <Button
+                  variant="outline-info"
+                  onClick={() => navigate(`/member/edit?email=${member.email}`)}
+                  className="d-flex align-items-center gap-1"
+                >
+                  수정
+                </Button>
 
-                  {/* 관리자면 로그아웃 버튼 숨김 */}
-                  {
-                    <Button
-                      variant="outline-secondary"
-                      onClick={handleLogoutClick}
-                      className="d-flex align-items-center gap-1"
-                    >
-                      로그아웃
-                    </Button>
-                  }
+                {/* 관리자면 로그아웃 버튼 숨김 */}
+                {
+                  <Button
+                    variant="outline-secondary"
+                    onClick={handleLogoutClick}
+                    className="d-flex align-items-center gap-1"
+                  >
+                    로그아웃
+                  </Button>
+                }
 
                   <Button
                     variant="outline-success"
