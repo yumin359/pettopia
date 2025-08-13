@@ -5,6 +5,7 @@ import axios from "axios";
 import { BoardListMini } from "../main/BoardListMini.jsx";
 import { ReviewCarousel } from "../main/ReviewCarousel.jsx";
 
+const sitelogo1 = "/sitelogo1.png";
 const sitelogo2 = "/sitelogo2.png";
 const sitelogo3 = "/sitelogo3.png";
 const sitelogo4 = "/sitelogo4.png";
@@ -162,7 +163,15 @@ export function BoardLayout() {
             있습니다.
           </p>
           <div className="d-flex justify-content-evenly">
-            <h4>관련기관</h4>
+            <img
+              src={sitelogo1}
+              alt=""
+              style={{
+                width: "200px",
+                height: "60px",
+                objectFit: "contain",
+              }}
+            />
             <img
               src={sitelogo2}
               alt=""
