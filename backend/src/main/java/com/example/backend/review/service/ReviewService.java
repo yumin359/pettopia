@@ -114,33 +114,13 @@ public class ReviewService {
         }
     }
 
-    // ✨ 안전한 파일명 생성 메서드 추가
+
     private String createSafeFileName(String originalFileName) {
         if (originalFileName == null) {
             return "file";
         }
 
-        // 파일 확장자 분리
-        String extension = "";
-        int lastDotIndex = originalFileName.lastIndexOf('.');
-        if (lastDotIndex > 0) {
-            extension = originalFileName.substring(lastDotIndex);
-            originalFileName = originalFileName.substring(0, lastDotIndex);
-        }
-
-        // 한글, 공백, 특수문자를 영어/숫자로 변환
-        String safeFileName = originalFileName
-                .replaceAll("[가-힣]", "korean")  // 한글을 "korean"으로 변경
-                .replaceAll("\\s+", "_")         // 공백을 언더스코어로
-                .replaceAll("[^a-zA-Z0-9_-]", "") // 영어, 숫자, 언더스코어, 하이픈만 허용
-                .replaceAll("_{2,}", "_");       // 연속된 언더스코어를 하나로
-
-        // 빈 문자열이면 기본값 사용
-        if (safeFileName.isEmpty()) {
-            safeFileName = "file";
-        }
-
-        return safeFileName + extension;
+        return UUID.randomUUID().toString() + "_" + originalFileName;
     }
 
     private void newFiles(Review review, List<MultipartFile> newFiles) {
