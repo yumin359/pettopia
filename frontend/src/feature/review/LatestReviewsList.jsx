@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { ReviewLikeContainer } from "../like/ReviewLikeContainer.jsx";
 import ReportModal from "../report/ReportModal.jsx";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
+import { toast } from "react-toastify";  // 1. react-toastify import
 
 export function LatestReviewsList() {
   const { user } = useContext(AuthenticationContext);
@@ -36,10 +37,18 @@ export function LatestReviewsList() {
   const isImageFile = (fileUrl) =>
     /\.(jpg|jpeg|png|gif|webp)$/i.test(fileUrl.split("?")[0]);
 
-  const openReportModal = (reviewId, event) => {
+  // 2. 신고 버튼 클릭 핸들러 수정
+  const openReportModal = (review, event) => {
     event.stopPropagation();
     if (!user) return; // 로그인 안 했으면 모달 안 열림
-    setReportingReviewId(reviewId);
+
+    // 내가 쓴 리뷰면 토스트 메시지 띄우고 신고 모달 안 열기
+    if (user.email === review.memberEmail) {
+      toast.error("자신의 리뷰는 신고할 수 없습니다.");
+      return;
+    }
+
+    setReportingReviewId(review.id);
     setReportModalOpen(true);
   };
 
@@ -70,9 +79,7 @@ export function LatestReviewsList() {
     <Container className="my-4 p-4">
       <h2 className="text-center mb-4 fw-bold">
         📝 최신 리뷰
-        <span className="ms-2 fs-6 text-muted">
-          ({filteredReviews.length}개)
-        </span>
+        <span className="ms-2 fs-6 text-muted">({filteredReviews.length}개)</span>
       </h2>
 
       <Form
@@ -266,10 +273,7 @@ export function LatestReviewsList() {
                 {/* 신고 버튼 */}
                 <Button
                   size="sm"
-                  onClick={(e) => {
-                    if (!user) return; // 로그인 안 했으면 클릭 막음
-                    openReportModal(r.id, e);
-                  }}
+                  onClick={(e) => openReportModal(r, e)}  // 3. 리뷰 전체 객체 넘겨서 비교
                   style={{
                     position: "absolute",
                     bottom: "10px",

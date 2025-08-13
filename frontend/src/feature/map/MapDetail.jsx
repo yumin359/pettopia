@@ -11,6 +11,8 @@ import FacilityInfoCard from "./FacilityInfoCard.jsx";
 import MapPreviewCard from "./MapPreviewCard.jsx";
 import ReviewStatsCard from "./ReviewStatusCard.jsx";
 import ReportModal from "../report/ReportModal.jsx"; // 신고 모달 컴포넌트 임포트
+import { toast } from "react-toastify"; // 토스트 임포트
+import "react-toastify/dist/ReactToastify.css";
 
 export function MapDetail() {
   const { id } = useParams();
@@ -27,7 +29,7 @@ export function MapDetail() {
 
   const reviewRefs = useRef({});
 
-  // 신고 관련 상태 (분리된 모달에 넘길 값만 관리)
+  // 신고 관련 상태
   const [reportModalOpen, setReportModalOpen] = useState(false);
   const [reportingReviewId, setReportingReviewId] = useState(null);
 
@@ -62,7 +64,7 @@ export function MapDetail() {
     }
   };
 
-  // 리뷰 관련 핸들러들
+  // 리뷰 핸들러들
   const handleUpdate = (reviewId) => {
     fetchReviews();
     setSearchParams({ focusReviewId: reviewId });
@@ -91,9 +93,16 @@ export function MapDetail() {
   };
   const handleReviewCancel = () => setIsWriting(false);
 
-  // 신고 모달 열기/닫기
-  const openReportModal = (reviewId) => {
-    setReportingReviewId(reviewId);
+  // 신고 모달 열기/닫기 (내 리뷰 신고 시 토스트 메시지 띄우기 추가)
+  const openReportModal = (review) => {
+    if (!user) return;
+
+    if (user.email === review.memberEmail) {
+      toast.error("자신의 리뷰는 신고할 수 없습니다.");
+      return;
+    }
+
+    setReportingReviewId(review.id);
     setReportModalOpen(true);
   };
 
@@ -102,7 +111,7 @@ export function MapDetail() {
     setReportModalOpen(false);
   };
 
-  // 유틸리티 함수들
+  // 유틸 함수들
   const getAverageRating = () => {
     if (reviews.length === 0) return null;
     const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
@@ -135,7 +144,6 @@ export function MapDetail() {
     });
   }
 
-  // useEffect 훅들
   useEffect(() => {
     fetchFacility();
     fetchReviews();
@@ -259,9 +267,7 @@ export function MapDetail() {
                 <i className="bi bi-camera-fill me-3 fs-4"></i>
                 <div>
                   <h4 className="card-title mb-0">사진 ▪ 영상</h4>
-                  <small className="opacity-75">
-                    Photos & Videos from Reviews
-                  </small>
+                  <small className="opacity-75">Photos & Videos from Reviews</small>
                 </div>
               </div>
             </div>
@@ -277,12 +283,8 @@ export function MapDetail() {
               ) : allImagesAndNickNameFromReviews.length === 0 ? (
                 <div className="text-center py-5">
                   <i className="bi bi-images text-muted display-4"></i>
-                  <h5 className="mt-3 text-muted">
-                    아직 업로드된 사진이 없습니다
-                  </h5>
-                  <small className="text-muted">
-                    첫 번째 사진을 공유해보세요!
-                  </small>
+                  <h5 className="mt-3 text-muted">아직 업로드된 사진이 없습니다</h5>
+                  <small className="text-muted">첫 번째 사진을 공유해보세요!</small>
                 </div>
               ) : (
                 <ReviewCard
@@ -310,9 +312,7 @@ export function MapDetail() {
                         {reviews.length}
                       </span>
                     </h4>
-                    <small className="opacity-75">
-                      User Reviews & Experiences
-                    </small>
+                    <small className="opacity-75">User Reviews & Experiences</small>
                   </div>
                 </div>
 
@@ -353,9 +353,7 @@ export function MapDetail() {
                   <h5 className="mt-3 fw-bold text-muted">
                     아직 작성된 리뷰가 없습니다
                   </h5>
-                  {user && (
-                    <p className="text-muted">첫 번째 리뷰를 작성해보세요!</p>
-                  )}
+                  {user && <p className="text-muted">첫 번째 리뷰를 작성해보세요!</p>}
                 </div>
               ) : (
                 <div className="list-group list-group-flush">
@@ -390,10 +388,7 @@ export function MapDetail() {
                       <div className="d-flex align-items-center gap-3 mt-4 pt-3 border-top">
                         <ReviewLikeContainer reviewId={review.id} />
                         <button
-                          onClick={() => {
-                            if (!user) return; // 로그인 안 하면 동작 안 함
-                            openReportModal(review.id);
-                          }}
+                          onClick={() => openReportModal(review)}
                           className="p-0 border-0 bg-transparent"
                           style={{ cursor: user ? "pointer" : "not-allowed" }}
                           disabled={!user}
