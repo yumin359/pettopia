@@ -94,7 +94,7 @@ export function MyReview() {
                     ) : (
                       // 이미지가 2개 이상일 때
                       <Carousel
-                        className="rounded"
+                        className="hover-controls"
                         interval={null}
                         indicators={false}
                       >
