@@ -91,6 +91,8 @@ body::before {
 
 /* 콘텐츠 영역 */
 .content-area {
+    padding-left: 0;
+    padding-right: 0;
     flex: 1;
     overflow-y: auto;
     overflow-x: hidden;

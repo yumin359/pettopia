@@ -3,7 +3,7 @@ import { Container } from "react-bootstrap";
 
 export function AppFooter() {
   return (
-    <footer className="border-top bg-dark py-3">
+    <footer className="bg-dark py-3">
       <Container>
         <div className="row align-items-center">
           {/* 왼쪽: 프로젝트 정보 */}

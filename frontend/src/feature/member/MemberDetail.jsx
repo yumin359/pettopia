@@ -2,13 +2,13 @@ import {
   Button,
   Card,
   Col,
+  Container,
   FormControl,
   FormGroup,
   FormLabel,
   Modal,
   Row,
   Spinner,
-  Container,
 } from "react-bootstrap";
 import { useContext, useEffect, useState } from "react";
 import axios from "axios";
@@ -112,11 +112,11 @@ export function MemberDetail() {
   const defaultImage = "/user.png";
 
   return (
-    <Container fluid className="my-4">
+    <div className="bg-dark text-white p-3 p-md-4 h-100">
       <Row>
         {/* 왼쪽 컬럼: 회원 정보 */}
-        <Col lg={5} md={12} className="mb-4 mb-lg-0">
-          <div className="d-flex justify-content-between align-items-center mb-3">
+        <Col lg={5} md={12}>
+          <div className="d-flex justify-content-between align-items-center">
             <h3 className="fw-bold mb-0 text-dark">회원 정보</h3>
             <small className="text-muted" style={{ fontSize: "0.85rem" }}>
               {isAdminFlag ? (
@@ -127,21 +127,21 @@ export function MemberDetail() {
             </small>
           </div>
 
-        <Card className="shadow-sm border-0 rounded-3">
-          <Card.Body>
-            <div className="mb-4 d-flex justify-content-center">
-              <img
-                src={profileImageUrl || defaultImage}
-                alt="프로필 이미지"
-                className="shadow rounded-circle"
-                style={{
-                  width: "120px",
-                  height: "120px",
-                  objectFit: "cover",
-                  border: "2px solid #ddd",
-                }}
-              />
-            </div>
+          <Card className="border-0">
+            <Card.Body>
+              <div className="mb-4 d-flex justify-content-center">
+                <img
+                  src={profileImageUrl || defaultImage}
+                  alt="프로필 이미지"
+                  className="shadow rounded-circle"
+                  style={{
+                    width: "120px",
+                    height: "120px",
+                    objectFit: "cover",
+                    border: "2px solid #ddd",
+                  }}
+                />
+              </div>
 
               {!profileImageUrl && <br />}
 
@@ -208,33 +208,35 @@ export function MemberDetail() {
                 />
               </FormGroup>
 
-            {hasAccess(member.email) && (
-              <div className="d-flex justify-content-start gap-2">
-                <Button
-                  variant="outline-danger"
-                  onClick={handleModalButtonClick}
-                  className="d-flex align-items-center gap-1"
-                >
-                  탈퇴
-                </Button>
-                <Button
-                  variant="outline-info"
-                  onClick={() => navigate(`/member/edit?email=${member.email}`)}
-                  className="d-flex align-items-center gap-1"
-                >
-                  수정
-                </Button>
-
-                {/* 관리자면 로그아웃 버튼 숨김 */}
-                {
+              {hasAccess(member.email) && (
+                <div className="d-flex justify-content-start gap-2">
                   <Button
-                    variant="outline-secondary"
-                    onClick={handleLogoutClick}
+                    variant="outline-danger"
+                    onClick={handleModalButtonClick}
                     className="d-flex align-items-center gap-1"
                   >
-                    로그아웃
+                    탈퇴
                   </Button>
-                }
+                  <Button
+                    variant="outline-info"
+                    onClick={() =>
+                      navigate(`/member/edit?email=${member.email}`)
+                    }
+                    className="d-flex align-items-center gap-1"
+                  >
+                    수정
+                  </Button>
+
+                  {/* 관리자면 로그아웃 버튼 숨김 */}
+                  {
+                    <Button
+                      variant="outline-secondary"
+                      onClick={handleLogoutClick}
+                      className="d-flex align-items-center gap-1"
+                    >
+                      로그아웃
+                    </Button>
+                  }
 
                   <Button
                     variant="outline-success"
@@ -294,6 +296,6 @@ export function MemberDetail() {
           </Button>
         </Modal.Footer>
       </Modal>
-    </Container>
+    </div>
   );
 }
