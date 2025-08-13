@@ -7,7 +7,7 @@ import { useNavigate } from "react-router";
 import { ReviewText } from "../../common/ReviewText.jsx";
 
 function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
-  const { user, isAdmin } = useContext(AuthenticationContext);  // isAdmin 추가
+  const { user, isAdmin } = useContext(AuthenticationContext); // isAdmin 추가
   const [isEditing, setIsEditing] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
 
@@ -167,13 +167,32 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
           <Modal.Header closeButton className="border-0 bg-transparent" />
           <Modal.Body
             className="d-flex justify-content-center align-items-center p-0 bg-transparent"
-            style={{ minHeight: "400px" }}
+            style={{ minHeight: "500px" }}
           >
             <Carousel
+              className="hover-controls"
               activeIndex={modalImageIndex}
               onSelect={setModalImageIndex}
               interval={null}
               slide={false}
+              // 🔽 이미지 개수가 1개를 초과할 때만 버튼을 보여줍니다.
+              // 여기는 캡션 필요해서 버튼으로 ui 설정
+              prevIcon={
+                allImages.length > 1 ? (
+                  <span
+                    aria-hidden="true"
+                    className="carousel-control-prev-icon"
+                  />
+                ) : null
+              }
+              nextIcon={
+                allImages.length > 1 ? (
+                  <span
+                    aria-hidden="true"
+                    className="carousel-control-next-icon"
+                  />
+                ) : null
+              }
             >
               {allImages.map((imageInfo, idx) => (
                 <Carousel.Item key={idx}>
@@ -182,8 +201,8 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
                     alt={`확대 이미지 ${idx + 1}`}
                     fluid
                     style={{
-                      maxHeight: "80vh",
-                      maxWidth: "100%",
+                      height: "500px",
+                      width: "100vw",
                       objectFit: "contain",
                       margin: "0 auto", // 중앙 정렬
                     }}
@@ -256,7 +275,9 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
                 {review.memberAverageRating}
               </div>
             </div>
-            <div className="small text-muted">{formatDate(review.insertedAt)}</div>
+            <div className="small text-muted">
+              {formatDate(review.insertedAt)}
+            </div>
           </div>
         </div>
 
@@ -361,13 +382,32 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
         <Modal.Header closeButton className="border-0 bg-transparent" />
         <Modal.Body
           className="d-flex justify-content-center align-items-center p-0 bg-transparent"
-          style={{ minHeight: "400px" }}
+          style={{ minHeight: "500px" }}
         >
           <Carousel
+            className="hover-controls"
             activeIndex={modalImageIndex}
             onSelect={setModalImageIndex}
             interval={null}
             slide={false}
+            // 🔽 이미지 개수가 1개를 초과할 때만 버튼을 보여줍니다.
+            // 여기는 캡션 필요해서 버튼으로 ui 설정
+            prevIcon={
+              allImages.length > 1 ? (
+                <span
+                  aria-hidden="true"
+                  className="carousel-control-prev-icon"
+                />
+              ) : null
+            }
+            nextIcon={
+              allImages.length > 1 ? (
+                <span
+                  aria-hidden="true"
+                  className="carousel-control-next-icon"
+                />
+              ) : null
+            }
           >
             {allImages.map((imageInfo, idx) => (
               <Carousel.Item key={idx}>
@@ -376,8 +416,8 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
                   alt={`확대 이미지 ${idx + 1}`}
                   fluid
                   style={{
-                    maxHeight: "80vh",
-                    maxWidth: "100%",
+                    height: "500px",
+                    width: "100vw",
                     objectFit: "contain",
                     margin: "0 auto", // 중앙 정렬
                   }}
