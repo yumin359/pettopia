@@ -74,8 +74,7 @@ export function ReviewAdd({ facility, onSave, onCancel }) {
     const selectedFiles = Array.from(e.target.files);
 
     const validFiles = selectedFiles.filter((file) => {
-      const isValidType =
-        file.type.startsWith("image/") || file.type === "application/pdf";
+      const isValidType = file.type.startsWith("image/");
       const isValidSize = file.size <= 10 * 1024 * 1024;
 
       if (!isValidType) {
@@ -373,7 +372,7 @@ export function ReviewAdd({ facility, onSave, onCancel }) {
             disabled={isProcessing}
           />
           <Form.Text className="text-muted">
-            이미지 파일 또는 PDF 파일만 업로드 가능 (최대 10MB)
+            이미지 파일만 업로드 가능 (최대 10MB)
           </Form.Text>
         </FormGroup>
 
