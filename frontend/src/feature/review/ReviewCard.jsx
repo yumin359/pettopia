@@ -7,7 +7,7 @@ import { useNavigate } from "react-router";
 import { ReviewText } from "../../common/ReviewText.jsx";
 
 function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
-  const { user, isAdmin } = useContext(AuthenticationContext);  // isAdmin 추가
+  const { user, isAdmin } = useContext(AuthenticationContext); // isAdmin 추가
   const [isEditing, setIsEditing] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
 
@@ -114,42 +114,47 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
 
   // showOnlyImages prop이 true일 경우, 이미지 파일만 렌더링
   if (showOnlyImages) {
-    const imagesToShow = showAllImages ? allImages : allImages.slice(0, 6);
-    const hasMoreImages = allImages.length > 6;
+    const imagesToShow = showAllImages ? allImages : allImages.slice(0, 5);
+    const hasMoreImages = allImages.length > 5;
 
     return (
       <>
         <div className="d-flex flex-wrap gap-2">
           {imagesToShow.map((imageInfo, idx) => (
-            <Image
-              key={idx}
-              src={getImageUrl(imageInfo)} // 사진을 가져옴
-              alt={`첨부 이미지 ${idx + 1}`}
-              className="shadow rounded"
-              width="150"
-              height="150"
-              style={{
-                objectFit: "cover",
-                cursor: "pointer",
-              }}
-              onClick={() => handleImageClick(imageInfo, idx)} // 객체 자체를 전달하고
-            />
+            <div key={idx} className="position-relative">
+              <Image
+                src={getImageUrl(imageInfo)}
+                alt={`첨부 이미지 ${idx + 1}`}
+                className="shadow rounded"
+                width="150"
+                height="150"
+                style={{
+                  objectFit: "cover",
+                  cursor: "pointer",
+                }}
+                onClick={() => handleImageClick(imageInfo, idx)}
+              />
+              {/* 더보기 버튼을 마지막 이미지 위에 오버레이로 표시 */}
+              {idx === imagesToShow.length - 1 &&
+                hasMoreImages &&
+                !showAllImages && (
+                  <Button
+                    variant="dark"
+                    className="position-absolute top-50 start-50 translate-middle rounded-circle"
+                    style={{ width: "60px", height: "60px", opacity: 0.8 }}
+                    onClick={() => setShowAllImages(true)}
+                  >
+                    +{allImages.length - 6}
+                  </Button>
+                )}
+            </div>
           ))}
-          {hasMoreImages && !showAllImages && (
-            <Button
-              variant="outline-secondary"
-              className="d-flex align-items-center justify-content-center fw-bold"
-              style={{ width: "150px", height: "150px" }}
-              onClick={() => setShowAllImages(true)}
-            >
-              더보기 ({allImages.length - 6})
-            </Button>
-          )}
+
+          {/* 간략히 버튼은 이미지 갤러리 아래에 배치 */}
           {hasMoreImages && showAllImages && (
             <Button
               variant="outline-secondary"
-              className="d-flex align-items-center justify-content-center fw-bold"
-              style={{ width: "150px", height: "150px" }}
+              className="w-100 mt-2"
               onClick={() => setShowAllImages(false)}
             >
               간략히
@@ -167,13 +172,32 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
           <Modal.Header closeButton className="border-0 bg-transparent" />
           <Modal.Body
             className="d-flex justify-content-center align-items-center p-0 bg-transparent"
-            style={{ minHeight: "400px" }}
+            style={{ minHeight: "500px" }}
           >
             <Carousel
+              className="hover-controls"
               activeIndex={modalImageIndex}
               onSelect={setModalImageIndex}
               interval={null}
               slide={false}
+              // 🔽 이미지 개수가 1개를 초과할 때만 버튼을 보여줍니다.
+              // 여기는 캡션 필요해서 버튼으로 ui 설정
+              prevIcon={
+                allImages.length > 1 ? (
+                  <span
+                    aria-hidden="true"
+                    className="carousel-control-prev-icon"
+                  />
+                ) : null
+              }
+              nextIcon={
+                allImages.length > 1 ? (
+                  <span
+                    aria-hidden="true"
+                    className="carousel-control-next-icon"
+                  />
+                ) : null
+              }
             >
               {allImages.map((imageInfo, idx) => (
                 <Carousel.Item key={idx}>
@@ -182,8 +206,8 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
                     alt={`확대 이미지 ${idx + 1}`}
                     fluid
                     style={{
-                      maxHeight: "80vh",
-                      maxWidth: "100%",
+                      height: "500px",
+                      width: "100vw",
                       objectFit: "contain",
                       margin: "0 auto", // 중앙 정렬
                     }}
@@ -256,7 +280,9 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
                 {review.memberAverageRating}
               </div>
             </div>
-            <div className="small text-muted">{formatDate(review.insertedAt)}</div>
+            <div className="small text-muted">
+              {formatDate(review.insertedAt)}
+            </div>
           </div>
         </div>
 
@@ -361,13 +387,32 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
         <Modal.Header closeButton className="border-0 bg-transparent" />
         <Modal.Body
           className="d-flex justify-content-center align-items-center p-0 bg-transparent"
-          style={{ minHeight: "400px" }}
+          style={{ minHeight: "500px" }}
         >
           <Carousel
+            className="hover-controls"
             activeIndex={modalImageIndex}
             onSelect={setModalImageIndex}
             interval={null}
             slide={false}
+            // 🔽 이미지 개수가 1개를 초과할 때만 버튼을 보여줍니다.
+            // 여기는 캡션 필요해서 버튼으로 ui 설정
+            prevIcon={
+              allImages.length > 1 ? (
+                <span
+                  aria-hidden="true"
+                  className="carousel-control-prev-icon"
+                />
+              ) : null
+            }
+            nextIcon={
+              allImages.length > 1 ? (
+                <span
+                  aria-hidden="true"
+                  className="carousel-control-next-icon"
+                />
+              ) : null
+            }
           >
             {allImages.map((imageInfo, idx) => (
               <Carousel.Item key={idx}>
@@ -376,8 +421,8 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
                   alt={`확대 이미지 ${idx + 1}`}
                   fluid
                   style={{
-                    maxHeight: "80vh",
-                    maxWidth: "100%",
+                    height: "500px",
+                    width: "100vw",
                     objectFit: "contain",
                     margin: "0 auto", // 중앙 정렬
                   }}

@@ -4,8 +4,6 @@ import { Col, Image, Row, Spinner, Badge, Carousel } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router";
 import { FaChevronRight } from "react-icons/fa";
-import "./Review.css";
-import "../../common/Carousel.css";
 import { ReviewText } from "../../common/ReviewText.jsx";
 import { ReviewLikeContainer } from "../like/ReviewLikeContainer.jsx";
 
@@ -96,7 +94,7 @@ export function MyReview() {
                     ) : (
                       // 이미지가 2개 이상일 때
                       <Carousel
-                        className="rounded"
+                        className="hover-controls"
                         interval={null}
                         indicators={false}
                       >
