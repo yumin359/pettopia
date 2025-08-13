@@ -4,8 +4,8 @@ import { Col, Image, Row, Spinner, Badge, Carousel } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router";
 import { FaChevronRight } from "react-icons/fa";
-import "./Review.css";
-import "../../common/Carousel.css";
+import "../../styles/Review.css";
+import "../../styles/Carousel.css";
 import { ReviewText } from "../../common/ReviewText.jsx";
 import { ReviewLikeContainer } from "../like/ReviewLikeContainer.jsx";
 

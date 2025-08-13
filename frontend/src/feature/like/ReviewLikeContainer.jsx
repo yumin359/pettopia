@@ -3,7 +3,7 @@ import axios from "axios";
 import { useContext, useEffect, useState } from "react";
 import { OverlayTrigger, Spinner, Tooltip } from "react-bootstrap";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
-import "./ReviewLike.css"; // CSS 파일 import
+import "../../styles/ReviewLike.css"; // CSS 파일 import
 
 export function ReviewLikeContainer({ reviewId }) {
   const [isProcessing, setIsProcessing] = useState(false);
