@@ -32,34 +32,45 @@ public class CalendarService {
     }
 
     private Map<String, Object> getKoreanHolidays(int year) {
+        // --- 이 메소드만 아래 내용으로 교체해주세요 ---
         try {
-            String url = String.format(
-                    "https://www.googleapis.com/calendar/v3/calendars/" +
-                            "ko.south_korea%%23holiday@group.v.calendar.google.com/events" +
-                            "?key=%s&timeMin=%d-01-01T00:00:00Z&timeMax=%d-12-31T23:59:59Z",
-                    googleApiKey, year, year
-            );
+            String urlTemplate = "https://www.googleapis.com/calendar/v3/calendars/{calendarId}/events" +
+                    "?key={key}&timeMin={timeMin}&timeMax={timeMax}";
 
-            Map response = restTemplate.getForObject(url, Map.class);
+            String calendarId = "ko.south_korea#holiday@group.v.calendar.google.com";
+            String timeMin = String.format("%d-01-01T00:00:00Z", year);
+            String timeMax = String.format("%d-12-31T23:59:59Z", year);
+
+            // 템플릿과 값들을 사용해 API를 호출합니다. 이 방식이 가장 안전하고 표준적인 방법입니다.
+            Map<String, String> uriVariables = new HashMap<>();
+            uriVariables.put("calendarId", calendarId);
+            uriVariables.put("key", googleApiKey);
+            uriVariables.put("timeMin", timeMin);
+            uriVariables.put("timeMax", timeMax);
+
+            Map response = restTemplate.getForObject(urlTemplate, Map.class, uriVariables);
+
             List<Map> items = (List<Map>) response.get("items");
 
             Map<String, Object> holidays = new HashMap<>();
-            for (Map item : items) {
-                Map<String, String> start = (Map<String, String>) item.get("start");
-                String date = start.get("date");
+            if (items != null) {
+                for (Map item : items) {
+                    Map<String, String> start = (Map<String, String>) item.get("start");
+                    String date = start.get("date");
 
-                Map<String, String> holiday = new HashMap<>();
-                holiday.put("name", (String) item.get("summary"));
-                holidays.put(date, holiday);
+                    Map<String, String> holiday = new HashMap<>();
+                    holiday.put("name", (String) item.get("summary"));
+                    holidays.put(date, holiday);
+                }
             }
-
             return holidays;
 
         } catch (Exception e) {
             log.error("Failed to fetch holidays", e);
-            return new HashMap<>();  // 빈 맵 반환
+            return new HashMap<>();
         }
     }
+
 
     private List<Map<String, Object>> getUserReviews(String email, int year, Integer month) {
         List<Object[]> rawReviews;
