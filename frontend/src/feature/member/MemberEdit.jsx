@@ -295,30 +295,58 @@ export function MemberEdit() {
               </FormLabel>
               <div className="d-flex justify-content-center flex-column align-items-center gap-2">
                 <div
-                  className="profile-upload-area shadow rounded-circle d-flex justify-content-center align-items-center"
-                  onClick={handleProfileClick}
+                  className="profile-upload-area shadow rounded-circle d-flex justify-content-center align-items-center position-relative"
+                  onClick={
+                    isSelf && !displayProfileImage
+                      ? handleProfileClick
+                      : undefined
+                  }
                   style={{
                     width: "150px",
                     height: "150px",
                     border: `2px solid ${isSelf ? "#ddd" : "#eee"}`,
-                    cursor: isSelf ? "pointer" : "default",
-                    overflow: "hidden",
+                    cursor:
+                      isSelf && !displayProfileImage ? "pointer" : "default",
+                    overflow: "visible", // overflow를 visible로 변경
                     backgroundColor: displayProfileImage
                       ? "transparent"
                       : "#f8f9fa",
                   }}
                 >
                   {displayProfileImage ? (
-                    <img
-                      src={displayProfileImage} // 기존 또는 새로 선택된 파일의 미리보기
-                      alt="프로필 미리보기"
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
-                      }}
-                    />
+                    // 이미지가 있을 때: 이미지와 삭제 버튼을 함께 렌더링
+                    <>
+                      <img
+                        src={displayProfileImage}
+                        alt="프로필 미리보기"
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                          borderRadius: "50%", // 이미지도 원형으로
+                        }}
+                      />
+                      {isSelf && (
+                        <Button
+                          variant="danger"
+                          className="position-absolute top-0 end-0 p-1"
+                          style={{
+                            borderRadius: "50%",
+                            lineHeight: 0.8,
+                            opacity: 0.8,
+                          }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRemoveProfile(displayProfileImage);
+                          }}
+                          aria-label="프로필 사진 제거"
+                        >
+                          &times;
+                        </Button>
+                      )}
+                    </>
                   ) : (
+                    // 이미지가 없을 때: + 아이콘만 렌더링
                     <FaPlus size={40} color="#6c757d" />
                   )}
                 </div>
@@ -335,23 +363,20 @@ export function MemberEdit() {
                   }}
                 />
 
-                {/* 프로필 사진 제거 버튼 (표시할 이미지가 있을 때만) */}
-                {isSelf && displayProfileImage && (
-                  <Button
-                    variant="outline-danger"
-                    size="sm"
-                    // 📝 삭제할 URL을 직접 전달
-                    onClick={() => handleRemoveProfile(displayProfileImage)}
-                    className="mt-2 d-flex align-items-center gap-1"
-                  >
-                    <FaTrashAlt /> 프로필 사진 제거
-                  </Button>
-                )}
+                {/* 추가적인 파일 업로드 버튼 (옵션) */}
+                {/*{isSelf && displayProfileImage && (*/}
+                {/*  <Button*/}
+                {/*    variant="outline-primary"*/}
+                {/*    size="sm"*/}
+                {/*    onClick={handleProfileClick}*/}
+                {/*    className="mt-2"*/}
+                {/*  >*/}
+                {/*    사진 변경*/}
+                {/*  </Button>*/}
+                {/*)}*/}
               </div>
             </FormGroup>
-
             <hr />
-
             <FormGroup controlId="email1" className="mb-3">
               <FormLabel>이메일</FormLabel>
               <FormControl
@@ -361,7 +386,6 @@ export function MemberEdit() {
                 style={{ userSelect: "text", color: "#6c757d" }}
               />
             </FormGroup>
-
             <FormGroup controlId="nickName1" className="mb-3">
               <FormLabel>별명</FormLabel>
               <FormControl
@@ -384,7 +408,6 @@ export function MemberEdit() {
                 </FormText>
               )}
             </FormGroup>
-
             <FormGroup controlId="info1" className="mb-3">
               <FormLabel>자기소개</FormLabel>
               <FormControl
@@ -401,7 +424,6 @@ export function MemberEdit() {
                 disabled={!isSelf}
               />
             </FormGroup>
-
             <FormGroup controlId="insertedAt1" className="mb-3">
               <FormLabel>가입일시</FormLabel>
               <FormControl
@@ -411,7 +433,6 @@ export function MemberEdit() {
                 style={{ userSelect: "text", color: "#6c757d" }}
               />
             </FormGroup>
-
             {/* 버튼 3개 - 탈퇴, 수정, 로그아웃과 같은 스타일과 위치 */}
             {hasAccess(member.email) && (
               <div className="d-flex justify-content-start gap-2">
