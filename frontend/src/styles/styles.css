@@ -64,22 +64,18 @@ body::before {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100dvh;
-    padding: 2rem;
+    padding: 3rem 1rem;
+    min-height: 100vh;
+    box-sizing: border-box;
 }
 
-/* 🎨 박스 색상과 박스 크기 */
 .main-container {
-    height: 130dvh;
-    width: 120vh;
-    max-width: 1200px;
+    width: 90%;
+    max-width: 1400px;
+    min-height: 80vh;
     background-color: white;
-    border-style: solid;
-    border-color: black;
-    border-width: 2px;
+    border: 2px solid black;
     box-shadow: 5px 5px 1px 1px black;
-    overflow-y: auto;
-    overflow-x: hidden;
     display: flex;
     flex-direction: column;
 }
