@@ -23,6 +23,9 @@ import { AdminPage } from "./AdminPage.jsx";
 import ReviewReportList from "./feature/report/ReviewReportList.jsx";
 import { About } from "./common/About.jsx";
 import "./styles/styles.css";
+import "./styles/Carousel.css";
+import "./styles/Review.css";
+import "./styles/ReviewLike.css";
 
 function App() {
   return (
