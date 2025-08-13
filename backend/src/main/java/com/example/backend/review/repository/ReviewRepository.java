@@ -41,4 +41,29 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
     // 특정 회원의 리뷰 평점 평균을 계산하는 JPQL 쿼리
     @Query("SELECT AVG(r.rating) FROM Review r WHERE r.memberEmail.id = :memberId")
     Optional<Double> findAverageRatingByMemberId(@Param("memberId") Long memberId);
+
+
+    @Query(value = "SELECT r.id, pf.name, r.rating, r.review, " +
+            "DATE_FORMAT(r.inserted_at, '%Y-%m-%d') as date, r.facility_id " +
+            "FROM review r " +
+            "JOIN pet_facility pf ON r.facility_id = pf.id " +
+            "WHERE r.member_email = :email " +
+            "AND YEAR(r.inserted_at) = :year " +
+            "ORDER BY r.inserted_at DESC",
+            nativeQuery = true)
+    List<Object[]> findReviewsByYear(@Param("email") String email,
+                                     @Param("year") int year);
+
+    @Query(value = "SELECT r.id, pf.name, r.rating, r.review, " +
+            "DATE_FORMAT(r.inserted_at, '%Y-%m-%d') as date, r.facility_id " +
+            "FROM review r " +
+            "JOIN pet_facility pf ON r.facility_id = pf.id " +
+            "WHERE r.member_email = :email " +
+            "AND YEAR(r.inserted_at) = :year " +
+            "AND MONTH(r.inserted_at) = :month " +
+            "ORDER BY r.inserted_at DESC",
+            nativeQuery = true)
+    List<Object[]> findReviewsByYearAndMonth(@Param("email") String email,
+                                             @Param("year") int year,
+                                             @Param("month") int month);
 }

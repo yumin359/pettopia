@@ -174,7 +174,7 @@ body::before {
    최신리뷰 카드
    ======================================== */
 .card:hover {
-    background-color: #f6ece6 !important;
+    background-color: #f6ece6;
     box-shadow: 5px 5px 1px 1px black;
     cursor: pointer;
 }
