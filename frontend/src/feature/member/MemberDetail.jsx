@@ -112,12 +112,16 @@ export function MemberDetail() {
   const defaultImage = "/user.png";
 
   return (
-    <div className="bg-dark text-white p-3 p-md-4 h-100">
-      <Row>
+    <div className="p-0 h-100">
+      <Row className="h-100 g-0">
         {/* 왼쪽 컬럼: 회원 정보 */}
-        <Col lg={5} md={12}>
-          <div className="d-flex justify-content-between align-items-center">
-            <h3 className="fw-bold mb-0 text-dark">회원 정보</h3>
+        <Col
+          lg={5}
+          md={12}
+          className="bg-dark text-white p-4 d-flex flex-column"
+        >
+          <div className="d-flex justify-content-between align-items-center mb-3">
+            <h3 className="fw-bold mb-0 text-white">회원 정보</h3>
             <small className="text-muted" style={{ fontSize: "0.85rem" }}>
               {isAdminFlag ? (
                 <span className="badge bg-danger">관리자</span>
