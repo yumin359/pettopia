@@ -286,8 +286,7 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
           </div>
         </div>
 
-        {/* 수정/삭제 버튼 (오른쪽) */}
-        {(user?.email === review.memberEmail || isAdmin()) && (
+        {user?.email === review.memberEmail && (
           <div className="d-flex gap-2">
             <Button
               variant="outline-secondary"
