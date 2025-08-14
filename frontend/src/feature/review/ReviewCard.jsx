@@ -1,5 +1,5 @@
-import React, { useState, useContext } from "react";
-import { Badge, Image, Modal, Button, Carousel } from "react-bootstrap";
+import React, { useContext, useState } from "react";
+import { Badge, Button, Carousel, Image, Modal } from "react-bootstrap";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
 import ReviewEdit from "./ReviewEdit.jsx";
@@ -7,7 +7,7 @@ import { useNavigate } from "react-router";
 import { ReviewText } from "../../common/ReviewText.jsx";
 
 function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
-  const { user, isAdmin } = useContext(AuthenticationContext); // isAdmin 추가
+  const { user } = useContext(AuthenticationContext);
   const [isEditing, setIsEditing] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
 
@@ -320,7 +320,7 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
       )}
 
       {/* 리뷰 본문 */}
-      <div className="mb-3 p-3 bg-light rounded">
+      <div className="mb-3 p-3 bg-light">
         <ReviewText text={review.review} />
       </div>
 

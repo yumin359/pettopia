@@ -216,11 +216,11 @@ body::before {
 /* ========================================
    최신리뷰 카드
    ======================================== */
-.card:hover {
-    background-color: #f6ece6;
-    box-shadow: 5px 5px 1px 1px black;
-    cursor: pointer;
-}
+/*.card:hover {*/
+/*    background-color: #f6ece6;*/
+/*    box-shadow: 5px 5px 1px 1px black;*/
+/*    cursor: pointer;*/
+/*}*/
 
 /* ========================================
    레트로 스타일 스크롤바
