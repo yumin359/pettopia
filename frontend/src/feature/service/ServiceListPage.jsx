@@ -88,19 +88,19 @@ export default function ServiceListPage() {
         <thead>
           <tr>
             <th>
-              <FaUserCircle className="me-2" />
+              {/*<FaUserCircle className="me-2" />*/}
               이메일
             </th>
             <th>
-              <BsChatLeftTextFill className="me-2" />
+              {/*<BsChatLeftTextFill className="me-2" />*/}
               제목
             </th>
             <th>
-              <BsChatLeftTextFill className="me-2" />
+              {/*<BsChatLeftTextFill className="me-2" />*/}
               내용
             </th>
             <th>
-              <BsCalendar2DateFill className="me-2" />
+              {/*<BsCalendar2DateFill className="me-2" />*/}
               접수일
             </th>
             <th>관리</th>
