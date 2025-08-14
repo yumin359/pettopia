@@ -113,7 +113,7 @@ export function FavoriteContainer({ facilityName, facilityId }) {
   }
 
   const starStyle = {
-    fontSize: "1.5rem",
+    fontSize: "1.8rem",
     cursor: user ? (isProcessing ? "wait" : "pointer") : "not-allowed",
     color: favoriteInfo?.isFavorite ? "gold" : "#ccc",
     transition: "color 0.3s ease",
