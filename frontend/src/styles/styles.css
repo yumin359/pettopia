@@ -31,6 +31,24 @@
 }
 
 /* ========================================
+   로고
+   ======================================== */
+
+.logo-image {
+    background-color: var(--primary-red);
+
+    mask-image: url('/PETOPIA-Photoroom.png');
+    -webkit-mask-image: url('/PETOPIA-Photoroom.png');
+
+    mask-size: contain;
+    -webkit-mask-size: contain;
+    mask-repeat: no-repeat;
+    -webkit-mask-repeat: no-repeat;
+    mask-position: center;
+    -webkit-mask-position: center;
+}
+
+/* ========================================
    바탕화면
    ======================================== */
 * {
