@@ -143,7 +143,12 @@ export function MemberAdd() {
                 <img
                   src={currentProfilePreview}
                   alt="프로필 미리보기"
-                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    cursor: "pointer",
+                  }}
                 />
               ) : (
                 <FaPlus size={40} color="#6c757d" /> // 이미지가 없을 때 + 아이콘
