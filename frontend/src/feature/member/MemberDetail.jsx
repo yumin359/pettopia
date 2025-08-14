@@ -121,7 +121,7 @@ export function MemberDetail() {
               )}
             </small>
           </div>
-          <div className="border-0">
+          <div className="border-0 mb-4">
             <div className="mb-4 d-flex justify-content-center">
               <img
                 src={profileImageUrl || defaultImage}
