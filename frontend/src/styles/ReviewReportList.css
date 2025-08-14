@@ -43,3 +43,7 @@
     word-break: break-word;
     text-overflow: initial;
 }
+
+.review-report-table tbody tr td div div {
+    cursor: pointer;
+}
