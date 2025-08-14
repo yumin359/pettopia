@@ -242,7 +242,7 @@ export function AppNavBar() {
         `}
       </style>
       <Navbar
-        expand="lg"
+        expand="xl"
         className="px-4"
         expanded={expanded}
         ref={navbarRef}
