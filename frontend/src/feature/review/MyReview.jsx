@@ -80,7 +80,14 @@ export function MyReview() {
           return (
             <div key={r.id} className="review-item mb-3">
               {/* 처음에 구분선 추가 */}
-              <hr className="hr-color-hotpink review-separator" />
+              {index === 0 ? (
+                <hr
+                  className="hr-color-hotpink"
+                  style={{ borderTopWidth: "5px" }}
+                />
+              ) : (
+                <hr className="hr-color-hotpink review-separator" />
+              )}
               <div className={reviewImages.length > 0 ? "mb-3" : ""}>
                 {/* 이미지가 있을 때만 컨테이너 렌더링 */}
                 {reviewImages.length > 0 && (
@@ -140,6 +147,11 @@ export function MyReview() {
                       />
                     )}
                   </div>
+                </div>
+                {/* 시설명 주소 */}
+                <div style={{ color: "#888", fontSize: "0.85rem" }}>
+                  {r.petFacility.sidoName}
+                  {r.petFacility.sigunguName}
                 </div>
                 <hr className="my-2 hr-color-hotpink" />
 
