@@ -29,9 +29,8 @@
     text-overflow: ellipsis;
 }
 
-.review-report-table tbody .clickable-row {
+.review-report-table tbody .clickable-row td {
     cursor: pointer;
-    transition: background-color 0.2s ease;
 }
 
 .review-report-table tbody .clickable-row:hover td {
@@ -43,13 +42,4 @@
     white-space: pre-wrap;
     word-break: break-word;
     text-overflow: initial;
-}
-
-.review-report-table .reason-cell .reason-text {
-    max-height: 5em;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
 }

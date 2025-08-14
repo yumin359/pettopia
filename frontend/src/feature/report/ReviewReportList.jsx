@@ -13,6 +13,7 @@ import { BsCardText, BsCalendar2DateFill } from "react-icons/bs";
 import { GoMail } from "react-icons/go";
 import axios from "axios";
 import "../../styles/ReviewReportList.css";
+import { ReviewText } from "../../common/ReviewText.jsx";
 
 export default function ReviewReportList() {
   const [reports, setReports] = useState([]);
@@ -132,14 +133,7 @@ export default function ReviewReportList() {
                 </td>
                 <td>{reviewId}</td>
                 <td className="reason-cell">
-                  <OverlayTrigger
-                    placement="top"
-                    overlay={
-                      <Tooltip id={`tooltip-reason-${id}`}>{reason}</Tooltip>
-                    }
-                  >
-                    <div className="reason-text">{reason}</div>
-                  </OverlayTrigger>
+                  <ReviewText text={reason} />
                 </td>
                 <td>{reportedAt ? reportedAt.substring(0, 10) : "-"}</td>
               </tr>
