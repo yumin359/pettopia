@@ -253,7 +253,7 @@ export function AppNavBar() {
           {/* 로고와 브랜드 이름 */}
           <Navbar.Brand as={Link} to="/" className="d-flex align-items-center">
             <span
-              className=" ms-3 md-3"
+              className=" ms-2 md-3"
               style={{
                 fontFamily: "'Poppins'",
                 fontSize: "clamp(1.2rem, 4vw, 1.8rem)",
@@ -263,9 +263,8 @@ export function AppNavBar() {
             >
               PET
             </span>
-            <img
-              src="/PETOPIA-Photoroom.png"
-              alt="PETOPIA 로고"
+            <div
+              className="logo-image"
               style={{ width: "50px", height: "50px" }}
             />
             <span
@@ -286,18 +285,19 @@ export function AppNavBar() {
             <Nav className="me-3">
               {user ? (
                 <div className="nav-dropdown-container">
-                  <button
-                    className="btn btn-link p-0"
+                  <Button
+                    className="fw-bold"
                     style={{
+                      padding: "0.5rem 1.5rem",
+                      color: "#D9534F",
+                      backgroundColor: "transparent",
                       border: "none",
-                      background: "transparent",
-                      color: "black",
-                      textDecoration: "none",
+                      fontSize: "1.25rem",
                     }}
                     onClick={handleDropdownToggle}
                   >
                     {userDropdownTitle}
-                  </button>
+                  </Button>
                   <CustomDropdown />
                 </div>
               ) : (
@@ -307,6 +307,10 @@ export function AppNavBar() {
                   className="fw-bold"
                   style={{
                     padding: "0.5rem 1.5rem",
+                    color: "#D9534F",
+                    backgroundColor: "transparent",
+                    border: "none",
+                    fontSize: "1.25rem",
                   }}
                 >
                   LOGIN
