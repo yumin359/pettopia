@@ -94,7 +94,7 @@ export function MemberDetail() {
     : "";
 
   const profileImageUrl = member.files?.find((file) =>
-    /\.(jpg|jpeg|png|gif|webp)$/i.test(file),
+    /\.(jpg|jpeg|png|gif|webp)$/i.test(file)
   );
 
   const isAdminFlag = isAdmin();
@@ -121,6 +121,7 @@ export function MemberDetail() {
               )}
             </small>
           </div>
+
           <div className="border-0 mb-4">
             <div className="mb-4 d-flex justify-content-center">
               <img
@@ -143,28 +144,22 @@ export function MemberDetail() {
                 readOnly
                 value={member.email}
                 className="bg-light border-0"
-                style={{
-                  userSelect: "text",
-                  boxShadow: "none",
-                  outline: "none",
-                }}
+                style={{ userSelect: "text", boxShadow: "none", outline: "none" }}
                 onFocus={(e) => e.target.blur()}
               />
             </FormGroup>
+
             <FormGroup controlId="nickName1" className="mb-3">
               <FormLabel>별명</FormLabel>
               <FormControl
                 readOnly
                 value={member.nickName}
                 className="bg-light border-0"
-                style={{
-                  userSelect: "text",
-                  boxShadow: "none",
-                  outline: "none",
-                }}
+                style={{ userSelect: "text", boxShadow: "none", outline: "none" }}
                 onFocus={(e) => e.target.blur()}
               />
             </FormGroup>
+
             <FormGroup controlId="info1" className="mb-3">
               <FormLabel>자기소개</FormLabel>
               <FormControl
@@ -182,23 +177,20 @@ export function MemberDetail() {
                 onFocus={(e) => e.target.blur()}
               />
             </FormGroup>
+
             <FormGroup controlId="inserted1" className="mb-3">
               <FormLabel>가입일시</FormLabel>
               <FormControl
                 readOnly
                 value={formattedInsertedAt}
                 className="bg-light border-0"
-                style={{
-                  userSelect: "text",
-                  boxShadow: "none",
-                  outline: "none",
-                }}
+                style={{ userSelect: "text", boxShadow: "none", outline: "none" }}
                 onFocus={(e) => e.target.blur()}
               />
             </FormGroup>
 
             {hasAccess(member.email) && (
-              <div className="d-flex justify-content-start gap-2">
+              <div className="d-flex justify-content-start gap-2 flex-wrap">
                 <Button
                   variant="outline-danger"
                   onClick={handleModalButtonClick}
@@ -214,8 +206,7 @@ export function MemberDetail() {
                   수정
                 </Button>
 
-                {/* 관리자면 로그아웃 버튼 숨김 */}
-                {
+                {!isAdminFlag && (
                   <Button
                     variant="outline-secondary"
                     onClick={handleLogoutClick}
@@ -223,36 +214,41 @@ export function MemberDetail() {
                   >
                     로그아웃
                   </Button>
-                }
+                )}
 
                 <Button
                   variant="outline-success"
                   onClick={() =>
                     setRightColumnView(
-                      rightColumnView === "calendar" ? "myReviews" : "calendar",
+                      rightColumnView === "calendar" ? "myReviews" : "calendar"
                     )
                   }
                   className="d-flex align-items-center gap-1"
                 >
-                  {rightColumnView === "calendar"
-                    ? "내가 쓴 리뷰 보기"
-                    : "달력으로 보기"}
+                  {rightColumnView === "calendar" ? "내가 쓴 리뷰 보기" : "달력으로 보기"}
                 </Button>
               </div>
             )}
           </div>
         </Col>
 
-        {/* 오른쪽 컬럼에 조건부 렌더링 적용 */}
+        {/* 오른쪽 컬럼 */}
         <Col
           lg={7}
           md={12}
           className="p-4"
           style={{ height: "100%", overflowY: "auto" }}
         >
-          {rightColumnView === "calendar" && <GoogleCalendarReview />}
-          {rightColumnView === "myReviews" && <MyReview memberId={member.id} />}
+          {/* 캘린더 표시 조건 */}
+          {hasAccess(member.email) && rightColumnView === "calendar" && (
+            <GoogleCalendarReview />
+          )}
+          {/* 내 리뷰 표시 */}
+          {rightColumnView === "myReviews" || (!hasAccess(member.email) && isAdmin()) ? (
+            <MyReview memberId={member.id} />
+          ) : null}
         </Col>
+
       </Row>
 
       {/* 탈퇴 확인 모달 */}
@@ -283,10 +279,7 @@ export function MemberDetail() {
           </FormGroup>
         </Modal.Body>
         <Modal.Footer>
-          <Button
-            variant="outline-secondary"
-            onClick={() => setModalShow(false)}
-          >
+          <Button variant="outline-secondary" onClick={() => setModalShow(false)}>
             취소
           </Button>
           <Button variant="danger" onClick={handleDeleteButtonClick}>
