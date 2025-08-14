@@ -36,11 +36,8 @@ const GoogleCalendarReview = () => {
     <div className="container-fluid p-3 p-md-4">
       <div className="mb-4">
         <h2 className="d-flex align-items-center gap-2 mb-2 fw-bold">
-          <Calendar size={28} /> 리뷰 캘린더
+          <Calendar size={28} /> 내 리뷰 내역
         </h2>
-        <p className="text-muted">
-          내 리뷰 내역을 확인하세요
-        </p>
       </div>
 
       {error && <div className="alert alert-warning">...</div>}
