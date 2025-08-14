@@ -13,6 +13,11 @@ export function ReviewText({ text }) {
     }
   }, [text]);
 
+  const handleButtonClick = (e) => {
+    e.stopPropagation(); // 이벤트 버블링 중단
+    setExpanded(!expanded);
+  };
+
   return (
     <div style={{ whiteSpace: "pre-wrap" }}>
       <div
@@ -28,7 +33,7 @@ export function ReviewText({ text }) {
       </div>
       {isClamped && (
         <button
-          onClick={() => setExpanded(!expanded)}
+          onClick={handleButtonClick}
           style={{
             border: "none",
             background: "none",
