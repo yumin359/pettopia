@@ -6,6 +6,7 @@ import { useParams } from "react-router";
 import { FaChevronRight } from "react-icons/fa";
 import { ReviewText } from "../../common/ReviewText.jsx";
 import { ReviewLikeContainer } from "../like/ReviewLikeContainer.jsx";
+import { FavoriteContainer } from "../kakaoMap/FavoriteContainer.jsx";
 
 export function MyReview() {
   const [reviews, setReviews] = useState(null);
@@ -17,6 +18,7 @@ export function MyReview() {
       .get(`/api/review/myReview/${memberId}`)
       .then((res) => {
         setReviews(res.data);
+        console.log(res.data);
       })
       .catch((err) => {
         console.error("리뷰 불러오기 실패", err);
@@ -128,15 +130,16 @@ export function MyReview() {
                     {r.petFacility.name}
                     <FaChevronRight className="ms-1" size={13} />
                   </div>
-                  {/* 별점 */}
-                  {/*<div className="small d-flex align-items-center">*/}
-                  {/*  <span style={{ color: "#f0ad4e", fontSize: "1.1rem" }}>*/}
-                  {/*    {"★".repeat(r.rating)}*/}
-                  {/*  </span>*/}
-                  {/*  <span className="ms-2 text-dark fw-semibold">*/}
-                  {/*    {r.rating}*/}
-                  {/*  </span>*/}
-                  {/*</div>*/}
+                  {/* 즐겨찾기 */}
+                  <div className="small d-flex align-items-center">
+                    {r.petFacility && r.petFacility.id && (
+                      <FavoriteContainer
+                        className="small"
+                        facilityName={r.petFacility.name}
+                        facilityId={r.petFacility.id}
+                      />
+                    )}
+                  </div>
                 </div>
                 <hr className="my-2 hr-color-hotpink" />
 

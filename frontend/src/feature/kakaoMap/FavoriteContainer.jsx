@@ -1,4 +1,9 @@
-import { MdFavorite, MdFavoriteBorder } from "react-icons/md";
+import {
+  MdFavorite,
+  MdFavoriteBorder,
+  MdStar,
+  MdStarBorder,
+} from "react-icons/md";
 import axios from "axios";
 import { useContext, useEffect, useState } from "react";
 import { OverlayTrigger, Spinner, Tooltip } from "react-bootstrap";
@@ -107,10 +112,10 @@ export function FavoriteContainer({ facilityName, facilityId }) {
       .finally(() => setIsProcessing(false));
   }
 
-  const heartStyle = {
-    fontSize: "2rem",
+  const starStyle = {
+    fontSize: "1.5rem",
     cursor: user ? (isProcessing ? "wait" : "pointer") : "not-allowed",
-    color: favoriteInfo?.isFavorite ? "red" : "#ccc",
+    color: favoriteInfo?.isFavorite ? "gold" : "#ccc",
     transition: "color 0.3s ease",
   };
 
@@ -127,7 +132,7 @@ export function FavoriteContainer({ facilityName, facilityId }) {
           <Tooltip id="tooltip-login">로그인 하세요</Tooltip>
         ) : (
           <Tooltip id="tooltip-like">
-            {favoriteInfo?.isFavorite ? "찜 취소" : "찜"}
+            {favoriteInfo?.isFavorite ? "즐겨찾기 취소" : "즐겨찾기"}
           </Tooltip>
         )
       }
@@ -140,12 +145,12 @@ export function FavoriteContainer({ facilityName, facilityId }) {
           isProcessing ? (
             <Spinner animation="border" size="sm" />
           ) : favoriteInfo?.isFavorite ? (
-            <MdFavorite style={heartStyle} />
+            <MdStar style={starStyle} />
           ) : (
-            <MdFavoriteBorder style={heartStyle} />
+            <MdStarBorder style={starStyle} />
           )
         ) : (
-          <MdFavoriteBorder style={heartStyle} />
+          <MdStarBorder style={starStyle} />
         )}
       </div>
     </OverlayTrigger>
