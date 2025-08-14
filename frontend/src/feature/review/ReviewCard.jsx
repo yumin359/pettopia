@@ -249,7 +249,7 @@ function ReviewCard({ review, onUpdate, onDelete, showOnlyImages = false }) {
 
   // 일반 표시 모드
   return (
-    <div className="position-relative">
+    <div className="position-relative px-4">
       {/* 프로필 정보 섹션 */}
       <div className="d-flex align-items-start justify-content-between mb-3">
         {/* 작성자 정보 (왼쪽) */}

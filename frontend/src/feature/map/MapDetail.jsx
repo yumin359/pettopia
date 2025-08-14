@@ -377,7 +377,7 @@ export function MapDetail() {
                       }`}
                     >
                       {/* 평점 */}
-                      <div className="d-flex align-items-center mb-3">
+                      <div className="d-flex align-items-center mb-3 px-4">
                         <span className="text-warning fs-4 me-3">
                           {"★".repeat(review.rating)}
                           {"☆".repeat(5 - review.rating)}
@@ -396,7 +396,7 @@ export function MapDetail() {
                         showOnlyImages={false}
                       />
 
-                      <div className="d-flex align-items-center gap-3 mt-4 pt-3 border-top">
+                      <div className="d-flex align-items-center gap-3 mt-4 pt-3 border-top px-4">
                         <ReviewLikeContainer reviewId={review.id} />
                         <button
                           onClick={() => openReportModal(review)}
