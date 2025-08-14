@@ -12,7 +12,7 @@ import { MemberEdit } from "./feature/member/MemberEdit.jsx";
 import { MemberLogin } from "./feature/member/MemberLogin.jsx";
 import { AuthenticationContextProvider } from "./common/AuthenticationContextProvider.jsx";
 import { MapDetail } from "./feature/map/MapDetail.jsx";
-import FullFilterKakaoMap from "./feature/map/FullFilterKakaoMap";
+import FullFilterKakaoMap from "./feature/kakaoMap/FullFilterKakaoMap.jsx";
 import { Chatbot } from "./feature/openai/Chatbot";
 import { LatestReviewsList } from "./feature/review/LatestReviewsList.jsx";
 import ServicePage from "./feature/service/ServicePage.jsx";
@@ -21,6 +21,11 @@ import { MyReview } from "./feature/review/MyReview.jsx";
 import { KakaoCallback } from "./feature/member/KakaoCallback.jsx";
 import { AdminPage } from "./AdminPage.jsx";
 import ReviewReportList from "./feature/report/ReviewReportList.jsx";
+import { About } from "./common/About.jsx";
+import "./styles/styles.css";
+import "./styles/Carousel.css";
+import "./styles/Review.css";
+import "./styles/ReviewLike.css";
 
 function App() {
   return (
@@ -29,6 +34,8 @@ function App() {
         <Routes>
           <Route path="/" element={<MainLayout />}>
             <Route index element={<BoardLayout />} />
+
+            <Route path="/about" element={<About />} />
 
             <Route path="/board/add" element={<BoardAdd />} />
             <Route path="/board/list" element={<BoardList />} />
@@ -40,14 +47,14 @@ function App() {
             <Route path="/member" element={<MemberDetail />} />
             <Route path="/member/edit" element={<MemberEdit />} />
 
+            <Route path="/review/my/:memberId" element={<MyReview />} />
+            <Route path="/review/latest" element={<LatestReviewsList />} />
+
             <Route path="/auth/kakao/callback" element={<KakaoCallback />} />
 
             <Route path="/KakaoMap" element={<FullFilterKakaoMap />} />
 
             <Route path="/facility/:id" element={<MapDetail />} />
-
-            <Route path="/review/my/:memberId" element={<MyReview />} />
-            <Route path="/review/latest" element={<LatestReviewsList />} />
 
             <Route path="/chatbot" element={<Chatbot />} />
 

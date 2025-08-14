@@ -70,7 +70,6 @@ export function BoardDetail() {
     ? board.insertedAt.substring(0, 16)
     : "";
 
-  // 프로필 사진 없는 사람들
   const defaultProfileImage = "/user.png";
 
   return (
@@ -97,7 +96,7 @@ export function BoardDetail() {
               {board.content}
             </Card.Text>
 
-            {/* 이미지 미리보기 */}
+            {/* 이미지 미리보기: 원본 크기 그대로 출력 */}
             {Array.isArray(board.files) &&
               board.files.some((file) =>
                 /\.(jpg|jpeg|png|gif|webp)$/i.test(file),
@@ -112,15 +111,18 @@ export function BoardDetail() {
                         alt={`첨부 이미지 ${idx + 1}`}
                         className="shadow rounded"
                         style={{
-                          width: "500px",
-                          height: "500px",
-                          objectFit: "cover",
+                          // 아래 스타일 제거해서 원본 크기 유지
+                          width: "auto",
+                          height: "auto",
+                          maxWidth: "100%", // 화면 넘치지 않게 부모 너비 제한
+                          objectFit: "unset",
                         }}
                       />
                     ))}
                 </div>
               )}
             <br />
+
             {/* 첨부 파일 목록 */}
             {Array.isArray(board.files) && board.files.length > 0 && (
               <div className="mb-4">

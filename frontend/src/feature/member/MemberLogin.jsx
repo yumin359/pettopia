@@ -163,21 +163,6 @@ export function MemberLogin() {
           </Button>
         </div>
 
-        {/* 구글 로그인 버튼 */}
-        <div className="d-grid mb-3">
-          <Button
-            onClick={handleGoogleLoginClick}
-            disabled={loading}
-            variant="outline-dark"
-          >
-            <img
-              src="/img_1.png"
-              alt="google"
-              style={{ width: "22px", marginRight: "10px" }}
-            />
-            <span>구글로 로그인</span>
-          </Button>
-        </div>
 
         <hr />
 

@@ -4,7 +4,22 @@ import {
   fallbackCategories2,
   fallbackRegions,
   fallbackSigunguData,
-} from "./fallbackSigunguData";
+} from "./fallbackSigunguData.jsx";
+
+// selectedRegion을 폴백 및 API 호출용으로 변환해주는 함수
+const normalizeRegionName = (region) => {
+  const mapping = {
+    "강원도": "강원특별자치도",
+    "전북": "전북특별자치도",
+    "전라북도": "전북특별자치도",
+    "경기도": "경기도",
+    "충청북도": "충청북도",
+    "충청남도": "충청남도",
+    "제주도": "제주특별자치도",
+    // 필요한 경우 여기에 추가 매핑 작성
+  };
+  return mapping[region] || region;
+};
 
 export const useFilters = () => {
   const [regions, setRegions] = useState([]);
@@ -48,17 +63,25 @@ export const useFilters = () => {
       return;
     }
 
+    const normalizedRegion = normalizeRegionName(selectedRegion);
+
     const loadSigungus = async () => {
       try {
-        const sigungusData = await fetchSigungus(selectedRegion);
-        setSigungus(["전체", ...sigungusData]);
+        const sigungusData = await fetchSigungus(normalizedRegion);
+
+        // API가 전국 시군구를 반환한다면, 지역별 시군구만 필터링
+        const filteredSigungus = sigungusData.filter((sigungu) =>
+          fallbackSigunguData[normalizedRegion]?.includes(sigungu)
+        );
+
+        setSigungus(["전체", ...filteredSigungus]);
       } catch (err) {
-        console.error("시군구 로드 오류:", err);
-        setSigungus(["전체", ...(fallbackSigunguData[selectedRegion] || [])]);
+        setSigungus(["전체", ...(fallbackSigunguData[normalizedRegion] || [])]);
       } finally {
         setSelectedSigungu("전체");
       }
     };
+
     loadSigungus();
   }, [selectedRegion]);
 
@@ -70,7 +93,11 @@ export const useFilters = () => {
       newSet.add("전체");
     } else {
       newSet.delete("전체");
-      newSet.has(value) ? newSet.delete(value) : newSet.add(value);
+      if (newSet.has(value)) {
+        newSet.delete(value);
+      } else {
+        newSet.add(value);
+      }
       if (newSet.size === 0) newSet.add("전체");
     }
     setFunction(newSet);

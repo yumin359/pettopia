@@ -116,7 +116,7 @@ export function MemberAdd() {
   return (
     <Row className="justify-content-center">
       <Col xs={12} md={8} lg={6}>
-        <h2 className="mb-4">회원 가입</h2>
+        <h2 className="my-4">회원 가입</h2>
 
         {/* 프로필 사진 업로드 섹션 */}
         <FormGroup className="mb-4">

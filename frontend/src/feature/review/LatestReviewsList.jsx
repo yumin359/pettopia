@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useContext } from "react";
 import axios from "axios";
 import {
   Badge,
@@ -11,16 +11,18 @@ import {
 } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { ReviewLikeContainer } from "../like/ReviewLikeContainer.jsx";
+import ReportModal from "../report/ReportModal.jsx";
+import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
+import { toast } from "react-toastify"; // 1. react-toastify import
 
 export function LatestReviewsList() {
+  const { user } = useContext(AuthenticationContext);
   const [reviews, setReviews] = useState(null);
   const [displayCount, setDisplayCount] = useState(12);
   const [tagFilter, setTagFilter] = useState("");
 
   const [reportModalOpen, setReportModalOpen] = useState(false);
-  const [reportReason, setReportReason] = useState("");
   const [reportingReviewId, setReportingReviewId] = useState(null);
-  const [reportLoading, setReportLoading] = useState(false);
 
   const reviewRefs = useRef({});
   const navigate = useNavigate();
@@ -35,47 +37,35 @@ export function LatestReviewsList() {
   const isImageFile = (fileUrl) =>
     /\.(jpg|jpeg|png|gif|webp)$/i.test(fileUrl.split("?")[0]);
 
-  const openReportModal = (reviewId, event) => {
+  // 2. 신고 버튼 클릭 핸들러 수정
+  const openReportModal = (review, event) => {
     event.stopPropagation();
-    setReportingReviewId(reviewId);
-    setReportReason("");
+    if (!user) return; // 로그인 안 했으면 모달 안 열림
+
+    // 내가 쓴 리뷰면 토스트 메시지 띄우고 신고 모달 안 열기
+    if (user.email === review.memberEmail) {
+      toast.error("자신의 리뷰는 신고할 수 없습니다.");
+      return;
+    }
+
+    setReportingReviewId(review.id);
     setReportModalOpen(true);
   };
 
   const closeReportModal = () => {
     setReportModalOpen(false);
     setReportingReviewId(null);
-    setReportReason("");
-  };
-
-  const submitReport = async () => {
-    if (!reportReason.trim()) {
-      alert("신고 사유를 입력해주세요.");
-      return;
-    }
-    setReportLoading(true);
-    try {
-      await axios.post("/api/review/report", {
-        reviewId: reportingReviewId,
-        reason: reportReason.trim(),
-      });
-      alert("신고가 접수되었습니다.");
-      closeReportModal();
-    } catch (error) {
-      alert("신고 실패: " + error.message);
-    } finally {
-      setReportLoading(false);
-    }
   };
 
   const loadMoreReviews = () => {
     setDisplayCount((prev) => Math.min(prev + 12, filteredReviews.length));
   };
 
-  const filteredReviews = reviews?.filter((r) => {
-    if (!tagFilter.trim()) return true;
-    return r.tags?.some((tag) => tag.name.includes(tagFilter.trim()));
-  }) || [];
+  const filteredReviews =
+    reviews?.filter((r) => {
+      if (!tagFilter.trim()) return true;
+      return r.tags?.some((tag) => tag.name.includes(tagFilter.trim()));
+    }) || [];
 
   if (!reviews) {
     return (
@@ -86,13 +76,21 @@ export function LatestReviewsList() {
   }
 
   return (
-    <Container className="my-4 p-4 bg-light rounded shadow">
+    <Container className="my-4 p-4">
       <h2 className="text-center mb-4 fw-bold">
         📝 최신 리뷰
-        <span className="ms-2 fs-6 text-muted">({filteredReviews.length}개)</span>
+        <span className="ms-2 fs-6 text-muted">
+          ({filteredReviews.length}개)
+        </span>
       </h2>
 
-      <Form className="mb-4">
+      <Form
+        className="mb-4"
+        style={{
+          border: "solid 1px black",
+          boxShadow: "5px 5px 1px 1px black",
+        }}
+      >
         <Form.Control
           type="text"
           placeholder="#태그 검색"
@@ -110,7 +108,7 @@ export function LatestReviewsList() {
           return (
             <Col key={r.id} xs={12} sm={6} md={4} lg={3}>
               <Card
-                className="h-100 border shadow-sm position-relative"
+                className="h-100 position-relative"
                 onClick={() => {
                   if (!facilityInfo || !facilityInfo.id) return;
                   const url = `/facility/${facilityInfo.id}`;
@@ -118,22 +116,17 @@ export function LatestReviewsList() {
                   params.append("focusReviewId", r.id);
                   navigate(`${url}?${params.toString()}`);
                 }}
-                style={{ cursor: "pointer" }}
+                style={{
+                  border: "solid 1px black",
+                }}
               >
                 <Card.Body className="d-flex flex-column">
-                  {/* 1. 시설명 */}
-                  <div
-                    className="fw-semibold text-truncate text-secondary mb-1"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (facilityInfo?.id)
-                        navigate(`/facility/${facilityInfo.id}`);
-                    }}
-                  >
+                  {/* 시설명 */}
+                  <div className="fw-semibold text-truncate text-secondary mb-1">
                     📍 {facilityInfo?.name || "정보 없음"}
                   </div>
 
-                  {/* 2. 별점 */}
+                  {/* 별점 */}
                   <div
                     className="mb-2"
                     style={{ color: "#f0ad4e", fontSize: "1.1rem" }}
@@ -141,7 +134,7 @@ export function LatestReviewsList() {
                     {"★".repeat(r.rating)}
                   </div>
 
-                  {/* 3. 사진 */}
+                  {/* 사진 */}
                   {hasImages && (
                     <>
                       {imageFiles.length === 1 && (
@@ -150,7 +143,7 @@ export function LatestReviewsList() {
                           src={imageFiles[0]}
                           style={{
                             objectFit: "cover",
-                            height: "150px",
+                            height: "200px",
                             borderRadius: "6px",
                             marginBottom: "8px",
                           }}
@@ -166,7 +159,7 @@ export function LatestReviewsList() {
                             gridTemplateColumns: "1fr 1fr",
                             gridTemplateRows: "1fr 1fr",
                             gap: "4px",
-                            height: "150px",
+                            height: "200px",
                             borderRadius: "6px",
                             overflow: "hidden",
                             marginBottom: "8px",
@@ -195,9 +188,7 @@ export function LatestReviewsList() {
                           ))}
 
                           {imageFiles.length === 2 && <div />}
-
                           {imageFiles.length === 3 && <div />}
-
                           {imageFiles.length >= 4 && (
                             <div
                               style={{
@@ -219,7 +210,7 @@ export function LatestReviewsList() {
                     </>
                   )}
 
-                  {/* 4. 리뷰 본문 (2줄 clamp with ellipsis) */}
+                  {/* 리뷰 본문 */}
                   <div
                     ref={(el) => (reviewRefs.current[r.id] = el)}
                     className="mb-2 text-muted"
@@ -279,13 +270,10 @@ export function LatestReviewsList() {
                   </div>
                 </Card.Body>
 
-                {/* 신고 버튼 - 카드 하단 오른쪽 고정 */}
+                {/* 신고 버튼 */}
                 <Button
                   size="sm"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    openReportModal(r.id, e);
-                  }}
+                  onClick={(e) => openReportModal(r, e)} // 3. 리뷰 전체 객체 넘겨서 비교
                   style={{
                     position: "absolute",
                     bottom: "10px",
@@ -298,8 +286,9 @@ export function LatestReviewsList() {
                     border: "none",
                     color: "red",
                     zIndex: 10,
+                    cursor: user ? "pointer" : "not-allowed",
                   }}
-                  title="신고"
+                  title={user ? "신고" : "로그인 후 이용 가능"}
                 >
                   🚨
                 </Button>
@@ -317,58 +306,8 @@ export function LatestReviewsList() {
         </div>
       )}
 
-      {reportModalOpen && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100vw",
-            height: "100vh",
-            backgroundColor: "rgba(0,0,0,0.5)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 1000,
-          }}
-          onClick={closeReportModal}
-        >
-          <div
-            style={{
-              backgroundColor: "white",
-              padding: "2rem",
-              borderRadius: "12px",
-              width: "90%",
-              maxWidth: "400px",
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h4 className="mb-3">🚨 리뷰 신고하기</h4>
-            <textarea
-              rows={5}
-              placeholder="신고 사유를 작성해주세요."
-              value={reportReason}
-              onChange={(e) => setReportReason(e.target.value)}
-              className="form-control mb-3"
-            />
-            <div className="d-flex justify-content-end gap-2">
-              <Button
-                variant="secondary"
-                onClick={closeReportModal}
-                disabled={reportLoading}
-              >
-                취소
-              </Button>
-              <Button
-                variant="danger"
-                onClick={submitReport}
-                disabled={reportLoading || !reportReason.trim()}
-              >
-                {reportLoading ? "신고 중..." : "신고하기"}
-              </Button>
-            </div>
-          </div>제
-        </div>
+      {reportModalOpen && reportingReviewId && (
+        <ReportModal reviewId={reportingReviewId} onClose={closeReportModal} />
       )}
     </Container>
   );

@@ -31,7 +31,7 @@ export const createInfoWindowContent = (
   }
 
   return `
-    <div style="font-size: 11px; border: none;">
+    <div style="font-size: 11px;">
       <div class="card-body p-1">
         <h6 class="card-title mb-1" style="font-size: 12px; font-weight: bold;">
           ${facility.name || "이름 없음"}

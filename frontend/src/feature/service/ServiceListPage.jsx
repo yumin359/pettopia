@@ -1,5 +1,5 @@
 import { useEffect, useState, useContext } from "react";
-import { Table, Alert, Spinner } from "react-bootstrap";
+import { Table, Alert, Spinner, Button } from "react-bootstrap";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
 import { Navigate, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -33,12 +33,24 @@ export default function ServiceListPage() {
     fetchServices();
   }, []);
 
+  // 삭제 함수
+  const handleDelete = async (id) => {
+    if (!window.confirm("정말 삭제하시겠습니까?")) return;
+    try {
+      await axios.delete(`/api/support/${id}`);
+      // 삭제 성공하면 리스트에서 해당 항목 제거
+      setServices((prev) => prev.filter((item) => item.id !== id));
+    } catch (err) {
+      alert("삭제 중 오류가 발생했습니다.");
+    }
+  };
+
   if (loading) {
     return (
-        <div className="text-center my-4">
-          <Spinner animation="border" />
-          <div>불러오는 중...</div>
-        </div>
+      <div className="text-center my-4">
+        <Spinner animation="border" />
+        <div>불러오는 중...</div>
+      </div>
     );
   }
 
@@ -51,51 +63,71 @@ export default function ServiceListPage() {
   }
 
   return (
-      <div style={{ padding: "2rem" }}>
-        <h2 className="mb-4">문의 내역 목록</h2>
-        <Table striped bordered hover>
-          <thead>
-          <tr>
-            <th>#</th>
-            <th>이메일</th>
-            <th>제목</th>
-            <th>내용</th>
-            <th>접수일</th>
+    <div style={{ padding: "2rem" }}>
+      <h2 className="mb-4">문의 내역 목록</h2>
+      <Table striped bordered hover>
+        <thead>
+        <tr>
+          <th>이메일</th>
+          <th>제목</th>
+          <th>내용</th>
+          <th>접수일</th>
+        </tr>
+        </thead>
+        <tbody>
+        {services.map(({ id, email, title, content, inserted_at }) => (
+          <tr key={id}>
+            <td style={{ /* 이메일 + 삭제 버튼 flex 스타일 */ }}>
+    <span style={{ flexGrow: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+      {email}
+    </span>
+              <button
+                onClick={() => handleDelete(id)}
+                style={{
+                  background: "none",
+                  border: "none",
+                  color: "red",
+                  fontWeight: "bold",
+                  cursor: "pointer",
+                  fontSize: "18px",
+                  lineHeight: "1",
+                  padding: "0",
+                  marginLeft: "8px",
+                }}
+                aria-label="삭제"
+                title="삭제"
+              >
+                ×
+              </button>
+            </td>
+            <td
+              style={{
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                maxWidth: "220px",
+                color: "inherit",
+                cursor: "default",
+              }}
+            >
+              {title}
+            </td>
+            <td
+              style={{
+                whiteSpace: "pre-wrap",
+                overflowWrap: "break-word",
+                wordBreak: "break-word",
+                maxWidth: "400px",
+              }}
+            >
+              {content}
+            </td>
+            <td>{new Date(inserted_at).toLocaleString()}</td>
           </tr>
-          </thead>
-          <tbody>
-          {services.map(({ id, email, title, content, inserted_at }, idx) => (
-              <tr key={id ?? idx}>
-                <td>{idx + 1}</td>
-                <td
-                    style={{
-                      whiteSpace: "pre-wrap",
-                      overflowWrap: "break-word",
-                      wordBreak: "break-word",
-                      maxWidth: "220px",
-                      color: "inherit",
-                      cursor: "default",
-                      textDecoration: "none",
-                    }}
-                >
-                  {email}
-                </td>
-                <td>{title}</td>
-                <td
-                    style={{
-                      whiteSpace: "pre-wrap",
-                      overflowWrap: "break-word",
-                      wordBreak: "break-word",
-                      maxWidth: "400px",
-                    }}
-                >
-                  {content}
-                </td>
-                <td>{new Date(inserted_at).toLocaleString()}</td>
-              </tr>
-          ))}
-          </tbody>
-        </Table>
-      </div>
+        ))}
+        </tbody>
+
+      </Table>
+    </div>
   );
 }

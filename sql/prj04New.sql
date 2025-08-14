@@ -95,31 +95,6 @@ CREATE TABLE `member_file`
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 # ---------------------------------------------------------------------------------
-CREATE TABLE `notice`
-(
-    `id`          int(11)        NOT NULL AUTO_INCREMENT,
-    `title`       varchar(300)   NOT NULL,
-    `content`     varchar(10000) NOT NULL,
-    `author`      varchar(255)   NOT NULL,
-    `is_private`  tinyint(1)     NOT NULL DEFAULT 0,
-    `inserted_at` datetime       NOT NULL DEFAULT current_timestamp(),
-    PRIMARY KEY (`id`),
-    KEY `author` (`author`),
-    CONSTRAINT `notice_ibfk_1` FOREIGN KEY (`author`) REFERENCES `member` (`email`) ON DELETE CASCADE
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4
-  COLLATE = utf8mb4_unicode_ci;
-# ---------------------------------------------------------------------------------
-CREATE TABLE `notice_file`
-(
-    `notice_id` int(11)      NOT NULL,
-    `name`      varchar(300) NOT NULL,
-    PRIMARY KEY (`notice_id`, `name`),
-    CONSTRAINT `notice_file_ibfk_1` FOREIGN KEY (`notice_id`) REFERENCES `notice` (`id`) ON DELETE CASCADE
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4
-  COLLATE = utf8mb4_unicode_ci;
-# ---------------------------------------------------------------------------------
 CREATE TABLE `pet_facility`
 (
     `name`                      varchar(255) DEFAULT NULL,
@@ -186,12 +161,12 @@ CREATE TABLE `review`
     `inserted_at`   datetime      NOT NULL DEFAULT current_timestamp(),
     `facility_id`   bigint(20)    NOT NULL,
     PRIMARY KEY (`id`),
-    KEY `member_email` (`member_email`),
     KEY `FKg5515o0nnntje78uxpmiaq084` (`facility_id`),
+    KEY `idx_member_date` (`member_email`, `inserted_at`),
     CONSTRAINT `FKg5515o0nnntje78uxpmiaq084` FOREIGN KEY (`facility_id`) REFERENCES `pet_facility` (`id`),
     CONSTRAINT `review_ibfk_1` FOREIGN KEY (`member_email`) REFERENCES `member` (`email`) ON DELETE CASCADE
 ) ENGINE = InnoDB
-  AUTO_INCREMENT = 65
+  AUTO_INCREMENT = 144
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 # ---------------------------------------------------------------------------------
@@ -294,6 +269,16 @@ SHOW CREATE TABLE review_like;
 SHOW CREATE TABLE review_report;
 SHOW CREATE TABLE favorite;
 SHOW CREATE TABLE tags;
+
+SELECT DISTINCT allowed_pet_size
+FROM pet_facility
+WHERE allowed_pet_size LIKE '%주말%'
+   OR allowed_pet_size LIKE '%kg%'
+   OR allowed_pet_size LIKE '%공휴일%';
+
+-- 캘린더 추가합니다.
+ALTER TABLE `review`
+    ADD INDEX `idx_member_date` (`member_email`, `inserted_at`);
 # ---------------------------------------------------------------------------------
 # UPDATE review r
 #     JOIN pet_facility pf ON TRIM(r.facility_name) = TRIM(pf.name)
@@ -308,3 +293,9 @@ SHOW CREATE TABLE tags;
 #     MODIFY COLUMN facility_name VARCHAR(255) NULL;
 # ---------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------
+
+TRUNCATE TABLE support;
+
+DELETE
+FROM prj04.board
+WHERE id = 17;

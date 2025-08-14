@@ -1,6 +1,5 @@
 import {
   Button,
-  Card,
   Col,
   FormControl,
   FormGroup,
@@ -14,15 +13,15 @@ import axios from "axios";
 import { useNavigate, useSearchParams } from "react-router";
 import { toast } from "react-toastify";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
-import { FiUser } from "react-icons/fi";
+import GoogleCalendarReview from "../calendar/GoogleCalendarReview.jsx";
 
 export function MemberDetail() {
   const [member, setMember] = useState(null);
-  const [reviews, setReviews] = useState(null); // 내 리뷰 목록 상태 추가
+  const [, setReviews] = useState(null);
   const [modalShow, setModalShow] = useState(false);
   const [password, setPassword] = useState("");
   const [tempCode, setTempCode] = useState("");
-  const { logout, hasAccess } = useContext(AuthenticationContext);
+  const { logout, hasAccess, isAdmin } = useContext(AuthenticationContext);
   const [params] = useSearchParams();
   const navigate = useNavigate();
 
@@ -32,7 +31,6 @@ export function MemberDetail() {
       .then((res) => {
         setMember(res.data);
         if (res.data?.id) {
-          // 회원 정보 불러오면, 그 회원이 쓴 리뷰 목록도 같이 요청
           axios
             .get(`/api/review/myReview/${res.data.id}`)
             .then((res2) => setReviews(res2.data))
@@ -99,65 +97,50 @@ export function MemberDetail() {
     );
   }
 
-  // 가입일시 포맷 통일
   const formattedInsertedAt = member.insertedAt
     ? member.insertedAt.replace("T", " ").substring(0, 16)
     : "";
 
-  // 프로필 이미지 URL 찾기
   const profileImageUrl = member.files?.find((file) =>
     /\.(jpg|jpeg|png|gif|webp)$/i.test(file),
   );
 
-  // 관리자 여부 확인
-  const isAdmin = member.authNames?.includes("admin");
-
-  // 카카오 회원 여부
+  const isAdminFlag = isAdmin(); // 함수 호출
   const isKakao = member.provider?.includes("kakao");
+  const defaultImage = "/user.png";
 
   return (
-    <Row className="justify-content-center my-4">
-      <Col xs={12} md={8} lg={6}>
-        <div className="d-flex justify-content-between align-items-center mb-3">
-          <h3 className="fw-bold mb-0 text-dark">회원 정보</h3>
-          <small className="text-muted" style={{ fontSize: "0.85rem" }}>
-            {isAdmin ? (
-              <span className="badge bg-danger">관리자</span>
-            ) : (
-              <span className="badge bg-secondary">일반 사용자</span>
-            )}
-          </small>
-        </div>
-
-        <Card className="shadow-sm border-0 rounded-3">
-          <Card.Body>
-            <div className="mb-4 d-flex justify-content-center">
-              {profileImageUrl ? (
-                <img
-                  src={profileImageUrl}
-                  alt="프로필 이미지"
-                  className="shadow rounded-circle"
-                  style={{
-                    width: "120px",
-                    height: "120px",
-                    objectFit: "cover",
-                    border: "2px solid #ddd",
-                  }}
-                />
+    <div className="p-0 h-100">
+      <Row className="h-100 g-0">
+        {/* 왼쪽 컬럼: 회원 정보 */}
+        <Col
+          lg={5}
+          md={12}
+          className="p-4 d-flex flex-column bg-dark text-light"
+        >
+          <div className="d-flex justify-content-between align-items-center mb-3">
+            <h3 className="fw-bold mb-0">회원 정보</h3>
+            <small className="text-muted" style={{ fontSize: "0.85rem" }}>
+              {isAdminFlag ? (
+                <span className="badge bg-danger">관리자</span>
               ) : (
-                <div
-                  className="shadow rounded-circle d-flex justify-content-center align-items-center"
-                  style={{
-                    width: "120px",
-                    height: "120px",
-                    backgroundColor: "#e9ecef",
-                    border: "2px solid #ddd",
-                    color: "#6c757d",
-                  }}
-                >
-                  <FiUser size={80} />
-                </div>
+                <span className="badge bg-secondary">일반 사용자</span>
               )}
+            </small>
+          </div>
+
+          <div className="border-0">
+            <div className="mb-4 d-flex justify-content-center">
+              <img
+                src={profileImageUrl || defaultImage}
+                alt="프로필 이미지"
+                className="shadow rounded-circle"
+                style={{
+                  width: "150px",
+                  height: "150px",
+                  objectFit: "cover",
+                }}
+              />
             </div>
 
             {!profileImageUrl && <br />}
@@ -241,13 +224,18 @@ export function MemberDetail() {
                 >
                   수정
                 </Button>
-                <Button
-                  variant="outline-secondary"
-                  onClick={handleLogoutClick}
-                  className="d-flex align-items-center gap-1"
-                >
-                  로그아웃
-                </Button>
+
+                {/* 관리자면 로그아웃 버튼 숨김 */}
+                {
+                  <Button
+                    variant="outline-secondary"
+                    onClick={handleLogoutClick}
+                    className="d-flex align-items-center gap-1"
+                  >
+                    로그아웃
+                  </Button>
+                }
+
                 <Button
                   variant="outline-success"
                   onClick={() => navigate(`/review/my/${member.id}`)}
@@ -257,49 +245,54 @@ export function MemberDetail() {
                 </Button>
               </div>
             )}
-          </Card.Body>
-        </Card>
+          </div>
+        </Col>
 
-        {/* 탈퇴 확인 모달 */}
-        <Modal show={modalShow} onHide={() => setModalShow(false)} centered>
-          <Modal.Header closeButton>
-            <Modal.Title>
-              {isKakao ? "카카오 회원 탈퇴" : "회원 탈퇴 확인"}
-            </Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <FormGroup controlId="password1">
-              <FormLabel>
-                {isKakao
-                  ? `탈퇴를 원하시면 ${tempCode}를 아래에 작성하세요.`
-                  : "탈퇴를 원하시면 암호를 입력하세요"}
-              </FormLabel>
-              <FormControl
-                type={isKakao ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder={
-                  isKakao
-                    ? "탈퇴를 원하시면 위의 코드를 작성하세요."
-                    : "탈퇴를 원하시면 비밀번호를 입력하세요"
-                }
-                autoFocus
-              />
-            </FormGroup>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button
-              variant="outline-secondary"
-              onClick={() => setModalShow(false)}
-            >
-              취소
-            </Button>
-            <Button variant="danger" onClick={handleDeleteButtonClick}>
-              탈퇴
-            </Button>
-          </Modal.Footer>
-        </Modal>
-      </Col>
-    </Row>
+        {/* 오른쪽 컬럼: 리뷰 캘린더 */}
+        <Col lg={7} md={12}>
+          <GoogleCalendarReview />
+        </Col>
+      </Row>
+
+      {/* 탈퇴 확인 모달 */}
+      <Modal show={modalShow} onHide={() => setModalShow(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>
+            {isKakao ? "카카오 회원 탈퇴" : "회원 탈퇴 확인"}
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <FormGroup controlId="password1">
+            <FormLabel>
+              {isKakao
+                ? `탈퇴를 원하시면 ${tempCode}를 아래에 작성하세요.`
+                : "탈퇴를 원하시면 암호를 입력하세요"}
+            </FormLabel>
+            <FormControl
+              type={isKakao ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder={
+                isKakao
+                  ? "탈퇴를 원하시면 위의 코드를 작성하세요."
+                  : "탈퇴를 원하시면 비밀번호를 입력하세요"
+              }
+              autoFocus
+            />
+          </FormGroup>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="outline-secondary"
+            onClick={() => setModalShow(false)}
+          >
+            취소
+          </Button>
+          <Button variant="danger" onClick={handleDeleteButtonClick}>
+            탈퇴
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </div>
   );
 }
