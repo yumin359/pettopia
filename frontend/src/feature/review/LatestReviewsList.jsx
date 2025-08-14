@@ -105,19 +105,15 @@ export function LatestReviewsList() {
           const hasImages = imageFiles.length > 0;
 
           return (
-            <Col key={r.id} xs={12} sm={6} md={4} lg={3}>
+            <Col key={r.id} xs={18} sm={6} md={3} lg={2}>
               <Card
-                className="h-100 position-relative rounded-0"
+                className="h-100 position-relative rounded-0 retro-shadow"
                 onClick={() => {
                   if (!facilityInfo || !facilityInfo.id) return;
                   const url = `/facility/${facilityInfo.id}`;
                   const params = new URLSearchParams();
                   params.append("focusReviewId", r.id);
                   navigate(`${url}?${params.toString()}`);
-                }}
-                style={{
-                  border: "solid 1px black",
-                  boxShadow: "1.5px 1.5px 1px 1px black",
                 }}
               >
                 <Card.Body className="d-flex flex-column">

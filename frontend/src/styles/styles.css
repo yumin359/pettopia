@@ -216,11 +216,18 @@ body::before {
 /* ========================================
    최신리뷰 카드
    ======================================== */
-/*.card:hover {*/
-/*    background-color: #f6ece6;*/
-/*    box-shadow: 5px 5px 1px 1px black;*/
-/*    cursor: pointer;*/
-/*}*/
+
+.retro-shadow {
+    border: 1px solid black;
+    box-shadow: 5px 5px 1px 1px black;
+    /*transition: box-shadow 0.2s ease-in-out; !* 부드러운 전환 효과를 위해 추가 *!*/
+}
+
+.retro-shadow:hover {
+    border: 1px solid transparent;
+    background-color: #f6ece6;
+    box-shadow: 5px 5px 1px 1px #D9534F; /* 👈 호버 시 그림자 색상 변경 */
+}
 
 /* ========================================
    레트로 스타일 스크롤바
