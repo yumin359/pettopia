@@ -117,9 +117,9 @@ export default function ReviewReportList() {
     return <Alert variant="info">신고된 리뷰가 없습니다.</Alert>;
   }
 
-  const handleRowClick = (reviewWriterId) => {
+  const handleRowClick = (reviewWriterId, reviewId) => {
     if (reviewWriterId) {
-      navigate(`/review/my/${reviewWriterId}`);
+      navigate(`/review/my/${reviewWriterId}?focusReviewId=${reviewId}`);
     } else {
       alert("작성자 정보가 없습니다.");
     }
@@ -150,7 +150,7 @@ export default function ReviewReportList() {
               <tr
                 key={id}
                 className={reviewWriterId ? "clickable-row" : ""}
-                onClick={() => handleRowClick(reviewWriterId)}
+                onClick={() => handleRowClick(reviewWriterId, reviewId)}
                 title={reviewWriterId ? "작성자 리뷰 보기" : undefined}
               >
                 <td className="reporter-email-cell">

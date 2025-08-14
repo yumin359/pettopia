@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { Badge, Carousel, Col, Image, Row, Spinner } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { useParams } from "react-router";
+import { useParams, useSearchParams } from "react-router";
 import { FaChevronRight } from "react-icons/fa";
 import { ReviewText } from "../../common/ReviewText.jsx";
 import { ReviewLikeContainer } from "../like/ReviewLikeContainer.jsx";
@@ -28,7 +28,9 @@ export function MyReview({ memberId: memberIdFromProp }) {
   const [favoriteMap, setFavoriteMap] = useState({}); // facilityId -> isFavorite
   const navigate = useNavigate();
   const { memberId: memberIdFromUrl } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams(); // setSearchParams는 안 쓸 수도??
   const memberId = memberIdFromProp || memberIdFromUrl;
+  const reviewRefs = useRef({});
 
   useEffect(() => {
     axios
@@ -50,6 +52,21 @@ export function MyReview({ memberId: memberIdFromProp }) {
         setReviews([]);
       });
   }, [memberId]);
+
+  useEffect(() => {
+    const focusReviewId = searchParams.get("focusReviewId");
+    if (focusReviewId && reviews?.length > 0) {
+      const el = reviewRefs.current[focusReviewId];
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+        el.classList.add("bg-warning", "bg-opacity-25", "rounded", "p-2");
+        const timer = setTimeout(() => {
+          el.classList.remove("bg-warning", "bg-opacity-25", "rounded", "p-2");
+        }, 2500);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [reviews, searchParams]);
 
   const isImageFile = (url) =>
     /\.(jpg|jpeg|png|gif|webp)$/i.test(url?.split("?")[0]);
@@ -115,6 +132,7 @@ export function MyReview({ memberId: memberIdFromProp }) {
               <div
                 key={r.id}
                 className="card mb-3 rounded-4 review-card-custom"
+                ref={(el) => (reviewRefs.current[r.id] = el)}
               >
                 <div className="card-body p-4">
                   <div className={reviewImages.length > 0 ? "mb-3" : ""}>
@@ -135,7 +153,10 @@ export function MyReview({ memberId: memberIdFromProp }) {
                                   src={image}
                                   alt={`리뷰 이미지 ${i + 1}`}
                                   className="d-block w-100"
-                                  style={{ height: "400px", objectFit: "cover" }}
+                                  style={{
+                                    height: "400px",
+                                    objectFit: "cover",
+                                  }}
                                 />
                                 <div className="carousel-counter">
                                   {i + 1} / {reviewImages.length}
