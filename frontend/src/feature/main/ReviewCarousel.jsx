@@ -66,24 +66,15 @@ export const ReviewCarousel = () => {
 
   return (
     <>
-      {/* 고정 높이를 위한 CSS */}
+      {/*고정 높이를 위한 CSS*/}
       <style>
         {`
-          .review-card-fixed {
-            height: 220px !important;
-          }
-          .review-image-area {
-            height: 220px;
-          }
-          .review-content-area {
-            height: 220px;
-          }
           .review-author-area {
             min-height: 32px;
           }
           .review-tag-area {
-            min-height: 28px;
-            max-height: 28px;
+            min-height: 22px;
+            max-height: 22px;
           }
           .review-text-area {
             min-height: 60px;
@@ -113,7 +104,6 @@ export const ReviewCarousel = () => {
           }
         `}
       </style>
-
       <Carousel
         indicators={false}
         interval={5000}
@@ -132,7 +122,7 @@ export const ReviewCarousel = () => {
           return (
             <Carousel.Item key={review.id}>
               <Card
-                className="border-0 review-card-fixed"
+                className="h-100"
                 role="button"
                 onClick={() =>
                   navigate(
@@ -141,7 +131,7 @@ export const ReviewCarousel = () => {
                 }
                 style={{ cursor: "pointer", background: "#f6ece6" }}
               >
-                <Row className="g-0 h-100">
+                <Row className="g-0">
                   {/* 이미지 영역 */}
                   <Col
                     xs={4}
@@ -166,7 +156,7 @@ export const ReviewCarousel = () => {
                     )}
 
                     {totalImages >= 2 && (
-                      <div className="review-image-grid rounded overflow-hidden">
+                      <div className="review-image-grid overflow-hidden gap-0">
                         {imageFiles.slice(0, 3).map((img, i) => (
                           <div key={i} className="overflow-hidden">
                             <img
@@ -188,9 +178,9 @@ export const ReviewCarousel = () => {
 
                   {/* 본문 영역 */}
                   <Col xs={8}>
-                    <Card.Body className="p-3 d-flex flex-column review-content-area">
+                    <Card.Body className="p-3 d-flex flex-column">
                       {/* 작성자 정보 */}
-                      <div className="d-flex align-items-center mb-2 review-author-area">
+                      <div className="d-flex align-items-center mb-2">
                         <img
                           src={review.profileImageUrl || "/user.png"}
                           alt=""

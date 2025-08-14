@@ -72,9 +72,9 @@ export function BoardLayout() {
 
   return (
     <div>
+      {/* 캐러셀 */}
       <Row className="align-items-center">
         <Col xs={12} md={12}>
-          {/* 캐러셀 */}
           <Carousel
             style={{
               maxWidth: "auto",
@@ -136,9 +136,11 @@ export function BoardLayout() {
           </Carousel>
         </Col>
       </Row>
+
+      {/* 공지사항과 리뷰 */}
       <div className="container">
-        <Row className="mt-3" style={{ maxHeight: "280px" }}>
-          <Col md={6}>
+        <Row className="mt-3">
+          <Col md={6} className="mb-3 mb-md-0">
             <h5 style={{ fontSize: "2rem", fontWeight: "600" }}>공지사항</h5>
             <BoardListMini />
           </Col>
