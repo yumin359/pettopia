@@ -46,23 +46,24 @@ export function MemberList() {
   }
 
   return (
-    <Row className="justify-content-center">
-      <Col xs={12} md={10} lg={8} style={{ maxWidth: "900px", margin: "0 auto" }}>
-        <h2 className="mb-4">회원 목록</h2>
-        <Table striped bordered hover responsive>
-          <thead>
+    <div style={{ padding: "2rem" }}>
+      <h2 className="mb-4">회원 목록</h2>
+      <Table striped bordered hover responsive>
+        <thead>
           <tr>
             <th>이메일</th>
             <th>별명</th>
             <th>가입일</th>
           </tr>
-          </thead>
-          <tbody>
+        </thead>
+        <tbody>
           {memberList.map(({ email, nickName, insertedAt }) => (
             <tr
               key={email}
               style={{ cursor: "pointer" }}
-              onClick={() => navigate(`/member?email=${encodeURIComponent(email)}`)}
+              onClick={() =>
+                navigate(`/member?email=${encodeURIComponent(email)}`)
+              }
             >
               <td
                 style={{
@@ -80,9 +81,8 @@ export function MemberList() {
               <td>{insertedAt ? insertedAt.substring(0, 16) : "-"}</td>
             </tr>
           ))}
-          </tbody>
-        </Table>
-      </Col>
-    </Row>
+        </tbody>
+      </Table>
+    </div>
   );
 }
