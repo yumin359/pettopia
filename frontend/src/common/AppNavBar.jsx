@@ -243,7 +243,7 @@ export function AppNavBar() {
       </style>
       <Navbar
         expand="lg"
-        className="px-4 shadow-sm"
+        className="px-4"
         expanded={expanded}
         ref={navbarRef}
         onMouseEnter={handleMouseEnter}

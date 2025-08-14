@@ -76,6 +76,30 @@ body::before {
 }
 
 /* ========================================
+   네브바 디자인
+   ======================================== */
+.navbar {
+    background-color: #f6ece6 !important;
+    border-bottom: 1px solid black !important;
+    padding: 0 !important;
+    min-height: 72px;
+    overflow: visible;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.navbar-nav .nav-link {
+    text-decoration: none;
+    font-family: var(--font-family), serif;
+    color: var(--dark-text, #333);
+    font-weight: 600;
+    padding: 8px 12px !important;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+/* ========================================
    MainLayout.jsx
    ======================================== */
 .main-layout {
@@ -197,30 +221,6 @@ body::before {
     background-color: #f6ece6;
     box-shadow: 5px 5px 1px 1px black;
     cursor: pointer;
-}
-
-/* ========================================
-   네브바 디자인
-   ======================================== */
-.navbar {
-    background-color: #f6ece6 !important;
-    border-bottom: 1px solid black !important;
-    padding: 0 !important;
-    min-height: 72px;
-    overflow: visible;
-    position: sticky;
-    top: 0;
-    z-index: 10;
-}
-
-.navbar-nav .nav-link {
-    text-decoration: none;
-    font-family: var(--font-family), serif;
-    color: var(--dark-text, #333);
-    font-weight: 600;
-    padding: 8px 12px !important;
-    border-radius: 8px;
-    transition: all 0.2s ease;
 }
 
 /* ========================================
