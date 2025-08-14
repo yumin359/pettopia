@@ -35,7 +35,7 @@
    ======================================== */
 
 .logo-image {
-    background-color: var(--primary-red);
+    background-color: #D9534F;
 
     mask-image: url('/PETOPIA-Photoroom.png');
     -webkit-mask-image: url('/PETOPIA-Photoroom.png');
