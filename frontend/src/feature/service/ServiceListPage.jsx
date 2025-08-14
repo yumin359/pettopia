@@ -1,5 +1,13 @@
 import { useEffect, useState, useContext } from "react";
-import { Table, Alert, Spinner, Button, Modal } from "react-bootstrap";
+import {
+  Table,
+  Alert,
+  Spinner,
+  Button,
+  Modal,
+  Tooltip,
+  OverlayTrigger,
+} from "react-bootstrap";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
 import { Navigate, useNavigate } from "react-router-dom";
 import { FaUserCircle, FaTrash } from "react-icons/fa";
@@ -51,7 +59,9 @@ export default function ServiceListPage() {
     try {
       setDeletingId(selectedServiceId);
       await axios.delete(`/api/support/${selectedServiceId}`);
-      setServices((prev) => prev.filter((item) => item.id !== selectedServiceId));
+      setServices((prev) =>
+        prev.filter((item) => item.id !== selectedServiceId),
+      );
       toast("문의가 삭제되었습니다.");
     } catch (err) {
       console.error("삭제 중 오류가 발생했습니다.", err);
@@ -90,44 +100,57 @@ export default function ServiceListPage() {
       <h2 className="mb-4 fw-bold text-muted">문의 내역 목록</h2>
       <Table className="service-list-table" responsive>
         <thead>
-        <tr>
-          <th>이메일</th>
-          <th>제목</th>
-          <th>내용</th>
-          <th>접수일</th>
-        </tr>
+          <tr>
+            <th>이메일</th>
+            <th>제목</th>
+            <th>내용</th>
+            <th>접수일</th>
+          </tr>
         </thead>
         <tbody>
-        {services.map(({ id, email, title, content, inserted_at }) => (
-          <tr
-            key={id}
-            onClick={() => {
-              /* 행 클릭으로 상세 페이지나 다른 동작이 필요하면 여기서 처리 */
-            }}
-          >
-            <td className="text-truncate service-email-cell" title={email}>
-              <span>{email}</span>
-              {/* 이메일 옆에 작은 휴지통 버튼 */}
-              <Button
-                variant="outline-danger"
-                size="sm"
-                className="ms-2 p-1 align-middle btn-no-wrap"
-                onClick={(e) => handleDeleteClick(e, id)}
-                aria-label={`delete-service-${id}`}
-                title="문의 삭제"
-              >
-                <FaTrash />
-              </Button>
-            </td>
-            <td className="text-truncate" title={title}>
-              {title}
-            </td>
-            <td className="content-cell">
-              <ReviewText text={content} />
-            </td>
-            <td>{inserted_at ? inserted_at.substring(0, 10) : "-"}</td>
-          </tr>
-        ))}
+          {services.map(({ id, email, title, content, inserted_at }) => (
+            <tr
+              key={id}
+              onClick={() => {
+                /* 행 클릭으로 상세 페이지나 다른 동작이 필요하면 여기서 처리 */
+              }}
+            >
+              <td className="text-truncate service-email-cell" title={email}>
+                <div className="d-flex align-items-center">
+                  <span className="flex-grow-1 text-truncate me-2">
+                    {email}
+                  </span>
+                  <OverlayTrigger
+                    placement="top"
+                    overlay={
+                      <Tooltip id={`tooltip-delete-${id}`}>문의 삭제</Tooltip>
+                    }
+                  >
+                    <Button
+                      variant="outline-danger"
+                      size="sm"
+                      onClick={(e) => handleDeleteClick(e, id)}
+                      disabled={deletingId === id}
+                      aria-label={`delete-service-${id}`}
+                    >
+                      {deletingId === id ? (
+                        <Spinner animation="border" size="sm" />
+                      ) : (
+                        <FaTrash />
+                      )}
+                    </Button>
+                  </OverlayTrigger>
+                </div>
+              </td>
+              <td className="text-truncate" title={title}>
+                {title}
+              </td>
+              <td className="content-cell">
+                <ReviewText text={content} />
+              </td>
+              <td>{inserted_at ? inserted_at.substring(0, 10) : "-"}</td>
+            </tr>
+          ))}
         </tbody>
       </Table>
 
