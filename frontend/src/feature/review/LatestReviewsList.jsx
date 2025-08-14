@@ -85,7 +85,7 @@ export function LatestReviewsList() {
         className="mb-4"
         style={{
           border: "solid 1px black",
-          boxShadow: "5px 5px 1px 1px black",
+          boxShadow: "5px 5px 1px 1px #2C2D31FF",
         }}
       >
         <Form.Control

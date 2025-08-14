@@ -80,7 +80,7 @@ body::before {
    ======================================== */
 .navbar {
     background-color: #f6ece6 !important;
-    border-bottom: 1px solid black;
+    border-bottom: 1px solid #2C2D31FF;
     padding: 0 !important;
     min-height: 72px;
     overflow: visible;
@@ -117,8 +117,8 @@ body::before {
     max-width: 1400px;
     max-height: 1080px;
     background-color: white;
-    border: 2px solid black;
-    box-shadow: 5px 5px 1px 1px black;
+    border: 3px solid #212529;
+    box-shadow: 10px 10px 1px 1px #2C2D31FF;
     display: flex;
     flex-direction: column;
 }
@@ -152,7 +152,7 @@ body::before {
     padding: 18px;
     margin-bottom: 0;
     text-align: center;
-    border-top: 1px solid black;
+    border-top: 1px solid #2C2D31FF;
 }
 
 .cta-content {
@@ -218,8 +218,8 @@ body::before {
    ======================================== */
 
 .retro-shadow {
-    border: 1px solid black;
-    box-shadow: 5px 5px 1px 1px black;
+    border: 1px solid #212529;
+    box-shadow: 5px 5px 1px 1px #212529;
     /*transition: box-shadow 0.2s ease-in-out; !* 부드러운 전환 효과를 위해 추가 *!*/
 }
 
@@ -241,32 +241,32 @@ body::before {
 
 ::-webkit-scrollbar-track {
     background: #f6ece6;
-    border: 2px solid black;
+    border: 2px solid #2C2D31FF;
     border-radius: 0;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: black; /* 검은색 썸 */
-    border: 2px solid black;
+    background: #2C2D31FF;
+    border: 2px solid #2C2D31FF;
     border-radius: 0;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: black;
-    border: 2px solid black;
+    background: #2C2D31FF;
+    border: 2px solid #2C2D31FF;
 }
 
 /* 스크롤바 버튼 (위/아래 화살표) */
 ::-webkit-scrollbar-button {
     background: #f6ece6;
-    border: 2px solid black;
+    border: 2px solid #2C2D31FF;
     height: 16px;
-    box-shadow: 1px 1px 0px 0px black;
+    box-shadow: 1px 1px 0px 0px #2C2D31FF;
 }
 
 /* 위 화살표 */
 ::-webkit-scrollbar-button:vertical:decrement {
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8"><path d="M4 2L1 5h6z" fill="black"/></svg>');
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8"><path d="M4 2L1 5h6z" fill="#2C2D31FF"/></svg>');
     background-repeat: no-repeat;
     background-position: center;
     background-color: #f6ece6;
@@ -274,7 +274,7 @@ body::before {
 
 /* 아래 화살표 */
 ::-webkit-scrollbar-button:vertical:increment {
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8"><path d="M4 6L7 3H1z" fill="black"/></svg>');
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8"><path d="M4 6L7 3H1z" fill="#2C2D31FF"/></svg>');
     background-repeat: no-repeat;
     background-position: center;
     background-color: #f6ece6;
@@ -283,13 +283,13 @@ body::before {
 /* 스크롤바 코너 */
 ::-webkit-scrollbar-corner {
     background: #f6ece6;
-    border: 2px solid black;
+    border: 2px solid #2C2D31FF;
 }
 
 /* Firefox용 스크롤바 스타일 */
 * {
     scrollbar-width: auto;
-    scrollbar-color: black #f6ece6;
+    scrollbar-color: #2C2D31FF #f6ece6;
 }
 
 /* ========================================
@@ -298,7 +298,7 @@ body::before {
 
 /* 기본 커서 - 픽셀 화살표 */
 * {
-    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><path d="M4 4v12l4-4h3v-3l4 4v-9z" fill="black"/><path d="M5 5v9l3-3h3v-3l3 3v-6z" fill="white"/></svg>') 4 4, auto;
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><path d="M4 4v12l4-4h3v-3l4 4v-9z" fill="#2C2D31FF"/><path d="M5 5v9l3-3h3v-3l3 3v-6z" fill="white"/></svg>') 4 4, auto;
 }
 
 /* 링크/버튼 호버 커서 - 손가락 모양 */
@@ -307,40 +307,40 @@ button,
 [role="button"],
 .clickable,
 .btn {
-    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><rect x="6" y="10" width="4" height="8" fill="black"/><rect x="10" y="6" width="4" height="12" fill="black"/><rect x="14" y="8" width="4" height="10" fill="black"/><rect x="18" y="10" width="4" height="8" fill="black"/><rect x="6" y="18" width="16" height="4" fill="black"/><rect x="7" y="11" width="2" height="6" fill="white"/><rect x="11" y="7" width="2" height="10" fill="white"/><rect x="15" y="9" width="2" height="8" fill="white"/><rect x="19" y="11" width="2" height="6" fill="white"/></svg>') 12 6, pointer;
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><rect x="6" y="10" width="4" height="8" fill="#2C2D31FF"/><rect x="10" y="6" width="4" height="12" fill="#2C2D31FF"/><rect x="14" y="8" width="4" height="10" fill="#2C2D31FF"/><rect x="18" y="10" width="4" height="8" fill="#2C2D31FF"/><rect x="6" y="18" width="16" height="4" fill="#2C2D31FF"/><rect x="7" y="11" width="2" height="6" fill="white"/><rect x="11" y="7" width="2" height="10" fill="white"/><rect x="15" y="9" width="2" height="8" fill="white"/><rect x="19" y="11" width="2" height="6" fill="white"/></svg>') 12 6, pointer;
 }
 
 /* 텍스트 선택 커서 - I빔 */
 input,
 textarea,
 [contenteditable="true"] {
-    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="20" viewBox="0 0 16 20"><rect x="2" y="2" width="12" height="2" fill="black"/><rect x="7" y="2" width="2" height="16" fill="black"/><rect x="2" y="16" width="12" height="2" fill="black"/></svg>') 8 10, text;
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="20" viewBox="0 0 16 20"><rect x="2" y="2" width="12" height="2" fill="#2C2D31FF"/><rect x="7" y="2" width="2" height="16" fill="#2C2D31FF"/><rect x="2" y="16" width="12" height="2" fill="#2C2D31FF"/></svg>') 8 10, text;
 }
 
 /* 드래그 가능한 요소 - 십자 화살표 */
 .draggable,
 [draggable="true"] {
-    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 4v16M4 12h16" stroke="black" stroke-width="2"/><path d="M12 2l3 4h-6zM12 22l-3-4h6zM2 12l4-3v6zM22 12l-4 3v-6z" fill="black"/></svg>') 12 12, move;
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 4v16M4 12h16" stroke="#2C2D31FF" stroke-width="2"/><path d="M12 2l3 4h-6zM12 22l-3-4h6zM2 12l4-3v6zM22 12l-4 3v-6z" fill="#2C2D31FF"/></svg>') 12 12, move;
 }
 
 /* 로딩 커서 - 모래시계 */
 .loading,
 .processing,
 .wait {
-    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="24" viewBox="0 0 20 24"><rect x="4" y="2" width="12" height="2" fill="black"/><rect x="4" y="20" width="12" height="2" fill="black"/><path d="M6 4v6l4 2-4 2v6h8v-6l-4-2 4-2V4z" fill="black"/><path d="M7 5v4l3 2-3 2v5h6v-5l-3-2 3-2V5z" fill="white"/><rect x="8" y="6" width="4" height="2" fill="black"/></svg>') 10 12, wait;
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="24" viewBox="0 0 20 24"><rect x="4" y="2" width="12" height="2" fill="#2C2D31FF"/><rect x="4" y="20" width="12" height="2" fill="#2C2D31FF"/><path d="M6 4v6l4 2-4 2v6h8v-6l-4-2 4-2V4z" fill="#2C2D31FF"/><path d="M7 5v4l3 2-3 2v5h6v-5l-3-2 3-2V5z" fill="white"/><rect x="8" y="6" width="4" height="2" fill="#2C2D31FF"/></svg>') 10 12, wait;
 }
 
 /* 비활성화 커서 - X 표시 */
 :disabled,
 .disabled,
 [aria-disabled="true"] {
-    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" fill="none" stroke="black" stroke-width="2"/><path d="M6 6l8 8M14 6l-8 8" stroke="black" stroke-width="2"/></svg>') 10 10, not-allowed;
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" fill="none" stroke="#2C2D31FF" stroke-width="2"/><path d="M6 6l8 8M14 6l-8 8" stroke="#2C2D31FF" stroke-width="2"/></svg>') 10 10, not-allowed;
 }
 
 /* 리사이즈 커서 */
 .resize,
 .resizable {
-    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><path d="M4 16h12v-12" fill="none" stroke="black" stroke-width="2"/><path d="M8 16l8-8" stroke="black" stroke-width="2"/></svg>') 10 10, nwse-resize;
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><path d="M4 16h12v-12" fill="none" stroke="#2C2D31FF" stroke-width="2"/><path d="M8 16l8-8" stroke="#2C2D31FF" stroke-width="2"/></svg>') 10 10, nwse-resize;
 }
 
 /* ========================================
@@ -351,13 +351,13 @@ textarea,
 button:hover,
 .btn:hover {
     transform: translate(-1px, -1px);
-    box-shadow: 6px 6px 1px 1px black;
+    box-shadow: 6px 6px 1px 1px #2C2D31FF;
 }
 
 button:active,
 .btn:active {
     transform: translate(1px, 1px);
-    box-shadow: 3px 3px 1px 1px black;
+    box-shadow: 3px 3px 1px 1px #2C2D31FF;
 }
 
 /* ========================================
@@ -365,12 +365,12 @@ button:active,
    ======================================== */
 
 ::selection {
-    background: black;
+    background: #2C2D31FF;
     color: #f6ece6;
 }
 
 ::-moz-selection {
-    background: black;
+    background: #2C2D31FF;
     color: #f6ece6;
 }
 
@@ -379,6 +379,6 @@ button:active,
    ======================================== */
 
 :focus-visible {
-    outline: 2px dashed black;
+    outline: 2px dashed #2C2D31FF;
     outline-offset: 2px;
 }
