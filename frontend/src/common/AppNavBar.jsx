@@ -253,7 +253,7 @@ export function AppNavBar() {
           {/* 로고와 브랜드 이름 */}
           <Navbar.Brand as={Link} to="/" className="d-flex align-items-center">
             <span
-              className="ms-2 ms-md-3"
+              className=" ms-3 md-3"
               style={{
                 fontFamily: "'Poppins'",
                 fontSize: "clamp(1.2rem, 4vw, 1.8rem)",
@@ -261,7 +261,23 @@ export function AppNavBar() {
                 color: "black",
               }}
             >
-              PETOPIA
+              PET
+            </span>
+            <img
+              src="/PETOPIA-Photoroom.png"
+              alt="PETOPIA 로고"
+              style={{ width: "50px", height: "50px" }}
+            />
+            <span
+              className="md-3"
+              style={{
+                fontFamily: "'Poppins'",
+                fontSize: "clamp(1.2rem, 4vw, 1.8rem)",
+                fontWeight: "bolder",
+                color: "black",
+              }}
+            >
+              TOPIA
             </span>
           </Navbar.Brand>
 
