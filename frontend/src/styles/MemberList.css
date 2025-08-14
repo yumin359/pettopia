@@ -30,8 +30,7 @@
 }
 
 .member-list-table tbody tr:hover td {
-    background-color: #b7b8b8 !important;
-    color: #ffffff !important;
+    background-color: #f1f3f5;
 }
 
 .member-list-table .email-cell {
