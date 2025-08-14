@@ -58,13 +58,11 @@ export function LatestReviewsList() {
   const loadMoreReviews = () => {
     setDisplayCount((prev) => Math.min(prev + 12, filteredReviews.length));
   };
-
   const filteredReviews =
     reviews?.filter((r) => {
       if (!tagFilter.trim()) return true;
       return r.tags?.some((tag) => tag.name.includes(tagFilter.trim()));
     }) || [];
-
   if (!reviews) {
     return (
       <Container className="my-5 text-center">
@@ -116,7 +114,7 @@ export function LatestReviewsList() {
                   navigate(`${url}?${params.toString()}`);
                 }}
               >
-                <Card.Body className="d-flex flex-column">
+                <Card.Body className="d-flex flex-column p-2">
                   {/* 시설명 */}
                   <div className="fw-semibold text-truncate text-secondary mb-1">
                     📍 {facilityInfo?.name || "정보 없음"}
@@ -139,7 +137,7 @@ export function LatestReviewsList() {
                           src={imageFiles[0]}
                           style={{
                             objectFit: "cover",
-                            height: "200px",
+                            height: "100px",
                             marginBottom: "8px",
                           }}
                         />
@@ -153,7 +151,7 @@ export function LatestReviewsList() {
                             display: "grid",
                             gridTemplateColumns: "1fr 1fr",
                             gridTemplateRows: "1fr 1fr",
-                            height: "200px",
+                            height: "100px",
                             overflow: "hidden",
                             marginBottom: "8px",
                           }}
