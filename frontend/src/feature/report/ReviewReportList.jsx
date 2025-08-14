@@ -77,19 +77,19 @@ export default function ReviewReportList() {
         <thead>
           <tr>
             <th>
-              <GoMail className="me-2" />
+              {/*<GoMail className="me-2" />*/}
               신고자 이메일
             </th>
             <th>
-              <BsCardText className="me-2" />
+              {/*<BsCardText className="me-2" />*/}
               리뷰 ID
             </th>
             <th>
-              <BsCardText className="me-2" />
+              {/*<BsCardText className="me-2" />*/}
               신고 사유
             </th>
             <th>
-              <BsCalendar2DateFill className="me-2" />
+              {/*<BsCalendar2DateFill className="me-2" />*/}
               신고일
             </th>
           </tr>

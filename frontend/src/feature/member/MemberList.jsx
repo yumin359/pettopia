@@ -57,15 +57,15 @@ export function MemberList() {
           <thead>
             <tr>
               <th>
-                <GoMail className="me-2" />
+                {/*<GoMail className="me-2" />*/}
                 이메일
               </th>
               <th>
-                <FaUserCircle className="me-2" />
+                {/*<FaUserCircle className="me-2" />*/}
                 별명
               </th>
               <th>
-                <BsCalendar2DateFill className="me-2" />
+                {/*<BsCalendar2DateFill className="me-2" />*/}
                 가입일
               </th>
             </tr>
