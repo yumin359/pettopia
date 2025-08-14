@@ -110,6 +110,7 @@ export function MemberDetail() {
           md={12}
           className="p-4 d-flex flex-column bg-dark text-light"
         >
+          <div className="mb-4" />
           <div className="d-flex justify-content-between align-items-center mb-3">
             <h3 className="fw-bold mb-0">회원 정보</h3>
             <small className="text-muted" style={{ fontSize: "0.85rem" }}>
@@ -120,7 +121,6 @@ export function MemberDetail() {
               )}
             </small>
           </div>
-
           <div className="border-0">
             <div className="mb-4 d-flex justify-content-center">
               <img
