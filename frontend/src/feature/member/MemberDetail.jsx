@@ -14,15 +14,16 @@ import { useNavigate, useSearchParams } from "react-router";
 import { toast } from "react-toastify";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
 import GoogleCalendarReview from "../calendar/GoogleCalendarReview.jsx";
+import { MyReview } from "../review/MyReview.jsx";
 
 export function MemberDetail() {
   const [member, setMember] = useState(null);
-  const [, setReviews] = useState(null);
   const [modalShow, setModalShow] = useState(false);
   const [password, setPassword] = useState("");
   const [tempCode, setTempCode] = useState("");
   const { logout, hasAccess, isAdmin } = useContext(AuthenticationContext);
   const [params] = useSearchParams();
+  const [rightColumnView, setRightColumnView] = useState("calendar");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -30,15 +31,6 @@ export function MemberDetail() {
       .get(`/api/member?email=${params.get("email")}`)
       .then((res) => {
         setMember(res.data);
-        if (res.data?.id) {
-          axios
-            .get(`/api/review/myReview/${res.data.id}`)
-            .then((res2) => setReviews(res2.data))
-            .catch((err) => {
-              console.error("리뷰 목록 로드 실패:", err);
-              setReviews([]);
-            });
-        }
       })
       .catch((err) => {
         console.error(err);
@@ -105,7 +97,7 @@ export function MemberDetail() {
     /\.(jpg|jpeg|png|gif|webp)$/i.test(file),
   );
 
-  const isAdminFlag = isAdmin(); // 함수 호출
+  const isAdminFlag = isAdmin();
   const isKakao = member.provider?.includes("kakao");
   const defaultImage = "/user.png";
 
@@ -238,19 +230,33 @@ export function MemberDetail() {
 
                 <Button
                   variant="outline-success"
-                  onClick={() => navigate(`/review/my/${member.id}`)}
+                  // 페이지 이동 대신, rightColumnView 상태를 'calendar'와 'myReviews' 사이에서 전환(토글)합니다.
+                  onClick={() =>
+                    setRightColumnView(
+                      rightColumnView === "calendar" ? "myReviews" : "calendar",
+                    )
+                  }
                   className="d-flex align-items-center gap-1"
                 >
-                  내가 쓴 리뷰
+                  {/* 상태에 따라 버튼의 텍스트를 동적으로 변경합니다. */}
+                  {rightColumnView === "calendar"
+                    ? "내가 쓴 리뷰 보기"
+                    : "달력으로 보기"}
                 </Button>
               </div>
             )}
           </div>
         </Col>
 
-        {/* 오른쪽 컬럼: 리뷰 캘린더 */}
-        <Col lg={7} md={12}>
-          <GoogleCalendarReview />
+        {/* 오른쪽 컬럼에 조건부 렌더링 적용 */}
+        <Col
+          lg={7}
+          md={12}
+          className="p-4"
+          style={{ height: "100%", overflowY: "auto" }}
+        >
+          {rightColumnView === "calendar" && <GoogleCalendarReview />}
+          {rightColumnView === "myReviews" && <MyReview memberId={member.id} />}
         </Col>
       </Row>
 

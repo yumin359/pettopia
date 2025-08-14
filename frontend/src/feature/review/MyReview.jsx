@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Col, Image, Row, Spinner, Badge, Carousel } from "react-bootstrap";
+import { Badge, Carousel, Col, Image, Row, Spinner } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router";
 import { FaChevronRight } from "react-icons/fa";
@@ -24,10 +24,11 @@ const cardStyles = `
   }
 `;
 
-export function MyReview() {
+export function MyReview({ memberId: memberIdFromProp }) {
   const [reviews, setReviews] = useState(null);
   const navigate = useNavigate();
-  const { memberId } = useParams();
+  const { memberId: memberIdFromUrl } = useParams();
+  const memberId = memberIdFromProp || memberIdFromUrl;
 
   useEffect(() => {
     axios
@@ -91,7 +92,7 @@ export function MyReview() {
 
           <hr className="hr-color-hotpink review-separator" />
 
-          {reviews.map((r, index) => {
+          {reviews.map((r) => {
             const reviewImages = r.files?.filter(isImageFile) || [];
 
             return (
