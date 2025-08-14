@@ -136,8 +136,8 @@ export function MemberDetail() {
                 alt="프로필 이미지"
                 className="shadow rounded-circle"
                 style={{
-                  width: "120px",
-                  height: "120px",
+                  width: "150px",
+                  height: "150px",
                   objectFit: "cover",
                 }}
               />
