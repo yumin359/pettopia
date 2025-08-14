@@ -94,10 +94,13 @@ export function MemberDetail() {
     : "";
 
   const profileImageUrl = member.files?.find((file) =>
-    /\.(jpg|jpeg|png|gif|webp)$/i.test(file)
+    /\.(jpg|jpeg|png|gif|webp)$/i.test(file),
   );
 
-  const isAdminFlag = isAdmin();
+  // const isAdminFlag = isAdmin(); // 이거는 로그인 한 유저가 admin인지 확인하는 것.
+  // admin이 회원목록에서 memberDetail볼 때는 그 회원이 admin인지 확인해야함.
+  // 따라서 회원목록에서 authNames로 확인하기
+  const isAdminFlag = member.authNames?.includes("admin");
   const isKakao = member.provider?.includes("kakao");
   const defaultImage = "/user.png";
 
@@ -144,7 +147,11 @@ export function MemberDetail() {
                 readOnly
                 value={member.email}
                 className="bg-light border-0"
-                style={{ userSelect: "text", boxShadow: "none", outline: "none" }}
+                style={{
+                  userSelect: "text",
+                  boxShadow: "none",
+                  outline: "none",
+                }}
                 onFocus={(e) => e.target.blur()}
               />
             </FormGroup>
@@ -155,7 +162,11 @@ export function MemberDetail() {
                 readOnly
                 value={member.nickName}
                 className="bg-light border-0"
-                style={{ userSelect: "text", boxShadow: "none", outline: "none" }}
+                style={{
+                  userSelect: "text",
+                  boxShadow: "none",
+                  outline: "none",
+                }}
                 onFocus={(e) => e.target.blur()}
               />
             </FormGroup>
@@ -184,7 +195,11 @@ export function MemberDetail() {
                 readOnly
                 value={formattedInsertedAt}
                 className="bg-light border-0"
-                style={{ userSelect: "text", boxShadow: "none", outline: "none" }}
+                style={{
+                  userSelect: "text",
+                  boxShadow: "none",
+                  outline: "none",
+                }}
                 onFocus={(e) => e.target.blur()}
               />
             </FormGroup>
@@ -220,12 +235,14 @@ export function MemberDetail() {
                   variant="outline-success"
                   onClick={() =>
                     setRightColumnView(
-                      rightColumnView === "calendar" ? "myReviews" : "calendar"
+                      rightColumnView === "calendar" ? "myReviews" : "calendar",
                     )
                   }
                   className="d-flex align-items-center gap-1"
                 >
-                  {rightColumnView === "calendar" ? "내가 쓴 리뷰 보기" : "달력으로 보기"}
+                  {rightColumnView === "calendar"
+                    ? "내가 쓴 리뷰 보기"
+                    : "달력으로 보기"}
                 </Button>
               </div>
             )}
@@ -244,11 +261,11 @@ export function MemberDetail() {
             <GoogleCalendarReview />
           )}
           {/* 내 리뷰 표시 */}
-          {rightColumnView === "myReviews" || (!hasAccess(member.email) && isAdmin()) ? (
+          {rightColumnView === "myReviews" ||
+          (!hasAccess(member.email) && isAdmin()) ? (
             <MyReview memberId={member.id} />
           ) : null}
         </Col>
-
       </Row>
 
       {/* 탈퇴 확인 모달 */}
@@ -279,7 +296,10 @@ export function MemberDetail() {
           </FormGroup>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="outline-secondary" onClick={() => setModalShow(false)}>
+          <Button
+            variant="outline-secondary"
+            onClick={() => setModalShow(false)}
+          >
             취소
           </Button>
           <Button variant="danger" onClick={handleDeleteButtonClick}>
