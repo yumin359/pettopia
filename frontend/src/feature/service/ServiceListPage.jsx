@@ -7,6 +7,7 @@ import { BsChatLeftTextFill, BsCalendar2DateFill } from "react-icons/bs";
 import axios from "axios";
 import "../../styles/ServiceList.css";
 import { ReviewText } from "../../common/ReviewText.jsx";
+import { toast } from "react-toastify";
 
 export default function ServiceListPage() {
   const [services, setServices] = useState([]);
@@ -51,6 +52,7 @@ export default function ServiceListPage() {
       setServices((prev) =>
         prev.filter((item) => item.id !== selectedServiceId),
       );
+      toast("문의가 삭제되었습니다.");
     } catch (err) {
       console.error("삭제 중 오류가 발생했습니다.", err);
     }
