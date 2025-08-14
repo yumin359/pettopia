@@ -151,7 +151,6 @@ export function MemberDetail() {
                 onFocus={(e) => e.target.blur()}
               />
             </FormGroup>
-
             <FormGroup controlId="nickName1" className="mb-3">
               <FormLabel>별명</FormLabel>
               <FormControl
@@ -166,7 +165,6 @@ export function MemberDetail() {
                 onFocus={(e) => e.target.blur()}
               />
             </FormGroup>
-
             <FormGroup controlId="info1" className="mb-3">
               <FormLabel>자기소개</FormLabel>
               <FormControl
@@ -184,7 +182,6 @@ export function MemberDetail() {
                 onFocus={(e) => e.target.blur()}
               />
             </FormGroup>
-
             <FormGroup controlId="inserted1" className="mb-3">
               <FormLabel>가입일시</FormLabel>
               <FormControl
@@ -230,7 +227,6 @@ export function MemberDetail() {
 
                 <Button
                   variant="outline-success"
-                  // 페이지 이동 대신, rightColumnView 상태를 'calendar'와 'myReviews' 사이에서 전환(토글)합니다.
                   onClick={() =>
                     setRightColumnView(
                       rightColumnView === "calendar" ? "myReviews" : "calendar",
@@ -238,7 +234,6 @@ export function MemberDetail() {
                   }
                   className="d-flex align-items-center gap-1"
                 >
-                  {/* 상태에 따라 버튼의 텍스트를 동적으로 변경합니다. */}
                   {rightColumnView === "calendar"
                     ? "내가 쓴 리뷰 보기"
                     : "달력으로 보기"}
