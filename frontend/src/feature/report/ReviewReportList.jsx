@@ -60,7 +60,7 @@ export default function ReviewReportList() {
     event.stopPropagation();
 
     const ok = window.confirm(
-      "이 신고를 정말 삭제하시겠습니까? (되돌릴 수 없습니다)"
+      "이 신고를 정말 삭제하시겠습니까? (되돌릴 수 없습니다)",
     );
     if (!ok) return;
 
@@ -130,65 +130,68 @@ export default function ReviewReportList() {
       <h2 className="mb-4 fw-bold text-muted">리뷰 신고 내역 목록</h2>
       <Table className="review-report-table" responsive>
         <thead>
-        <tr>
-          <th>신고자 이메일</th>
-          <th>리뷰 ID</th>
-          <th>신고 사유</th>
-          <th>신고일</th>
-        </tr>
+          <tr>
+            <th>신고자 이메일</th>
+            <th>리뷰 ID</th>
+            <th>신고 사유</th>
+            <th>신고일</th>
+          </tr>
         </thead>
         <tbody>
-        {reports.map(
-          ({
-             id,
-             reporterEmail,
-             reviewId,
-             reason,
-             reportedAt,
-             reviewWriterId,
-           }) => (
-            <tr
-              key={id}
-              className={reviewWriterId ? "clickable-row" : ""}
-              onClick={() => handleRowClick(reviewWriterId)}
-              title={reviewWriterId ? "작성자 리뷰 보기" : undefined}
-            >
-              <td className="d-flex align-items-center">
-                <div className="flex-grow-1 text-truncate" title={reporterEmail}>
-                  {reporterEmail}
-                </div>
+          {reports.map(
+            ({
+              id,
+              reporterEmail,
+              reviewId,
+              reason,
+              reportedAt,
+              reviewWriterId,
+            }) => (
+              <tr
+                key={id}
+                className={reviewWriterId ? "clickable-row" : ""}
+                onClick={() => handleRowClick(reviewWriterId)}
+                title={reviewWriterId ? "작성자 리뷰 보기" : undefined}
+              >
+                <td className="reporter-email-cell">
+                  <div className="d-flex align-items-center">
+                    <div
+                      className="flex-grow-1 text-truncate me-2"
+                      title={reporterEmail}
+                    >
+                      {reporterEmail}
+                    </div>
+                    <OverlayTrigger
+                      placement="top"
+                      overlay={
+                        <Tooltip id={`tooltip-delete-${id}`}>신고 삭제</Tooltip>
+                      }
+                    >
+                      <Button
+                        variant="outline-danger"
+                        size="sm"
+                        onClick={(e) => handleDeleteReport(e, id)}
+                        disabled={deletingId === id}
+                        aria-label={`delete-report-${id}`}
+                      >
+                        {deletingId === id ? (
+                          <Spinner animation="border" size="sm" />
+                        ) : (
+                          <FaTrash />
+                        )}
+                      </Button>
+                    </OverlayTrigger>
+                  </div>
+                </td>
 
-                <OverlayTrigger
-                  placement="top"
-                  overlay={<Tooltip id={`tooltip-delete-${id}`}>신고 삭제</Tooltip>}
-                >
-                  <Button
-                    variant="outline-danger"
-                    size="sm"
-                    className="ms-2 p-1 btn-no-wrap"
-                    onClick={(e) => handleDeleteReport(e, id)}
-                    disabled={deletingId === id}
-                    aria-label={`delete-report-${id}`}
-                    title="신고 삭제"
-                  >
-                    {deletingId === id ? (
-                      // 간단한 상태 표시 (텍스트 대신 spinner를 원하면 교체 가능)
-                      "..."
-                    ) : (
-                      <FaTrash />
-                    )}
-                  </Button>
-                </OverlayTrigger>
-              </td>
-
-              <td>{reviewId}</td>
-              <td className="reason-cell">
-                <ReviewText text={reason} />
-              </td>
-              <td>{reportedAt ? reportedAt.substring(0, 10) : "-"}</td>
-            </tr>
-          )
-        )}
+                <td>{reviewId}</td>
+                <td className="reason-cell">
+                  <ReviewText text={reason} />
+                </td>
+                <td>{reportedAt ? reportedAt.substring(0, 10) : "-"}</td>
+              </tr>
+            ),
+          )}
         </tbody>
       </Table>
     </div>
