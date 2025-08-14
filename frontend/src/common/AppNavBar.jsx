@@ -59,7 +59,7 @@ export function AppNavBar() {
 
   // 로그인 시 드롭다운 메뉴에 표시될 타이틀
   const userDropdownTitle = (
-    <span className="text-white fw-bold">
+    <span className="fw-bold">
       <FaUserCircle size={24} className="me-2" />
       {user?.nickName}
     </span>
@@ -282,12 +282,13 @@ export function AppNavBar() {
 
           {/* 로그인 상태에 따른 UI (오른쪽) */}
           <div className="d-flex align-items-center order-lg-2">
-            <Nav className="me-3">
+            <Nav className="me-1">
               {user ? (
                 <div className="nav-dropdown-container">
                   <Button
                     className="fw-bold"
                     style={{
+                      boxShadow: "none",
                       padding: "0.5rem 1.5rem",
                       color: "#D9534F",
                       backgroundColor: "transparent",
@@ -306,6 +307,7 @@ export function AppNavBar() {
                   to="/login"
                   className="fw-bold"
                   style={{
+                    boxShadow: "none",
                     padding: "0.5rem 1.5rem",
                     color: "#D9534F",
                     backgroundColor: "transparent",

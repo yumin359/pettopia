@@ -80,7 +80,7 @@ body::before {
    ======================================== */
 .navbar {
     background-color: #f6ece6 !important;
-    border-bottom: 1px solid black !important;
+    border-bottom: 1px solid black;
     padding: 0 !important;
     min-height: 72px;
     overflow: visible;
@@ -214,7 +214,7 @@ body::before {
 }
 
 /* ========================================
-   최신리뷰 카드
+   LatestReviewsList.jsx
    ======================================== */
 
 .retro-shadow {
@@ -235,26 +235,25 @@ body::before {
 
 /* 웹킷 기반 브라우저 (Chrome, Safari, Edge) */
 ::-webkit-scrollbar {
-    width: 16px; /* 세로 스크롤바 너비 */
-    height: 16px; /* 가로 스크롤바 높이 */
+    width: 16px;
+    height: 16px;
 }
 
 ::-webkit-scrollbar-track {
-    background: #f6ece6; /* 베이지 배경 */
+    background: #f6ece6;
     border: 2px solid black;
-    box-shadow: inset 2px 2px 0px rgba(0, 0, 0, 0.1);
+    border-radius: 0;
 }
 
 ::-webkit-scrollbar-thumb {
     background: black; /* 검은색 썸 */
     border: 2px solid black;
-    box-shadow: 2px 2px 0px 0px black, /* 레트로 그림자 효과 */ inset -1px -1px 0px rgba(255, 255, 255, 0.3); /* 약간의 하이라이트 */
+    border-radius: 0;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #333; /* 호버시 약간 밝게 */
-    box-shadow: 3px 3px 0px 0px black,
-    inset -1px -1px 0px rgba(255, 255, 255, 0.4);
+    background: black;
+    border: 2px solid black;
 }
 
 /* 스크롤바 버튼 (위/아래 화살표) */
@@ -263,11 +262,6 @@ body::before {
     border: 2px solid black;
     height: 16px;
     box-shadow: 1px 1px 0px 0px black;
-}
-
-::-webkit-scrollbar-button:hover {
-    background: #fff;
-    box-shadow: 2px 2px 0px 0px black;
 }
 
 /* 위 화살표 */
