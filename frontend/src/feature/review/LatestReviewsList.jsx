@@ -1,19 +1,19 @@
-import React, { useEffect, useRef, useState, useContext } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import axios from "axios";
 import {
   Badge,
   Button,
   Card,
   Col,
-  Row,
   Container,
   Form,
+  Row,
 } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { ReviewLikeContainer } from "../like/ReviewLikeContainer.jsx";
 import ReportModal from "../report/ReportModal.jsx";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
-import { toast } from "react-toastify"; // 1. react-toastify import
+import { toast } from "react-toastify";
 
 export function LatestReviewsList() {
   const { user } = useContext(AuthenticationContext);
@@ -37,7 +37,6 @@ export function LatestReviewsList() {
   const isImageFile = (fileUrl) =>
     /\.(jpg|jpeg|png|gif|webp)$/i.test(fileUrl.split("?")[0]);
 
-  // 2. 신고 버튼 클릭 핸들러 수정
   const openReportModal = (review, event) => {
     event.stopPropagation();
     if (!user) return; // 로그인 안 했으면 모달 안 열림
@@ -51,7 +50,6 @@ export function LatestReviewsList() {
     setReportingReviewId(review.id);
     setReportModalOpen(true);
   };
-
   const closeReportModal = () => {
     setReportModalOpen(false);
     setReportingReviewId(null);
@@ -84,6 +82,7 @@ export function LatestReviewsList() {
         </span>
       </h2>
 
+      {/* 검색창 */}
       <Form
         className="mb-4"
         style={{
@@ -108,7 +107,7 @@ export function LatestReviewsList() {
           return (
             <Col key={r.id} xs={12} sm={6} md={4} lg={3}>
               <Card
-                className="h-100 position-relative"
+                className="h-100 position-relative rounded-0"
                 onClick={() => {
                   if (!facilityInfo || !facilityInfo.id) return;
                   const url = `/facility/${facilityInfo.id}`;
@@ -118,6 +117,7 @@ export function LatestReviewsList() {
                 }}
                 style={{
                   border: "solid 1px black",
+                  boxShadow: "1.5px 1.5px 1px 1px black",
                 }}
               >
                 <Card.Body className="d-flex flex-column">
@@ -144,7 +144,6 @@ export function LatestReviewsList() {
                           style={{
                             objectFit: "cover",
                             height: "200px",
-                            borderRadius: "6px",
                             marginBottom: "8px",
                           }}
                         />
@@ -158,9 +157,7 @@ export function LatestReviewsList() {
                             display: "grid",
                             gridTemplateColumns: "1fr 1fr",
                             gridTemplateRows: "1fr 1fr",
-                            gap: "4px",
                             height: "200px",
-                            borderRadius: "6px",
                             overflow: "hidden",
                             marginBottom: "8px",
                           }}

@@ -10,8 +10,8 @@ import ReviewAdd from "../review/ReviewAdd.jsx";
 import FacilityInfoCard from "./FacilityInfoCard.jsx";
 import MapPreviewCard from "./MapPreviewCard.jsx";
 import ReviewStatsCard from "./ReviewStatusCard.jsx";
-import ReportModal from "../report/ReportModal.jsx"; // 신고 모달 컴포넌트 임포트
-import { toast } from "react-toastify"; // 토스트 임포트
+import ReportModal from "../report/ReportModal.jsx";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 export function MapDetail() {
@@ -47,7 +47,6 @@ export function MapDetail() {
       setLoadingFacility(false);
     }
   };
-
   const fetchReviews = async () => {
     if (!id) return;
     setLoadingReviews(true);
@@ -69,7 +68,6 @@ export function MapDetail() {
     fetchReviews();
     setSearchParams({ focusReviewId: reviewId });
   };
-
   const handleDelete = async (reviewId) => {
     try {
       await axios.delete(`/api/review/delete/${reviewId}`, {
@@ -103,7 +101,6 @@ export function MapDetail() {
     setReportingReviewId(review.id);
     setReportModalOpen(true);
   };
-
   const closeReportModal = () => {
     setReportingReviewId(null);
     setReportModalOpen(false);
@@ -170,7 +167,7 @@ export function MapDetail() {
       {/* 헤더 섹션 */}
       <div className="row mb-5">
         <div className="col-12">
-          <div className="card border-0 shadow-lg bg-primary text-white">
+          <div className="card border-0 shadow-lg bg-transparent">
             <div className="card-body p-4">
               <div className="d-flex justify-content-between align-items-center">
                 <div>
