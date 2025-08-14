@@ -1,14 +1,22 @@
 import { useEffect, useState, useContext } from "react";
-import { Table, Alert, Spinner } from "react-bootstrap";
+import { Table, Alert, Spinner, Button, Modal } from "react-bootstrap";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
+import { FaUserCircle } from "react-icons/fa";
+import { BsChatLeftTextFill, BsCalendar2DateFill } from "react-icons/bs";
 import axios from "axios";
+import "../../styles/ServiceList.css";
+import { ReviewText } from "../../common/ReviewText.jsx";
+import { toast } from "react-toastify";
 
 export default function ServiceListPage() {
   const { isAdmin, loading: loadingAuth } = useContext(AuthenticationContext);
   const [services, setServices] = useState([]);
   const [loadingServices, setLoadingServices] = useState(true);
   const [error, setError] = useState("");
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedServiceId, setSelectedServiceId] = useState(null);
+  const navigate = useNavigate();
 
   // 🔹 모든 Hooks 최상위에서 호출
   useEffect(() => {
@@ -29,12 +37,30 @@ export default function ServiceListPage() {
     fetchServices();
   }, []);
 
+  const handleDeleteClick = (id) => {
+    setSelectedServiceId(id);
+    setShowDeleteModal(true);
+  };
+
+  const handleDeleteConfirmed = async () => {
+    setShowDeleteModal(false);
+    try {
+      await axios.delete(`/api/support/${selectedServiceId}`);
+      setServices((prev) =>
+        prev.filter((item) => item.id !== selectedServiceId),
+      );
+      toast("문의가 삭제되었습니다.");
+    } catch (err) {
+      console.error("삭제 중 오류가 발생했습니다.", err);
+    }
+  };
+
   // 🔹 인증 상태 로딩 중이면 로딩 화면
   if (loadingAuth || loadingServices) {
     return (
-      <div className="text-center my-4">
+      <div className="text-center my-5">
         <Spinner animation="border" />
-        <div>불러오는 중...</div>
+        <div className="mt-2 text-muted">데이터를 불러오는 중입니다...</div>
       </div>
     );
   }
@@ -52,88 +78,77 @@ export default function ServiceListPage() {
     return <Alert variant="info">등록된 문의가 없습니다.</Alert>;
   }
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("정말 삭제하시겠습니까?")) return;
-    try {
-      await axios.delete(`/api/support/${id}`);
-      setServices((prev) => prev.filter((item) => item.id !== id));
-    } catch (err) {
-      alert("삭제 중 오류가 발생했습니다.");
-    }
-  };
-
   return (
-    <div style={{ padding: "2rem" }}>
-      <h2 className="mb-4">문의 내역 목록</h2>
-      <Table striped bordered hover>
+    <div className="p-4">
+      <h2 className="mb-4 fw-bold text-muted">문의 내역 목록</h2>
+      <Table className="service-list-table" responsive>
         <thead>
-        <tr>
-          <th>이메일</th>
-          <th>제목</th>
-          <th>내용</th>
-          <th>접수일</th>
-        </tr>
+          <tr>
+            <th>
+              {/*<FaUserCircle className="me-2" />*/}
+              이메일
+            </th>
+            <th>
+              {/*<BsChatLeftTextFill className="me-2" />*/}
+              제목
+            </th>
+            <th>
+              {/*<BsChatLeftTextFill className="me-2" />*/}
+              내용
+            </th>
+            <th>
+              {/*<BsCalendar2DateFill className="me-2" />*/}
+              접수일
+            </th>
+            <th>관리</th>
+          </tr>
         </thead>
         <tbody>
-        {services.map(({ id, email, title, content, inserted_at }) => (
-          <tr key={id}>
-            <td style={{ display: "flex", alignItems: "center" }}>
-                <span
-                  style={{
-                    flexGrow: 1,
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
-                  }}
+          {services.map(({ id, email, title, content, inserted_at }) => (
+            <tr key={id}>
+              <td className="text-truncate service-email-cell" title={email}>
+                {email}
+              </td>
+              <td className="text-truncate" title={title}>
+                {title}
+              </td>
+              <td className="content-cell">
+                <ReviewText text={content} />
+              </td>
+              <td>{inserted_at ? inserted_at.substring(0, 10) : "-"}</td>
+              <td>
+                {/* 답변으로 바꾸기 */}
+                <Button
+                  variant="danger"
+                  size="sm"
+                  onClick={() => handleDeleteClick(id)}
                 >
-                  {email}
-                </span>
-              <button
-                onClick={() => handleDelete(id)}
-                style={{
-                  background: "none",
-                  border: "none",
-                  color: "red",
-                  fontWeight: "bold",
-                  cursor: "pointer",
-                  fontSize: "18px",
-                  lineHeight: "1",
-                  padding: "0",
-                  marginLeft: "8px",
-                }}
-                aria-label="삭제"
-                title="삭제"
-              >
-                ×
-              </button>
-            </td>
-            <td
-              style={{
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                maxWidth: "220px",
-                color: "inherit",
-                cursor: "default",
-              }}
-            >
-              {title}
-            </td>
-            <td
-              style={{
-                whiteSpace: "pre-wrap",
-                overflowWrap: "break-word",
-                wordBreak: "break-word",
-                maxWidth: "400px",
-              }}
-            >
-              {content}
-            </td>
-            <td>{new Date(inserted_at).toLocaleString()}</td>
-          </tr>
-        ))}
+                  삭제
+                </Button>
+              </td>
+            </tr>
+          ))}
         </tbody>
       </Table>
+
+      <Modal
+        show={showDeleteModal}
+        onHide={() => setShowDeleteModal(false)}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>문의 삭제</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>정말 이 문의를 삭제하시겠습니까?</Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
+            취소
+          </Button>
+          <Button variant="danger" onClick={handleDeleteConfirmed}>
+            삭제
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 }

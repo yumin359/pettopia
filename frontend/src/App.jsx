@@ -26,6 +26,7 @@ import "./styles/styles.css";
 import "./styles/Carousel.css";
 import "./styles/Review.css";
 import "./styles/ReviewLike.css";
+import { AdminHome } from "./AdminHome.jsx";
 
 function App() {
   return (
@@ -61,6 +62,7 @@ function App() {
             <Route path="/support" element={<ServicePage />} />
 
             <Route path="/admin" element={<AdminPage />}>
+              <Route index element={<AdminHome />} />
               <Route path="member/list" element={<MemberList />} />
               <Route path="support/list" element={<ServiceListPage />} />
               <Route path="review/report/list" element={<ReviewReportList />} />

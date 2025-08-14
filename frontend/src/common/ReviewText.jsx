@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import "../styles/ServiceList.css";
 
 export function ReviewText({ text }) {
   const [expanded, setExpanded] = useState(false);
@@ -11,6 +12,11 @@ export function ReviewText({ text }) {
       setIsClamped(scrollHeight > clientHeight);
     }
   }, [text]);
+
+  const handleButtonClick = (e) => {
+    e.stopPropagation(); // 이벤트 버블링 중단
+    setExpanded(!expanded);
+  };
 
   return (
     <div style={{ whiteSpace: "pre-wrap" }}>
@@ -27,7 +33,7 @@ export function ReviewText({ text }) {
       </div>
       {isClamped && (
         <button
-          onClick={() => setExpanded(!expanded)}
+          onClick={handleButtonClick}
           style={{
             border: "none",
             background: "none",
@@ -36,6 +42,7 @@ export function ReviewText({ text }) {
             cursor: "pointer",
             fontWeight: "bold",
           }}
+          className="text-hover"
         >
           {expanded ? "간략히" : "더보기"}
         </button>

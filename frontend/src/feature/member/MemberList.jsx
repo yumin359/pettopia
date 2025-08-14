@@ -2,6 +2,10 @@ import { useEffect, useState } from "react";
 import { Col, Row, Spinner, Table, Alert } from "react-bootstrap";
 import axios from "axios";
 import { useNavigate } from "react-router";
+import { FaUserCircle } from "react-icons/fa";
+import { GoMail } from "react-icons/go";
+import { BsCalendar2DateFill } from "react-icons/bs";
+import "../../styles/MemberList.css";
 
 export function MemberList() {
   const [memberList, setMemberList] = useState(null);
@@ -22,16 +26,16 @@ export function MemberList() {
 
   if (loading) {
     return (
-      <div className="text-center my-4">
+      <div className="text-center my-5">
         <Spinner animation="border" />
-        <div>불러오는 중...</div>
+        <div className="mt-2 text-muted">데이터를 불러오는 중입니다...</div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <Alert variant="danger" className="my-4">
+      <Alert variant="danger" className="my-5 text-center">
         {error}
       </Alert>
     );
@@ -39,50 +43,54 @@ export function MemberList() {
 
   if (!memberList || memberList.length === 0) {
     return (
-      <Alert variant="info" className="my-4">
+      <Alert variant="info" className="my-5 text-center">
         등록된 회원이 없습니다.
       </Alert>
     );
   }
 
   return (
-    <Row className="justify-content-center">
-      <Col xs={12} md={10} lg={8} style={{ maxWidth: "900px", margin: "0 auto" }}>
-        <h2 className="mb-4">회원 목록</h2>
-        <Table striped bordered hover responsive>
+    <>
+      <div style={{ padding: "2rem" }}>
+        <h2 className="mb-4 fw-bold text-muted">회원 목록</h2>
+        <Table className="member-list-table" responsive>
           <thead>
-          <tr>
-            <th>이메일</th>
-            <th>별명</th>
-            <th>가입일</th>
-          </tr>
+            <tr>
+              <th>
+                {/*<GoMail className="me-2" />*/}
+                이메일
+              </th>
+              <th>
+                {/*<FaUserCircle className="me-2" />*/}
+                별명
+              </th>
+              <th>
+                {/*<BsCalendar2DateFill className="me-2" />*/}
+                가입일
+              </th>
+            </tr>
           </thead>
           <tbody>
-          {memberList.map(({ email, nickName, insertedAt }) => (
-            <tr
-              key={email}
-              style={{ cursor: "pointer" }}
-              onClick={() => navigate(`/member?email=${encodeURIComponent(email)}`)}
-            >
-              <td
-                style={{
-                  whiteSpace: "pre-wrap",
-                  overflowWrap: "break-word",
-                  wordBreak: "break-word",
-                  maxWidth: "220px",
-                  color: "inherit",
-                  textDecoration: "none",
-                }}
+            {memberList.map(({ email, nickName, insertedAt }) => (
+              <tr
+                key={email}
+                onClick={() =>
+                  navigate(`/member?email=${encodeURIComponent(email)}`)
+                }
               >
-                {email}
-              </td>
-              <td>{nickName}</td>
-              <td>{insertedAt ? insertedAt.substring(0, 16) : "-"}</td>
-            </tr>
-          ))}
+                <td
+                  className="email-cell"
+                  title={email} // 마우스를 올리면 전체 이메일 표시
+                >
+                  {email}
+                </td>
+                <td>{nickName}</td>
+                <td>{insertedAt ? insertedAt.substring(0, 10) : "-"}</td>
+              </tr>
+            ))}
           </tbody>
         </Table>
-      </Col>
-    </Row>
+      </div>
+    </>
   );
 }

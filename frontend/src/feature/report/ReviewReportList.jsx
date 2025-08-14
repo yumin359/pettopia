@@ -1,8 +1,13 @@
 import { useEffect, useState, useContext } from "react";
-import { Table, Alert, Spinner } from "react-bootstrap";
+import { Table, Alert, Spinner, OverlayTrigger, Tooltip, } from "react-bootstrap";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
+import { FaUserCircle } from "react-icons/fa";
+import { BsCardText, BsCalendar2DateFill } from "react-icons/bs";
+import { GoMail } from "react-icons/go";
 import axios from "axios";
+import "../../styles/ReviewReportList.css";
+import { ReviewText } from "../../common/ReviewText.jsx";
 
 export default function ReviewReportList() {
   const { isAdmin, loading: loadingAuth } = useContext(AuthenticationContext);
@@ -36,9 +41,9 @@ export default function ReviewReportList() {
   // 🔹 인증 상태 로딩 중이면 로딩 화면
   if (loadingAuth || loadingReports) {
     return (
-      <div className="text-center my-4">
+      <div className="text-center my-5">
         <Spinner animation="border" />
-        <div>불러오는 중...</div>
+        <div className="mt-2 text-muted">데이터를 불러오는 중입니다...</div>
       </div>
     );
   }
@@ -74,37 +79,73 @@ export default function ReviewReportList() {
   };
 
   return (
-    <div style={{ padding: "2rem" }}>
-      <h2 className="mb-4">리뷰 신고 내역 목록</h2>
-      <Table striped bordered hover style={{ tableLayout: "fixed", width: "100%" }}>
+    <div className="p-4">
+      <h2 className="mb-4 fw-bold text-muted">리뷰 신고 내역 목록</h2>
+      <Table className="review-report-table" responsive>
         <thead>
-        <tr style={{ cursor: "default" }}>
-          <th style={{ width: "25%", wordBreak: "break-word" }}>신고자 이메일</th>
-          <th style={{ width: "10%", wordBreak: "break-word" }}>리뷰 ID</th>
-          <th style={{ width: "45%", wordBreak: "break-word" }}>신고 사유</th>
-          <th style={{ width: "20%", wordBreak: "break-word" }}>신고일</th>
-        </tr>
+          <tr>
+            <th>
+              {/*<GoMail className="me-2" />*/}
+              신고자 이메일
+            </th>
+            <th>
+              {/*<BsCardText className="me-2" />*/}
+              리뷰 ID
+            </th>
+            <th>
+              {/*<BsCardText className="me-2" />*/}
+              신고 사유
+            </th>
+            <th>
+              {/*<BsCalendar2DateFill className="me-2" />*/}
+              신고일
+            </th>
+          </tr>
         </thead>
         <tbody>
-        {reports.map(({ id, reporterEmail, reviewId, reason, reportedAt, reviewWriterId }) => (
-          <tr
-            key={id}
-            style={{ cursor: reviewWriterId ? "pointer" : "default" }}
-            onClick={() => handleRowClick(reviewWriterId)}
-            title={reviewWriterId ? "작성자 리뷰 보기" : undefined}
-          >
-            <td style={{ whiteSpace: "normal", wordBreak: "break-word" }}>{reporterEmail}</td>
-            <td style={{ whiteSpace: "normal", wordBreak: "break-word" }}>{reviewId}</td>
-            <td style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
-              {reason.length > 100
-                ? renderWithLineBreaks(reason.substring(0, 100)) + "..."
-                : renderWithLineBreaks(reason)}
-            </td>
-            <td style={{ whiteSpace: "normal", wordBreak: "break-word" }}>
-              {new Date(reportedAt).toLocaleString()}
-            </td>
-          </tr>
-        ))}
+          {reports.map(
+            ({
+              id,
+              reporterEmail,
+              reviewId,
+              reason,
+              reportedAt,
+              reviewWriterId,
+            }) => (
+              <tr
+                key={id}
+                className={reviewWriterId ? "clickable-row" : ""}
+                onClick={() => {
+                  if (reviewWriterId) {
+                    navigate(`/review/my/${reviewWriterId}`);
+                  } else {
+                    console.error("작성자 정보가 없어 이동할 수 없습니다.");
+                  }
+                }}
+                title={reviewWriterId ? "작성자 리뷰 보기" : undefined}
+              >
+                <td>
+                  <OverlayTrigger
+                    placement="top"
+                    overlay={
+                      <Tooltip id={`tooltip-email-${id}`}>
+                        {reporterEmail}
+                      </Tooltip>
+                    }
+                  >
+                    <span className="text-truncate d-block">
+                      {reporterEmail}
+                    </span>
+                  </OverlayTrigger>
+                </td>
+                <td>{reviewId}</td>
+                <td className="reason-cell">
+                  <ReviewText text={reason} />
+                </td>
+                <td>{reportedAt ? reportedAt.substring(0, 10) : "-"}</td>
+              </tr>
+            ),
+          )}
         </tbody>
       </Table>
     </div>
