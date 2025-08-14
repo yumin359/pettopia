@@ -9,7 +9,6 @@ import { ReviewLikeContainer } from "../like/ReviewLikeContainer.jsx";
 import { FavoriteContainer } from "../kakaoMap/FavoriteContainer.jsx";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-// 새로운 카드 스타일을 위한 CSS
 const cardStyles = `
   .review-card-custom {
     background-color: #fffafa;
@@ -26,6 +25,7 @@ const cardStyles = `
 
 export function MyReview({ memberId: memberIdFromProp }) {
   const [reviews, setReviews] = useState(null);
+  const [favoriteMap, setFavoriteMap] = useState({}); // facilityId -> isFavorite
   const navigate = useNavigate();
   const { memberId: memberIdFromUrl } = useParams();
   const memberId = memberIdFromProp || memberIdFromUrl;
@@ -34,7 +34,16 @@ export function MyReview({ memberId: memberIdFromProp }) {
     axios
       .get(`/api/review/myReview/${memberId}`)
       .then((res) => {
-        setReviews(res.data);
+        setReviews(res.data || []);
+
+        // 초기 favoriteMap 생성
+        const map = {};
+        res.data?.forEach((r) => {
+          if (r.petFacility?.id != null) {
+            map[r.petFacility.id] = r.petFacility.isFavorite || false;
+          }
+        });
+        setFavoriteMap(map);
       })
       .catch((err) => {
         console.error("리뷰 불러오기 실패", err);
@@ -63,6 +72,13 @@ export function MyReview({ memberId: memberIdFromProp }) {
   const userProfileImage = reviews[0].profileImageUrl || "/user.png";
   const userCountMemberReview = reviews[0].countMemberReview;
   const userMemberAverageRating = reviews[0].memberAverageRating;
+
+  const toggleFavorite = (facilityId, newState) => {
+    setFavoriteMap((prev) => ({
+      ...prev,
+      [facilityId]: newState,
+    }));
+  };
 
   return (
     <>
@@ -98,12 +114,9 @@ export function MyReview({ memberId: memberIdFromProp }) {
             return (
               <div
                 key={r.id}
-                // 기존 클래스에 'review-card-custom' 클래스 추가
                 className="card mb-3 rounded-4 review-card-custom"
-                // style 속성 제거
               >
                 <div className="card-body p-4">
-                  {/* ... (이전과 동일) ... */}
                   <div className={reviewImages.length > 0 ? "mb-3" : ""}>
                     {reviewImages.length > 0 && (
                       <div style={{ maxWidth: "400px", margin: "0 auto" }}>
@@ -115,21 +128,14 @@ export function MyReview({ memberId: memberIdFromProp }) {
                             style={{ height: "400px", objectFit: "cover" }}
                           />
                         ) : (
-                          <Carousel
-                            className="hover-controls"
-                            interval={null}
-                            indicators={false}
-                          >
+                          <Carousel interval={null} indicators={false}>
                             {reviewImages.map((image, i) => (
                               <Carousel.Item key={i}>
                                 <img
                                   src={image}
                                   alt={`리뷰 이미지 ${i + 1}`}
                                   className="d-block w-100"
-                                  style={{
-                                    height: "400px",
-                                    objectFit: "cover",
-                                  }}
+                                  style={{ height: "400px", objectFit: "cover" }}
                                 />
                                 <div className="carousel-counter">
                                   {i + 1} / {reviewImages.length}
@@ -155,18 +161,20 @@ export function MyReview({ memberId: memberIdFromProp }) {
                         <FaChevronRight className="ms-1" size={13} />
                       </div>
                       <div className="small d-flex align-items-center">
-                        {r.petFacility && r.petFacility.id && (
+                        {r.petFacility?.id != null && (
                           <FavoriteContainer
-                            className="small"
                             facilityName={r.petFacility.name}
                             facilityId={r.petFacility.id}
+                            isFavorite={favoriteMap[r.petFacility.id] ?? false}
+                            onToggle={(newState) =>
+                              toggleFavorite(r.petFacility.id, newState)
+                            }
                           />
                         )}
                       </div>
                     </div>
                     <div style={{ color: "#888", fontSize: "0.85rem" }}>
-                      {r.petFacility.sidoName}
-                      {r.petFacility.sigunguName}
+                      {r.petFacility.sidoName} {r.petFacility.sigunguName}
                     </div>
                     <hr className="my-2 hr-color-hotpink" />
 
