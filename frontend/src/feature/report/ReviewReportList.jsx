@@ -1,8 +1,18 @@
 import { useEffect, useState, useContext } from "react";
-import { Table, Alert, Spinner } from "react-bootstrap";
+import {
+  Table,
+  Alert,
+  Spinner,
+  OverlayTrigger,
+  Tooltip,
+} from "react-bootstrap";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
 import { Navigate, useNavigate } from "react-router-dom";
+import { FaUserCircle } from "react-icons/fa";
+import { BsCardText, BsCalendar2DateFill } from "react-icons/bs";
+import { GoMail } from "react-icons/go";
 import axios from "axios";
+import "../../styles/ReviewReportList.css";
 
 export default function ReviewReportList() {
   const [reports, setReports] = useState([]);
@@ -35,70 +45,106 @@ export default function ReviewReportList() {
     fetchReports();
   }, []);
 
-  function renderWithLineBreaks(text) {
-    return text.split('\n').map((line, i) => (
-      <span key={i}>
-        {line}
-        <br />
-      </span>
-    ));
-  }
-
   if (loading) {
     return (
-      <div className="text-center my-4">
+      <div className="text-center my-5">
         <Spinner animation="border" />
-        <div>불러오는 중...</div>
+        <div className="mt-2 text-muted">데이터를 불러오는 중입니다...</div>
       </div>
     );
   }
 
   if (error) {
-    return <Alert variant="danger">{error}</Alert>;
+    return (
+      <Alert variant="danger" className="my-5 text-center">
+        {error}
+      </Alert>
+    );
   }
 
   if (reports.length === 0) {
-    return <Alert variant="info">신고된 리뷰가 없습니다.</Alert>;
+    return (
+      <Alert variant="info" className="my-5 text-center">
+        신고된 리뷰가 없습니다.
+      </Alert>
+    );
   }
 
   return (
-    <div style={{ padding: "2rem" }}>
-      <h2 className="mb-4">리뷰 신고 내역 목록</h2>
-      <Table striped bordered hover style={{ tableLayout: "fixed", width: "100%" }}>
+    <div className="p-4">
+      <h2 className="mb-4 fw-bold text-muted">리뷰 신고 내역 목록</h2>
+      <Table className="review-report-table" responsive>
         <thead>
-        <tr style={{ cursor: "default" }}>
-          <th style={{ width: "25%", wordBreak: "break-word" }}>신고자 이메일</th>
-          <th style={{ width: "10%", wordBreak: "break-word" }}>리뷰 ID</th>
-          <th style={{ width: "45%", wordBreak: "break-word" }}>신고 사유</th>
-          <th style={{ width: "20%", wordBreak: "break-word" }}>신고일</th>
-        </tr>
+          <tr>
+            <th>
+              <GoMail className="me-2" />
+              신고자 이메일
+            </th>
+            <th>
+              <BsCardText className="me-2" />
+              리뷰 ID
+            </th>
+            <th>
+              <BsCardText className="me-2" />
+              신고 사유
+            </th>
+            <th>
+              <BsCalendar2DateFill className="me-2" />
+              신고일
+            </th>
+          </tr>
         </thead>
         <tbody>
-        {reports.map(({ id, reporterEmail, reviewId, reason, reportedAt, reviewWriterId }) => (
-          <tr
-            key={id}
-            style={{ cursor: reviewWriterId ? "pointer" : "default" }}
-            onClick={() => {
-              if (reviewWriterId) {
-                navigate(`/review/my/${reviewWriterId}`);
-              } else {
-                alert("작성자 정보가 없습니다.");
-              }
-            }}
-            title={reviewWriterId ? "작성자 리뷰 보기" : undefined}
-          >
-            <td style={{ whiteSpace: "normal", wordBreak: "break-word" }}>{reporterEmail}</td>
-            <td style={{ whiteSpace: "normal", wordBreak: "break-word" }}>{reviewId}</td>
-            <td style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
-              {reason.length > 100
-                ? renderWithLineBreaks(reason.substring(0, 100)) + "..."
-                : renderWithLineBreaks(reason)}
-            </td>
-            <td style={{ whiteSpace: "normal", wordBreak: "break-word" }}>
-              {new Date(reportedAt).toLocaleString()}
-            </td>
-          </tr>
-        ))}
+          {reports.map(
+            ({
+              id,
+              reporterEmail,
+              reviewId,
+              reason,
+              reportedAt,
+              reviewWriterId,
+            }) => (
+              <tr
+                key={id}
+                className={reviewWriterId ? "clickable-row" : ""}
+                onClick={() => {
+                  if (reviewWriterId) {
+                    navigate(`/review/my/${reviewWriterId}`);
+                  } else {
+                    console.error("작성자 정보가 없어 이동할 수 없습니다.");
+                  }
+                }}
+                title={reviewWriterId ? "작성자 리뷰 보기" : undefined}
+              >
+                <td>
+                  <OverlayTrigger
+                    placement="top"
+                    overlay={
+                      <Tooltip id={`tooltip-email-${id}`}>
+                        {reporterEmail}
+                      </Tooltip>
+                    }
+                  >
+                    <span className="text-truncate d-block">
+                      {reporterEmail}
+                    </span>
+                  </OverlayTrigger>
+                </td>
+                <td>{reviewId}</td>
+                <td className="reason-cell">
+                  <OverlayTrigger
+                    placement="top"
+                    overlay={
+                      <Tooltip id={`tooltip-reason-${id}`}>{reason}</Tooltip>
+                    }
+                  >
+                    <div className="reason-text">{reason}</div>
+                  </OverlayTrigger>
+                </td>
+                <td>{reportedAt ? reportedAt.substring(0, 10) : "-"}</td>
+              </tr>
+            ),
+          )}
         </tbody>
       </Table>
     </div>
