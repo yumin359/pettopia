@@ -1,19 +1,17 @@
 import { useEffect, useState, useContext } from "react";
 import { Table, Alert, Spinner } from "react-bootstrap";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 export default function ReviewReportList() {
+  const { isAdmin, loading: loadingAuth } = useContext(AuthenticationContext);
   const [reports, setReports] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loadingReports, setLoadingReports] = useState(true);
   const [error, setError] = useState("");
-  const { isAdmin } = useContext(AuthenticationContext);
   const navigate = useNavigate();
 
-  if (!(typeof isAdmin === "function" ? isAdmin() : isAdmin)) {
-    return <Navigate to="/login" replace />;
-  }
+  // 🔹 모든 Hooks 최상위에서 호출
 
   useEffect(() => {
     async function fetchReports() {
@@ -29,28 +27,25 @@ export default function ReviewReportList() {
           setError("서버 오류로 신고 내역을 불러올 수 없습니다.");
         }
       } finally {
-        setLoading(false);
+        setLoadingReports(false);
       }
     }
     fetchReports();
   }, []);
 
-  function renderWithLineBreaks(text) {
-    return text.split('\n').map((line, i) => (
-      <span key={i}>
-        {line}
-        <br />
-      </span>
-    ));
-  }
-
-  if (loading) {
+  // 🔹 인증 상태 로딩 중이면 로딩 화면
+  if (loadingAuth || loadingReports) {
     return (
       <div className="text-center my-4">
         <Spinner animation="border" />
         <div>불러오는 중...</div>
       </div>
     );
+  }
+
+  // 🔹 admin 체크 후 접근 제한
+  if (!isAdmin()) {
+    return <Navigate to="/login" replace />;
   }
 
   if (error) {
@@ -60,6 +55,23 @@ export default function ReviewReportList() {
   if (reports.length === 0) {
     return <Alert variant="info">신고된 리뷰가 없습니다.</Alert>;
   }
+
+  function renderWithLineBreaks(text) {
+    return text.split("\n").map((line, i) => (
+      <span key={i}>
+        {line}
+        <br />
+      </span>
+    ));
+  }
+
+  const handleRowClick = (reviewWriterId) => {
+    if (reviewWriterId) {
+      navigate(`/review/my/${reviewWriterId}`);
+    } else {
+      alert("작성자 정보가 없습니다.");
+    }
+  };
 
   return (
     <div style={{ padding: "2rem" }}>
@@ -78,13 +90,7 @@ export default function ReviewReportList() {
           <tr
             key={id}
             style={{ cursor: reviewWriterId ? "pointer" : "default" }}
-            onClick={() => {
-              if (reviewWriterId) {
-                navigate(`/review/my/${reviewWriterId}`);
-              } else {
-                alert("작성자 정보가 없습니다.");
-              }
-            }}
+            onClick={() => handleRowClick(reviewWriterId)}
             title={reviewWriterId ? "작성자 리뷰 보기" : undefined}
           >
             <td style={{ whiteSpace: "normal", wordBreak: "break-word" }}>{reporterEmail}</td>

@@ -1,20 +1,16 @@
 import { useEffect, useState, useContext } from "react";
-import { Table, Alert, Spinner, Button } from "react-bootstrap";
+import { Table, Alert, Spinner } from "react-bootstrap";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import axios from "axios";
 
 export default function ServiceListPage() {
+  const { isAdmin, loading: loadingAuth } = useContext(AuthenticationContext);
   const [services, setServices] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loadingServices, setLoadingServices] = useState(true);
   const [error, setError] = useState("");
-  const { isAdmin } = useContext(AuthenticationContext);
-  const navigate = useNavigate();
 
-  if (!(typeof isAdmin === "function" ? isAdmin() : isAdmin)) {
-    return <Navigate to="/login" replace />;
-  }
-
+  // 🔹 모든 Hooks 최상위에서 호출
   useEffect(() => {
     async function fetchServices() {
       try {
@@ -27,31 +23,25 @@ export default function ServiceListPage() {
           setError("서버 오류로 문의 내역을 불러올 수 없습니다.");
         }
       } finally {
-        setLoading(false);
+        setLoadingServices(false);
       }
     }
     fetchServices();
   }, []);
 
-  // 삭제 함수
-  const handleDelete = async (id) => {
-    if (!window.confirm("정말 삭제하시겠습니까?")) return;
-    try {
-      await axios.delete(`/api/support/${id}`);
-      // 삭제 성공하면 리스트에서 해당 항목 제거
-      setServices((prev) => prev.filter((item) => item.id !== id));
-    } catch (err) {
-      alert("삭제 중 오류가 발생했습니다.");
-    }
-  };
-
-  if (loading) {
+  // 🔹 인증 상태 로딩 중이면 로딩 화면
+  if (loadingAuth || loadingServices) {
     return (
       <div className="text-center my-4">
         <Spinner animation="border" />
         <div>불러오는 중...</div>
       </div>
     );
+  }
+
+  // 🔹 인증 후 admin 체크
+  if (!isAdmin()) {
+    return <Navigate to="/login" replace />;
   }
 
   if (error) {
@@ -61,6 +51,16 @@ export default function ServiceListPage() {
   if (services.length === 0) {
     return <Alert variant="info">등록된 문의가 없습니다.</Alert>;
   }
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("정말 삭제하시겠습니까?")) return;
+    try {
+      await axios.delete(`/api/support/${id}`);
+      setServices((prev) => prev.filter((item) => item.id !== id));
+    } catch (err) {
+      alert("삭제 중 오류가 발생했습니다.");
+    }
+  };
 
   return (
     <div style={{ padding: "2rem" }}>
@@ -77,10 +77,17 @@ export default function ServiceListPage() {
         <tbody>
         {services.map(({ id, email, title, content, inserted_at }) => (
           <tr key={id}>
-            <td style={{ /* 이메일 + 삭제 버튼 flex 스타일 */ }}>
-    <span style={{ flexGrow: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-      {email}
-    </span>
+            <td style={{ display: "flex", alignItems: "center" }}>
+                <span
+                  style={{
+                    flexGrow: 1,
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {email}
+                </span>
               <button
                 onClick={() => handleDelete(id)}
                 style={{
@@ -126,7 +133,6 @@ export default function ServiceListPage() {
           </tr>
         ))}
         </tbody>
-
       </Table>
     </div>
   );
