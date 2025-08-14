@@ -401,7 +401,10 @@ export function MapDetail() {
                         <button
                           onClick={() => openReportModal(review)}
                           className="p-0 border-0 bg-transparent"
-                          style={{ cursor: user ? "pointer" : "not-allowed" }}
+                          style={{
+                            cursor: user ? "pointer" : "not-allowed",
+                            boxShadow: "none",
+                          }}
                           disabled={!user}
                           title={user ? "리뷰 신고하기" : "로그인 후 이용 가능"}
                         >
