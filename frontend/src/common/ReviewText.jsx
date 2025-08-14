@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import "../styles/ServiceList.css";
 
 export function ReviewText({ text }) {
   const [expanded, setExpanded] = useState(false);
@@ -36,6 +37,7 @@ export function ReviewText({ text }) {
             cursor: "pointer",
             fontWeight: "bold",
           }}
+          className="text-hover"
         >
           {expanded ? "간략히" : "더보기"}
         </button>
