@@ -163,7 +163,10 @@ export function MapDetail() {
   }, [reviews, searchParams]);
 
   return (
-    <div className="container-fluid px-4 py-4" style={{ maxWidth: "1400px" }}>
+    <div
+      className="map-detail-container container-fluid px-4 py-4"
+      style={{ maxWidth: "1400px" }}
+    >
       {/* 헤더 섹션 */}
       <div className="row mb-5">
         <div className="col-12">
