@@ -267,7 +267,8 @@ export function MemberEdit() {
         <Col
           lg={5}
           md={12}
-          className="p-4 d-flex flex-column bg-dark text-light"
+          className="p-4 d-flex flex-column"
+          style={{ backgroundColor: "#F6ECE6" }}
         >
           <div className="mb-4" />
           <div className="d-flex justify-content-between align-items-center mb-3">
