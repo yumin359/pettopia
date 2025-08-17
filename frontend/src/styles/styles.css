@@ -476,19 +476,19 @@ body::before {
 
 .map-detail-container .card-header.bg-info {
     background: #6c8bfa !important;
-    color: white !important;
+    /*color: white !important;*/
 }
 
 .map-detail-container .card-header.bg-success {
     background: #51cf66 !important;
-    color: white !important;
+    /*color: white !important;*/
 }
 
 .map-detail-container .card-title {
     font-weight: 700 !important;
     font-size: 1.3rem !important;
     margin-bottom: 5px !important;
-    color: white !important;
+    /*color: white !important;*/
 }
 
 /* ========================================
