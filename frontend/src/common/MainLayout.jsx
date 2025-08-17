@@ -18,7 +18,7 @@ function AdSpace({ width = 250, height = 400, position }) {
         justifyContent: "center",
         borderRadius: "0px",
         marginBottom: "20px",
-        boxShadow: "3px 3px 0px 0px #2C2D31FF",
+        boxShadow: "5px 5px 0px 0px #2C2D31FF",
       }}
     >
       <div
