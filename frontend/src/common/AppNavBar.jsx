@@ -1,10 +1,11 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useContext, useEffect, useRef, useState } from "react";
-import { Button, Container, Nav, Navbar } from "react-bootstrap";
+import { Button, Container, Nav, Navbar, Modal } from "react-bootstrap";
 import { AuthenticationContext } from "./AuthenticationContextProvider.jsx";
 import { toast } from "react-toastify";
 import { FaUserCircle } from "react-icons/fa";
 import { createPortal } from "react-dom";
+import { MemberLogin } from "../feature/member/MemberLogin.jsx";
 
 export function AppNavBar() {
   const { user, logout, isAdmin } = useContext(AuthenticationContext);
@@ -20,6 +21,13 @@ export function AppNavBar() {
   const dropdownRef = useRef(null);
   const navbarRef = useRef(null); // 네비바 전체 참조 추가
   const hoverTimeoutRef = useRef(null); // 타임아웃 참조 추가
+
+  // 1. 로그인 모달의 열림/닫힘 상태를 관리할 state 추가
+  const [showLoginModal, setShowLoginModal] = useState(false);
+
+  // 2. 모달을 열고 닫는 핸들러 함수 추가
+  const handleCloseLoginModal = () => setShowLoginModal(false);
+  const handleShowLoginModal = () => setShowLoginModal(true);
 
   // 햄버거 메뉴 토글
   const handleToggle = () => {
@@ -303,8 +311,7 @@ export function AppNavBar() {
                 </div>
               ) : (
                 <Button
-                  as={Link}
-                  to="/login"
+                  onClick={handleShowLoginModal}
                   className="fw-bold"
                   style={{
                     boxShadow: "none",
@@ -397,6 +404,26 @@ export function AppNavBar() {
           </Navbar.Collapse>
         </Container>
       </Navbar>
+
+      {/* 4. 화면에 렌더링될 Modal 컴포넌트 추가 */}
+      <Modal
+        show={showLoginModal}
+        onHide={handleCloseLoginModal}
+        centered
+        className="login-modal-neo"
+      >
+        <Modal.Header closeButton>
+          <Modal.Title
+            className="login-title"
+            style={{ width: "100%", textAlign: "center" }}
+          >
+            🐾 PETOPIA 로그인
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <MemberLogin onLoginSuccess={handleCloseLoginModal} isModal={true} />
+        </Modal.Body>
+      </Modal>
     </>
   );
 }

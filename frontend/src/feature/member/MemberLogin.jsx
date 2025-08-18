@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
 import "../../styles/member-login.css";
 
-export function MemberLogin() {
+export function MemberLogin({ onLoginSuccess, isModal }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -41,6 +41,11 @@ export function MemberLogin() {
 
       login(token);
       toast.success("로그인 되었습니다.");
+
+      if (onLoginSuccess) {
+        onLoginSuccess();
+      }
+
       navigate("/");
     } catch (err) {
       const message =
@@ -60,14 +65,18 @@ export function MemberLogin() {
     window.location.href = kakaoAuthUrl;
   }
 
-  return (
+  const loginFormContent = (
     <div className="login-container">
-      <div className="login-card">
+      <div
+        className="login-card"
+        style={isModal ? { boxShadow: "none", border: "none" } : {}}
+      >
         {/* 헤더 섹션 */}
-        <div className="login-header">
-          <h1 className="login-title">🐾 PETOPIA</h1>
-          <p className="login-subtitle">로그인</p>
-        </div>
+        {!isModal && (
+          <div className="login-header">
+            <h1 className="login-title">🐾 PETOPIA</h1>
+          </div>
+        )}
 
         {/* 에러 메시지 */}
         {errorMsg && (
@@ -150,6 +159,16 @@ export function MemberLogin() {
           </div>
         </div>
       </div>
+    </div>
+  );
+
+  return isModal ? (
+    loginFormContent // 모달일 경우, 전체 페이지 컨테이너 없이 내용만 반환
+  ) : (
+    <div className="login-container">
+      {" "}
+      {/* 페이지일 경우, 기존처럼 전체 컨테이너와 함께 반환 */}
+      {loginFormContent}
     </div>
   );
 }
