@@ -4,6 +4,7 @@ import { Carousel, Col, Row } from "react-bootstrap";
 import axios from "axios";
 import { BoardListMini } from "../main/BoardListMini.jsx";
 import { ReviewCarousel } from "../main/ReviewCarousel.jsx";
+import "../../styles/BoardLayout.css";
 
 const sitelogo1 = "/sitelogo1.png";
 const sitelogo2 = "/sitelogo2.png";

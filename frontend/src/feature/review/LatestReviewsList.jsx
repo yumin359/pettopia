@@ -14,6 +14,7 @@ import { ReviewLikeContainer } from "../like/ReviewLikeContainer.jsx";
 import ReportModal from "../report/ReportModal.jsx";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
 import { toast } from "react-toastify";
+import "../../styles/LatestReviewsList.css";
 
 export function LatestReviewsList() {
   const { user } = useContext(AuthenticationContext);

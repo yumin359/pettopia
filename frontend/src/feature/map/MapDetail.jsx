@@ -13,6 +13,7 @@ import ReviewStatsCard from "./ReviewStatusCard.jsx";
 import ReportModal from "../report/ReportModal.jsx";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import "../../styles/MapDetail.css";
 
 export function MapDetail() {
   const { id } = useParams();

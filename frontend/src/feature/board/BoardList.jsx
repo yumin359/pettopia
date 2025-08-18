@@ -20,6 +20,7 @@ import {
   FaThumbtack,
 } from "react-icons/fa";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
+import "../../styles/BoardList.css";
 
 export function BoardList() {
   const [boardList, setBoardList] = useState(null);
