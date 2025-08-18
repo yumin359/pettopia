@@ -53,6 +53,14 @@ export function AuthenticationContextProvider({ children }) {
   const hasAccess = (email) => user && user.email === email;
   const isAdmin = () => user?.scope?.includes("admin");
 
+  // memberEdit에서 필요한 것
+  const updateUser = useCallback((newUserData) => {
+    setUser((prevUser) => {
+      if (!prevUser) return null;
+      return { ...prevUser, ...newUserData };
+    });
+  }, []);
+
   // axios interceptor: 모든 요청에 token 붙이기
   axios.interceptors.request.use((config) => {
     const token = localStorage.getItem("token");
@@ -62,7 +70,7 @@ export function AuthenticationContextProvider({ children }) {
 
   return (
     <AuthenticationContext.Provider
-      value={{ user, login, logout, hasAccess, isAdmin, loading }}
+      value={{ user, login, logout, hasAccess, isAdmin, loading, updateUser }}
     >
       {children}
     </AuthenticationContext.Provider>
