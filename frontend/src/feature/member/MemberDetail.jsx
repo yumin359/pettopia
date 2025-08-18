@@ -105,149 +105,76 @@ export function MemberDetail() {
   const defaultImage = "/user.png";
 
   return (
-    <div className="p-0 h-100">
+    <div className="member-detail-container p-0 h-100">
       <Row className="h-100 g-0">
-        {/* 왼쪽 컬럼: 회원 정보 */}
-        <Col
-          lg={5}
-          md={12}
-          className="p-4 d-flex flex-column"
-          style={{ backgroundColor: "#F6ECE6" }}
-        >
-          <div className="mb-4" />
-          <div className="d-flex justify-content-between align-items-center mb-3">
-            <h3 className="fw-bold mb-0">회원 정보</h3>
-            <small className="text-muted" style={{ fontSize: "0.85rem" }}>
-              {isAdminFlag ? (
-                <span className="badge bg-danger">관리자</span>
-              ) : (
-                <span className="badge bg-secondary">일반 사용자</span>
-              )}
-            </small>
+        <Col lg={5} md={12} className="member-info-column">
+          {/* 헤더 */}
+          <div className="brutal-card member-info-header">
+            <h3 className="member-info-title">👤 회원 정보</h3>
+            {isAdminFlag && <span className="member-role-badge">관리자</span>}
           </div>
 
-          <div className="border-0 mb-4">
-            <div className="mb-4 d-flex justify-content-center">
+          {/* 프로필 정보 섹션 */}
+          <div className="brutal-card profile-section">
+            <div className="profile-image-wrapper">
               <img
                 src={profileImageUrl || defaultImage}
                 alt="프로필 이미지"
-                className="shadow rounded-circle"
-                style={{
-                  width: "150px",
-                  height: "150px",
-                  objectFit: "cover",
-                }}
+                className="profile-image"
               />
             </div>
-
-            {!profileImageUrl && <br />}
-
-            <FormGroup controlId="email1" className="mb-3">
-              <FormLabel>이메일</FormLabel>
-              <FormControl
-                readOnly
-                value={member.email}
-                className="bg-light border-0"
-                style={{
-                  userSelect: "text",
-                  boxShadow: "none",
-                  outline: "none",
-                }}
-                onFocus={(e) => e.target.blur()}
-              />
-            </FormGroup>
-
-            <FormGroup controlId="nickName1" className="mb-3">
-              <FormLabel>별명</FormLabel>
-              <FormControl
-                readOnly
-                value={member.nickName}
-                className="bg-light border-0"
-                style={{
-                  userSelect: "text",
-                  boxShadow: "none",
-                  outline: "none",
-                }}
-                onFocus={(e) => e.target.blur()}
-              />
-            </FormGroup>
-
-            <FormGroup controlId="info1" className="mb-3">
-              <FormLabel>자기소개</FormLabel>
-              <FormControl
-                as="textarea"
-                readOnly
-                value={member.info || ""}
-                className="bg-light border-0"
-                style={{
-                  minHeight: "120px",
-                  resize: "none",
-                  userSelect: "text",
-                  fontSize: "1rem",
-                  lineHeight: 1.5,
-                }}
-                onFocus={(e) => e.target.blur()}
-              />
-            </FormGroup>
-
-            <FormGroup controlId="inserted1" className="mb-3">
-              <FormLabel>가입일시</FormLabel>
-              <FormControl
-                readOnly
-                value={formattedInsertedAt}
-                className="bg-light border-0"
-                style={{
-                  userSelect: "text",
-                  boxShadow: "none",
-                  outline: "none",
-                }}
-                onFocus={(e) => e.target.blur()}
-              />
-            </FormGroup>
-
-            {hasAccess(member.email) && (
-              <div className="d-flex justify-content-start gap-2 flex-wrap">
-                <Button
-                  variant="outline-danger"
-                  onClick={handleModalButtonClick}
-                  className="d-flex align-items-center gap-1"
-                >
-                  탈퇴
-                </Button>
-                <Button
-                  variant="outline-info"
-                  onClick={() => navigate(`/member/edit?email=${member.email}`)}
-                  className="d-flex align-items-center gap-1"
-                >
-                  수정
-                </Button>
-
-                {!isAdminFlag && (
-                  <Button
-                    variant="outline-secondary"
-                    onClick={handleLogoutClick}
-                    className="d-flex align-items-center gap-1"
-                  >
-                    로그아웃
-                  </Button>
-                )}
-
-                <Button
-                  variant="outline-success"
-                  onClick={() =>
-                    setRightColumnView(
-                      rightColumnView === "calendar" ? "myReviews" : "calendar",
-                    )
-                  }
-                  className="d-flex align-items-center gap-1"
-                >
-                  {rightColumnView === "calendar"
-                    ? "내가 쓴 리뷰 보기"
-                    : "달력으로 보기"}
-                </Button>
+            <div className="profile-main-info">
+              <div className="info-group">
+                <div className="info-label-brutal">이메일</div>
+                <div className="info-value-brutal">{member.email}</div>
               </div>
-            )}
+              <div className="info-group">
+                <div className="info-label-brutal">별명</div>
+                <div className="info-value-brutal">{member.nickName}</div>
+              </div>
+            </div>
           </div>
+
+          <div className="brutal-card">
+            <div className="info-group">
+              <div className="info-label-brutal">자기소개</div>
+              <div className="info-value-brutal textarea">
+                {member.info || "자기소개가 없습니다."}
+              </div>
+            </div>
+            <div className="info-group">
+              <div className="info-label-brutal">가입일시</div>
+              <div className="info-value-brutal">{formattedInsertedAt}</div>
+            </div>
+          </div>
+
+          {/* 액션 버튼들 */}
+          {hasAccess(member.email) && (
+            <div className="action-buttons-container">
+              <Button
+                onClick={() => navigate(`/member/edit?email=${member.email}`)}
+                className="btn-brutal btn-edit"
+              >
+                수정
+              </Button>
+              <Button
+                onClick={() =>
+                  setRightColumnView(
+                    rightColumnView === "calendar" ? "myReviews" : "calendar",
+                  )
+                }
+                className="btn-brutal btn-view"
+              >
+                {rightColumnView === "calendar" ? "리뷰 보기" : "달력 보기"}
+              </Button>
+              <Button
+                onClick={handleModalButtonClick}
+                className="btn-brutal btn-delete"
+              >
+                탈퇴
+              </Button>
+            </div>
+          )}
         </Col>
 
         {/* 오른쪽 컬럼 */}
