@@ -1,19 +1,10 @@
-import {
-  Button,
-  Col,
-  FormControl,
-  FormGroup,
-  FormLabel,
-  FormText,
-  ListGroup,
-  Row,
-  Spinner,
-} from "react-bootstrap";
+import { Button, Form, FormText, Spinner } from "react-bootstrap";
 import { useRef, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router";
-import { FaFileAlt, FaTrashAlt, FaPlus } from "react-icons/fa";
+import { FaCheckCircle, FaPaw, FaPlus } from "react-icons/fa";
+import "../../styles/MemberAdd.css";
 
 export function MemberAdd() {
   // 입력값 상태 정의
@@ -22,7 +13,7 @@ export function MemberAdd() {
   const [password, setPassword] = useState("");
   const [password2, setPassword2] = useState("");
   const [nickName, setNickName] = useState("");
-  const [info, setInfo] = useState("");
+  const [info] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const navigate = useNavigate();
 
@@ -114,151 +105,150 @@ export function MemberAdd() {
   const currentProfilePreview = files.length > 0 ? files[0].previewUrl : null;
 
   return (
-    <Row className="justify-content-center">
-      <Col xs={12} md={8} lg={6}>
-        <h2 className="my-4">회원 가입</h2>
-
-        {/* 프로필 사진 업로드 섹션 */}
-        <FormGroup className="mb-4">
-          <FormLabel className="d-block text-center mb-3">
-            프로필 사진
-          </FormLabel>
-          <div className="d-flex justify-content-center">
-            {/* 프로필 이미지 미리보기 또는 아이콘 */}
-            <div
-              className="profile-upload-area shadow rounded-circle d-flex justify-content-center align-items-center"
-              onClick={handleProfileClick}
-              style={{
-                width: "150px", // 원하는 크기
-                height: "150px", // 원하는 크기
-                border: "2px solid #ddd",
-                cursor: "pointer",
-                overflow: "hidden", // 이미지가 영역을 벗어나지 않도록
-                backgroundColor: currentProfilePreview
-                  ? "transparent"
-                  : "#f8f9fa", // 배경색
-              }}
-            >
-              {currentProfilePreview ? (
-                <img
-                  src={currentProfilePreview}
-                  alt="프로필 미리보기"
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                    cursor: "pointer",
-                  }}
-                />
-              ) : (
-                <FaPlus size={40} color="#6c757d" /> // 이미지가 없을 때 + 아이콘
-              )}
+    <>
+      <div className="signup-page-wrapper">
+        <div className="signup-container-v2">
+          {/* 왼쪽: 환영 패널 */}
+          <div className="signup-welcome-panel">
+            <div className="welcome-content">
+              <h1 className="welcome-logo">🐾 PETOPIA</h1>
+              {/* 2. 환영 메시지를 더 따뜻하게 변경 */}
+              <h2>
+                펫토피아의
+                <br />
+                가족이 되세요!
+              </h2>
+              <p>따뜻한 커뮤니티가 당신을 기다립니다.</p>
+              <ul className="welcome-benefits">
+                {/* 3. 아이콘을 FaPaw로 변경 */}
+                <li>
+                  <FaPaw /> 전국의 펫플레이스 정보 탐색
+                </li>
+                <li>
+                  <FaPaw /> 나만의 장소 리뷰 및 공유
+                </li>
+                <li>
+                  <FaPaw /> 다른 반려인들과의 소통
+                </li>
+              </ul>
             </div>
-
-            {/* 실제 파일 선택 input (숨김) */}
-            <FormControl
-              type="file"
-              ref={fileInputRef} // useRef로 참조
-              onChange={handleFileChange}
-              style={{ display: "none" }} // 숨김
-              accept="image/*" // 이미지 파일만 선택하도록 제한
-              disabled={isProcessing}
-            />
           </div>
-        </FormGroup>
 
-        <hr />
-        {/* 프로필 사진 섹션과 다른 폼 필드 구분 */}
+          {/* 오른쪽: 가입 폼 패널 */}
+          <div className="signup-form-panel">
+            <Form>
+              <Form.Group className="mb-4 text-center">
+                <div
+                  className="profile-uploader-neo rounded-circle"
+                  onClick={handleProfileClick}
+                >
+                  {currentProfilePreview ? (
+                    <img
+                      src={currentProfilePreview}
+                      alt="프로필 미리보기"
+                      className="profile-preview-img"
+                    />
+                  ) : (
+                    <FaPlus size={40} color="#999" />
+                  )}
+                </div>
+                <p className="form-label-neo mb-3 mt-4">프로필 사진 (선택)</p>
+                <Form.Control
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleFileChange}
+                  style={{ display: "none" }}
+                  accept="image/*"
+                  disabled={isProcessing}
+                />
+              </Form.Group>
 
-        {/* 이메일 */}
-        <FormGroup className="mb-3" controlId="email1">
-          <FormLabel>이메일</FormLabel>
-          <FormControl
-            type="text"
-            value={email}
-            maxLength={255}
-            placeholder="예: user@example.com"
-            onChange={(e) => setEmail(e.target.value.replace(/\s/g, ""))}
-          />
-          {email && !isEmailValid && (
-            <FormText className="text-danger">
-              이메일 형식이 올바르지 않습니다.
-            </FormText>
-          )}
-        </FormGroup>
+              <Form.Group className="mb-3">
+                <Form.Label className="form-label-neo">이메일</Form.Label>
+                <Form.Control
+                  type="text"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value.replace(/\s/g, ""))}
+                  className="form-input-neo"
+                  placeholder="user@example.com"
+                />
+                {email && !isEmailValid && (
+                  <FormText className="text-danger fw-bold">
+                    이메일 형식이 올바르지 않습니다.
+                  </FormText>
+                )}
+              </Form.Group>
 
-        {/* 비밀번호 */}
-        <FormGroup className="mb-3" controlId="password1">
-          <FormLabel>비밀번호</FormLabel>
-          <FormControl
-            type="password"
-            value={password}
-            maxLength={255}
-            placeholder="8자 이상, 영문 대/소문자, 숫자, 특수문자 포함"
-            onChange={(e) => setPassword(e.target.value.replace(/\s/g, ""))}
-          />
-          {password && !isPasswordValid && (
-            <FormText className="text-danger">
-              비밀번호는 8자 이상, 영문 대소문자, 숫자, 특수문자를 포함해야
-              합니다.
-            </FormText>
-          )}
-        </FormGroup>
+              <Form.Group className="mb-3">
+                <Form.Label className="form-label-neo">비밀번호</Form.Label>
+                <Form.Control
+                  type="password"
+                  value={password}
+                  onChange={(e) =>
+                    setPassword(e.target.value.replace(/\s/g, ""))
+                  }
+                  className="form-input-neo"
+                  placeholder="8자 이상, 대/소문자, 숫자, 특수문자 포함"
+                />
+                {password && !isPasswordValid && (
+                  <FormText className="text-danger fw-bold">
+                    비밀번호는 8자 이상, 영문 대소문자, 숫자, 특수문자를
+                    포함해야 합니다.
+                  </FormText>
+                )}
+              </Form.Group>
 
-        {/* 비밀번호 확인 */}
-        <FormGroup className="mb-3" controlId="password2">
-          <FormLabel>비밀번호 확인</FormLabel>
-          <FormControl
-            type="password"
-            value={password2}
-            maxLength={255}
-            placeholder="비밀번호를 다시 입력하세요"
-            onChange={(e) => setPassword2(e.target.value.replace(/\s/g, ""))}
-          />
-          {password2 && !isPasswordMatch && (
-            <FormText className="text-danger">
-              비밀번호가 일치하지 않습니다.
-            </FormText>
-          )}
-        </FormGroup>
+              <Form.Group className="mb-3">
+                <Form.Label className="form-label-neo">
+                  비밀번호 확인
+                </Form.Label>
+                <Form.Control
+                  type="password"
+                  value={password2}
+                  onChange={(e) =>
+                    setPassword2(e.target.value.replace(/\s/g, ""))
+                  }
+                  className="form-input-neo"
+                  placeholder="비밀번호를 다시 한번 입력해주세요"
+                />
+                {password2 && !isPasswordMatch && (
+                  <FormText className="text-danger fw-bold">
+                    비밀번호가 일치하지 않습니다.
+                  </FormText>
+                )}
+              </Form.Group>
 
-        <hr />
-        {/* 닉네임 */}
-        <FormGroup className="mb-3" controlId="nickName1">
-          <FormLabel>별명</FormLabel>
-          <FormControl
-            value={nickName}
-            maxLength={20}
-            placeholder="2~20자, 한글/영문/숫자만 사용 가능"
-            onChange={(e) => setNickName(e.target.value.replace(/\s/g, ""))}
-          />
-          {nickName && !isNickNameValid && (
-            <FormText className="text-danger">
-              별명은 2~20자, 한글/영문/숫자만 사용할 수 있습니다.
-            </FormText>
-          )}
-        </FormGroup>
+              <Form.Group className="mb-3">
+                <Form.Label className="form-label-neo">별명</Form.Label>
+                <Form.Control
+                  value={nickName}
+                  onChange={(e) =>
+                    setNickName(e.target.value.replace(/\s/g, ""))
+                  }
+                  className="form-input-neo"
+                  placeholder="2~20자, 한글/영문/숫자"
+                />
+                {nickName && !isNickNameValid && (
+                  <FormText className="text-danger fw-bold">
+                    별명은 2~20자, 한글/영문/숫자만 사용할 수 있습니다.
+                  </FormText>
+                )}
+              </Form.Group>
 
-        {/* 자기 소개 */}
-        <FormGroup className="mb-3" controlId="info1">
-          <FormLabel>자기 소개</FormLabel>
-          <FormControl
-            as="textarea"
-            rows={3}
-            value={info}
-            maxLength={3000}
-            placeholder="자기 소개를 입력하세요. 1000자 이내. (선택)"
-            onChange={(e) => setInfo(e.target.value)}
-          />
-        </FormGroup>
-
-        {/* 가입 버튼 */}
-        <div className="mb-3">
-          <Button onClick={handleSaveClick} disabled={disabled}>
-            {isProcessing && <Spinner size="sm" />}가입
-          </Button>
+              <div className="mt-4">
+                <Button
+                  onClick={handleSaveClick}
+                  disabled={disabled}
+                  className="btn-neo btn-primary-neo w-100"
+                >
+                  {isProcessing && <Spinner size="sm" className="me-2" />}
+                  가입하기
+                </Button>
+              </div>
+            </Form>
+          </div>
         </div>
-      </Col>
-    </Row>
+      </div>
+    </>
   );
 }
