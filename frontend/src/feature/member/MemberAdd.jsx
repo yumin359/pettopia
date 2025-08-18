@@ -13,12 +13,12 @@ export function MemberAdd() {
   const [password, setPassword] = useState("");
   const [password2, setPassword2] = useState("");
   const [nickName, setNickName] = useState("");
-  const [info] = useState("");
+  const [info, setInfo] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const navigate = useNavigate();
 
   // 숨겨진 파일 인풋을 참조하기 위한 useRef
-  const fileInputRef = useRef(null); // 추가: useRef 훅
+  const fileInputRef = useRef(null);
 
   // 정규식 (백엔드와 동일한 조건)
   const emailRegex = /^[\w.-]+@[\w.-]+\.[a-zA-Z]{2,}$/;
@@ -43,18 +43,16 @@ export function MemberAdd() {
 
   // 파일 첨부 시 처리하는 함수 (프로필 사진은 하나만)
   const handleFileChange = (e) => {
-    const selectedFile = e.target.files[0]; // 선택된 파일 중 첫 번째만 가져옵니다.
+    const selectedFile = e.target.files[0];
     if (selectedFile) {
-      // 새로운 파일을 받으면 기존 파일들을 대체
       setFiles([
         {
           file: selectedFile,
-          previewUrl: URL.createObjectURL(selectedFile), // 이미지 미리보기 URL 생성
+          previewUrl: URL.createObjectURL(selectedFile),
         },
       ]);
     } else {
-      // 파일 선택이 취소된 경우
-      setFiles([]); // 파일 목록 초기화
+      setFiles([]);
     }
   };
 
@@ -72,13 +70,10 @@ export function MemberAdd() {
     formData.append("nickName", nickName);
     formData.append("info", info);
 
-    // files 배열에 프로필 이미지가 있다면 첫 번째 파일만 추가
     if (files.length > 0) {
       formData.append("files", files[0].file);
     }
-    // files.forEach((fileObj) => formData.append("files", fileObj.file));
 
-    // 걍 방식 차이인가?
     axios
       .post("/api/member/add", formData, {
         headers: { "Content-type": "multipart/form-data" },
@@ -105,30 +100,39 @@ export function MemberAdd() {
   const currentProfilePreview = files.length > 0 ? files[0].previewUrl : null;
 
   return (
-    <>
-      <div className="signup-page-wrapper">
-        <div className="signup-container-v2">
+    <div className="signup-page-wrapper">
+      <div className="signup-container-v2">
+        {/* 2단 레이아웃 그리드 */}
+        <div className="signup-grid">
           {/* 왼쪽: 환영 패널 */}
           <div className="signup-welcome-panel">
             <div className="welcome-content">
               <h1 className="welcome-logo">🐾 PETOPIA</h1>
-              {/* 2. 환영 메시지를 더 따뜻하게 변경 */}
               <h2>
                 펫토피아의
                 <br />
                 가족이 되세요!
               </h2>
-              <p>따뜻한 커뮤니티가 당신을 기다립니다.</p>
+              <p>
+                반려동물과 함께하는 특별한 순간들을 공유하고, 전국의
+                펫플레이스를 탐험해보세요.
+              </p>
               <ul className="welcome-benefits">
-                {/* 3. 아이콘을 FaPaw로 변경 */}
                 <li>
-                  <FaPaw /> 전국의 펫플레이스 정보 탐색
+                  <FaPaw size={18} />
+                  <span>전국의 펫플레이스 정보 탐색</span>
                 </li>
                 <li>
-                  <FaPaw /> 나만의 장소 리뷰 및 공유
+                  <FaPaw size={18} />
+                  <span>나만의 장소 리뷰 및 공유</span>
                 </li>
                 <li>
-                  <FaPaw /> 다른 반려인들과의 소통
+                  <FaPaw size={18} />
+                  <span>다른 반려인들과의 소통</span>
+                </li>
+                <li>
+                  <FaPaw size={18} />
+                  <span>반려동물 케어 정보 교환</span>
                 </li>
               </ul>
             </div>
@@ -139,7 +143,7 @@ export function MemberAdd() {
             <Form>
               <Form.Group className="mb-4 text-center">
                 <div
-                  className="profile-uploader-neo rounded-circle"
+                  className="profile-uploader-neo"
                   onClick={handleProfileClick}
                 >
                   {currentProfilePreview ? (
@@ -149,10 +153,10 @@ export function MemberAdd() {
                       className="profile-preview-img"
                     />
                   ) : (
-                    <FaPlus size={40} color="#999" />
+                    <FaPlus size={30} color="#999" />
                   )}
                 </div>
-                <p className="form-label-neo mb-3 mt-4">프로필 사진 (선택)</p>
+                <p className="form-label-neo mb-3 mt-3">프로필 사진 (선택)</p>
                 <Form.Control
                   type="file"
                   ref={fileInputRef}
@@ -218,7 +222,7 @@ export function MemberAdd() {
                 )}
               </Form.Group>
 
-              <Form.Group className="mb-3">
+              <Form.Group className="mb-4">
                 <Form.Label className="form-label-neo">별명</Form.Label>
                 <Form.Control
                   value={nickName}
@@ -235,6 +239,26 @@ export function MemberAdd() {
                 )}
               </Form.Group>
 
+              <Form.Group className="mb-4">
+                <Form.Label className="form-label-neo">자기소개</Form.Label>
+                <Form.Control
+                  as="textarea"
+                  rows={3}
+                  value={info}
+                  maxLength={1000}
+                  placeholder="자기소개를 입력하세요. 1000자 이내 (선택)"
+                  onChange={(e) => setInfo(e.target.value)}
+                  className="form-input-neo"
+                  style={{ resize: "none" }}
+                />
+                <div
+                  className="text-end text-muted mt-1"
+                  style={{ fontSize: "0.8rem" }}
+                >
+                  {info.length} / 1000
+                </div>
+              </Form.Group>
+
               <div className="mt-4">
                 <Button
                   onClick={handleSaveClick}
@@ -249,6 +273,6 @@ export function MemberAdd() {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
