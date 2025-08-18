@@ -13,6 +13,7 @@ import { FaTrash } from "react-icons/fa";
 import axios from "axios";
 import "../../styles/ReviewReportList.css";
 import { ReviewText } from "../../common/ReviewText.jsx";
+import { toast } from "react-toastify";
 
 export default function ReviewReportList() {
   const { isAdmin, loading: loadingAuth } = useContext(AuthenticationContext);
@@ -72,22 +73,23 @@ export default function ReviewReportList() {
           ...getAuthHeader(),
         },
       });
+      toast.success("신고 삭제 완료되었습니다.");
 
       // 성공하면 로컬 상태에서 제거
       setReports((prev) => prev.filter((r) => String(r.id) !== String(id)));
     } catch (err) {
       console.error(err);
       if (err.response?.status === 401) {
-        alert("로그인이 필요합니다.");
+        toast.error("로그인이 필요합니다.");
       } else if (err.response?.status === 403) {
-        alert("권한이 없습니다.");
+        toast.error("권한이 없습니다.");
       } else {
         // 서버가 반환한 텍스트가 있으면 보여주기
         const message =
           err.response?.data ||
           err.response?.data?.message ||
           "삭제 중 오류가 발생했습니다.";
-        alert(message);
+        toast.error(message);
       }
     } finally {
       setDeletingId(null);
@@ -121,7 +123,7 @@ export default function ReviewReportList() {
     if (reviewWriterId) {
       navigate(`/review/my/${reviewWriterId}?focusReviewId=${reviewId}`);
     } else {
-      alert("작성자 정보가 없습니다.");
+      toast.error("작성자 정보가 없습니다.");
     }
   };
 
