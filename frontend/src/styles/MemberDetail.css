@@ -76,15 +76,15 @@
 
 .profile-image-wrapper {
     border: var(--brutal-border);
-    padding: 6px;
+    padding: 0;
     background-color: white;
     flex-shrink: 0;
     box-shadow: var(--brutal-shadow-sm);
 }
 
 .profile-image {
-    width: 80px; /* 프로필 이미지 크기 줄임 */
-    height: 80px;
+    width: 120px;
+    height: 120px;
     object-fit: cover;
     display: block;
 }

@@ -75,11 +75,11 @@ export function MemberDetail() {
     }
   }
 
-  function handleLogoutClick() {
-    logout();
-    navigate("/login");
-    toast("로그아웃 되었습니다.", { type: "success" });
-  }
+  // function handleLogoutClick() {
+  //   logout();
+  //   navigate("/login");
+  //   toast("로그아웃 되었습니다.", { type: "success" });
+  // }
 
   if (!member) {
     return (
