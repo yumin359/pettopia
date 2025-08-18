@@ -6,6 +6,7 @@ import {
   OverlayTrigger,
   Tooltip,
   Button,
+  Modal,
 } from "react-bootstrap";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
 import { Navigate, useNavigate } from "react-router-dom";
@@ -21,6 +22,8 @@ export default function ReviewReportList() {
   const [loadingReports, setLoadingReports] = useState(true);
   const [error, setError] = useState("");
   const [deletingId, setDeletingId] = useState(null); // 삭제중인 id
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [reportToDelete, setReportToDelete] = useState(null);
   const navigate = useNavigate();
 
   // 토큰을 읽어 Authorization 헤더 객체 반환 (프로젝트에 맞게 수정 가능)
@@ -55,28 +58,37 @@ export default function ReviewReportList() {
     fetchReports();
   }, []);
 
-  // 삭제 처리 함수 (버튼 클릭 시 호출)
-  async function handleDeleteReport(event, id) {
-    // 버튼 클릭시 부모 tr의 onClick(navigate) 막기
+  // 모달 열기
+  const handleShowDeleteModal = (event, id) => {
     event.stopPropagation();
+    setReportToDelete(id);
+    setShowDeleteModal(true);
+  };
 
-    const ok = window.confirm(
-      "이 신고를 정말 삭제하시겠습니까? (되돌릴 수 없습니다)",
-    );
-    if (!ok) return;
+  // 모달 닫기
+  const handleCloseDeleteModal = () => {
+    setShowDeleteModal(false);
+    setReportToDelete(null); // 상태 초기화
+  };
+
+  // 삭제 처리 함수 (버튼 클릭 시 호출)
+  async function handleDeleteReport() {
+    if (!reportToDelete) return;
 
     try {
-      setDeletingId(id);
-      await axios.delete(`/api/review/${id}`, {
+      setDeletingId(reportToDelete);
+      await axios.delete(`/api/review/${reportToDelete}`, {
         headers: {
           "Content-Type": "application/json",
           ...getAuthHeader(),
         },
       });
-      toast.success("신고 삭제 완료되었습니다.");
 
+      toast.success("신고 삭제 완료되었습니다.");
       // 성공하면 로컬 상태에서 제거
-      setReports((prev) => prev.filter((r) => String(r.id) !== String(id)));
+      setReports((prev) =>
+        prev.filter((r) => String(r.id) !== String(reportToDelete)),
+      );
     } catch (err) {
       console.error(err);
       if (err.response?.status === 401) {
@@ -93,6 +105,7 @@ export default function ReviewReportList() {
       }
     } finally {
       setDeletingId(null);
+      handleCloseDeleteModal();
     }
   }
 
@@ -172,7 +185,7 @@ export default function ReviewReportList() {
                       <Button
                         variant="outline-danger"
                         size="sm"
-                        onClick={(e) => handleDeleteReport(e, id)}
+                        onClick={(e) => handleShowDeleteModal(e, id)}
                         disabled={deletingId === id}
                         aria-label={`delete-report-${id}`}
                       >
@@ -196,6 +209,23 @@ export default function ReviewReportList() {
           )}
         </tbody>
       </Table>
+
+      <Modal show={showDeleteModal} onHide={handleCloseDeleteModal} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>신고 삭제 확인</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          이 신고를 정말 삭제하시겠습니까? (되돌릴 수 없습니다)
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="outline-secondary" onClick={handleCloseDeleteModal}>
+            취소
+          </Button>
+          <Button variant="danger" onClick={handleDeleteReport}>
+            삭제
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 }
