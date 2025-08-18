@@ -6,6 +6,7 @@ import { FaUserCircle } from "react-icons/fa";
 import { GoMail } from "react-icons/go";
 import { BsCalendar2DateFill } from "react-icons/bs";
 import "../../styles/MemberList.css";
+import { toast } from "react-toastify";
 
 export function MemberList() {
   const [memberList, setMemberList] = useState(null);
@@ -20,6 +21,7 @@ export function MemberList() {
       .catch((err) => {
         console.error("회원 목록 오류", err);
         setError("회원 목록을 불러오는 중 문제가 발생했습니다.");
+        navigate("/login");
       })
       .finally(() => setLoading(false));
   }, []);
