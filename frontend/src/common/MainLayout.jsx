@@ -101,7 +101,7 @@ export function MainLayout() {
       </div>
 
       {/* 반응형: 작은 화면에서 광고 숨기기 */}
-      <style jsx>{`
+      <style>{`
         @media (max-width: 1600px) {
           .left-ad-area,
           .right-ad-area {

@@ -19,18 +19,18 @@ export function BoardLayout() {
     axios
       .get("/api/board/latest3") // 백엔드 최신 3개 게시글 API
       .then((res) => {
-        console.log("원본 데이터:", res.data); // 디버깅용
+        // console.log("원본 데이터:", res.data); // 디버깅용
 
         // 각 게시글의 firstImageUrl 확인
-        res.data.forEach((slide, index) => {
-          console.log(`게시글 ${slide.id} (인덱스 ${index}):`, {
-            title: slide.title,
-            firstImageUrl: slide.firstImageUrl,
-            hasImage: !!slide.firstImageUrl,
-            isEmptyString: slide.firstImageUrl === "",
-            type: typeof slide.firstImageUrl,
-          });
-        });
+        // res.data.forEach((slide, index) => {
+        // console.log(`게시글 ${slide.id} (인덱스 ${index}):`, {
+        //   title: slide.title,
+        //   firstImageUrl: slide.firstImageUrl,
+        //   hasImage: !!slide.firstImageUrl,
+        //   isEmptyString: slide.firstImageUrl === "",
+        //   type: typeof slide.firstImageUrl,
+        // });
+        // });
 
         // 이미지가 있는 게시글만 필터링
         const slidesWithImages = res.data.filter((slide) => {
@@ -40,16 +40,16 @@ export function BoardLayout() {
             slide.firstImageUrl !== "null" &&
             slide.firstImageUrl !== "undefined";
 
-          console.log(`게시글 ${slide.id} 필터링 결과:`, hasValidImage);
+          // console.log(`게시글 ${slide.id} 필터링 결과:`, hasValidImage);
           return hasValidImage;
         });
 
-        console.log("필터링된 데이터:", slidesWithImages);
+        // console.log("필터링된 데이터:", slidesWithImages);
         setSlides(slidesWithImages);
         setLoading(false);
       })
-      .catch((err) => {
-        console.error("최신 게시글 로딩 실패", err);
+      .catch(() => {
+        // console.error("최신 게시글 로딩 실패", err);
         setLoading(false);
       });
   }, []);
