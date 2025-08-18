@@ -281,16 +281,14 @@ export function MemberDetail() {
             <FormLabel>
               {isKakao
                 ? `탈퇴를 원하시면 ${tempCode}를 아래에 작성하세요.`
-                : "탈퇴를 원하시면 암호를 입력하세요"}
+                : "탈퇴를 원하시면 비밀번호를 입력하세요."}
             </FormLabel>
             <FormControl
               type={isKakao ? "text" : "password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder={
-                isKakao
-                  ? "탈퇴를 원하시면 위의 코드를 작성하세요."
-                  : "탈퇴를 원하시면 비밀번호를 입력하세요"
+                isKakao ? "위의 코드를 작성하세요." : "비밀번호를 입력하세요."
               }
               autoFocus
             />
