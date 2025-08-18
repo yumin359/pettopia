@@ -10,9 +10,10 @@ import ReviewAdd from "../review/ReviewAdd.jsx";
 import FacilityInfoCard from "./FacilityInfoCard.jsx";
 import MapPreviewCard from "./MapPreviewCard.jsx";
 import ReviewStatsCard from "./ReviewStatusCard.jsx";
-import ReportModal from "../report/ReportModal.jsx"; // 신고 모달 컴포넌트 임포트
-import { toast } from "react-toastify"; // 토스트 임포트
+import ReportModal from "../report/ReportModal.jsx";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import "../../styles/MapDetail.css";
 
 export function MapDetail() {
   const { id } = useParams();
@@ -47,7 +48,6 @@ export function MapDetail() {
       setLoadingFacility(false);
     }
   };
-
   const fetchReviews = async () => {
     if (!id) return;
     setLoadingReviews(true);
@@ -69,7 +69,6 @@ export function MapDetail() {
     fetchReviews();
     setSearchParams({ focusReviewId: reviewId });
   };
-
   const handleDelete = async (reviewId) => {
     try {
       await axios.delete(`/api/review/delete/${reviewId}`, {
@@ -103,7 +102,6 @@ export function MapDetail() {
     setReportingReviewId(review.id);
     setReportModalOpen(true);
   };
-
   const closeReportModal = () => {
     setReportingReviewId(null);
     setReportModalOpen(false);
@@ -166,11 +164,14 @@ export function MapDetail() {
   }, [reviews, searchParams]);
 
   return (
-    <div className="container-fluid px-4 py-4" style={{ maxWidth: "1400px" }}>
+    <div
+      className="map-detail-container container-fluid px-4 py-4"
+      style={{ maxWidth: "1400px" }}
+    >
       {/* 헤더 섹션 */}
       <div className="row mb-5">
         <div className="col-12">
-          <div className="card border-0 shadow-lg bg-primary text-white">
+          <div className="card border-0 shadow-lg bg-transparent">
             <div className="card-body p-4">
               <div className="d-flex justify-content-between align-items-center">
                 <div>
@@ -401,7 +402,10 @@ export function MapDetail() {
                         <button
                           onClick={() => openReportModal(review)}
                           className="p-0 border-0 bg-transparent"
-                          style={{ cursor: user ? "pointer" : "not-allowed" }}
+                          style={{
+                            cursor: user ? "pointer" : "not-allowed",
+                            boxShadow: "none",
+                          }}
                           disabled={!user}
                           title={user ? "리뷰 신고하기" : "로그인 후 이용 가능"}
                         >

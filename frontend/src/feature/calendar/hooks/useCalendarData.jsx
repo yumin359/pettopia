@@ -17,15 +17,10 @@ export const useCalendarData = (currentDate) => {
     const month = currentDate.getMonth() + 1;
 
     const fetchAllDataFromBackend = async () => {
-      setLoading(true); // 데이터 로딩 시작
+      setLoading(true);
       setError(null);
       try {
-        // --- 여기가 핵심입니다 ---
-        // 기존의 샘플 데이터와 Google API 직접 호출 로직을 모두 버리고,
-        // 우리가 만든 calendarService를 통해 백엔드에 데이터를 요청합니다.
-        console.log(`백엔드에 ${year}년 ${month}월 데이터 요청을 보냅니다...`);
         const data = await calendarService.getCalendarData(year, month);
-        console.log("백엔드로부터 데이터를 성공적으로 받았습니다!", data);
 
         // 백엔드가 보내준 데이터로 프론트엔드의 상태를 업데이트합니다.
         setHolidays(data.holidays || {});

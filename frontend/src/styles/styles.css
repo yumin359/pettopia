@@ -31,6 +31,24 @@
 }
 
 /* ========================================
+   로고 : 이거 빨간줄 생겨도 정상이에요.
+   ======================================== */
+
+.logo-image {
+    background-color: #D9534F;
+
+    mask-image: url('/PETOPIA-Photoroom.png');
+    -webkit-mask-image: url('/PETOPIA-Photoroom.png');
+
+    mask-size: contain;
+    -webkit-mask-size: contain;
+    mask-repeat: no-repeat;
+    -webkit-mask-repeat: no-repeat;
+    mask-position: center;
+    -webkit-mask-position: center;
+}
+
+/* ========================================
    바탕화면
    ======================================== */
 * {
@@ -58,135 +76,11 @@ body::before {
 }
 
 /* ========================================
-   MainLayout.jsx
-   ======================================== */
-.main-layout {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 3rem 1rem;
-    min-height: 100vh;
-    box-sizing: border-box;
-}
-
-.main-container {
-    width: 90%;
-    height: 120vh;
-    max-width: 1400px;
-    max-height: 1080px;
-    background-color: white;
-    border: 2px solid black;
-    box-shadow: 5px 5px 1px 1px black;
-    display: flex;
-    flex-direction: column;
-}
-
-/* 메인 콘텐츠와 푸터를 감싸는 래퍼 */
-.main-content-wrapper {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    min-height: 0;
-}
-
-/* 콘텐츠 영역 */
-.content-area {
-    padding-left: 0;
-    padding-right: 0;
-    flex: 1;
-    overflow-y: auto;
-    overflow-x: hidden;
-}
-
-/* 푸터는 항상 맨 아래 고정 */
-.footer-area {
-    flex-shrink: 0;
-}
-
-/* ========================================
-   BoardLayout.jsx cta 디자인
-   ======================================== */
-.cta-section {
-    background: #f6ece6;
-    padding: 18px;
-    margin-bottom: 0;
-    text-align: center;
-    border-top: 1px solid black;
-}
-
-.cta-content {
-    max-width: 960px;
-    margin: 0 auto;
-}
-
-.cta-title {
-    font-size: 1.75rem;
-    font-weight: bold;
-    margin-bottom: 15px;
-    color: #343a40;
-}
-
-.cta-description {
-    font-size: 1.0rem;
-    margin-bottom: 25px;
-    color: #6c757d;
-}
-
-.cta-buttons {
-    display: flex;
-    gap: 15px;
-    justify-content: center;
-    flex-wrap: wrap;
-}
-
-.cta-button {
-    padding: 10px 20px;
-    font-size: 0.95rem;
-    font-weight: bold;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.cta-button.primary {
-    background-color: #ffc107; /* 노란색 계열 */
-    color: #212529; /* 어두운 글씨색 */
-}
-
-.cta-button.primary:hover {
-    background-color: #e0a800;
-}
-
-.cta-button.secondary {
-    background-color: #ffffff;
-    color: #343a40;
-    border: 1px solid #ced4da;
-}
-
-.cta-button.secondary:hover {
-    background-color: #e9ecef;
-}
-
-.cta-button i {
-    margin-right: 8px;
-}
-
-/* ========================================
-   최신리뷰 카드
-   ======================================== */
-.card:hover {
-    background-color: #f6ece6;
-    box-shadow: 5px 5px 1px 1px black;
-    cursor: pointer;
-}
-
-/* ========================================
    네브바 디자인
    ======================================== */
 .navbar {
     background-color: #f6ece6 !important;
-    border-bottom: 1px solid black !important;
+    border-bottom: 1px solid #2C2D31FF;
     padding: 0 !important;
     min-height: 72px;
     overflow: visible;
@@ -206,49 +100,88 @@ body::before {
 }
 
 /* ========================================
+   MainLayout.jsx
+   ======================================== */
+.main-layout {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 3rem 1rem;
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+
+.main-container {
+    width: 90%;
+    height: 120vh;
+    max-width: 1400px;
+    max-height: 1080px;
+    background-color: white;
+    border: 3px solid #212529;
+    box-shadow: 10px 10px 1px 1px #2C2D31FF;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 메인 콘텐츠와 푸터를 감싸는 래퍼 */
+.main-content-wrapper {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+}
+
+/* 콘텐츠 영역 */
+.content-area {
+    padding-left: 0;
+    padding-right: 0;
+    flex: 1;
+    overflow-x: hidden;
+}
+
+/* 푸터는 항상 맨 아래 고정 */
+.footer-area {
+    flex-shrink: 0;
+}
+
+/* ========================================
    레트로 스타일 스크롤바
    ======================================== */
 
 /* 웹킷 기반 브라우저 (Chrome, Safari, Edge) */
 ::-webkit-scrollbar {
-    width: 16px; /* 세로 스크롤바 너비 */
-    height: 16px; /* 가로 스크롤바 높이 */
+    width: 16px;
+    height: 16px;
 }
 
 ::-webkit-scrollbar-track {
-    background: #f6ece6; /* 베이지 배경 */
-    border: 2px solid black;
-    box-shadow: inset 2px 2px 0px rgba(0, 0, 0, 0.1);
+    background: #f6ece6;
+    border: 2px solid #2C2D31FF;
+    border-radius: 0;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: black; /* 검은색 썸 */
-    border: 2px solid black;
-    box-shadow: 2px 2px 0px 0px black, /* 레트로 그림자 효과 */ inset -1px -1px 0px rgba(255, 255, 255, 0.3); /* 약간의 하이라이트 */
+    background: #2C2D31FF;
+    border: 2px solid #2C2D31FF;
+    border-radius: 0;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #333; /* 호버시 약간 밝게 */
-    box-shadow: 3px 3px 0px 0px black,
-    inset -1px -1px 0px rgba(255, 255, 255, 0.4);
+    background: #2C2D31FF;
+    border: 2px solid #2C2D31FF;
 }
 
 /* 스크롤바 버튼 (위/아래 화살표) */
 ::-webkit-scrollbar-button {
     background: #f6ece6;
-    border: 2px solid black;
+    border: 2px solid #2C2D31FF;
     height: 16px;
-    box-shadow: 1px 1px 0px 0px black;
-}
-
-::-webkit-scrollbar-button:hover {
-    background: #fff;
-    box-shadow: 2px 2px 0px 0px black;
+    box-shadow: 1px 1px 0px 0px #2C2D31FF;
 }
 
 /* 위 화살표 */
 ::-webkit-scrollbar-button:vertical:decrement {
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8"><path d="M4 2L1 5h6z" fill="black"/></svg>');
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8"><path d="M4 2L1 5h6z" fill="#2C2D31FF"/></svg>');
     background-repeat: no-repeat;
     background-position: center;
     background-color: #f6ece6;
@@ -256,7 +189,7 @@ body::before {
 
 /* 아래 화살표 */
 ::-webkit-scrollbar-button:vertical:increment {
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8"><path d="M4 6L7 3H1z" fill="black"/></svg>');
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8"><path d="M4 6L7 3H1z" fill="#2C2D31FF"/></svg>');
     background-repeat: no-repeat;
     background-position: center;
     background-color: #f6ece6;
@@ -265,13 +198,13 @@ body::before {
 /* 스크롤바 코너 */
 ::-webkit-scrollbar-corner {
     background: #f6ece6;
-    border: 2px solid black;
+    border: 2px solid #2C2D31FF;
 }
 
 /* Firefox용 스크롤바 스타일 */
 * {
     scrollbar-width: auto;
-    scrollbar-color: black #f6ece6;
+    scrollbar-color: #2C2D31FF #f6ece6;
 }
 
 /* ========================================
@@ -280,7 +213,7 @@ body::before {
 
 /* 기본 커서 - 픽셀 화살표 */
 * {
-    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><path d="M4 4v12l4-4h3v-3l4 4v-9z" fill="black"/><path d="M5 5v9l3-3h3v-3l3 3v-6z" fill="white"/></svg>') 4 4, auto;
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><path d="M4 4v12l4-4h3v-3l4 4v-9z" fill="#2C2D31FF"/><path d="M5 5v9l3-3h3v-3l3 3v-6z" fill="white"/></svg>') 4 4, auto;
 }
 
 /* 링크/버튼 호버 커서 - 손가락 모양 */
@@ -289,40 +222,40 @@ button,
 [role="button"],
 .clickable,
 .btn {
-    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><rect x="6" y="10" width="4" height="8" fill="black"/><rect x="10" y="6" width="4" height="12" fill="black"/><rect x="14" y="8" width="4" height="10" fill="black"/><rect x="18" y="10" width="4" height="8" fill="black"/><rect x="6" y="18" width="16" height="4" fill="black"/><rect x="7" y="11" width="2" height="6" fill="white"/><rect x="11" y="7" width="2" height="10" fill="white"/><rect x="15" y="9" width="2" height="8" fill="white"/><rect x="19" y="11" width="2" height="6" fill="white"/></svg>') 12 6, pointer;
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><rect x="6" y="10" width="4" height="8" fill="#2C2D31FF"/><rect x="10" y="6" width="4" height="12" fill="#2C2D31FF"/><rect x="14" y="8" width="4" height="10" fill="#2C2D31FF"/><rect x="18" y="10" width="4" height="8" fill="#2C2D31FF"/><rect x="6" y="18" width="16" height="4" fill="#2C2D31FF"/><rect x="7" y="11" width="2" height="6" fill="white"/><rect x="11" y="7" width="2" height="10" fill="white"/><rect x="15" y="9" width="2" height="8" fill="white"/><rect x="19" y="11" width="2" height="6" fill="white"/></svg>') 12 6, pointer;
 }
 
 /* 텍스트 선택 커서 - I빔 */
 input,
 textarea,
 [contenteditable="true"] {
-    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="20" viewBox="0 0 16 20"><rect x="2" y="2" width="12" height="2" fill="black"/><rect x="7" y="2" width="2" height="16" fill="black"/><rect x="2" y="16" width="12" height="2" fill="black"/></svg>') 8 10, text;
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="20" viewBox="0 0 16 20"><rect x="2" y="2" width="12" height="2" fill="#2C2D31FF"/><rect x="7" y="2" width="2" height="16" fill="#2C2D31FF"/><rect x="2" y="16" width="12" height="2" fill="#2C2D31FF"/></svg>') 8 10, text;
 }
 
 /* 드래그 가능한 요소 - 십자 화살표 */
 .draggable,
 [draggable="true"] {
-    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 4v16M4 12h16" stroke="black" stroke-width="2"/><path d="M12 2l3 4h-6zM12 22l-3-4h6zM2 12l4-3v6zM22 12l-4 3v-6z" fill="black"/></svg>') 12 12, move;
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 4v16M4 12h16" stroke="#2C2D31FF" stroke-width="2"/><path d="M12 2l3 4h-6zM12 22l-3-4h6zM2 12l4-3v6zM22 12l-4 3v-6z" fill="#2C2D31FF"/></svg>') 12 12, move;
 }
 
 /* 로딩 커서 - 모래시계 */
 .loading,
 .processing,
 .wait {
-    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="24" viewBox="0 0 20 24"><rect x="4" y="2" width="12" height="2" fill="black"/><rect x="4" y="20" width="12" height="2" fill="black"/><path d="M6 4v6l4 2-4 2v6h8v-6l-4-2 4-2V4z" fill="black"/><path d="M7 5v4l3 2-3 2v5h6v-5l-3-2 3-2V5z" fill="white"/><rect x="8" y="6" width="4" height="2" fill="black"/></svg>') 10 12, wait;
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="24" viewBox="0 0 20 24"><rect x="4" y="2" width="12" height="2" fill="#2C2D31FF"/><rect x="4" y="20" width="12" height="2" fill="#2C2D31FF"/><path d="M6 4v6l4 2-4 2v6h8v-6l-4-2 4-2V4z" fill="#2C2D31FF"/><path d="M7 5v4l3 2-3 2v5h6v-5l-3-2 3-2V5z" fill="white"/><rect x="8" y="6" width="4" height="2" fill="#2C2D31FF"/></svg>') 10 12, wait;
 }
 
 /* 비활성화 커서 - X 표시 */
 :disabled,
 .disabled,
 [aria-disabled="true"] {
-    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" fill="none" stroke="black" stroke-width="2"/><path d="M6 6l8 8M14 6l-8 8" stroke="black" stroke-width="2"/></svg>') 10 10, not-allowed;
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" fill="none" stroke="#2C2D31FF" stroke-width="2"/><path d="M6 6l8 8M14 6l-8 8" stroke="#2C2D31FF" stroke-width="2"/></svg>') 10 10, not-allowed;
 }
 
 /* 리사이즈 커서 */
 .resize,
 .resizable {
-    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><path d="M4 16h12v-12" fill="none" stroke="black" stroke-width="2"/><path d="M8 16l8-8" stroke="black" stroke-width="2"/></svg>') 10 10, nwse-resize;
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><path d="M4 16h12v-12" fill="none" stroke="#2C2D31FF" stroke-width="2"/><path d="M8 16l8-8" stroke="#2C2D31FF" stroke-width="2"/></svg>') 10 10, nwse-resize;
 }
 
 /* ========================================
@@ -333,13 +266,13 @@ textarea,
 button:hover,
 .btn:hover {
     transform: translate(-1px, -1px);
-    box-shadow: 6px 6px 1px 1px black;
+    box-shadow: 6px 6px 1px 1px #2C2D31FF;
 }
 
 button:active,
 .btn:active {
     transform: translate(1px, 1px);
-    box-shadow: 3px 3px 1px 1px black;
+    box-shadow: 3px 3px 1px 1px #2C2D31FF;
 }
 
 /* ========================================
@@ -347,12 +280,12 @@ button:active,
    ======================================== */
 
 ::selection {
-    background: black;
+    background: #2C2D31FF;
     color: #f6ece6;
 }
 
 ::-moz-selection {
-    background: black;
+    background: #2C2D31FF;
     color: #f6ece6;
 }
 
@@ -361,6 +294,6 @@ button:active,
    ======================================== */
 
 :focus-visible {
-    outline: 2px dashed black;
+    outline: 2px dashed #2C2D31FF;
     outline-offset: 2px;
 }

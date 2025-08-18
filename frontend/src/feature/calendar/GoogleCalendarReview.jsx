@@ -7,6 +7,7 @@ import { CalendarHeader } from "./CalendarHeader";
 import { CalendarGrid } from "./CalendarGrid";
 import { DateDetailModal } from "./DateDetailModal";
 import { CalendarStats } from "./CalendarStats";
+import "../../styles/calendar.css";
 
 const GoogleCalendarReview = () => {
   const {
@@ -33,18 +34,8 @@ const GoogleCalendarReview = () => {
   };
 
   return (
-    <div className="container-fluid p-3 p-md-4">
-      <div className="mb-4">
-        <h2 className="d-flex align-items-center gap-2 mb-2 fw-bold">
-          <Calendar size={28} /> 내 리뷰 캘린더
-        </h2>
-        <p className="text-muted">
-          Google Calendar API로 한국 공휴일과 내 리뷰를 함께 확인하세요.
-        </p>
-      </div>
-
+    <div className="calendar-container container-fluid p-3 p-md-4">
       {error && <div className="alert alert-warning">...</div>}
-
       <div className="card shadow-sm">
         <div className="card-body">
           <CalendarHeader

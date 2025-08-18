@@ -80,9 +80,9 @@ const FullFilterKakaoMap = () => {
   ]);
 
   // 지도 범위 검색 핸들러 (지역 정보 포함하도록 수정)
-  const handleBoundsSearch = useCallback((boundsResults, locationInfo) => {
-    console.log("지도 범위 검색 결과:", boundsResults);
-    console.log("지역 정보:", locationInfo);
+  const handleBoundsSearch = useCallback((boundsResults) => {
+    // console.log("지도 범위 검색 결과:", boundsResults);
+    // console.log("지역 정보:", locationInfo);
 
     // 검색 결과를 시설 목록에 설정
     setFacilities(boundsResults);

@@ -26,70 +26,105 @@ export function ChatButton() {
 
   return (
     <>
+      {/* 플로팅 버튼 - 네오브루탈리즘 스타일 */}
       <button
         onClick={() => setOpen((prev) => !prev)}
         style={{
           position: "fixed",
           bottom: "80px",
-          right: open ? drawerWidth + 20 : 20,
-          backgroundColor: "#ff944d",
-          color: "#fff",
-          border: "none",
-          borderRadius: "50%",
+          right: open ? drawerWidth + 30 : 30,
+          backgroundColor: "#ffc107", // 노란색으로 변경
+          color: "#2C2D31FF",
+          border: "3px solid #2C2D31FF",
+          borderRadius: "0", // 직각 모서리
           width: "70px",
           height: "70px",
-          boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
+          boxShadow: "5px 5px 0px 0px #2C2D31FF",
           zIndex: 9999,
-          transition: "right 0.3s ease",
+          transition: "all 0.3s ease",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           cursor: "pointer",
+          fontWeight: "bold",
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.transform = "translate(-2px, -2px)";
+          e.currentTarget.style.boxShadow = "7px 7px 0px 0px #2C2D31FF";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = "translate(0, 0)";
+          e.currentTarget.style.boxShadow = "5px 5px 0px 0px #2C2D31FF";
         }}
         aria-label={open ? "Close chat" : "Open chat"}
       >
         <FaRobot size={30} />
       </button>
 
+      {/* 챗봇 서랍 - 네오브루탈리즘 스타일 */}
       <div
         style={{
           position: "fixed",
-          top: "70px",
-          right: open ? 0 : -drawerWidth,
+          top: "100px", // 네브바 아래로 조정
+          right: open ? 20 : -drawerWidth - 50,
           width: drawerWidth,
-          height: "calc(100vh - 100px)",
-          backgroundColor: "#fff",
-          boxShadow: "-2px 0 10px rgba(0,0,0,0.1)",
-          borderLeft: "1px solid #ddd",
+          height: "calc(100vh - 140px)",
+          backgroundColor: "#ffffff",
+          border: "3px solid #2C2D31FF",
+          borderRadius: "0",
+          boxShadow: open ? "8px 8px 0px 0px #2C2D31FF" : "none",
           zIndex: 9998,
-          transition: "right 0.3s ease",
+          transition: "all 0.3s ease",
           display: "flex",
           flexDirection: "column",
           overflow: "hidden",
         }}
       >
+        {/* 헤더 - 베이지색 배경 */}
         <div
           style={{
-            padding: "10px",
-            borderBottom: "1px solid #eee",
-            backgroundColor: "#ff944d",
-            color: "#fff",
-            fontWeight: "bold",
+            padding: "15px 20px",
+            borderBottom: "3px solid #2C2D31FF",
+            backgroundColor: "#f6ece6", // 베이지색
+            color: "#2C2D31FF",
+            fontWeight: "700",
+            fontSize: "1.2rem",
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
+            fontFamily: "'Poppins', sans-serif",
           }}
         >
-          <span>챗봇</span>
+          <span style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <FaRobot size={20} />
+            펫토피아 챗봇
+          </span>
           <button
             onClick={() => setOpen(false)}
             style={{
-              background: "none",
-              border: "none",
-              color: "#fff",
-              fontSize: "1.5rem",
+              background: "#ffffff",
+              border: "2px solid #2C2D31FF",
+              borderRadius: "0",
+              color: "#2C2D31FF",
+              fontSize: "1.2rem",
+              width: "30px",
+              height: "30px",
               cursor: "pointer",
-              lineHeight: 1,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontWeight: "bold",
+              transition: "all 0.2s ease",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = "#ffc107";
+              e.currentTarget.style.transform = "translate(-2px, -2px)";
+              e.currentTarget.style.boxShadow = "2px 2px 0px 0px #2C2D31FF";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = "#ffffff";
+              e.currentTarget.style.transform = "translate(0, 0)";
+              e.currentTarget.style.boxShadow = "none";
             }}
             aria-label="Close chat"
           >
@@ -97,10 +132,33 @@ export function ChatButton() {
           </button>
         </div>
 
-        <div style={{ flex: 1, overflowY: "auto" }}>
+        {/* 챗봇 본체 */}
+        <div
+          style={{
+            flex: 1,
+            overflowY: "auto",
+            backgroundColor: "#fdfdfd",
+          }}
+        >
           <Chatbot />
         </div>
       </div>
+
+      {/* 배경 오버레이 (모바일용) */}
+      {open && windowWidth < 768 && (
+        <div
+          onClick={() => setOpen(false)}
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0, 0, 0, 0.3)",
+            zIndex: 9997,
+          }}
+        />
+      )}
     </>
   );
 }

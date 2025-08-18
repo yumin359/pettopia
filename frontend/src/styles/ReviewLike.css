@@ -10,6 +10,12 @@
     font-size: 1rem;
 }
 
+.like-button-base:hover {
+    color: #007bff; /* 호버 시 색상 변경 예시 */
+    transform: none; /* 다른 css의 transform 효과를 덮어쓰기 위해 none으로 지정 */
+    box-shadow: none; /* 다른 css의 box-shadow 효과를 덮어쓰기 위해 none으로 지정 */
+}
+
 .like-button-base:disabled {
     cursor: not-allowed;
     opacity: 0.6;

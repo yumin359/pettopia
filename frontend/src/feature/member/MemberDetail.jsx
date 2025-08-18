@@ -14,15 +14,17 @@ import { useNavigate, useSearchParams } from "react-router";
 import { toast } from "react-toastify";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
 import GoogleCalendarReview from "../calendar/GoogleCalendarReview.jsx";
+import { MyReview } from "../review/MyReview.jsx";
+import "../../styles/MemberDetail.css";
 
 export function MemberDetail() {
   const [member, setMember] = useState(null);
-  const [, setReviews] = useState(null);
   const [modalShow, setModalShow] = useState(false);
   const [password, setPassword] = useState("");
   const [tempCode, setTempCode] = useState("");
   const { logout, hasAccess, isAdmin } = useContext(AuthenticationContext);
   const [params] = useSearchParams();
+  const [rightColumnView, setRightColumnView] = useState("calendar");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -30,15 +32,6 @@ export function MemberDetail() {
       .get(`/api/member?email=${params.get("email")}`)
       .then((res) => {
         setMember(res.data);
-        if (res.data?.id) {
-          axios
-            .get(`/api/review/myReview/${res.data.id}`)
-            .then((res2) => setReviews(res2.data))
-            .catch((err) => {
-              console.error("리뷰 목록 로드 실패:", err);
-              setReviews([]);
-            });
-        }
       })
       .catch((err) => {
         console.error(err);
@@ -83,11 +76,11 @@ export function MemberDetail() {
     }
   }
 
-  function handleLogoutClick() {
-    logout();
-    navigate("/login");
-    toast("로그아웃 되었습니다.", { type: "success" });
-  }
+  // function handleLogoutClick() {
+  //   logout();
+  //   navigate("/login");
+  //   toast("로그아웃 되었습니다.", { type: "success" });
+  // }
 
   if (!member) {
     return (
@@ -105,152 +98,106 @@ export function MemberDetail() {
     /\.(jpg|jpeg|png|gif|webp)$/i.test(file),
   );
 
-  const isAdminFlag = isAdmin(); // 함수 호출
+  const isAdminFlag = member.authNames?.includes("admin");
   const isKakao = member.provider?.includes("kakao");
   const defaultImage = "/user.png";
 
   return (
-    <div className="p-0 h-100">
+    <div className="member-detail-container p-0 h-100">
       <Row className="h-100 g-0">
-        {/* 왼쪽 컬럼: 회원 정보 */}
-        <Col
-          lg={5}
-          md={12}
-          className="p-4 d-flex flex-column bg-dark text-light"
-        >
-          <div className="d-flex justify-content-between align-items-center mb-3">
-            <h3 className="fw-bold mb-0">회원 정보</h3>
-            <small className="text-muted" style={{ fontSize: "0.85rem" }}>
-              {isAdminFlag ? (
-                <span className="badge bg-danger">관리자</span>
-              ) : (
-                <span className="badge bg-secondary">일반 사용자</span>
-              )}
-            </small>
+        <Col lg={5} md={12} className="member-info-column">
+          {/* 헤더 */}
+          <div className="brutal-card member-info-header">
+            <h3 className="member-info-title">👤 회원 정보</h3>
+            {/* --- 역할 배지 로직 수정 --- */}
+            <span
+              className={`member-role-badge ${
+                isAdminFlag ? "admin" : isKakao ? "kakao" : "user"
+              }`}
+            >
+              {isAdminFlag ? "관리자" : isKakao ? "카카오 회원" : "일반 회원"}
+            </span>
           </div>
 
-          <div className="border-0">
-            <div className="mb-4 d-flex justify-content-center">
+          {/* 프로필 정보 섹션 */}
+          <div className="brutal-card profile-section">
+            <div className="profile-image-wrapper">
               <img
                 src={profileImageUrl || defaultImage}
                 alt="프로필 이미지"
-                className="shadow rounded-circle"
-                style={{
-                  width: "150px",
-                  height: "150px",
-                  objectFit: "cover",
-                }}
+                className="profile-image"
               />
             </div>
-
-            {!profileImageUrl && <br />}
-
-            <FormGroup controlId="email1" className="mb-3">
-              <FormLabel>이메일</FormLabel>
-              <FormControl
-                readOnly
-                value={member.email}
-                className="bg-light border-0"
-                style={{
-                  userSelect: "text",
-                  boxShadow: "none",
-                  outline: "none",
-                }}
-                onFocus={(e) => e.target.blur()}
-              />
-            </FormGroup>
-
-            <FormGroup controlId="nickName1" className="mb-3">
-              <FormLabel>별명</FormLabel>
-              <FormControl
-                readOnly
-                value={member.nickName}
-                className="bg-light border-0"
-                style={{
-                  userSelect: "text",
-                  boxShadow: "none",
-                  outline: "none",
-                }}
-                onFocus={(e) => e.target.blur()}
-              />
-            </FormGroup>
-
-            <FormGroup controlId="info1" className="mb-3">
-              <FormLabel>자기소개</FormLabel>
-              <FormControl
-                as="textarea"
-                readOnly
-                value={member.info || ""}
-                className="bg-light border-0"
-                style={{
-                  minHeight: "120px",
-                  resize: "none",
-                  userSelect: "text",
-                  fontSize: "1rem",
-                  lineHeight: 1.5,
-                }}
-                onFocus={(e) => e.target.blur()}
-              />
-            </FormGroup>
-
-            <FormGroup controlId="inserted1" className="mb-3">
-              <FormLabel>가입일시</FormLabel>
-              <FormControl
-                readOnly
-                value={formattedInsertedAt}
-                className="bg-light border-0"
-                style={{
-                  userSelect: "text",
-                  boxShadow: "none",
-                  outline: "none",
-                }}
-                onFocus={(e) => e.target.blur()}
-              />
-            </FormGroup>
-
-            {hasAccess(member.email) && (
-              <div className="d-flex justify-content-start gap-2">
-                <Button
-                  variant="outline-danger"
-                  onClick={handleModalButtonClick}
-                  className="d-flex align-items-center gap-1"
-                >
-                  탈퇴
-                </Button>
-                <Button
-                  variant="outline-info"
-                  onClick={() => navigate(`/member/edit?email=${member.email}`)}
-                  className="d-flex align-items-center gap-1"
-                >
-                  수정
-                </Button>
-
-                {/* 관리자면 로그아웃 버튼 숨김 */}
-                {
-                  <Button
-                    variant="outline-secondary"
-                    onClick={handleLogoutClick}
-                    className="d-flex align-items-center gap-1"
-                  >
-                    로그아웃
-                  </Button>
-                }
-
-                <Button
-                  variant="outline-success"
-                  onClick={() => navigate(`/review/my/${member.id}`)}
-                  className="d-flex align-items-center gap-1"
-                >
-                  내가 쓴 리뷰
-                </Button>
+            <div className="profile-main-info">
+              <div className="info-group">
+                <div className="info-label-brutal">이메일</div>
+                <div className="info-value-brutal">{member.email}</div>
               </div>
-            )}
+              <div className="info-group">
+                <div className="info-label-brutal">별명</div>
+                <div className="info-value-brutal">{member.nickName}</div>
+              </div>
+            </div>
           </div>
+
+          <div className="brutal-card">
+            <div className="info-group">
+              <div className="info-label-brutal">자기소개</div>
+              <div className="info-value-brutal textarea">
+                {member.info || "자기소개가 없습니다."}
+              </div>
+            </div>
+            <div className="info-group">
+              <div className="info-label-brutal">가입일시</div>
+              <div className="info-value-brutal">{formattedInsertedAt}</div>
+            </div>
+          </div>
+
+          {/* 액션 버튼들 */}
+          {hasAccess(member.email) && (
+            <div className="action-buttons-container">
+              <Button
+                onClick={() => navigate(`/member/edit?email=${member.email}`)}
+                className="btn-brutal btn-edit"
+              >
+                수정
+              </Button>
+              <Button
+                onClick={() =>
+                  setRightColumnView(
+                    rightColumnView === "calendar" ? "myReviews" : "calendar",
+                  )
+                }
+                className="btn-brutal btn-view"
+              >
+                {rightColumnView === "calendar" ? "리뷰 보기" : "달력 보기"}
+              </Button>
+              <Button
+                onClick={handleModalButtonClick}
+                className="btn-brutal btn-delete"
+              >
+                탈퇴
+              </Button>
+            </div>
+          )}
         </Col>
 
-        {/* 오른쪽 컬럼: 리뷰 캘린더 */}
-        <Col lg={7} md={12}>
-          <GoogleCalendarReview />
+        {/* 오른쪽 컬럼 */}
+        <Col
+          lg={7}
+          md={12}
+          className="p-4"
+          style={{ height: "100%", overflowY: "auto" }}
+        >
+          {/* 캘린더 표시 조건 */}
+          {hasAccess(member.email) && rightColumnView === "calendar" && (
+            <GoogleCalendarReview />
+          )}
+          {/* 내 리뷰 표시 */}
+          {rightColumnView === "myReviews" ||
+          (!hasAccess(member.email) && isAdmin()) ? (
+            <MyReview memberId={member.id} />
+          ) : null}
         </Col>
       </Row>
 
@@ -266,16 +213,14 @@ export function MemberDetail() {
             <FormLabel>
               {isKakao
                 ? `탈퇴를 원하시면 ${tempCode}를 아래에 작성하세요.`
-                : "탈퇴를 원하시면 암호를 입력하세요"}
+                : "탈퇴를 원하시면 비밀번호를 입력하세요."}
             </FormLabel>
             <FormControl
               type={isKakao ? "text" : "password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder={
-                isKakao
-                  ? "탈퇴를 원하시면 위의 코드를 작성하세요."
-                  : "탈퇴를 원하시면 비밀번호를 입력하세요"
+                isKakao ? "위의 코드를 작성하세요." : "비밀번호를 입력하세요."
               }
               autoFocus
             />

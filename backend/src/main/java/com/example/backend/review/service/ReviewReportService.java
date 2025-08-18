@@ -43,4 +43,11 @@ public class ReviewReportService {
                 .map(ReviewReportDto::fromEntity)
                 .collect(Collectors.toList());
     }
+
+    public void deletereview(Long id) {
+        if (!reviewReportRepository.existsById(id)) {
+            throw new IllegalArgumentException("해당 문의가 존재하지 않습니다.");
+        }
+        reviewReportRepository.deleteById(id);
+    }
 }

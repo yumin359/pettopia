@@ -1,5 +1,11 @@
 import { useState } from "react";
 import { Form, Button, Alert } from "react-bootstrap";
+import "../../styles/service.css";
+import { FaPhoneAlt, FaRegBuilding, FaRegEnvelope } from "react-icons/fa";
+
+// 문의 양식의 최대 길이를 상수로 정의하여 관리하기 쉽도록 함
+const MAX_SUBJECT_LENGTH = 30;
+const MAX_MESSAGE_LENGTH = 300;
 
 export default function ServicePage() {
   const [form, setForm] = useState({
@@ -11,7 +17,6 @@ export default function ServicePage() {
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
 
-  // 필드별 에러 상태
   const [formErrors, setFormErrors] = useState({
     email: "",
     subject: "",
@@ -26,9 +31,8 @@ export default function ServicePage() {
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    // 길이 제한
-    if (name === "subject" && value.length > 20) return;
-    if (name === "message" && value.length > 100) return;
+    if (name === "subject" && value.length > MAX_SUBJECT_LENGTH) return;
+    if (name === "message" && value.length > MAX_MESSAGE_LENGTH) return;
 
     setForm((prev) => ({ ...prev, [name]: value }));
 
@@ -36,12 +40,22 @@ export default function ServicePage() {
     setFormErrors((prev) => {
       const newErrors = { ...prev };
       if (name === "email") {
-        newErrors.email = validateEmail(value) ? "" : "올바른 이메일 형식을 입력하세요.";
-      } else if (name === "subject") {
-        newErrors.subject = value.length > 20 ? "제목은 20자 이하로 작성해주세요." : "";
-      } else if (name === "message") {
-        newErrors.message = value.length > 100 ? "문의 내용은 100자 이하로 작성해주세요." : "";
+        newErrors.email = validateEmail(value)
+          ? ""
+          : "올바른 이메일 형식을 입력하세요.";
       }
+      if (name === "subject" && value.length > MAX_SUBJECT_LENGTH) {
+        newErrors.subject = `제목은 ${MAX_SUBJECT_LENGTH}자 이하로 작성해주세요.`;
+      } else if (name === "subject") {
+        newErrors.subject = "";
+      }
+
+      if (name === "message" && value.length > MAX_MESSAGE_LENGTH) {
+        newErrors.message = `문의 내용은 ${MAX_MESSAGE_LENGTH}자 이하로 작성해주세요.`;
+      } else if (name === "message") {
+        newErrors.message = "";
+      }
+
       return newErrors;
     });
   };
@@ -49,7 +63,6 @@ export default function ServicePage() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // 제출 전 유효성 검사
     const errors = { email: "", subject: "", message: "" };
     let hasError = false;
 
@@ -57,27 +70,26 @@ export default function ServicePage() {
       errors.email = "올바른 이메일 형식을 입력하세요.";
       hasError = true;
     }
-    if (form.subject.length === 0 || form.subject.length > 20) {
-      errors.subject = "제목은 1자 이상 20자 이하로 작성해주세요.";
+    // ✅ 길이 초과 검사는 제거하고, 빈 값인지 여부만 확인합니다.
+    if (form.subject.length === 0) {
+      errors.subject = `제목은 1자 이상 ${MAX_SUBJECT_LENGTH}자 이하로 작성해주세요.`;
       hasError = true;
     }
-    if (form.message.length === 0 || form.message.length > 100) {
-      errors.message = "문의 내용은 1자 이상 100자 이하로 작성해주세요.";
+    if (form.message.length === 0) {
+      errors.message = `문의 내용은 1자 이상 ${MAX_MESSAGE_LENGTH}자 이하로 작성해주세요.`;
       hasError = true;
     }
 
     if (hasError) {
       setFormErrors(errors);
-      return; // 에러 있으면 제출 중단
+      return;
     }
 
-    // 에러 없으면 초기화
     setFormErrors({ email: "", subject: "", message: "" });
     setErrorMsg("");
     setSuccessMsg("");
     setLoading(true);
 
-    // 비동기 요청
     (async () => {
       try {
         const response = await fetch("/api/support", {
@@ -95,7 +107,9 @@ export default function ServicePage() {
         setSuccessMsg(data);
         setForm({ email: "", subject: "", message: "" });
       } catch {
-        setErrorMsg("문의 접수 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+        setErrorMsg(
+          "문의 접수 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
+        );
       } finally {
         setLoading(false);
       }
@@ -103,61 +117,118 @@ export default function ServicePage() {
   };
 
   return (
-    <div style={{ padding: "2rem" }}>
-      {successMsg && <Alert variant="success">{successMsg}</Alert>}
-      {errorMsg && <Alert variant="danger">{errorMsg}</Alert>}
+    <div className="support-page-container">
+      <div className="support-page-header">
+        <h1>CONTACT US</h1>
+        <p>PETOPIA에 궁금한 점이 있으신가요? 언제든지 편하게 문의해주세요.</p>
+      </div>
 
-      <Form onSubmit={handleSubmit} noValidate>
-        <Form.Group className="mb-3" controlId="formEmail">
-          <Form.Label>이메일</Form.Label>
-          <Form.Control
-            type="email"
-            name="email"
-            value={form.email}
-            onChange={handleChange}
-            isInvalid={!!formErrors.email}
-            required
-          />
-          <Form.Control.Feedback type="invalid">{formErrors.email}</Form.Control.Feedback>
-        </Form.Group>
-
-        <Form.Group className="mb-3" controlId="formSubject">
-          <Form.Label>제목 (최대 20자)</Form.Label>
-          <Form.Control
-            type="text"
-            name="subject"
-            value={form.subject}
-            onChange={handleChange}
-            isInvalid={!!formErrors.subject}
-            maxLength={20}
-            required
-          />
-          <Form.Control.Feedback type="invalid">{formErrors.subject}</Form.Control.Feedback>
-        </Form.Group>
-
-        <Form.Group className="mb-3" controlId="formMessage">
-          <Form.Label>문의 내용 (최대 100자)</Form.Label>
-          <Form.Control
-            as="textarea"
-            rows={5}
-            name="message"
-            value={form.message}
-            onChange={handleChange}
-            isInvalid={!!formErrors.message}
-            maxLength={100}
-            required
-            style={{ resize: "none" }}
-          />
-          <Form.Control.Feedback type="invalid">{formErrors.message}</Form.Control.Feedback>
-          <div className="text-end text-muted" style={{ fontSize: "0.8rem" }}>
-            {form.message.length} / 100
+      <div className="support-grid">
+        <div className="support-info-panel">
+          <h3>문의 정보</h3>
+          <p>
+            아래 연락처를 통해 직접 문의하시거나, 오른쪽의 양식을 작성하여
+            보내주시면 신속하게 답변해 드리겠습니다.
+          </p>
+          <div className="contact-details">
+            <div className="contact-item">
+              <FaRegBuilding size={20} />
+              <span>PETOPIA Portfolio Project</span>
+            </div>
+            <div className="contact-item">
+              <FaRegEnvelope size={20} />
+              <span>petopia@email.com</span>
+            </div>
+            <div className="contact-item">
+              <FaPhoneAlt size={20} />
+              <span>TEL: 010-1234-5678</span>
+            </div>
           </div>
-        </Form.Group>
+        </div>
 
-        <Button type="submit" disabled={loading} variant="warning">
-          {loading ? "전송 중..." : "문의 보내기"}
-        </Button>
-      </Form>
+        <div className="support-form-panel">
+          {successMsg && (
+            <Alert className="alert-neo alert-success-neo">{successMsg}</Alert>
+          )}
+          {errorMsg && (
+            <Alert className="alert-neo alert-danger-neo">{errorMsg}</Alert>
+          )}
+
+          <Form onSubmit={handleSubmit} noValidate>
+            <Form.Group className="mb-4" controlId="formEmail">
+              <Form.Label className="form-label-neo">이메일 주소</Form.Label>
+              <Form.Control
+                type="email"
+                name="email"
+                value={form.email}
+                onChange={handleChange}
+                isInvalid={!!formErrors.email}
+                required
+                className="form-input-neo"
+              />
+              <Form.Control.Feedback type="invalid">
+                {formErrors.email}
+              </Form.Control.Feedback>
+            </Form.Group>
+
+            <Form.Group className="mb-4" controlId="formSubject">
+              <Form.Label className="form-label-neo">제목</Form.Label>
+              <Form.Control
+                type="text"
+                name="subject"
+                value={form.subject}
+                onChange={handleChange}
+                isInvalid={!!formErrors.subject}
+                maxLength={MAX_SUBJECT_LENGTH}
+                required
+                className="form-input-neo"
+              />
+              <Form.Control.Feedback type="invalid">
+                {formErrors.subject}
+              </Form.Control.Feedback>
+              <div
+                className="text-end text-muted mt-1"
+                style={{ fontSize: "0.8rem" }}
+              >
+                {form.subject.length} / {MAX_SUBJECT_LENGTH}
+              </div>
+            </Form.Group>
+
+            <Form.Group className="mb-4" controlId="formMessage">
+              <Form.Label className="form-label-neo">문의 내용</Form.Label>
+              <Form.Control
+                as="textarea"
+                rows={6}
+                name="message"
+                value={form.message}
+                onChange={handleChange}
+                isInvalid={!!formErrors.message}
+                maxLength={MAX_MESSAGE_LENGTH}
+                required
+                className="form-input-neo"
+                style={{ resize: "none" }}
+              />
+              <Form.Control.Feedback type="invalid">
+                {formErrors.message}
+              </Form.Control.Feedback>
+              <div
+                className="text-end text-muted mt-1"
+                style={{ fontSize: "0.8rem" }}
+              >
+                {form.message.length} / {MAX_MESSAGE_LENGTH}
+              </div>
+            </Form.Group>
+
+            <Button
+              type="submit"
+              disabled={loading}
+              className="btn-neo btn-warning-neo w-100"
+            >
+              {loading ? "전송 중..." : "문의 보내기"}
+            </Button>
+          </Form>
+        </div>
+      </div>
     </div>
   );
 }

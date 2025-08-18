@@ -20,6 +20,7 @@ import {
   FaThumbtack,
 } from "react-icons/fa";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
+import "../../styles/BoardList.css";
 
 export function BoardList() {
   const [boardList, setBoardList] = useState(null);
@@ -104,7 +105,7 @@ export function BoardList() {
   const adminFlag = typeof isAdmin === "function" ? isAdmin() : isAdmin;
 
   return (
-    <>
+    <div className="board-list-container">
       {/* 헤더 */}
       <div className="p-3 mb-0 d-flex align-items-center justify-content-between">
         <div className="d-flex align-items-center">
@@ -128,82 +129,82 @@ export function BoardList() {
       ) : (
         <Table hover className="mb-0" style={{ fontSize: "0.9rem" }}>
           <thead className="table-light">
-          <tr>
-            <th style={{ width: "60px", textAlign: "center" }}>번호</th>
-            <th style={{ width: "80px", textAlign: "center" }}>구분</th>
-            <th>제목</th>
-            <th style={{ width: "120px", textAlign: "center" }}>작성자</th>
-            <th style={{ width: "120px", textAlign: "center" }}>작성일</th>
-            <th style={{ width: "80px", textAlign: "center" }}>첨부</th>
-          </tr>
+            <tr>
+              <th style={{ width: "60px", textAlign: "center" }}>번호</th>
+              <th style={{ width: "80px", textAlign: "center" }}>구분</th>
+              <th>제목</th>
+              <th style={{ width: "120px", textAlign: "center" }}>작성자</th>
+              <th style={{ width: "120px", textAlign: "center" }}>작성일</th>
+              <th style={{ width: "80px", textAlign: "center" }}>첨부</th>
+            </tr>
           </thead>
           <tbody>
-          {boardList.map((board) => (
-            <tr
-              key={board.id}
-              style={{ cursor: "pointer" }}
-              onClick={() => handleTableRowClick(board.id)}
-              className="align-middle"
-            >
-              <td className="text-center text-muted">
-                <small>{board.id}</small>
-              </td>
-              <td className="text-center">
-                <Badge
-                  bg="danger"
-                  className="d-flex align-items-center justify-content-center gap-1"
-                >
-                  <FaThumbtack size={10} />
-                  <small>공지</small>
-                </Badge>
-              </td>
-              <td>
-                <div className="d-flex align-items-center">
+            {boardList.map((board) => (
+              <tr
+                key={board.id}
+                style={{ cursor: "pointer" }}
+                onClick={() => handleTableRowClick(board.id)}
+                className="align-middle"
+              >
+                <td className="text-center text-muted">
+                  <small>{board.id}</small>
+                </td>
+                <td className="text-center">
+                  <Badge
+                    bg="danger"
+                    className="d-flex align-items-center justify-content-center gap-1"
+                  >
+                    <FaThumbtack size={10} />
+                    <small>공지</small>
+                  </Badge>
+                </td>
+                <td>
+                  <div className="d-flex align-items-center">
                     <span className="fw-semibold text-dark me-2">
                       {board.title}
                     </span>
-                  {board.countComment > 0 && (
+                    {board.countComment > 0 && (
+                      <Badge
+                        bg="light"
+                        text="dark"
+                        className="d-flex align-items-center gap-1 me-1"
+                      >
+                        <FaRegComments size={10} />
+                        <small>{board.countComment}</small>
+                      </Badge>
+                    )}
+                  </div>
+                </td>
+                <td className="text-center">
+                  <div className="d-flex align-items-center justify-content-center">
+                    <Image
+                      roundedCircle
+                      className="me-1"
+                      src={board.profileImageUrl || defaultProfileImage}
+                      alt={`${board.nickName ?? "익명"} 프로필`}
+                      style={{ width: "16px", height: "16px" }}
+                    />
+                    <small className="text-muted">{board.nickName}</small>
+                  </div>
+                </td>
+                <td className="text-center">
+                  <small className="text-muted">{board.timesAgo}</small>
+                </td>
+                <td className="text-center">
+                  {board.countFile > 0 ? (
                     <Badge
-                      bg="light"
-                      text="dark"
-                      className="d-flex align-items-center gap-1 me-1"
+                      bg="secondary"
+                      className="d-flex align-items-center justify-content-center gap-1"
                     >
-                      <FaRegComments size={10} />
-                      <small>{board.countComment}</small>
+                      <FaRegImages size={10} />
+                      <small>{board.countFile}</small>
                     </Badge>
+                  ) : (
+                    <small className="text-muted">-</small>
                   )}
-                </div>
-              </td>
-              <td className="text-center">
-                <div className="d-flex align-items-center justify-content-center">
-                  <Image
-                    roundedCircle
-                    className="me-1"
-                    src={board.profileImageUrl || defaultProfileImage}
-                    alt={`${board.nickName ?? "익명"} 프로필`}
-                    style={{ width: "16px", height: "16px" }}
-                  />
-                  <small className="text-muted">{board.nickName}</small>
-                </div>
-              </td>
-              <td className="text-center">
-                <small className="text-muted">{board.timesAgo}</small>
-              </td>
-              <td className="text-center">
-                {board.countFile > 0 ? (
-                  <Badge
-                    bg="secondary"
-                    className="d-flex align-items-center justify-content-center gap-1"
-                  >
-                    <FaRegImages size={10} />
-                    <small>{board.countFile}</small>
-                  </Badge>
-                ) : (
-                  <small className="text-muted">-</small>
-                )}
-              </td>
-            </tr>
-          ))}
+                </td>
+              </tr>
+            ))}
           </tbody>
         </Table>
       )}
@@ -266,6 +267,6 @@ export function BoardList() {
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }

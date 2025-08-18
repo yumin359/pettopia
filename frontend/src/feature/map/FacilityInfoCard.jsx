@@ -175,7 +175,7 @@ const FacilityInfoCard = ({ facility, loading }) => {
 
   return (
     <div className="card border-0 shadow h-100">
-      <div className="card-header bg-primary text-white">
+      <div className="card-header bg-primary">
         <div className="d-flex align-items-center">
           <i className="bi bi-info-circle-fill me-3 fs-4"></i>
           <div>

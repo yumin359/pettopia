@@ -1,15 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
-import { Col, Image, Row, Spinner, Badge, Carousel } from "react-bootstrap";
+import { Badge, Carousel, Col, Image, Row, Spinner } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { useParams } from "react-router";
+import { useParams, useSearchParams } from "react-router";
 import { FaChevronRight } from "react-icons/fa";
 import { ReviewText } from "../../common/ReviewText.jsx";
 import { ReviewLikeContainer } from "../like/ReviewLikeContainer.jsx";
 import { FavoriteContainer } from "../kakaoMap/FavoriteContainer.jsx";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-// 새로운 카드 스타일을 위한 CSS
 const cardStyles = `
   .review-card-custom {
     background-color: #fffafa;
@@ -24,23 +23,50 @@ const cardStyles = `
   }
 `;
 
-export function MyReview() {
+export function MyReview({ memberId: memberIdFromProp }) {
   const [reviews, setReviews] = useState(null);
+  const [favoriteMap, setFavoriteMap] = useState({}); // facilityId -> isFavorite
   const navigate = useNavigate();
-  const { memberId } = useParams();
+  const { memberId: memberIdFromUrl } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams(); // setSearchParams는 안 쓸 수도??
+  const memberId = memberIdFromProp || memberIdFromUrl;
+  const reviewRefs = useRef({});
 
   useEffect(() => {
     axios
       .get(`/api/review/myReview/${memberId}`)
       .then((res) => {
-        setReviews(res.data);
-        console.log(res.data);
+        setReviews(res.data || []);
+
+        // 초기 favoriteMap 생성
+        const map = {};
+        res.data?.forEach((r) => {
+          if (r.petFacility?.id != null) {
+            map[r.petFacility.id] = r.petFacility.isFavorite || false;
+          }
+        });
+        setFavoriteMap(map);
       })
       .catch((err) => {
         console.error("리뷰 불러오기 실패", err);
         setReviews([]);
       });
   }, [memberId]);
+
+  useEffect(() => {
+    const focusReviewId = searchParams.get("focusReviewId");
+    if (focusReviewId && reviews?.length > 0) {
+      const el = reviewRefs.current[focusReviewId];
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+        el.classList.add("bg-warning", "bg-opacity-25", "rounded", "p-2");
+        const timer = setTimeout(() => {
+          el.classList.remove("bg-warning", "bg-opacity-25", "rounded", "p-2");
+        }, 2500);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [reviews, searchParams]);
 
   const isImageFile = (url) =>
     /\.(jpg|jpeg|png|gif|webp)$/i.test(url?.split("?")[0]);
@@ -63,6 +89,13 @@ export function MyReview() {
   const userProfileImage = reviews[0].profileImageUrl || "/user.png";
   const userCountMemberReview = reviews[0].countMemberReview;
   const userMemberAverageRating = reviews[0].memberAverageRating;
+
+  const toggleFavorite = (facilityId, newState) => {
+    setFavoriteMap((prev) => ({
+      ...prev,
+      [facilityId]: newState,
+    }));
+  };
 
   return (
     <>
@@ -92,18 +125,16 @@ export function MyReview() {
 
           <hr className="hr-color-hotpink review-separator" />
 
-          {reviews.map((r, index) => {
+          {reviews.map((r) => {
             const reviewImages = r.files?.filter(isImageFile) || [];
 
             return (
               <div
                 key={r.id}
-                // 기존 클래스에 'review-card-custom' 클래스 추가
                 className="card mb-3 rounded-4 review-card-custom"
-                // style 속성 제거
+                ref={(el) => (reviewRefs.current[r.id] = el)}
               >
                 <div className="card-body p-4">
-                  {/* ... (이전과 동일) ... */}
                   <div className={reviewImages.length > 0 ? "mb-3" : ""}>
                     {reviewImages.length > 0 && (
                       <div style={{ maxWidth: "400px", margin: "0 auto" }}>
@@ -115,11 +146,7 @@ export function MyReview() {
                             style={{ height: "400px", objectFit: "cover" }}
                           />
                         ) : (
-                          <Carousel
-                            className="hover-controls"
-                            interval={null}
-                            indicators={false}
-                          >
+                          <Carousel interval={null} indicators={false}>
                             {reviewImages.map((image, i) => (
                               <Carousel.Item key={i}>
                                 <img
@@ -155,18 +182,20 @@ export function MyReview() {
                         <FaChevronRight className="ms-1" size={13} />
                       </div>
                       <div className="small d-flex align-items-center">
-                        {r.petFacility && r.petFacility.id && (
+                        {r.petFacility?.id != null && (
                           <FavoriteContainer
-                            className="small"
                             facilityName={r.petFacility.name}
                             facilityId={r.petFacility.id}
+                            isFavorite={favoriteMap[r.petFacility.id] ?? false}
+                            onToggle={(newState) =>
+                              toggleFavorite(r.petFacility.id, newState)
+                            }
                           />
                         )}
                       </div>
                     </div>
                     <div style={{ color: "#888", fontSize: "0.85rem" }}>
-                      {r.petFacility.sidoName}
-                      {r.petFacility.sigunguName}
+                      {r.petFacility.sidoName} {r.petFacility.sigunguName}
                     </div>
                     <hr className="my-2 hr-color-hotpink" />
 

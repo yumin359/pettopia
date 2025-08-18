@@ -1,10 +1,11 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useContext, useEffect, useRef, useState } from "react";
-import { Button, Container, Nav, Navbar } from "react-bootstrap";
+import { Button, Container, Nav, Navbar, Modal } from "react-bootstrap";
 import { AuthenticationContext } from "./AuthenticationContextProvider.jsx";
 import { toast } from "react-toastify";
 import { FaUserCircle } from "react-icons/fa";
 import { createPortal } from "react-dom";
+import { MemberLogin } from "../feature/member/MemberLogin.jsx";
 
 export function AppNavBar() {
   const { user, logout, isAdmin } = useContext(AuthenticationContext);
@@ -20,6 +21,13 @@ export function AppNavBar() {
   const dropdownRef = useRef(null);
   const navbarRef = useRef(null); // 네비바 전체 참조 추가
   const hoverTimeoutRef = useRef(null); // 타임아웃 참조 추가
+
+  // 1. 로그인 모달의 열림/닫힘 상태를 관리할 state 추가
+  const [showLoginModal, setShowLoginModal] = useState(false);
+
+  // 2. 모달을 열고 닫는 핸들러 함수 추가
+  const handleCloseLoginModal = () => setShowLoginModal(false);
+  const handleShowLoginModal = () => setShowLoginModal(true);
 
   // 햄버거 메뉴 토글
   const handleToggle = () => {
@@ -59,7 +67,7 @@ export function AppNavBar() {
 
   // 로그인 시 드롭다운 메뉴에 표시될 타이틀
   const userDropdownTitle = (
-    <span className="text-white fw-bold">
+    <span className="fw-bold">
       <FaUserCircle size={24} className="me-2" />
       {user?.nickName}
     </span>
@@ -118,8 +126,8 @@ export function AppNavBar() {
           onMouseLeave={(e) => (e.target.style.backgroundColor = "transparent")}
           onClick={() => {
             logout();
-            navigate("/login");
-            toast("로그아웃되었습니다.");
+            navigate("/");
+            toast.success("로그아웃되었습니다.");
             setShowDropdown(false);
           }}
         >
@@ -242,8 +250,8 @@ export function AppNavBar() {
         `}
       </style>
       <Navbar
-        expand="lg"
-        className="px-4 shadow-sm"
+        expand="xl"
+        className="px-4"
         expanded={expanded}
         ref={navbarRef}
         onMouseEnter={handleMouseEnter}
@@ -253,7 +261,7 @@ export function AppNavBar() {
           {/* 로고와 브랜드 이름 */}
           <Navbar.Brand as={Link} to="/" className="d-flex align-items-center">
             <span
-              className=" ms-3 md-3"
+              className=" ms-2 md-3"
               style={{
                 fontFamily: "'Poppins'",
                 fontSize: "clamp(1.2rem, 4vw, 1.8rem)",
@@ -263,9 +271,8 @@ export function AppNavBar() {
             >
               PET
             </span>
-            <img
-              src="/PETOPIA-Photoroom.png"
-              alt="PETOPIA 로고"
+            <div
+              className="logo-image"
               style={{ width: "50px", height: "50px" }}
             />
             <span
@@ -283,30 +290,36 @@ export function AppNavBar() {
 
           {/* 로그인 상태에 따른 UI (오른쪽) */}
           <div className="d-flex align-items-center order-lg-2">
-            <Nav className="me-3">
+            <Nav className="me-1">
               {user ? (
                 <div className="nav-dropdown-container">
-                  <button
-                    className="btn btn-link p-0"
+                  <Button
+                    className="fw-bold"
                     style={{
+                      boxShadow: "none",
+                      padding: "0.5rem 1.5rem",
+                      color: "#D9534F",
+                      backgroundColor: "transparent",
                       border: "none",
-                      background: "transparent",
-                      color: "black",
-                      textDecoration: "none",
+                      fontSize: "1.25rem",
                     }}
                     onClick={handleDropdownToggle}
                   >
                     {userDropdownTitle}
-                  </button>
+                  </Button>
                   <CustomDropdown />
                 </div>
               ) : (
                 <Button
-                  as={Link}
-                  to="/login"
+                  onClick={handleShowLoginModal}
                   className="fw-bold"
                   style={{
+                    boxShadow: "none",
                     padding: "0.5rem 1.5rem",
+                    color: "#D9534F",
+                    backgroundColor: "transparent",
+                    border: "none",
+                    fontSize: "1.25rem",
                   }}
                 >
                   LOGIN
@@ -391,6 +404,30 @@ export function AppNavBar() {
           </Navbar.Collapse>
         </Container>
       </Navbar>
+
+      {/* 4. 화면에 렌더링될 Modal 컴포넌트 추가 */}
+      <Modal
+        show={showLoginModal}
+        onHide={handleCloseLoginModal}
+        centered
+        className="login-modal-neo"
+      >
+        <Modal.Header closeButton>
+          <Modal.Title
+            className="login-title"
+            style={{ width: "100%", textAlign: "center" }}
+          >
+            🐾 PETOPIA
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <MemberLogin
+            onLoginSuccess={handleCloseLoginModal}
+            onNavigateToSignup={handleCloseLoginModal}
+            isModal={true}
+          />
+        </Modal.Body>
+      </Modal>
     </>
   );
 }

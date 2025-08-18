@@ -1,19 +1,20 @@
-import React, { useEffect, useRef, useState, useContext } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import axios from "axios";
 import {
   Badge,
   Button,
   Card,
   Col,
-  Row,
   Container,
   Form,
+  Row,
 } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { ReviewLikeContainer } from "../like/ReviewLikeContainer.jsx";
 import ReportModal from "../report/ReportModal.jsx";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
-import { toast } from "react-toastify"; // 1. react-toastify import
+import { toast } from "react-toastify";
+import "../../styles/LatestReviewsList.css";
 
 export function LatestReviewsList() {
   const { user } = useContext(AuthenticationContext);
@@ -37,7 +38,6 @@ export function LatestReviewsList() {
   const isImageFile = (fileUrl) =>
     /\.(jpg|jpeg|png|gif|webp)$/i.test(fileUrl.split("?")[0]);
 
-  // 2. 신고 버튼 클릭 핸들러 수정
   const openReportModal = (review, event) => {
     event.stopPropagation();
     if (!user) return; // 로그인 안 했으면 모달 안 열림
@@ -51,7 +51,6 @@ export function LatestReviewsList() {
     setReportingReviewId(review.id);
     setReportModalOpen(true);
   };
-
   const closeReportModal = () => {
     setReportModalOpen(false);
     setReportingReviewId(null);
@@ -60,13 +59,11 @@ export function LatestReviewsList() {
   const loadMoreReviews = () => {
     setDisplayCount((prev) => Math.min(prev + 12, filteredReviews.length));
   };
-
   const filteredReviews =
     reviews?.filter((r) => {
       if (!tagFilter.trim()) return true;
       return r.tags?.some((tag) => tag.name.includes(tagFilter.trim()));
     }) || [];
-
   if (!reviews) {
     return (
       <Container className="my-5 text-center">
@@ -84,11 +81,12 @@ export function LatestReviewsList() {
         </span>
       </h2>
 
+      {/* 검색창 */}
       <Form
         className="mb-4"
         style={{
           border: "solid 1px black",
-          boxShadow: "5px 5px 1px 1px black",
+          boxShadow: "5px 5px 1px 1px #2C2D31FF",
         }}
       >
         <Form.Control
@@ -106,9 +104,9 @@ export function LatestReviewsList() {
           const hasImages = imageFiles.length > 0;
 
           return (
-            <Col key={r.id} xs={12} sm={6} md={4} lg={3}>
+            <Col key={r.id} xs={18} sm={6} md={3} lg={2}>
               <Card
-                className="h-100 position-relative"
+                className="h-100 position-relative rounded-0 retro-shadow"
                 onClick={() => {
                   if (!facilityInfo || !facilityInfo.id) return;
                   const url = `/facility/${facilityInfo.id}`;
@@ -116,11 +114,8 @@ export function LatestReviewsList() {
                   params.append("focusReviewId", r.id);
                   navigate(`${url}?${params.toString()}`);
                 }}
-                style={{
-                  border: "solid 1px black",
-                }}
               >
-                <Card.Body className="d-flex flex-column">
+                <Card.Body className="d-flex flex-column p-2">
                   {/* 시설명 */}
                   <div className="fw-semibold text-truncate text-secondary mb-1">
                     📍 {facilityInfo?.name || "정보 없음"}
@@ -143,8 +138,7 @@ export function LatestReviewsList() {
                           src={imageFiles[0]}
                           style={{
                             objectFit: "cover",
-                            height: "200px",
-                            borderRadius: "6px",
+                            height: "100px",
                             marginBottom: "8px",
                           }}
                         />
@@ -158,9 +152,7 @@ export function LatestReviewsList() {
                             display: "grid",
                             gridTemplateColumns: "1fr 1fr",
                             gridTemplateRows: "1fr 1fr",
-                            gap: "4px",
-                            height: "200px",
-                            borderRadius: "6px",
+                            height: "100px",
                             overflow: "hidden",
                             marginBottom: "8px",
                           }}
