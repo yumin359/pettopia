@@ -134,7 +134,7 @@ export default function ServicePage() {
             </div>
             <div className="contact-item">
               <FaRegEnvelope size={20} />
-              <span>jiwan78choi@gmail.com</span>
+              <span>petopia@email.com</span>
             </div>
             <div className="contact-item">
               <FaPhoneAlt size={20} />
