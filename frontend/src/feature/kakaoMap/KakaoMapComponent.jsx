@@ -525,6 +525,114 @@ const KakaoMapComponent = ({
     }
   }, [myLocation]);
 
+  // 컴포넌트 상단 Refs 근처에 추가
+  const restrictingRef = useRef(false);
+  const lastValidCenterRef = useRef(null);
+  const lastValidLevelRef = useRef(null);
+
+  // 4. 지도 경계 하드 락
+  useEffect(() => {
+    if (!mapInstance.current || !isMapReady) return;
+
+    const map = mapInstance.current;
+
+    // 🔒 허용 영역(대한민국 대략 범위)
+    const ALLOWED_SW = new window.kakao.maps.LatLng(33.0, 124.5);
+    const ALLOWED_NE = new window.kakao.maps.LatLng(38.8, 132.0);
+
+    // 현재 뷰포트가 허용 경계 안에 완전히 들어오도록 즉시 보정
+    const keepViewportInside = () => {
+      if (restrictingRef.current) return;
+
+      const bounds = map.getBounds();
+      const sw = bounds.getSouthWest();
+      const ne = bounds.getNorthEast();
+      const center = map.getCenter();
+      const level = map.getLevel();
+
+      const allowedHeight = ALLOWED_NE.getLat() - ALLOWED_SW.getLat();
+      const allowedWidth = ALLOWED_NE.getLng() - ALLOWED_SW.getLng();
+      const curHeight = ne.getLat() - sw.getLat();
+      const curWidth = ne.getLng() - sw.getLng();
+
+      // ✅ 뷰포트가 허용 구역보다 커지면(너무 줌아웃) 직전 유효 상태로 되돌림
+      if (curHeight > allowedHeight || curWidth > allowedWidth) {
+        restrictingRef.current = true;
+        const fallbackCenter =
+          lastValidCenterRef.current ||
+          new window.kakao.maps.LatLng(37.566826, 126.9786567);
+        const fallbackLevel = lastValidLevelRef.current ?? 8; // 초기 레벨
+        map.setLevel(fallbackLevel);
+        map.setCenter(fallbackCenter);
+        restrictingRef.current = false;
+        return;
+      }
+
+      // ✅ 뷰포트가 경계 밖으로 나가려 하면 즉시 중심을 재계산해서 안쪽으로
+      const halfH = curHeight / 2;
+      const halfW = curWidth / 2;
+      let lat = center.getLat();
+      let lng = center.getLng();
+      let changed = false;
+
+      if (lat + halfH > ALLOWED_NE.getLat()) {
+        lat = ALLOWED_NE.getLat() - halfH;
+        changed = true;
+      }
+      if (lat - halfH < ALLOWED_SW.getLat()) {
+        lat = ALLOWED_SW.getLat() + halfH;
+        changed = true;
+      }
+      if (lng + halfW > ALLOWED_NE.getLng()) {
+        lng = ALLOWED_NE.getLng() - halfW;
+        changed = true;
+      }
+      if (lng - halfW < ALLOWED_SW.getLng()) {
+        lng = ALLOWED_SW.getLng() + halfW;
+        changed = true;
+      }
+
+      if (changed) {
+        restrictingRef.current = true;
+        map.setCenter(new window.kakao.maps.LatLng(lat, lng));
+        restrictingRef.current = false;
+        return;
+      }
+
+      // 현재 상태가 유효하면 저장
+      lastValidCenterRef.current = center;
+      lastValidLevelRef.current = level;
+    };
+
+    // 드래그/키보드/마우스 스크롤 등 모든 이동·줌 변화에 즉시 반응
+    window.kakao.maps.event.addListener(
+      map,
+      "center_changed",
+      keepViewportInside,
+    );
+    window.kakao.maps.event.addListener(
+      map,
+      "zoom_changed",
+      keepViewportInside,
+    );
+
+    // 최초 1회 보정
+    keepViewportInside();
+
+    return () => {
+      window.kakao.maps.event.removeListener(
+        map,
+        "center_changed",
+        keepViewportInside,
+      );
+      window.kakao.maps.event.removeListener(
+        map,
+        "zoom_changed",
+        keepViewportInside,
+      );
+    };
+  }, [isMapReady]);
+
   // --- JSX 렌더링 ---
   return (
     <div ref={mapContainer} className="w-100 h-100 position-relative">
@@ -546,8 +654,8 @@ const KakaoMapComponent = ({
                 textAlign: "center",
               }}
             >
-              📍 현재 화면 기준 검색 결과입니다. 다른 지역을 보려면 지도 이동 후
-              "현재 화면 검색"을 다시 눌러주세요.
+              📍 현재 화면 기준 검색 결과입니다. 다른 지역을 보려면 지도를
+              이동시켜 주세요.
             </div>
           )}
 
