@@ -15,6 +15,7 @@ import { toast } from "react-toastify";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
 import GoogleCalendarReview from "../calendar/GoogleCalendarReview.jsx";
 import { MyReview } from "../review/MyReview.jsx";
+import "../../styles/MemberDetail.css";
 
 export function MemberDetail() {
   const [member, setMember] = useState(null);
