@@ -62,7 +62,7 @@ export default function ServiceListPage() {
       setServices((prev) =>
         prev.filter((item) => item.id !== selectedServiceId),
       );
-      toast("문의가 삭제되었습니다.");
+      toast.success("문의 답변 완료되었습니다.");
     } catch (err) {
       console.error("삭제 중 오류가 발생했습니다.", err);
       toast.error("삭제 중 오류가 발생했습니다.");
