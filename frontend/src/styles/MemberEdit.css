@@ -13,6 +13,8 @@
     --brutal-border: 2px solid var(--brutal-black); /* 테두리 두께 조정 */
     --brutal-shadow-hover: 5px 5px 0px 0px var(--brutal-black);
     --brutal-shadow: 4px 4px 0px 0px var(--brutal-black);
+    --kakao-yellow: #FEE500;
+    --kakao-brown: #3A1D1D;
 
     --color-bg: #f6ece6;
     --color-primary: #0d6efd; /* 저장 버튼 */
@@ -61,21 +63,27 @@
 
 /* 역할 배지 */
 .role-badge {
-    margin-left: auto;
     padding: 6px 12px;
     border: var(--brutal-border);
-    font-weight: bold;
+    font-weight: 700;
     font-size: 0.8rem;
-    background-color: var(--petopia-yellow-dark); /* 옐로우 포인트 컬러 */
-    color: var(--brutal-black);
+    margin-left: auto;
 }
 
 .role-badge.admin {
-    background-color: var(--petopia-yellow-dark);
+    background-color: var(--color-danger);
+    color: white;
+}
+
+.role-badge.kakao {
+    background-color: var(--kakao-yellow);
+    color: var(--kakao-brown);
+    border-color: var(--kakao-brown);
 }
 
 .role-badge.user {
     background-color: var(--color-secondary);
+    color: white;
 }
 
 /* --- 프로필 업로드 영역 --- */

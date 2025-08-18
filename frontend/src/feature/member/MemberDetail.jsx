@@ -98,9 +98,6 @@ export function MemberDetail() {
     /\.(jpg|jpeg|png|gif|webp)$/i.test(file),
   );
 
-  // const isAdminFlag = isAdmin(); // 이거는 로그인 한 유저가 admin인지 확인하는 것.
-  // admin이 회원목록에서 memberDetail볼 때는 그 회원이 admin인지 확인해야함.
-  // 따라서 회원목록에서 authNames로 확인하기
   const isAdminFlag = member.authNames?.includes("admin");
   const isKakao = member.provider?.includes("kakao");
   const defaultImage = "/user.png";
@@ -112,7 +109,14 @@ export function MemberDetail() {
           {/* 헤더 */}
           <div className="brutal-card member-info-header">
             <h3 className="member-info-title">👤 회원 정보</h3>
-            {isAdminFlag && <span className="member-role-badge">관리자</span>}
+            {/* --- 역할 배지 로직 수정 --- */}
+            <span
+              className={`member-role-badge ${
+                isAdminFlag ? "admin" : isKakao ? "kakao" : "user"
+              }`}
+            >
+              {isAdminFlag ? "관리자" : isKakao ? "카카오 회원" : "일반 회원"}
+            </span>
           </div>
 
           {/* 프로필 정보 섹션 */}
