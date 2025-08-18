@@ -11,17 +11,17 @@ const FilterGroup = ({
   disabled = false,
 }) => {
   // 🆕 디버깅을 위한 로그 (select 타입일 때만)
-  if (
-    type === "select" &&
-    (title.includes("지역") || title.includes("시군구"))
-  ) {
-    console.log(`🔍 ${title} FilterGroup 상태:`, {
-      selectedValue,
-      options: options.slice(0, 5), // 처음 5개만 보기
-      optionsLength: options.length,
-      isSelected: options.includes(selectedValue),
-    });
-  }
+  // if (
+  //   type === "select" &&
+  //   (title.includes("지역") || title.includes("시군구"))
+  // ) {
+  //   console.log(`🔍 ${title} FilterGroup 상태:`, {
+  //     selectedValue,
+  //     options: options.slice(0, 5), // 처음 5개만 보기
+  //     optionsLength: options.length,
+  //     isSelected: options.includes(selectedValue),
+  //   });
+  // }
 
   // Checkbox 렌더링
   const renderCheckbox = () => (

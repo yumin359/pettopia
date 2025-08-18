@@ -30,11 +30,11 @@ const FilterPanel = ({
 
   // 🆕 지역 변경 감지 및 디버깅
   useEffect(() => {
-    console.log("📍 FilterPanel - 지역 변경 감지:", selectedRegion);
+    // console.log("📍 FilterPanel - 지역 변경 감지:", selectedRegion);
   }, [selectedRegion]);
 
   useEffect(() => {
-    console.log("🏘️ FilterPanel - 시군구 변경 감지:", selectedSigungu);
+    // console.log("🏘️ FilterPanel - 시군구 변경 감지:", selectedSigungu);
   }, [selectedSigungu]);
 
   const handleSearch = (query = null) => {
