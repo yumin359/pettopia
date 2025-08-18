@@ -126,7 +126,7 @@ export function AppNavBar() {
           onMouseLeave={(e) => (e.target.style.backgroundColor = "transparent")}
           onClick={() => {
             logout();
-            navigate("/login");
+            navigate("/");
             toast("로그아웃되었습니다.");
             setShowDropdown(false);
           }}
@@ -417,7 +417,7 @@ export function AppNavBar() {
             className="login-title"
             style={{ width: "100%", textAlign: "center" }}
           >
-            🐾 PETOPIA 로그인
+            🐾 PETOPIA
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
