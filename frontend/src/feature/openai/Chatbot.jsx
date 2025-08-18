@@ -1,5 +1,5 @@
-import { useState, useCallback, useRef, useEffect } from "react";
-import { Button, Form, InputGroup, Card, Spinner, Stack } from "react-bootstrap";
+import { useCallback, useEffect, useRef, useState } from "react";
+import "../../styles/chatbot.css";
 
 export function Chatbot() {
   const [messages, setMessages] = useState([
@@ -29,9 +29,8 @@ export function Chatbot() {
     scrollToBottom();
   }, [messages]);
 
-  // 최적화된 Claude API 호출 - 속도 개선!
+  // 최적화된 Claude API 호출
   const callClaudeViaBackend = useCallback(async (userInput) => {
-    // 이전 요청 취소해서 중복 요청 방지
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
@@ -45,10 +44,11 @@ export function Chatbot() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "claude-3-5-haiku-20241022", // 🚀 더 빠른 모델!
-          max_tokens: 300, // 🚀 토큰 수 줄여서 속도 UP
-          temperature: 0.3, // 🚀 온도 낮춰서 빠른 응답
-          system: "당신은 정중한 말투로 한국어로만 대답하는 친절하고 간결한 펫토피아 챗봇입니다. 답변은 3-4문장으로 간단명료하게 해주세요.",
+          model: "claude-3-5-haiku-20241022",
+          max_tokens: 300,
+          temperature: 0.3,
+          system:
+            "당신은 정중한 말투로 한국어로만 대답하는 친절하고 간결한 펫토피아 챗봇입니다. 답변은 3-4문장으로 간단명료하게 해주세요.",
           messages: [
             {
               role: "user",
@@ -56,7 +56,7 @@ export function Chatbot() {
             },
           ],
         }),
-        signal: abortControllerRef.current.signal, // 요청 취소 지원
+        signal: abortControllerRef.current.signal,
       });
 
       if (!response.ok) {
@@ -67,52 +67,58 @@ export function Chatbot() {
       const data = await response.json();
       return data?.content?.[0]?.text || "응답을 받을 수 없습니다.";
     } catch (err) {
-      if (err.name === 'AbortError') {
+      if (err.name === "AbortError") {
         throw new Error("요청이 취소되었습니다.");
       }
       throw err;
     }
   }, []);
 
-  // 최적화된 메시지 전송 - UI 반응성 UP!
-  const handleSend = useCallback(async (customInput) => {
-    const trimmed = (customInput ?? input).trim();
-    if (!trimmed || loading) return;
+  const handleSend = useCallback(
+    async (customInput) => {
+      const trimmed = (customInput ?? input).trim();
+      if (!trimmed || loading) return;
 
-    // 🚀 즉시 사용자 메시지 추가 (UI 반응성 향상)
-    const userMessage = { sender: "user", text: trimmed };
-    setMessages(prev => [...prev, userMessage]);
-    setInput("");
-    setLoading(true);
+      const userMessage = { sender: "user", text: trimmed };
+      setMessages((prev) => [...prev, userMessage]);
+      setInput("");
+      setLoading(true);
 
-    try {
-      const reply = await callClaudeViaBackend(trimmed);
-      setMessages(prev => [...prev, { sender: "bot", text: reply }]);
-    } catch (err) {
-      if (err.message !== "요청이 취소되었습니다.") {
-        setMessages(prev => [
-          ...prev,
-          { sender: "bot", text: `❌ 오류 발생: ${err.message}` },
-        ]);
+      try {
+        const reply = await callClaudeViaBackend(trimmed);
+        setMessages((prev) => [...prev, { sender: "bot", text: reply }]);
+      } catch (err) {
+        if (err.message !== "요청이 취소되었습니다.") {
+          setMessages((prev) => [
+            ...prev,
+            { sender: "bot", text: `❌ 오류 발생: ${err.message}` },
+          ]);
+        }
+      } finally {
+        setLoading(false);
+        abortControllerRef.current = null;
       }
-    } finally {
-      setLoading(false);
-      abortControllerRef.current = null;
-    }
-  }, [input, loading, callClaudeViaBackend]);
+    },
+    [input, loading, callClaudeViaBackend],
+  );
 
-  const handleKeyDown = useCallback((e) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
-    }
-  }, [handleSend]);
+  const handleKeyDown = useCallback(
+    (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        handleSend();
+      }
+    },
+    [handleSend],
+  );
 
-  const handleExampleClick = useCallback((question) => {
-    handleSend(question);
-  }, [handleSend]);
+  const handleExampleClick = useCallback(
+    (question) => {
+      handleSend(question);
+    },
+    [handleSend],
+  );
 
-  // 컴포넌트 언마운트 시 진행 중인 요청 취소
   useEffect(() => {
     return () => {
       if (abortControllerRef.current) {
@@ -121,88 +127,48 @@ export function Chatbot() {
     };
   }, []);
 
+  // 중복 컨테이너 제거 - 바로 내용만 렌더링
   return (
-    <div
-      style={{
-        padding: "1rem",
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-        width: "90%",
-        maxWidth: "1200px",
-        margin: "0 auto",
-      }}
-    >
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2 className="mb-0">펫토피아 챗봇</h2>
-        {loading && (
-          <div className="d-flex align-items-center text-primary">
-            <Spinner animation="border" size="sm" className="me-2" />
-            <small>답변 생성 중...</small>
-          </div>
-        )}
-      </div>
+    <>
+      {/* 로딩 표시 (필요한 경우) */}
+      {loading && (
+        <div className="chatbot-loading-inline">
+          <div className="chatbot-spinner"></div>
+          <span>답변 생성 중...</span>
+        </div>
+      )}
 
-      {/* 대화창 영역 */}
-      <div
-        style={{
-          flexGrow: 1,
-          border: "1px solid #dee2e6",
-          borderRadius: "12px",
-          padding: "1rem",
-          overflowY: "auto",
-          marginBottom: "1rem",
-          backgroundColor: "#f8f9fa",
-          height: "500px",
-          scrollBehavior: "smooth",
-        }}
-      >
+      {/* 대화창 영역 - 컨테이너 없이 바로 */}
+      <div className="chatbot-messages-simple">
         {messages.map((msg, idx) => (
-          <Card
+          <div
             key={idx}
-            className={`mb-3 shadow-sm ${
-              msg.sender === "user"
-                ? "ms-auto bg-primary text-white"
-                : "me-auto bg-white"
-            }`}
-            style={{
-              maxWidth: "75%",
-              border: msg.sender === "user" ? "none" : "1px solid #e9ecef",
-              borderRadius: "18px",
-            }}
+            className={`chatbot-message ${msg.sender === "user" ? "user" : "bot"}`}
           >
-            <Card.Body className="py-2 px-3">
-              <Card.Text className="mb-0" style={{ whiteSpace: "pre-wrap" }}>
-                {msg.text}
-              </Card.Text>
-            </Card.Body>
-          </Card>
+            <div className="message-bubble">
+              {msg.sender === "bot" && <span className="bot-emoji">🤖</span>}
+              <div className="message-text">{msg.text}</div>
+              {msg.sender === "user" && <span className="user-emoji">👤</span>}
+            </div>
+          </div>
         ))}
 
-        {/* 예시 질문 버튼들 - 대화 시작 시에만 표시 */}
+        {/* 예시 질문 버튼들 */}
         {messages.length === 1 && (
-          <div className="mt-4">
-            <h6 className="text-muted mb-3">💡 이런 질문을 해보세요:</h6>
-            <Stack direction="vertical" gap={2}>
+          <div className="example-questions">
+            <h6 className="example-title">💡 이런 질문을 해보세요:</h6>
+            <div className="example-buttons">
               {exampleQuestions.map((q, i) => (
-                <Button
+                <button
                   key={i}
-                  variant="outline-primary"
-                  size="sm"
+                  className="example-button"
                   onClick={() => handleExampleClick(q)}
                   disabled={loading}
-                  className="text-start"
-                  style={{
-                    whiteSpace: "normal",
-                    borderRadius: "20px",
-                    border: "1px solid #e9ecef",
-                    backgroundColor: "white",
-                  }}
                 >
                   {q}
-                </Button>
+                </button>
               ))}
-            </Stack>
+            </div>
           </div>
         )}
 
@@ -210,35 +176,24 @@ export function Chatbot() {
       </div>
 
       {/* 입력창 */}
-      <InputGroup style={{ flexShrink: 0 }}>
-        <Form.Control
-          as="textarea"
+      <div className="chatbot-input-area-simple">
+        <textarea
+          className="chatbot-input"
           rows={1}
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="궁금한 것을 물어보세요..."
-          style={{
-            resize: "none",
-            borderRadius: "25px 0 0 25px",
-            border: "2px solid #e9ecef",
-            paddingTop: "12px",
-          }}
           disabled={loading}
         />
-        <Button
+        <button
+          className="chatbot-send-btn"
           onClick={() => handleSend()}
-          variant="primary"
           disabled={loading || !input.trim()}
-          style={{
-            borderRadius: "0 25px 25px 0",
-            paddingLeft: "20px",
-            paddingRight: "20px",
-          }}
         >
-          {loading ? <Spinner animation="border" size="sm" /> : "전송"}
-        </Button>
-      </InputGroup>
-    </div>
+          {loading ? "..." : "전송"}
+        </button>
+      </div>
+    </>
   );
 }
