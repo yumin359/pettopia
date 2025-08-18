@@ -102,7 +102,7 @@ export function MainLayout() {
 
       {/* 반응형: 작은 화면에서 광고 숨기기 */}
       <style>{`
-        @media (max-width: 1600px) {
+        @media (max-width: 1875px) {
           .left-ad-area,
           .right-ad-area {
             display: none !important;
