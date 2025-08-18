@@ -7,6 +7,7 @@ import { CalendarHeader } from "./CalendarHeader";
 import { CalendarGrid } from "./CalendarGrid";
 import { DateDetailModal } from "./DateDetailModal";
 import { CalendarStats } from "./CalendarStats";
+import "../../styles/calendar.css";
 
 const GoogleCalendarReview = () => {
   const {
@@ -35,9 +36,9 @@ const GoogleCalendarReview = () => {
   return (
     <div className="calendar-container container-fluid p-3 p-md-4">
       <div className="mb-4">
-        <h2 className="d-flex align-items-center gap-2 mb-2 fw-bold">
+        <h3 className="d-flex align-items-center gap-2 mb-2 fw-bold">
           <Calendar size={28} /> 내 리뷰 내역
-        </h2>
+        </h3>
       </div>
 
       {error && <div className="alert alert-warning">...</div>}
