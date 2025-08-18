@@ -500,6 +500,7 @@ export function MemberEdit() {
             <FormControl
               type="password"
               value={oldPassword}
+              placeholder="현재 비밀번호를 입력하세요."
               onChange={(e) => setOldPassword(e.target.value)}
               className="bg-light border-0"
               style={{ userSelect: "text" }}
@@ -531,7 +532,7 @@ export function MemberEdit() {
               type="password"
               value={newPassword2}
               maxLength={255}
-              placeholder="변경할 비밀번호를 다시 입력하세요"
+              placeholder="변경할 비밀번호를 다시 입력하세요."
               onChange={(e) => setNewPassword2(e.target.value)}
               className="bg-light border-0"
               style={{ userSelect: "text" }}
