@@ -71,18 +71,99 @@ export function MemberLogin({ onLoginSuccess, onNavigateToSignup, isModal }) {
     window.location.href = kakaoAuthUrl;
   }
 
-  const loginFormContent = (
-    <div className="login-container">
-      <div
-        className="login-card"
-        style={isModal ? { boxShadow: "none", border: "none" } : {}}
-      >
-        {/* 헤더 섹션 */}
-        {!isModal && (
-          <div className="login-header">
-            <h1 className="login-title">🐾 PETOPIA</h1>
+  // 모달용 렌더링 (컨테이너 없음)
+  if (isModal) {
+    return (
+      <>
+        {/* 에러 메시지 */}
+        {errorMsg && (
+          <div className="login-alert">
+            <span className="alert-icon">⚠️</span>
+            <span>{errorMsg}</span>
           </div>
         )}
+
+        {/* 로그인 폼 */}
+        <div className="login-form">
+          <div className="form-group-neo">
+            <label className="form-label-neo">이메일</label>
+            <input
+              type="email"
+              className="form-input-neo"
+              placeholder="이메일을 입력하세요"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              disabled={loading}
+            />
+          </div>
+
+          <div className="form-group-neo">
+            <label className="form-label-neo">비밀번호</label>
+            <input
+              type="password"
+              className="form-input-neo"
+              placeholder="비밀번호를 입력하세요"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              disabled={loading}
+            />
+          </div>
+
+          {/* 로그인 버튼 */}
+          <button
+            className="btn-neo btn-primary-neo"
+            onClick={handleLogInButtonClick}
+            disabled={loading}
+          >
+            {loading ? (
+              <span className="loading-text">
+                <span className="spinner-neo"></span>
+                로그인 중...
+              </span>
+            ) : (
+              "로그인"
+            )}
+          </button>
+
+          {/* 구분선 */}
+          <div className="divider-neo">
+            <span>또는</span>
+          </div>
+
+          {/* 카카오 로그인 버튼 */}
+          <button
+            className="btn-neo btn-kakao-neo"
+            onClick={handleKakaoLoginClick}
+            disabled={loading}
+          >
+            <img
+              src="https://developers.kakao.com/assets/img/about/logos/kakaolink/kakaolink_btn_small.png"
+              alt="카카오 로고"
+              className="kakao-logo"
+            />
+            카카오로 로그인
+          </button>
+
+          {/* 회원가입 링크 */}
+          <div className="signup-link">
+            <span>아직 회원이 아니신가요?</span>
+            <Link to="/signup" onClick={handleSignupClick}>
+              회원가입
+            </Link>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  // 페이지용 렌더링 (전체 컨테이너 포함)
+  return (
+    <div className="login-container">
+      <div className="login-card">
+        {/* 헤더 섹션 */}
+        <div className="login-header">
+          <h1 className="login-title">🐾 PETOPIA</h1>
+        </div>
 
         {/* 에러 메시지 */}
         {errorMsg && (
@@ -156,25 +237,12 @@ export function MemberLogin({ onLoginSuccess, onNavigateToSignup, isModal }) {
           {/* 회원가입 링크 */}
           <div className="signup-link">
             <span>아직 회원이 아니신가요?</span>
-            <Link
-              to="/signup"
-              onClick={handleSignupClick} // <<< 여기에 onClick 핸들러를 추가하세요!
-            >
+            <Link to="/signup" onClick={handleSignupClick}>
               회원가입
             </Link>
           </div>
         </div>
       </div>
-    </div>
-  );
-
-  return isModal ? (
-    loginFormContent // 모달일 경우, 전체 페이지 컨테이너 없이 내용만 반환
-  ) : (
-    <div className="login-container">
-      {" "}
-      {/* 페이지일 경우, 기존처럼 전체 컨테이너와 함께 반환 */}
-      {loginFormContent}
     </div>
   );
 }
