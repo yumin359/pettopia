@@ -127,7 +127,7 @@ export function AppNavBar() {
           onClick={() => {
             logout();
             navigate("/");
-            toast("로그아웃되었습니다.");
+            toast.success("로그아웃되었습니다.");
             setShowDropdown(false);
           }}
         >
