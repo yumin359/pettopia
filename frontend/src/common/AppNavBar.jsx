@@ -421,7 +421,11 @@ export function AppNavBar() {
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <MemberLogin onLoginSuccess={handleCloseLoginModal} isModal={true} />
+          <MemberLogin
+            onLoginSuccess={handleCloseLoginModal}
+            onNavigateToSignup={handleCloseLoginModal}
+            isModal={true}
+          />
         </Modal.Body>
       </Modal>
     </>

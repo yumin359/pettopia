@@ -1,11 +1,11 @@
 import { useContext, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
 import "../../styles/member-login.css";
 
-export function MemberLogin({ onLoginSuccess, isModal }) {
+export function MemberLogin({ onLoginSuccess, onNavigateToSignup, isModal }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -13,6 +13,12 @@ export function MemberLogin({ onLoginSuccess, isModal }) {
 
   const { login } = useContext(AuthenticationContext);
   const navigate = useNavigate();
+
+  const handleSignupClick = () => {
+    if (onNavigateToSignup) {
+      onNavigateToSignup();
+    }
+  };
 
   async function handleLogInButtonClick() {
     const trimmedEmail = email.trim();
@@ -150,12 +156,12 @@ export function MemberLogin({ onLoginSuccess, isModal }) {
           {/* 회원가입 링크 */}
           <div className="signup-link">
             <span>아직 회원이 아니신가요?</span>
-            <button
-              className="btn-text-neo"
-              onClick={() => navigate("/signup")}
+            <Link
+              to="/signup"
+              onClick={handleSignupClick} // <<< 여기에 onClick 핸들러를 추가하세요!
             >
               회원가입
-            </button>
+            </Link>
           </div>
         </div>
       </div>
