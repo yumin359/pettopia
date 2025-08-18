@@ -459,16 +459,14 @@ export function MemberEdit() {
             <FormLabel>
               {isKakao
                 ? `정보 수정을 원하시면 ${tempCode}를 입력하세요.`
-                : "정보 수정을 원하시면 암호를 입력하세요."}
+                : "정보 수정을 원하시면 비밀번호를 입력하세요."}
             </FormLabel>
             <FormControl
               type={isKakao ? "text" : "password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder={
-                isKakao
-                  ? "정보 수정을 원하시면 위의 코드를 입력하세요."
-                  : "정보 수정을 원하시면 현재 비밀번호를 입력하세요."
+                isKakao ? "위의 코드를 입력하세요." : "비밀번호를 입력하세요."
               }
               autoFocus
             />
