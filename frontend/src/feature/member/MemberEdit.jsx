@@ -16,6 +16,7 @@ import { toast } from "react-toastify";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
 import { FaPlus } from "react-icons/fa";
 import GoogleCalendarReview from "../calendar/GoogleCalendarReview.jsx";
+import "../../styles/MemberEdit.css";
 
 export function MemberEdit() {
   const [member, setMember] = useState(null);
@@ -123,12 +124,9 @@ export function MemberEdit() {
         currentProfileUrls.length === 0 &&
         deleteProfileFileNames.length > 0
       ) {
-        // 기존 이미지는 없는데 삭제 목록에 이미 파일이 있다면 (이전 삭제 버튼 클릭 후 새 파일 선택)
-        // 삭제 목록 초기화 (새로운 파일이 올라왔으므로 삭제 필요 없음)
         setDeleteProfileFileNames([]);
       }
     }
-    // 파일 선택 취소 시에는 아무것도 하지 않음 (기존 상태 유지)
   };
 
   // 📝 프로필 이미지 제거 버튼 클릭 시 처리하는 함수: deleteProfileFileNames에 추가, newProfileFiles 초기화
@@ -261,202 +259,171 @@ export function MemberEdit() {
   }
 
   return (
-    <div className="p-0 h-100">
+    <div className="p-0 h-100 member-edit-container">
       <Row className="h-100 g-0">
-        {/* 왼쪽 컬럼 : 회원 정보 변경 */}
         <Col
           lg={5}
           md={12}
-          className="p-4 d-flex flex-column"
-          style={{ backgroundColor: "#F6ECE6" }}
+          className="p-4 d-flex flex-column member-edit-column"
         >
-          <div className="mb-4" />
-          <div className="d-flex justify-content-between align-items-center mb-3">
-            <h3 className="fw-bold mb-0">회원 정보</h3>
-            <small className="text-muted" style={{ fontSize: "0.85rem" }}>
-              {member.email === "admin@email.com" ? (
-                <span className="badge bg-danger">관리자</span>
-              ) : (
-                <span className="badge bg-secondary">일반 사용자</span>
-              )}
-            </small>
+          {/* 헤더 */}
+          <div className="brutal-card member-info-header">
+            <h3 className="member-info-title">✏️ 회원 정보 수정</h3>
+            <span
+              className={`role-badge ${member.authNames?.includes("admin") ? "admin" : "user"}`}
+            >
+              {member.authNames?.includes("admin") ? "관리자" : "일반 사용자"}
+            </span>
           </div>
 
-          <div className="border-0 mb-4">
-            {/* 프로필 사진 업로드 섹션 */}
-            <FormGroup className="mb-4">
-              <div className="d-flex justify-content-center flex-column align-items-center gap-2">
-                <div
-                  className="profile-upload-area shadow rounded-circle d-flex justify-content-center align-items-center position-relative"
-                  onClick={
-                    isSelf && !displayProfileImage
-                      ? handleProfileClick
-                      : undefined
-                  }
-                  style={{
-                    width: "150px",
-                    height: "150px",
-                    cursor:
-                      isSelf && !displayProfileImage ? "pointer" : "default",
-                    overflow: "visible", // overflow를 visible로 변경
-                    backgroundColor: displayProfileImage
-                      ? "transparent"
-                      : "#f8f9fa",
-                  }}
-                >
-                  {displayProfileImage ? (
-                    // 이미지가 있을 때: 이미지와 삭제 버튼을 함께 렌더링
-                    <>
-                      <img
-                        src={displayProfileImage}
-                        alt="프로필 미리보기"
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "cover",
-                          borderRadius: "50%",
-                        }}
-                      />
-                      {isSelf && (
-                        <Button
-                          variant="danger"
-                          className="position-absolute top-0 end-0 p-1"
-                          style={{
-                            borderRadius: "50%",
-                            lineHeight: 0.8,
-                            opacity: 0.8,
-                          }}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleRemoveProfile(displayProfileImage);
-                          }}
-                          aria-label="프로필 사진 제거"
-                        >
-                          &times;
-                        </Button>
-                      )}
-                    </>
-                  ) : (
-                    // 이미지가 없을 때: + 아이콘만 렌더링
-                    <FaPlus size={40} color="#6c757d" />
-                  )}
-                </div>
-
-                <FormControl
-                  type="file"
-                  ref={fileInputRef}
-                  onChange={handleFileChange}
-                  style={{ display: "none" }}
-                  accept="image/*"
-                  disabled={!isSelf}
-                  onClick={(e) => {
-                    e.target.value = null;
-                  }}
-                />
+          {/* 프로필 정보 섹션 */}
+          <div className="brutal-card profile-section">
+            <div className="profile-upload-wrapper">
+              <div
+                className="profile-upload-area"
+                onClick={isSelf ? handleProfileClick : undefined}
+              >
+                {displayProfileImage ? (
+                  <img
+                    src={displayProfileImage}
+                    alt="프로필 미리보기"
+                    className="profile-image-preview"
+                  />
+                ) : (
+                  <FaPlus size={40} color="#6c757d" />
+                )}
               </div>
-            </FormGroup>
-            <FormGroup controlId="email1" className="mb-3">
-              <FormLabel>이메일</FormLabel>
-              <FormControl
-                disabled
-                value={member.email}
-                className="bg-secondary bg-opacity-10 border-0"
-                style={{ userSelect: "text", color: "#6c757d" }}
-              />
-            </FormGroup>
-            <FormGroup controlId="nickName1" className="mb-3">
-              <FormLabel>별명</FormLabel>
-              <FormControl
-                value={member.nickName}
-                maxLength={20}
-                placeholder="2~20자, 한글/영문/숫자만 사용 가능"
-                onChange={(e) =>
-                  setMember({
-                    ...member,
-                    nickName: e.target.value.replace(/\s/g, ""),
-                  })
-                }
-                className="bg-light border-0"
-                style={{ userSelect: "text" }}
-                disabled={!isSelf}
-              />
-              {member.nickName && !isNickNameValid && (
-                <FormText className="text-danger">
-                  별명은 2~20자, 한글/영문/숫자만 사용할 수 있습니다.
-                </FormText>
+              {isSelf && displayProfileImage && (
+                <Button
+                  className="btn-remove-profile"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleRemoveProfile(displayProfileImage);
+                  }}
+                  aria-label="프로필 사진 제거"
+                >
+                  &times;
+                </Button>
               )}
-            </FormGroup>
-            <FormGroup controlId="info1" className="mb-3">
-              <FormLabel>자기소개</FormLabel>
+              <FormControl
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                style={{ display: "none" }}
+                accept="image/*"
+                disabled={!isSelf}
+                onClick={(e) => {
+                  e.target.value = null;
+                }}
+              />
+            </div>
+            <div className="profile-main-info">
+              <FormGroup controlId="email1" className="info-group">
+                <FormLabel className="info-label">이메일</FormLabel>
+                <FormControl
+                  disabled
+                  value={member.email}
+                  className="form-control-brutal"
+                />
+              </FormGroup>
+              <FormGroup controlId="nickName1" className="info-group">
+                <FormLabel className="info-label">별명</FormLabel>
+                <FormControl
+                  value={member.nickName}
+                  maxLength={20}
+                  placeholder="2~20자, 한글/영문/숫자만 사용 가능"
+                  onChange={(e) =>
+                    setMember({
+                      ...member,
+                      nickName: e.target.value.replace(/\s/g, ""),
+                    })
+                  }
+                  className="form-control-brutal"
+                  disabled={!isSelf}
+                />
+                {member.nickName && !isNickNameValid && (
+                  <FormText className="text-danger">
+                    별명은 2~20자, 한글/영문/숫자만 사용할 수 있습니다.
+                  </FormText>
+                )}
+              </FormGroup>
+            </div>
+          </div>
+
+          {/* 상세 정보 카드 */}
+          <div className="brutal-card">
+            <FormGroup controlId="info1" className="info-group">
+              <FormLabel className="info-label">자기소개</FormLabel>
               <FormControl
                 as="textarea"
                 value={member.info || ""}
                 maxLength={3000}
                 onChange={(e) => setMember({ ...member, info: e.target.value })}
-                className="bg-light border-0"
-                style={{
-                  minHeight: "120px",
-                  resize: "none",
-                  userSelect: "text",
-                }}
+                className="form-control-brutal textarea"
                 disabled={!isSelf}
               />
             </FormGroup>
-            <FormGroup controlId="insertedAt1" className="mb-3">
-              <FormLabel>가입일시</FormLabel>
+            <FormGroup controlId="insertedAt1" className="info-group">
+              <FormLabel className="info-label">가입일시</FormLabel>
               <FormControl
                 disabled
                 value={formattedInsertedAt}
-                className="bg-secondary bg-opacity-10 border-0"
-                style={{ userSelect: "text", color: "#6c757d" }}
+                className="form-control-brutal"
               />
             </FormGroup>
-            {/* 버튼 3개 - 탈퇴, 수정, 로그아웃과 같은 스타일과 위치 */}
-            {hasAccess(member.email) && (
-              <div className="d-flex justify-content-start gap-2">
-                <Button
-                  variant="outline-secondary"
-                  onClick={() => navigate(-1)}
-                  className="d-flex align-items-center gap-1"
-                >
-                  취소
-                </Button>
-                <Button
-                  variant="primary"
-                  disabled={isSaveDisabled}
-                  onClick={handleModalShowClick}
-                  className="d-flex align-items-center gap-1"
-                >
-                  저장
-                </Button>
-                {!isKakao && (
-                  <Button
-                    variant="outline-info"
-                    onClick={() => setPasswordModalShow(true)}
-                    className="d-flex align-items-center gap-1"
-                  >
-                    비밀번호 변경
-                  </Button>
-                )}
-              </div>
-            )}
           </div>
+
+          {/* 액션 버튼 */}
+          {hasAccess(member.email) && (
+            <div className="action-buttons-wrapper">
+              <Button
+                onClick={() => navigate(-1)}
+                className="btn-brutal btn-cancel"
+              >
+                취소
+              </Button>
+              <Button
+                disabled={isSaveDisabled}
+                onClick={handleModalShowClick}
+                className="btn-brutal btn-save"
+              >
+                저장
+              </Button>
+              {!isKakao && (
+                <Button
+                  onClick={() => setPasswordModalShow(true)}
+                  className="btn-brutal btn-password"
+                >
+                  비밀번호 변경
+                </Button>
+              )}
+            </div>
+          )}
         </Col>
 
-        {/* 오른쪽 컬럼: 리뷰 캘린더 */}
-        <Col lg={7} md={12}>
+        <Col
+          lg={7}
+          md={12}
+          className="p-4"
+          style={{ height: "100%", overflowY: "auto" }}
+        >
           <GoogleCalendarReview />
         </Col>
       </Row>
 
-      {/* 회원 정보 수정 확인 모달 */}
-      <Modal show={modalShow} onHide={() => setModalShow(false)} centered>
+      {/* 모달들 */}
+      <Modal
+        show={modalShow}
+        onHide={() => setModalShow(false)}
+        centered
+        className="modal-brutal"
+      >
         <Modal.Header closeButton>
-          <Modal.Title>회원 정보 수정 확인</Modal.Title>
+          <Modal.Title className="fw-bold">회원 정보 수정 확인</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <FormGroup controlId="password1">
-            <FormLabel>
+            <FormLabel className="info-label">
               {isKakao
                 ? `정보 수정을 원하시면 ${tempCode}를 입력하세요.`
                 : "정보 수정을 원하시면 비밀번호를 입력하세요."}
@@ -485,38 +452,33 @@ export function MemberEdit() {
         </Modal.Footer>
       </Modal>
 
-      {/* 비밀번호 변경 모달 */}
       <Modal
         show={passwordModalShow}
         onHide={() => setPasswordModalShow(false)}
         centered
+        className="modal-brutal"
       >
         <Modal.Header closeButton>
-          <Modal.Title>비밀번호 변경</Modal.Title>
+          <Modal.Title className="fw-bold">비밀번호 변경</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <FormGroup className="mb-3" controlId="password2">
-            <FormLabel>현재 비밀번호</FormLabel>
+            <FormLabel className="info-label">현재 비밀번호</FormLabel>
             <FormControl
               type="password"
               value={oldPassword}
               placeholder="현재 비밀번호를 입력하세요."
               onChange={(e) => setOldPassword(e.target.value)}
-              className="bg-light border-0"
-              style={{ userSelect: "text" }}
             />
           </FormGroup>
-
           <FormGroup className="mb-3" controlId="password3">
-            <FormLabel>변경할 비밀번호</FormLabel>
+            <FormLabel className="info-label">변경할 비밀번호</FormLabel>
             <FormControl
               type="password"
               value={newPassword1}
               maxLength={255}
               placeholder="8자 이상, 영문 대/소문자, 숫자, 특수문자 포함"
               onChange={(e) => setNewPassword1(e.target.value)}
-              className="bg-light border-0"
-              style={{ userSelect: "text" }}
             />
             {newPassword1 && !isPasswordValid && (
               <FormText className="text-danger">
@@ -525,17 +487,14 @@ export function MemberEdit() {
               </FormText>
             )}
           </FormGroup>
-
           <FormGroup className="mb-3" controlId="password4">
-            <FormLabel>변경할 비밀번호 확인</FormLabel>
+            <FormLabel className="info-label">변경할 비밀번호 확인</FormLabel>
             <FormControl
               type="password"
               value={newPassword2}
               maxLength={255}
               placeholder="변경할 비밀번호를 다시 입력하세요."
               onChange={(e) => setNewPassword2(e.target.value)}
-              className="bg-light border-0"
-              style={{ userSelect: "text" }}
             />
             {newPassword2 && !isPasswordMatch && (
               <FormText className="text-danger">
