@@ -73,7 +73,7 @@ export function LatestReviewsList() {
     return (
       <Container className="latest-reviews-container">
         <div className="loading-brutal">
-          <div className="loading-pet-brutal">🐕</div>
+          <div className="loading-pet-brutal">🐶😺🐭</div>
           <p className="loading-text-brutal">리뷰를 불러오는 중...</p>
         </div>
       </Container>
