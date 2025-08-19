@@ -191,7 +191,6 @@ export function ReviewAdd({ facility, onSave, onCancel }) {
       });
       // 새로 생성된 리뷰 ID를 가져옴
       const reviewId = response.data.id;
-      console.log("생성된 리뷰 id : " + reviewId);
 
       toast.success("리뷰가 저장되었습니다.");
 

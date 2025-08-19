@@ -75,6 +75,7 @@ export function MapDetail() {
         data: { email: user.email },
       });
       setSearchParams({ focusReviewId: "" });
+      toast.success("리뷰가 삭제되었습니다.");
       fetchReviews();
     } catch (err) {
       console.error("리뷰 삭제 실패:", err);

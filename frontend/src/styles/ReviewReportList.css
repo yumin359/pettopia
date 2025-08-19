@@ -44,6 +44,10 @@
     text-overflow: initial;
 }
 
-.review-report-table tbody tr td div div {
-    cursor: pointer;
+/* 안된다고 ~~~~~~~~~ */
+/* ⭐️ 여기를 수정했습니다. .reporter-email-cell에 z-index를 제거하고, */
+/* 드롭다운 버튼과 메뉴를 감싸는 .review-actions-container에 z-index를 부여합니다. */
+.review-report-table .reporter-email-cell .review-actions-container {
+    position: relative;
+    z-index: 100; /* 충분히 높은 값으로 설정하여 다른 모든 요소 위에 보이게 합니다. */
 }
