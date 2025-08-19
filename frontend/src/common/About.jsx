@@ -106,26 +106,6 @@ export function About() {
           ))}
         </Row>
       </div>
-
-      {/* CTA */}
-      <div className="about-cta">
-        <h4 className="fw-bold mb-3">
-          <i className="bi bi-rocket-takeoff me-2"></i>
-          지금 바로 시작해보세요!
-        </h4>
-        <p className="mb-4 opacity-90">
-          우리 아이와 함께 할 수 있는 특별한 장소들이 여러분을 기다리고 있습니다.
-        </p>
-        <Button
-          variant="outline-light"
-          size="lg"
-          className="fw-bold mb-2"
-          onClick={() => navigate("/signup")}
-        >
-          <i className="bi bi-person-plus me-2"></i>
-          회원가입하기
-        </Button>
-      </div>
     </div>
   );
 }
