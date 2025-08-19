@@ -7,23 +7,30 @@ export default function ReviewReportActions({
   reviewId,
   handleDeleteReportOnly,
   handleDeleteReview,
+  isDropdownOpen, // 드롭다운 상태
+  handleToggleDropdown, // 토글 함수
 }) {
-  const [actionType, setActionType] = useState(null); // "report" | "review"
+  const [actionType, setActionType] = useState(null);
   const [showModal, setShowModal] = useState(false);
 
+  // 이벤트 버블링을 중지하는 헬퍼 함수
+  const stopBubbling = (e) => {
+    e.stopPropagation();
+  };
+
   const handleAction = (e, type) => {
-    e.stopPropagation(); // ⭐️ 이벤트 버블링 중지
+    stopBubbling(e);
     setActionType(type);
     setShowModal(true);
   };
 
   const handleCloseModal = (e) => {
-    if (e) e.stopPropagation(); // 모달 닫기 버튼 클릭 시 버블링 중지
+    if (e) stopBubbling(e);
     setShowModal(false);
   };
 
   const confirmAction = (e) => {
-    e.stopPropagation(); // 모달의 확인 버튼 클릭 시 버블링 중지
+    stopBubbling(e);
     if (actionType === "report") {
       handleDeleteReportOnly(reportId);
     } else if (actionType === "review") {
@@ -33,9 +40,12 @@ export default function ReviewReportActions({
   };
 
   return (
-    <>
-      {/* 드롭다운 */}
-      <Dropdown onClick={(e) => e.stopPropagation()}>
+    <div className="review-actions-container">
+      {/* show와 onToggle prop으로 부모의 상태와 함수를 제어합니다. */}
+      <Dropdown
+        show={isDropdownOpen}
+        onToggle={() => handleToggleDropdown(reportId)}
+      >
         <Dropdown.Toggle variant="outline-danger" size="sm">
           <FaTrash /> 삭제
         </Dropdown.Toggle>
@@ -51,8 +61,8 @@ export default function ReviewReportActions({
       </Dropdown>
 
       {/* 모달 (재사용) */}
-      <Modal show={showModal} onHide={handleCloseModal}>
-        <Modal.Header closeButton>
+      <Modal show={showModal} onHide={handleCloseModal} onClick={stopBubbling}>
+        <Modal.Header closeButton onClick={handleCloseModal}>
           <Modal.Title>
             {actionType === "report" ? "신고 내역 삭제" : "리뷰 삭제"}
           </Modal.Title>
@@ -71,6 +81,6 @@ export default function ReviewReportActions({
           </Button>
         </Modal.Footer>
       </Modal>
-    </>
+    </div>
   );
 }

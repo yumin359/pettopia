@@ -1,16 +1,7 @@
 import { useEffect, useState, useContext } from "react";
-import {
-  Table,
-  Alert,
-  Spinner,
-  OverlayTrigger,
-  Tooltip,
-  Button,
-  Modal,
-} from "react-bootstrap";
+import { Table, Alert, Spinner } from "react-bootstrap";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
 import { Navigate, useNavigate } from "react-router-dom";
-import { FaTrash } from "react-icons/fa";
 import axios from "axios";
 import "../../styles/ReviewReportList.css";
 import { ReviewText } from "../../common/ReviewText.jsx";
@@ -22,17 +13,16 @@ export default function ReviewReportList() {
   const [reports, setReports] = useState([]);
   const [loadingReports, setLoadingReports] = useState(true);
   const [error, setError] = useState("");
-  const [deletingId, setDeletingId] = useState(null); // 삭제할 리뷰 ID -> reviewId
-  const [reportToDelete, setReportToDelete] = useState(null); // 신고 ID -> id
+  const [deletingId, setDeletingId] = useState(null); // 리뷰 삭제 ID
+  const [reportToDelete, setReportToDelete] = useState(null); // 신고 내역 삭제 ID
+  const [openReportId, setOpenReportId] = useState(null); // 현재 열려 있는 드롭다운의 ID를 저장
   const navigate = useNavigate();
 
-  // 토큰을 읽어 Authorization 헤더 객체 반환 (프로젝트에 맞게 수정 가능)
   function getAuthHeader() {
     const token = localStorage.getItem("accessToken");
     return token ? { Authorization: `Bearer ${token}` } : {};
   }
 
-  // 🔹 모든 Hooks 최상위에서 호출
   useEffect(() => {
     async function fetchReports() {
       try {
@@ -58,24 +48,18 @@ export default function ReviewReportList() {
     fetchReports();
   }, []);
 
-  // 리뷰 신고 삭제 방법 1 : 신고 내역만 삭제
   async function handleDeleteReportOnly(id) {
     if (reportToDelete) return;
-    setReportToDelete(id); // 삭제 중 상태로 설정
+    setReportToDelete(id);
 
     try {
-      // API 호출: 신고 내역만 삭제하는 엔드포인트
-      // 엔드포인트는 /api/review/report/{id} 와 같이 명확하게 분리하는 것이 좋습니다. -> 백엔드 처리
       await axios.delete(`/api/review/report/${id}`, {
         headers: {
           "Content-Type": "application/json",
           ...getAuthHeader(),
         },
       });
-
       toast.success("신고 내역이 성공적으로 삭제되었습니다.");
-
-      // 로컬 상태에서 해당 신고 내역만 제거
       setReports((prev) => prev.filter((r) => String(r.id) !== String(id)));
     } catch (err) {
       console.error(err);
@@ -83,28 +67,23 @@ export default function ReviewReportList() {
         err.response?.data?.message || "신고 내역 삭제 중 오류가 발생했습니다.",
       );
     } finally {
-      setReportToDelete(null); // 삭제 상태 해제
+      setReportToDelete(null);
+      setOpenReportId(null); // 드롭다운 닫기
     }
   }
 
-  // 리뷰 신고 삭제 방법 2 : 리뷰와 관련된 모든 신고를 함께 삭제
   async function handleDeleteReview(reviewId) {
     if (deletingId) return;
-    setDeletingId(reviewId); // 삭제 중 상태로 설정
+    setDeletingId(reviewId);
 
     try {
-      // API 호출: 리뷰를 삭제하는 엔드포인트
-      // 백엔드에서 이 요청을 받으면, 리뷰에 연결된 신고 내역들을 먼저 삭제하고, 리뷰를 삭제해야 합니다.
       await axios.delete(`/api/review/delete/${reviewId}`, {
         headers: {
           "Content-Type": "application/json",
           ...getAuthHeader(),
         },
       });
-
       toast.success("리뷰와 관련된 모든 신고가 삭제되었습니다.");
-
-      // 로컬 상태에서 해당 리뷰 ID와 연결된 모든 신고 내역 제거 -> 확인 하기 @@@@@@@@@@@
       setReports((prev) =>
         prev.filter((r) => String(r.reviewId) !== String(reviewId)),
       );
@@ -115,11 +94,28 @@ export default function ReviewReportList() {
           "리뷰와 신고 삭제 중 오류가 발생했습니다.",
       );
     } finally {
-      setDeletingId(null); // 삭제 상태 해제
+      setDeletingId(null);
+      setOpenReportId(null); // 드롭다운 닫기
     }
   }
 
-  // 🔹 인증 상태 로딩 중이면 로딩 화면
+  const handleRowClick = (reviewWriterId, reviewId, e) => {
+    // 클릭된 요소가 ReviewReportActions 컨테이너에 속해 있는지 확인
+    if (e.target.closest(".review-actions-container")) {
+      return; // 만약 포함되어 있다면 페이지 이동을 막기
+    }
+    if (reviewWriterId) {
+      navigate(`/review/my/${reviewWriterId}?focusReviewId=${reviewId}`);
+    } else {
+      toast.error("작성자 정보가 없습니다.");
+    }
+  };
+
+  // 드롭다운 토글 핸들러
+  const handleToggleDropdown = (id) => {
+    setOpenReportId(openReportId === id ? null : id);
+  };
+
   if (loadingAuth || loadingReports) {
     return (
       <div className="text-center my-5">
@@ -129,7 +125,6 @@ export default function ReviewReportList() {
     );
   }
 
-  // 🔹 admin 체크 후 접근 제한
   if (!isAdmin()) {
     return <Navigate to="/login" replace />;
   }
@@ -141,14 +136,6 @@ export default function ReviewReportList() {
   if (reports.length === 0) {
     return <Alert variant="info">신고된 리뷰가 없습니다.</Alert>;
   }
-
-  const handleRowClick = (reviewWriterId, reviewId) => {
-    if (reviewWriterId) {
-      navigate(`/review/my/${reviewWriterId}?focusReviewId=${reviewId}`);
-    } else {
-      toast.error("작성자 정보가 없습니다.");
-    }
-  };
 
   return (
     <div className="p-4">
@@ -175,7 +162,7 @@ export default function ReviewReportList() {
               <tr
                 key={id}
                 className={reviewWriterId ? "clickable-row" : ""}
-                onClick={() => handleRowClick(reviewWriterId, reviewId)}
+                onClick={(e) => handleRowClick(reviewWriterId, reviewId, e)}
                 title={reviewWriterId ? "작성자 리뷰 보기" : undefined}
               >
                 <td className="reporter-email-cell">
@@ -186,16 +173,17 @@ export default function ReviewReportList() {
                     >
                       {reporterEmail}
                     </div>
-                    {/* 드롭다운 버튼 컴포넌트 */}
                     <ReviewReportActions
                       reportId={id}
                       reviewId={reviewId}
                       handleDeleteReportOnly={handleDeleteReportOnly}
                       handleDeleteReview={handleDeleteReview}
+                      // prop으로 openReportId와 토글 함수 전달
+                      isDropdownOpen={openReportId === id}
+                      handleToggleDropdown={handleToggleDropdown}
                     />
                   </div>
                 </td>
-
                 <td>{reviewId}</td>
                 <td className="reason-cell">
                   <ReviewText text={reason} />
