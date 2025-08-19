@@ -164,7 +164,11 @@ const FacilityInfoCard = ({ facility, loading }) => {
           <span
             className={`badge ${
               isAvailable ? "bg-success" : "bg-secondary"
-            } rounded-pill px-3 py-2`}
+            } rounded-0 px-3 py-2`}
+            style={{
+              border: "solid 1px black",
+              boxShadow: "3px 3px 0px 0px #212529",
+            }}
           >
             {isAvailable ? "🅿️ 주차 가능" : "🚫 주차 불가"}
           </span>
@@ -174,7 +178,7 @@ const FacilityInfoCard = ({ facility, loading }) => {
   };
 
   return (
-    <div className="card border-0 shadow h-100">
+    <div className="card border-0 h-100">
       <div className="card-header bg-primary">
         <div className="d-flex align-items-center">
           <i className="bi bi-info-circle-fill me-3 fs-4"></i>

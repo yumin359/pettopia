@@ -171,7 +171,7 @@ export function MapDetail() {
       {/* 헤더 섹션 */}
       <div className="row mb-5">
         <div className="col-12">
-          <div className="card border-0 shadow-lg bg-transparent">
+          <div className="card border-0 bg-transparent">
             <div className="card-body p-4">
               <div className="d-flex justify-content-between align-items-center">
                 <div>
@@ -216,13 +216,13 @@ export function MapDetail() {
             {user ? (
               <button
                 onClick={handleGoToWrite}
-                className="btn btn-warning btn-lg px-5 py-3 fw-bold shadow"
+                className="btn btn-warning btn-lg px-5 py-3 fw-bold"
               >
                 <i className="bi bi-pencil-square me-3 fs-5"></i>
                 리뷰 작성하기
               </button>
             ) : (
-              <div className="alert alert-info border-0 shadow">
+              <div className="alert alert-info border-0">
                 <div className="d-flex align-items-center justify-content-center">
                   <i className="bi bi-info-circle-fill me-3 fs-4"></i>
                   <div>
@@ -242,7 +242,7 @@ export function MapDetail() {
       {isWriting && facility && (
         <div className="row mb-5">
           <div className="col-12">
-            <div className="card border-0 shadow">
+            <div className="card border-0">
               <div className="card-body p-4">
                 <ReviewAdd
                   facility={facility}
@@ -263,7 +263,7 @@ export function MapDetail() {
       {/* 사진/영상 갤러리 */}
       <div className="row mb-5">
         <div className="col-12">
-          <div className="card border-0 shadow">
+          <div className="card border-0">
             <div className="card-header bg-info text-white">
               <div className="d-flex align-items-center">
                 <i className="bi bi-camera-fill me-3 fs-4"></i>
@@ -308,7 +308,7 @@ export function MapDetail() {
       {/* 리뷰 목록 */}
       <div className="row">
         <div className="col-12">
-          <div className="card border-0 shadow">
+          <div className="card border-0">
             <div className="card-header bg-success text-white">
               <div className="d-flex justify-content-between align-items-center">
                 <div className="d-flex align-items-center">
@@ -404,7 +404,6 @@ export function MapDetail() {
                           className="p-0 border-0 bg-transparent"
                           style={{
                             cursor: user ? "pointer" : "not-allowed",
-                            boxShadow: "none",
                           }}
                           disabled={!user}
                           title={user ? "리뷰 신고하기" : "로그인 후 이용 가능"}
