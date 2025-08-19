@@ -164,12 +164,12 @@
     padding: 10px 12px;
     margin-bottom: 12px;
     display: -webkit-box;
-    -webkit-line-clamp: 2;
+    -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: normal;
-    max-height: 2.8em;
+    max-height: 3.5em;
     cursor: default;
     user-select: text;
 }
