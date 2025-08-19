@@ -13,8 +13,6 @@ export default function ReviewReportActions({
   reviewId,
   handleDeleteReportOnly,
   handleDeleteReview,
-  isDropdownOpen, // 드롭다운 상태
-  handleToggleDropdown, // 토글 함수
 }) {
   const [actionType, setActionType] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -46,29 +44,7 @@ export default function ReviewReportActions({
   };
 
   return (
-    // <div className="review-actions-container">
-    //   {/* show와 onToggle prop으로 부모의 상태와 함수를 제어합니다. */}
-    //   <Dropdown
-    //     show={isDropdownOpen}
-    //     onToggle={() => handleToggleDropdown(reportId)}
-    //     container={document.body}
-    //   >
-    //     <Dropdown.Toggle variant="outline-danger" size="sm">
-    //       <FaTrash /> 삭제
-    //     </Dropdown.Toggle>
-    //
-    //     <Dropdown.Menu renderOnMount popperConfig={{ strategy: "fixed" }}>
-    //       <Dropdown.Item onClick={(e) => handleAction(e, "report")}>
-    //         신고 내역만 삭제
-    //       </Dropdown.Item>
-    //       <Dropdown.Item onClick={(e) => handleAction(e, "review")}>
-    //         리뷰 삭제 (신고 포함)
-    //       </Dropdown.Item>
-    //     </Dropdown.Menu>
-    //   </Dropdown>
-
     <div className="review-actions-container d-flex gap-2">
-      {/* 버튼 2개를 나란히 배치 */}
       <OverlayTrigger
         placement="top"
         overlay={

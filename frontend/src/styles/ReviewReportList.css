@@ -4,7 +4,6 @@
     border-collapse: separate;
     border-spacing: 0;
     border-radius: 12px;
-    /* overflow: hidden;  ❌ 이거 제거 */
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
@@ -29,11 +28,6 @@
     text-overflow: ellipsis;
 }
 
-/* ✅ 드롭다운이 들어가는 신고자 이메일 셀은 overflow 풀기 */
-.review-report-table td.reporter-email-cell {
-    overflow: visible !important;
-}
-
 .review-report-table tbody .clickable-row td {
     cursor: pointer;
 }
@@ -49,8 +43,6 @@
     text-overflow: initial;
 }
 
-/* ✅ 드롭다운 버튼 컨테이너는 위치 기준점이 되도록 relative + z-index */
-.review-report-table .reporter-email-cell .review-actions-container {
-    position: relative;
-    z-index: 1000;
+.review-report-table td.reporter-email-cell {
+    overflow: visible;
 }

@@ -15,7 +15,6 @@ export default function ReviewReportList() {
   const [error, setError] = useState("");
   const [deletingId, setDeletingId] = useState(null); // 리뷰 삭제 ID
   const [reportToDelete, setReportToDelete] = useState(null); // 신고 내역 삭제 ID
-  const [openReportId, setOpenReportId] = useState(null); // 현재 열려 있는 드롭다운의 ID를 저장
   const navigate = useNavigate();
 
   function getAuthHeader() {
@@ -68,7 +67,6 @@ export default function ReviewReportList() {
       );
     } finally {
       setReportToDelete(null);
-      setOpenReportId(null); // 드롭다운 닫기
     }
   }
 
@@ -95,7 +93,6 @@ export default function ReviewReportList() {
       );
     } finally {
       setDeletingId(null);
-      setOpenReportId(null); // 드롭다운 닫기
     }
   }
 
@@ -109,11 +106,6 @@ export default function ReviewReportList() {
     } else {
       toast.error("작성자 정보가 없습니다.");
     }
-  };
-
-  // 드롭다운 토글 핸들러
-  const handleToggleDropdown = (id) => {
-    setOpenReportId(openReportId === id ? null : id);
   };
 
   if (loadingAuth || loadingReports) {
@@ -178,9 +170,6 @@ export default function ReviewReportList() {
                       reviewId={reviewId}
                       handleDeleteReportOnly={handleDeleteReportOnly}
                       handleDeleteReview={handleDeleteReview}
-                      // prop으로 openReportId와 토글 함수 전달
-                      isDropdownOpen={openReportId === id}
-                      handleToggleDropdown={handleToggleDropdown}
                     />
                   </div>
                 </td>
