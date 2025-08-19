@@ -4,7 +4,7 @@
     border-collapse: separate;
     border-spacing: 0;
     border-radius: 12px;
-    overflow: hidden;
+    /* overflow: hidden;  ❌ 이거 제거 */
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
@@ -29,6 +29,11 @@
     text-overflow: ellipsis;
 }
 
+/* ✅ 드롭다운이 들어가는 신고자 이메일 셀은 overflow 풀기 */
+.review-report-table td.reporter-email-cell {
+    overflow: visible !important;
+}
+
 .review-report-table tbody .clickable-row td {
     cursor: pointer;
 }
@@ -44,10 +49,8 @@
     text-overflow: initial;
 }
 
-/* 안된다고 ~~~~~~~~~ */
-/* ⭐️ 여기를 수정했습니다. .reporter-email-cell에 z-index를 제거하고, */
-/* 드롭다운 버튼과 메뉴를 감싸는 .review-actions-container에 z-index를 부여합니다. */
+/* ✅ 드롭다운 버튼 컨테이너는 위치 기준점이 되도록 relative + z-index */
 .review-report-table .reporter-email-cell .review-actions-container {
     position: relative;
-    z-index: 100; /* 충분히 높은 값으로 설정하여 다른 모든 요소 위에 보이게 합니다. */
+    z-index: 1000;
 }

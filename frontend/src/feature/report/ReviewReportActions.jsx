@@ -45,12 +45,13 @@ export default function ReviewReportActions({
       <Dropdown
         show={isDropdownOpen}
         onToggle={() => handleToggleDropdown(reportId)}
+        container={document.body}
       >
         <Dropdown.Toggle variant="outline-danger" size="sm">
           <FaTrash /> 삭제
         </Dropdown.Toggle>
 
-        <Dropdown.Menu>
+        <Dropdown.Menu renderOnMount popperConfig={{ strategy: "fixed" }}>
           <Dropdown.Item onClick={(e) => handleAction(e, "report")}>
             신고 내역만 삭제
           </Dropdown.Item>
