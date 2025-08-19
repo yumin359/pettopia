@@ -184,9 +184,7 @@ export function MemberDetail() {
 
         {/* 오른쪽 컬럼 */}
         <Col
-          lg={7}
-          md={12}
-          className="p-4"
+          // lg={7} md={12} 얘네들은 좀 생각 해봐야 한다.
           style={{ height: "100%", overflowY: "auto" }}
         >
           {/* 캘린더 표시 조건 */}

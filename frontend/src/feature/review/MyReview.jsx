@@ -12,7 +12,7 @@ import "../../styles/MyReview.css";
 
 export function MyReview({ memberId: memberIdFromProp }) {
   const [reviews, setReviews] = useState(null);
-  const [favoriteMap, setFavoriteMap] = useState({}); // facilityId -> isFavorite
+  const [favoriteMap, setFavoriteMap] = useState({});
   const navigate = useNavigate();
   const { memberId: memberIdFromUrl } = useParams();
   const [searchParams] = useSearchParams(); // setSearchParams는 안 쓸 수도??
@@ -86,16 +86,16 @@ export function MyReview({ memberId: memberIdFromProp }) {
 
   return (
     <>
-      <Row className="justify-content-center">
-        <Col xs={12} md={9} lg={7}>
+      <Row className="justify-content-center mt-5">
+        <Col xs={10} md={10} lg={10}>
           <div className="d-flex flex-row align-items-start mb-2">
             <Image
               className="me-3"
               src={userProfileImage}
               alt={`${userNickName} 프로필`}
               style={{
-                width: "67px",
-                height: "67px",
+                width: "75px",
+                height: "75px",
                 objectFit: "cover",
               }}
             />
@@ -199,6 +199,9 @@ export function MyReview({ memberId: memberIdFromProp }) {
                             bg="light"
                             text="dark"
                             className="fw-normal border"
+                            style={{
+                              borderRadius: "0",
+                            }}
                           >
                             # {tag.name}
                           </Badge>
