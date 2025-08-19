@@ -69,7 +69,7 @@ export function AppNavBar() {
           top: dropdownPosition.top,
           right: dropdownPosition.right,
           backgroundColor: "#f6ece6",
-          border: "1px solid black",
+          border: "3px solid black",
           boxShadow: "5px 5px 1px 1px black",
           minWidth: "160px",
           zIndex: 9999,
@@ -357,10 +357,35 @@ export function AppNavBar() {
       >
         <Modal.Header closeButton>
           <Modal.Title
-            className="login-title"
+            className="d-flex align-items-center justify-content-center"
             style={{ width: "100%", textAlign: "center" }}
           >
-            🐾 PETOPIA
+            <span
+              className="ms-4 md-3"
+              style={{
+                fontFamily: "'Poppins'",
+                fontSize: "clamp(1.5rem, 5vw, 2.5rem)",
+                fontWeight: "bolder",
+                color: "black",
+              }}
+            >
+              PET
+            </span>
+            <div
+              className="logo-image"
+              style={{ width: "70px", height: "70px" }}
+            />
+            <span
+              className="md-3"
+              style={{
+                fontFamily: "'Poppins'",
+                fontSize: "clamp(1.5rem, 5vw, 2.5rem)",
+                fontWeight: "bolder",
+                color: "black",
+              }}
+            >
+              TOPIA
+            </span>
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>

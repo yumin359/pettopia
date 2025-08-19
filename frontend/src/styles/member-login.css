@@ -39,7 +39,7 @@
 .login-header {
     background: #f6ece6;
     border-bottom: 3px solid #2C2D31FF;
-    padding: 30px;
+    padding: 20px;
     text-align: center;
 }
 
@@ -224,7 +224,7 @@
 .login-modal-neo .modal-header {
     background: #f6ece6;
     border-bottom: 3px solid #2C2D31FF;
-    padding: 30px;
+    padding: 20px;
     text-align: center;
     justify-content: center; /* 제목을 가운데로 */
 }
