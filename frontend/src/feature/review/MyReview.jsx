@@ -167,16 +167,17 @@ export function MyReview({ memberId: memberIdFromProp }) {
                         <FaChevronRight className="ms-1" size={13} />
                       </div>
                       <div className="small d-flex align-items-center">
-                        {r.petFacility?.id != null && (
-                          <FavoriteContainer
-                            facilityName={r.petFacility.name}
-                            facilityId={r.petFacility.id}
-                            isFavorite={favoriteMap[r.petFacility.id] ?? false}
-                            onToggle={(newState) =>
-                              toggleFavorite(r.petFacility.id, newState)
-                            }
-                          />
-                        )}
+                        {/* TODO : 즐찾 나오게 해야한당 */}
+                        {/*{r.petFacility?.id != null && (*/}
+                        {/*  <FavoriteContainer*/}
+                        {/*    facilityName={r.petFacility.name}*/}
+                        {/*    facilityId={r.petFacility.id}*/}
+                        {/*    isFavorite={favoriteMap[r.petFacility.id] ?? false}*/}
+                        {/*    onToggle={(newState) =>*/}
+                        {/*      toggleFavorite(r.petFacility.id, newState)*/}
+                        {/*    }*/}
+                        {/*  />*/}
+                        {/*)}*/}
                       </div>
                     </div>
                     <div style={{ color: "#888", fontSize: "0.85rem" }}>
