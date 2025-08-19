@@ -61,7 +61,12 @@ export default function ReviewReportActions({
       </Dropdown>
 
       {/* 모달 (재사용) */}
-      <Modal show={showModal} onHide={handleCloseModal} onClick={stopBubbling}>
+      <Modal
+        show={showModal}
+        centered
+        onHide={handleCloseModal}
+        onClick={stopBubbling}
+      >
         <Modal.Header closeButton onClick={handleCloseModal}>
           <Modal.Title>
             {actionType === "report" ? "신고 내역 삭제" : "리뷰 삭제"}
