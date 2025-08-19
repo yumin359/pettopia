@@ -227,6 +227,7 @@ public class ReviewService {
         }
     }
 
+    // 리뷰 삭제
     public void delete(Integer id, String requesterEmail) {
         Review review = reviewRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("리뷰를 찾을 수 없습니다: " + id));

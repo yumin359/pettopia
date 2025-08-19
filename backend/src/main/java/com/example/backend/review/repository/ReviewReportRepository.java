@@ -13,6 +13,7 @@ public interface ReviewReportRepository extends JpaRepository<ReviewReport, Long
     @Query("select rr from ReviewReport rr join fetch rr.review r join fetch r.memberEmail where r.id = :reviewId")
     ReviewReport findByReviewIdWithMember(@Param("reviewId") Integer reviewId);
 
+    // 리뷰 지울 때 신고내역도 지워지게 할 때 쓰이는 거
     void deleteByReview_Id(Integer reviewId);
 
     List<ReviewReport> findAllByOrderByReportedAtDesc();
