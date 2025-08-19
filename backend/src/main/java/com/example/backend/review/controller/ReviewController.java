@@ -88,9 +88,7 @@ public class ReviewController {
     public ResponseEntity<String> deleteReview(@PathVariable Integer id, Authentication authentication) {
         try {
             String requesterEmail = authentication.getName();
-            System.out.println("백엔드 컨트롤러 요청 111");
             reviewService.delete(id, requesterEmail);
-            System.out.println("백엔드 컨트롤러 요청 222");
             return ResponseEntity.ok("리뷰와 관련된 신고가 모두 삭제되었습니다.");
         } catch (Exception e) {
             return ResponseEntity.status(500).body("리뷰 삭제중 오류 발생");

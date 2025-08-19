@@ -46,7 +46,7 @@ public class ReviewReportController {
         return ResponseEntity.ok(reviewReportService.getReportList());
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/report/{id}")
     public ResponseEntity<String> deleteSupport(@PathVariable Long id) {
         try {
             reviewReportService.deleteReviewReport(id);

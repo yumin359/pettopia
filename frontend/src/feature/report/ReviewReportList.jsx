@@ -15,15 +15,15 @@ import axios from "axios";
 import "../../styles/ReviewReportList.css";
 import { ReviewText } from "../../common/ReviewText.jsx";
 import { toast } from "react-toastify";
+import ReviewReportActions from "./ReviewReportActions.jsx";
 
 export default function ReviewReportList() {
   const { isAdmin, loading: loadingAuth } = useContext(AuthenticationContext);
   const [reports, setReports] = useState([]);
   const [loadingReports, setLoadingReports] = useState(true);
   const [error, setError] = useState("");
-  const [deletingId, setDeletingId] = useState(null); // 삭제할 리 id
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [reportToDelete, setReportToDelete] = useState(null);
+  const [deletingId, setDeletingId] = useState(null); // 삭제할 리뷰 ID -> reviewId
+  const [reportToDelete, setReportToDelete] = useState(null); // 신고 ID -> id
   const navigate = useNavigate();
 
   // 토큰을 읽어 Authorization 헤더 객체 반환 (프로젝트에 맞게 수정 가능)
@@ -58,71 +58,64 @@ export default function ReviewReportList() {
     fetchReports();
   }, []);
 
-  // 모달 열기 -> 아마도 id는 없어도 될 듯 최종적으로
-  const handleShowDeleteModal = (event, id, reviewId) => {
-    event.stopPropagation();
-    console.log(id); // 이때 전달되는 id는 신고 리뷰 id 이므로, reviewId를 넘겨주자
-    console.log(reviewId);
-    setReportToDelete(id); // 이건 리뷰 목록 id
-    setDeletingId(reviewId); // 진짜 리뷰 id
-    setShowDeleteModal(true);
-  };
-
-  // 모달 닫기
-  const handleCloseDeleteModal = () => {
-    setShowDeleteModal(false);
-    setReportToDelete(null); // 상태 초기화
-  };
-
-  // 삭제 처리 함수 (버튼 클릭 시 호출)
-  async function handleDeleteReport() {
-    if (!reportToDelete) return;
+  // 리뷰 신고 삭제 방법 1 : 신고 내역만 삭제
+  async function handleDeleteReportOnly(id) {
+    if (reportToDelete) return;
+    setReportToDelete(id); // 삭제 중 상태로 설정
 
     try {
-      // setDeletingId(reportToDelete); // 삭제할 신고 리뷰 id -> 인데 필요한가 ?
-      // 결국 reportToDelete 가 삭제할 리뷰 id 가 됨
-      console.log(reportToDelete);
-      console.log(deletingId);
-      // 지금 리뷰 아이디가 아니라, 리뷰 신고 아이디를 보낸 것이었음.
-
-      // 진짜 리뷰 삭제 -> 백엔드에서 관련 신고들이 먼저 삭제됨
-      await axios.delete(`/api/review/delete/${deletingId}`, {
+      // API 호출: 신고 내역만 삭제하는 엔드포인트
+      // 엔드포인트는 /api/review/report/{id} 와 같이 명확하게 분리하는 것이 좋습니다. -> 백엔드 처리
+      await axios.delete(`/api/review/report/${id}`, {
         headers: {
           "Content-Type": "application/json",
           ...getAuthHeader(),
         },
       });
 
-      // 2. 리뷰 신고 내역 목록에서 삭제
-      // await axios.delete(`/api/review/${reportToDelete}`, {
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //     ...getAuthHeader(),
-      //   },
-      // });
+      toast.success("신고 내역이 성공적으로 삭제되었습니다.");
 
-      toast.success("리뷰와 관련 신고가 모두 삭제 완료되었습니다.");
-      // 성공하면 로컬 상태에서 제거
-      setReports(
-        (prev) => prev.filter((r) => String(r.id) !== String(reportToDelete)), // 얘는 좀 헷갈리넹
+      // 로컬 상태에서 해당 신고 내역만 제거
+      setReports((prev) => prev.filter((r) => String(r.id) !== String(id)));
+    } catch (err) {
+      console.error(err);
+      toast.error(
+        err.response?.data?.message || "신고 내역 삭제 중 오류가 발생했습니다.",
+      );
+    } finally {
+      setReportToDelete(null); // 삭제 상태 해제
+    }
+  }
+
+  // 리뷰 신고 삭제 방법 2 : 리뷰와 관련된 모든 신고를 함께 삭제
+  async function handleDeleteReview(reviewId) {
+    if (deletingId) return;
+    setDeletingId(reviewId); // 삭제 중 상태로 설정
+
+    try {
+      // API 호출: 리뷰를 삭제하는 엔드포인트
+      // 백엔드에서 이 요청을 받으면, 리뷰에 연결된 신고 내역들을 먼저 삭제하고, 리뷰를 삭제해야 합니다.
+      await axios.delete(`/api/review/delete/${reviewId}`, {
+        headers: {
+          "Content-Type": "application/json",
+          ...getAuthHeader(),
+        },
+      });
+
+      toast.success("리뷰와 관련된 모든 신고가 삭제되었습니다.");
+
+      // 로컬 상태에서 해당 리뷰 ID와 연결된 모든 신고 내역 제거 -> 확인 하기 @@@@@@@@@@@
+      setReports((prev) =>
+        prev.filter((r) => String(r.reviewId) !== String(reviewId)),
       );
     } catch (err) {
       console.error(err);
-      if (err.response?.status === 401) {
-        toast.error("로그인이 필요합니다.");
-      } else if (err.response?.status === 403) {
-        toast.error("권한이 없습니다.");
-      } else {
-        // 서버가 반환한 텍스트가 있으면 보여주기
-        const message =
-          err.response?.data ||
-          err.response?.data?.message ||
-          "삭제 중 오류가 발생했습니다.";
-        toast.error(message);
-      }
+      toast.error(
+        err.response?.data?.message ||
+          "리뷰와 신고 삭제 중 오류가 발생했습니다.",
+      );
     } finally {
-      setDeletingId(null);
-      handleCloseDeleteModal();
+      setDeletingId(null); // 삭제 상태 해제
     }
   }
 
@@ -193,28 +186,13 @@ export default function ReviewReportList() {
                     >
                       {reporterEmail}
                     </div>
-                    <OverlayTrigger
-                      placement="top"
-                      overlay={
-                        <Tooltip id={`tooltip-delete-${id}`}>
-                          신고 리뷰 삭제
-                        </Tooltip>
-                      }
-                    >
-                      <Button
-                        variant="outline-danger"
-                        size="sm"
-                        onClick={(e) => handleShowDeleteModal(e, id, reviewId)}
-                        disabled={deletingId === id}
-                        aria-label={`delete-report-${id}`}
-                      >
-                        {deletingId === id ? (
-                          <Spinner animation="border" size="sm" />
-                        ) : (
-                          <FaTrash />
-                        )}
-                      </Button>
-                    </OverlayTrigger>
+                    {/* 드롭다운 버튼 컴포넌트 */}
+                    <ReviewReportActions
+                      reportId={id}
+                      reviewId={reviewId}
+                      handleDeleteReportOnly={handleDeleteReportOnly}
+                      handleDeleteReview={handleDeleteReview}
+                    />
                   </div>
                 </td>
 
@@ -228,23 +206,6 @@ export default function ReviewReportList() {
           )}
         </tbody>
       </Table>
-
-      <Modal show={showDeleteModal} onHide={handleCloseDeleteModal} centered>
-        <Modal.Header closeButton>
-          <Modal.Title>신고 삭제 확인</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          신고된 리뷰를 정말 삭제하시겠습니까? (되돌릴 수 없습니다)
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="outline-secondary" onClick={handleCloseDeleteModal}>
-            취소
-          </Button>
-          <Button variant="danger" onClick={handleDeleteReport}>
-            삭제
-          </Button>
-        </Modal.Footer>
-      </Modal>
     </div>
   );
 }
