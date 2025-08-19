@@ -39,7 +39,7 @@ public class ReviewReportService {
 
     @Transactional(readOnly = true)
     public List<ReviewReportDto> getReportList() {
-        return reviewReportRepository.findAll().stream()
+        return reviewReportRepository.findAllByOrderByReportedAtDesc().stream()
                 .map(ReviewReportDto::fromEntity)
                 .collect(Collectors.toList());
     }
