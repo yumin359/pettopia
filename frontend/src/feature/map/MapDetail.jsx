@@ -22,6 +22,7 @@ export function MapDetail() {
 
   // 상태 관리
   const [facility, setFacility] = useState(null);
+  const [isFavorite, setIsFavorite] = useState(false); // <- 추가
   const [reviews, setReviews] = useState([]);
   const [loadingFacility, setLoadingFacility] = useState(true);
   const [loadingReviews, setLoadingReviews] = useState(true);
@@ -41,13 +42,16 @@ export function MapDetail() {
     try {
       const facilityData = await get(`/pet_facilities/${id}`);
       setFacility(facilityData);
+      setIsFavorite(facilityData.isFavorite || false); // 서버 데이터 반영
     } catch (err) {
       console.error(`시설 조회 실패 (id=${id}):`, err);
       setFacility(null);
+      setIsFavorite(false);
     } finally {
       setLoadingFacility(false);
     }
   };
+
   const fetchReviews = async () => {
     if (!id) return;
     setLoadingReviews(true);
@@ -64,7 +68,7 @@ export function MapDetail() {
     }
   };
 
-  // 리뷰 핸들러들
+  // 리뷰 핸들러
   const handleUpdate = (reviewId) => {
     fetchReviews();
     setSearchParams({ focusReviewId: reviewId });
@@ -91,15 +95,13 @@ export function MapDetail() {
   };
   const handleReviewCancel = () => setIsWriting(false);
 
-  // 신고 모달 열기/닫기 (내 리뷰 신고 시 토스트 메시지 띄우기 추가)
+  // 신고 모달
   const openReportModal = (review) => {
     if (!user) return;
-
     if (user.email === review.memberEmail) {
       toast.error("자신의 리뷰는 신고할 수 없습니다.");
       return;
     }
-
     setReportingReviewId(review.id);
     setReportModalOpen(true);
   };
@@ -108,29 +110,24 @@ export function MapDetail() {
     setReportModalOpen(false);
   };
 
-  // 유틸 함수들
+  // 유틸 함수
   const getAverageRating = () => {
     if (reviews.length === 0) return null;
     const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
     return (sum / reviews.length).toFixed(1);
   };
-
-  // 이것도 없애도 상관없을 것 같긴 한디
   const isImageFile = (fileUrl) => {
     const ext = fileUrl.split(".").pop().split("?")[0];
     return ["jpg", "jpeg", "png", "gif", "webp"].includes(ext.toLowerCase());
   };
-
   const allImagesAndNickNameFromReviews = reviews.flatMap((review) =>
-    // 없애면 이렇게 쓰면 됨
-    // (review.files || []).map((fileUrl) => ({
     (review.files || []).filter(isImageFile).map((fileUrl) => ({
       url: fileUrl,
       nickName: review.memberEmailNickName,
       profileImageUrl: review.profileImageUrl || "/user.png",
       countMemberReview: review.countMemberReview,
       memberAverageRating: review.memberAverageRating,
-    })),
+    }))
   );
 
   const sortedReviews = [...reviews];
@@ -173,34 +170,34 @@ export function MapDetail() {
       <div className="row mb-5">
         <div className="col-12">
           <div className="card border-0 bg-transparent">
-            <div className="card-body p-4">
-              <div className="d-flex justify-content-between align-items-center">
-                <div>
-                  <h1 className="display-6 fw-bold mb-2">
-                    {loadingFacility
-                      ? "불러오는 중..."
-                      : facility
-                        ? facility.name
-                        : "시설 정보 없음"}
-                  </h1>
-                  <p className="opacity-75 mb-0">
-                    <i className="bi bi-geo-alt me-2"></i>
-                    반려동물과 함께하는 특별한 공간
-                  </p>
-                </div>
-                {facility && facility.id && (
-                  <FavoriteContainer
-                    facilityName={facility.name}
-                    facilityId={facility.id}
-                  />
-                )}
+            <div className="card-body p-4 d-flex justify-content-between align-items-center">
+              <div>
+                <h1 className="display-6 fw-bold mb-2">
+                  {loadingFacility
+                    ? "불러오는 중..."
+                    : facility
+                      ? facility.name
+                      : "시설 정보 없음"}
+                </h1>
+                <p className="opacity-75 mb-0">
+                  <i className="bi bi-geo-alt me-2"></i>
+                  반려동물과 함께하는 특별한 공간
+                </p>
               </div>
+              {facility && facility.id && (
+                <FavoriteContainer
+                  facilityName={facility.name}
+                  facilityId={facility.id}
+                  isFavorite={isFavorite}
+                  onToggle={setIsFavorite} // <- 추가
+                />
+              )}
             </div>
           </div>
         </div>
       </div>
 
-      {/* 시설 정보 및 지도 섹션 */}
+      {/* 시설 정보 및 지도 */}
       <div className="row mb-5 g-4">
         <div className="col-lg-7">
           <FacilityInfoCard facility={facility} loading={loadingFacility} />
@@ -256,12 +253,12 @@ export function MapDetail() {
         </div>
       )}
 
-      {/* 평균 평점 통계 */}
+      {/* 평균 평점 */}
       {reviews.length > 0 && (
         <ReviewStatsCard reviews={reviews} averageRating={getAverageRating()} />
       )}
 
-      {/* 사진/영상 갤러리 */}
+      {/* 사진/영상 */}
       <div className="row mb-5">
         <div className="col-12">
           <div className="card border-0">
@@ -291,9 +288,7 @@ export function MapDetail() {
                   <h5 className="mt-3 text-muted">
                     아직 업로드된 사진이 없습니다
                   </h5>
-                  <small className="text-muted">
-                    첫 번째 사진을 공유해보세요!
-                  </small>
+                  <small className="text-muted">첫 번째 사진을 공유해보세요!</small>
                 </div>
               ) : (
                 <ReviewCard
@@ -310,44 +305,36 @@ export function MapDetail() {
       <div className="row">
         <div className="col-12">
           <div className="card border-0">
-            <div className="card-header bg-success text-white">
-              <div className="d-flex justify-content-between align-items-center">
-                <div className="d-flex align-items-center">
-                  <i className="bi bi-chat-quote-fill me-3 fs-4"></i>
-                  <div>
-                    <h4 className="card-title mb-0">
-                      리뷰 목록
-                      <span className="badge bg-light text-dark ms-2">
-                        {reviews.length}
-                      </span>
-                    </h4>
-                    <small className="opacity-75">
-                      User Reviews & Experiences
-                    </small>
-                  </div>
+            <div className="card-header bg-success text-white d-flex justify-content-between align-items-center">
+              <div className="d-flex align-items-center">
+                <i className="bi bi-chat-quote-fill me-3 fs-4"></i>
+                <div>
+                  <h4 className="card-title mb-0">
+                    리뷰 목록
+                    <span className="badge bg-light text-dark ms-2">{reviews.length}</span>
+                  </h4>
+                  <small className="opacity-75">User Reviews & Experiences</small>
                 </div>
-
-                {reviews.length > 0 && (
-                  <div className="d-flex align-items-center">
-                    <label htmlFor="sortSelect" className="me-2 mb-0 fw-bold">
-                      정렬:
-                    </label>
-                    <select
-                      id="sortSelect"
-                      value={sortBy}
-                      onChange={(e) => {
-                        setSearchParams({ focusReviewId: "" });
-                        setSortBy(e.target.value);
-                      }}
-                      className="form-select form-select-sm"
-                      style={{ width: "auto" }}
-                    >
-                      <option value="latest">최신순</option>
-                      <option value="likes">좋아요순</option>
-                    </select>
-                  </div>
-                )}
               </div>
+
+              {reviews.length > 0 && (
+                <div className="d-flex align-items-center">
+                  <label htmlFor="sortSelect" className="me-2 mb-0 fw-bold">정렬:</label>
+                  <select
+                    id="sortSelect"
+                    value={sortBy}
+                    onChange={(e) => {
+                      setSearchParams({ focusReviewId: "" });
+                      setSortBy(e.target.value);
+                    }}
+                    className="form-select form-select-sm"
+                    style={{ width: "auto" }}
+                  >
+                    <option value="latest">최신순</option>
+                    <option value="likes">좋아요순</option>
+                  </select>
+                </div>
+              )}
             </div>
 
             <div className="card-body p-4">
@@ -361,12 +348,8 @@ export function MapDetail() {
               ) : sortedReviews.length === 0 ? (
                 <div className="text-center py-5">
                   <i className="bi bi-chat-left-text display-1 text-muted"></i>
-                  <h5 className="mt-3 fw-bold text-muted">
-                    아직 작성된 리뷰가 없습니다
-                  </h5>
-                  {user && (
-                    <p className="text-muted">첫 번째 리뷰를 작성해보세요!</p>
-                  )}
+                  <h5 className="mt-3 fw-bold text-muted">아직 작성된 리뷰가 없습니다</h5>
+                  {user && <p className="text-muted">첫 번째 리뷰를 작성해보세요!</p>}
                 </div>
               ) : (
                 <div className="list-group list-group-flush">
@@ -384,9 +367,7 @@ export function MapDetail() {
                           {"★".repeat(review.rating)}
                           {"☆".repeat(5 - review.rating)}
                         </span>
-                        <span className="fw-bold fs-5 text-dark">
-                          {review.rating}.0 / 5.0
-                        </span>
+                        <span className="fw-bold fs-5 text-dark">{review.rating}.0 / 5.0</span>
                       </div>
 
                       {/* 리뷰 카드 */}
@@ -403,9 +384,7 @@ export function MapDetail() {
                         <button
                           onClick={() => openReportModal(review)}
                           className="p-0 border-0 bg-transparent"
-                          style={{
-                            cursor: user ? "pointer" : "not-allowed",
-                          }}
+                          style={{ cursor: user ? "pointer" : "not-allowed" }}
                           disabled={!user}
                           title={user ? "리뷰 신고하기" : "로그인 후 이용 가능"}
                         >
@@ -422,9 +401,7 @@ export function MapDetail() {
       </div>
 
       {/* 신고 모달 */}
-      {reportModalOpen && (
-        <ReportModal reviewId={reportingReviewId} onClose={closeReportModal} />
-      )}
+      {reportModalOpen && <ReportModal reviewId={reportingReviewId} onClose={closeReportModal} />}
     </div>
   );
 }

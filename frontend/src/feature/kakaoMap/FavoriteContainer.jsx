@@ -9,7 +9,7 @@ export function FavoriteContainer({ facilityName, facilityId, isFavorite, onTogg
   const { user } = useContext(AuthenticationContext);
 
   if (!facilityName || !facilityName.trim()) {
-    return null; // 시설명이 없으면 렌더링하지 않음
+    return null;
   }
 
   const handleFavoriteClick = async () => {
@@ -23,7 +23,7 @@ export function FavoriteContainer({ facilityName, facilityId, isFavorite, onTogg
         facilityName: facilityName.trim(),
       });
 
-      // 낙관적 업데이트: 상위 컴포넌트 상태 갱신
+      // 상위 컴포넌트 상태 갱신
       onToggle?.(!isFavorite);
     } catch (err) {
       console.error("즐겨찾기 처리 실패:", err);
