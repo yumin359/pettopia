@@ -1,5 +1,11 @@
 import React, { useState } from "react";
-import { Dropdown, Modal, Button } from "react-bootstrap";
+import {
+  Dropdown,
+  Modal,
+  Button,
+  Tooltip,
+  OverlayTrigger,
+} from "react-bootstrap";
 import { FaTrash } from "react-icons/fa";
 
 export default function ReviewReportActions({
@@ -7,8 +13,6 @@ export default function ReviewReportActions({
   reviewId,
   handleDeleteReportOnly,
   handleDeleteReview,
-  isDropdownOpen, // 드롭다운 상태
-  handleToggleDropdown, // 토글 함수
 }) {
   const [actionType, setActionType] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -40,31 +44,51 @@ export default function ReviewReportActions({
   };
 
   return (
-    <div className="review-actions-container">
-      {/* show와 onToggle prop으로 부모의 상태와 함수를 제어합니다. */}
-      <Dropdown
-        show={isDropdownOpen}
-        onToggle={() => handleToggleDropdown(reportId)}
+    <div className="review-actions-container d-flex gap-2">
+      <OverlayTrigger
+        placement="top"
+        overlay={
+          <Tooltip id={`tooltip-report-${reportId}`}>신고 내역만 삭제</Tooltip>
+        }
       >
-        <Dropdown.Toggle variant="outline-danger" size="sm">
-          <FaTrash /> 삭제
-        </Dropdown.Toggle>
+        <Button
+          variant="outline-warning"
+          size="sm"
+          onClick={(e) => handleAction(e, "report")}
+        >
+          ⚠️
+        </Button>
+      </OverlayTrigger>
 
-        <Dropdown.Menu>
-          <Dropdown.Item onClick={(e) => handleAction(e, "report")}>
-            신고 내역만 삭제
-          </Dropdown.Item>
-          <Dropdown.Item onClick={(e) => handleAction(e, "review")}>
-            리뷰 삭제 (신고 포함)
-          </Dropdown.Item>
-        </Dropdown.Menu>
-      </Dropdown>
+      <OverlayTrigger
+        placement="top"
+        overlay={
+          <Tooltip id={`tooltip-review-${reviewId}`}>
+            리뷰와 신고 모두 삭제
+          </Tooltip>
+        }
+      >
+        <Button
+          variant="outline-danger"
+          size="sm"
+          onClick={(e) => handleAction(e, "review")}
+        >
+          🚨
+        </Button>
+      </OverlayTrigger>
 
       {/* 모달 (재사용) */}
-      <Modal show={showModal} onHide={handleCloseModal} onClick={stopBubbling}>
+      <Modal
+        show={showModal}
+        centered
+        onHide={handleCloseModal}
+        onClick={stopBubbling}
+      >
         <Modal.Header closeButton onClick={handleCloseModal}>
-          <Modal.Title>
-            {actionType === "report" ? "신고 내역 삭제" : "리뷰 삭제"}
+          <Modal.Title className="fw-bold">
+            {actionType === "report"
+              ? "⚠️ 신고 내역 삭제 ⚠️"
+              : "🚨 리뷰 삭제 🚨"}
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
@@ -76,9 +100,15 @@ export default function ReviewReportActions({
           <Button variant="secondary" onClick={handleCloseModal}>
             취소
           </Button>
-          <Button variant="danger" onClick={confirmAction}>
-            확인
-          </Button>
+          {actionType === "report" ? (
+            <Button variant="warning" onClick={confirmAction}>
+              확인
+            </Button>
+          ) : (
+            <Button variant="danger" onClick={confirmAction}>
+              확인
+            </Button>
+          )}
         </Modal.Footer>
       </Modal>
     </div>
