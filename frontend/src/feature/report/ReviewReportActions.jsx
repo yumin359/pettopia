@@ -17,7 +17,13 @@ export default function ReviewReportActions({
     setShowModal(true);
   };
 
-  const confirmAction = () => {
+  const handleCloseModal = (e) => {
+    if (e) e.stopPropagation(); // 모달 닫기 버튼 클릭 시 버블링 중지
+    setShowModal(false);
+  };
+
+  const confirmAction = (e) => {
+    e.stopPropagation(); // 모달의 확인 버튼 클릭 시 버블링 중지
     if (actionType === "report") {
       handleDeleteReportOnly(reportId);
     } else if (actionType === "review") {
@@ -45,7 +51,7 @@ export default function ReviewReportActions({
       </Dropdown>
 
       {/* 모달 (재사용) */}
-      <Modal show={showModal} onHide={() => setShowModal(false)}>
+      <Modal show={showModal} onHide={handleCloseModal}>
         <Modal.Header closeButton>
           <Modal.Title>
             {actionType === "report" ? "신고 내역 삭제" : "리뷰 삭제"}
@@ -57,7 +63,7 @@ export default function ReviewReportActions({
             : "리뷰와 관련된 모든 신고가 함께 삭제됩니다. 진행하시겠습니까?"}
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowModal(false)}>
+          <Button variant="secondary" onClick={handleCloseModal}>
             취소
           </Button>
           <Button variant="danger" onClick={confirmAction}>
