@@ -68,8 +68,10 @@ export default function ReviewReportActions({
         onClick={stopBubbling}
       >
         <Modal.Header closeButton onClick={handleCloseModal}>
-          <Modal.Title>
-            {actionType === "report" ? "신고 내역 삭제" : "리뷰 삭제"}
+          <Modal.Title className="fw-bold">
+            {actionType === "report"
+              ? "⚠️ 신고 내역 삭제 ⚠️"
+              : "🚨 리뷰 삭제 🚨"}
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
@@ -81,9 +83,15 @@ export default function ReviewReportActions({
           <Button variant="secondary" onClick={handleCloseModal}>
             취소
           </Button>
-          <Button variant="danger" onClick={confirmAction}>
-            확인
-          </Button>
+          {actionType === "report" ? (
+            <Button variant="warning" onClick={confirmAction}>
+              확인
+            </Button>
+          ) : (
+            <Button variant="danger" onClick={confirmAction}>
+              확인
+            </Button>
+          )}
         </Modal.Footer>
       </Modal>
     </div>
