@@ -259,23 +259,26 @@ export function LatestReviewsList() {
                       </div>
                     )}
 
-                    {/* 좋아요 버튼 */}
+                    {/* 좋아요 & 신고 버튼 */}
                     <div
                       className="like-section-brutal"
                       onClick={(e) => e.stopPropagation()}
                     >
-                      <ReviewLikeContainer reviewId={r.id} compact={true} />
-                    </div>
+                      <div className="like-container">
+                        <ReviewLikeContainer reviewId={r.id} compact={true} />
+                      </div>
 
-                    {/* 신고 버튼 */}
-                    <Button
-                      onClick={(e) => openReportModal(r, e)}
-                      className="report-button-brutal"
-                      disabled={!user}
-                      title={user ? "신고" : "로그인 후 이용 가능"}
-                    >
-                      🚨
-                    </Button>
+                      <div className="report-container">
+                        <Button
+                          onClick={(e) => openReportModal(r, e)}
+                          className="report-button-brutal"
+                          disabled={!user}
+                          title={user ? "신고" : "로그인 후 이용 가능"}
+                        >
+                          🚨
+                        </Button>
+                      </div>
+                    </div>
                   </Card.Body>
                 </Card>
               </Col>

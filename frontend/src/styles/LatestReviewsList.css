@@ -14,22 +14,12 @@
     text-align: center;
     padding: 40px;
     background: #F6ECE6;
-    border-bottom: 3px solid #2C2D31FF;
+    border-bottom: 1px solid #2C2D31FF;
     /*box-shadow: 4px 4px 0px 0px #2C2D31FF;*/
     margin: 0 auto 50px;
     position: relative;
     overflow: hidden;
 }
-
-/*.reviews-header::before {*/
-/*    content: '';*/
-/*    position: absolute;*/
-/*    top: 0;*/
-/*    left: 0;*/
-/*    right: 0;*/
-/*    height: 4px;*/
-/*    background: linear-gradient(90deg, #D9534F 0%, #c9302c 50%, #D9534F 100%);*/
-/*}*/
 
 .reviews-title {
     font-size: 2.8rem;
@@ -192,12 +182,12 @@
 }
 
 .tag-brutal {
-    background: #f8f9fa !important;
-    color: #495057 !important;
+    background: grey !important;
+    color: white !important;
     font-size: 0.7rem !important;
     padding: 4px 8px !important;
     border: 1px solid #dee2e6 !important;
-    border-radius: 12px !important;
+    border-radius: 0 !important;
     font-weight: 500 !important;
     transition: all 0.2s ease;
 }
@@ -213,35 +203,38 @@
     margin-top: auto;
     display: flex;
     align-items: center;
+    justify-content: space-between;
     padding-top: 8px;
     border-top: 1px solid #f1f3f4;
+    width: 100%;
+}
+
+.like-container {
+    display: flex;
+    align-items: center;
+}
+
+.report-container {
+    display: flex;
+    align-items: center;
 }
 
 /* 신고 버튼 */
 .report-button-brutal {
-    position: absolute !important;
-    top: 12px !important;
-    right: 12px !important;
-    width: 32px !important;
-    height: 32px !important;
+    width: 28px !important;
+    height: 28px !important;
     padding: 0 !important;
-    font-size: 0.8rem !important;
-    border-radius: 50% !important;
+    font-size: 0.7rem !important;
+    border-radius: 0 !important;
     background: rgba(255, 255, 255, 0.95) !important;
     border: 1px solid #dc3545 !important;
     color: #dc3545 !important;
-    z-index: 10 !important;
     cursor: pointer;
     transition: all 0.2s ease;
-    backdrop-filter: blur(4px);
-    opacity: 0.8;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-}
-
-.review-card-brutal:hover .report-button-brutal {
-    opacity: 1;
+    flex-shrink: 0;
 }
 
 .report-button-brutal:hover {
@@ -269,7 +262,7 @@
     padding: 18px 40px !important;
     background: white !important;
     color: #2C2D31FF !important;
-    box-shadow: 0 6px 20px rgba(44, 45, 49, 0.1) !important;
+    box-shadow: 4px 4px 0px 0px #2C2D31FF;
     transition: all 0.3s ease !important;
     font-family: 'Poppins', sans-serif !important;
     font-size: 1.1rem !important;
@@ -280,7 +273,7 @@
     background: #2C2D31FF !important;
     color: white !important;
     transform: translateY(-3px) !important;
-    box-shadow: 0 12px 30px rgba(44, 45, 49, 0.2) !important;
+    box-shadow: 4px 4px 0px 0px #2C2D31FF;
     border-color: #2C2D31FF !important;
 }
 
