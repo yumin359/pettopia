@@ -129,7 +129,7 @@ const FilterPanel = ({
           className="search-main-button-brutal"
           onClick={() => handleSearch()}
         >
-          🔍 검색하기
+          🔍 전체검색
         </button>
       </div>
 
