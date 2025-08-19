@@ -124,9 +124,6 @@ const FilterPanel = ({
         >
           ⭐ 즐겨찾기
         </button>
-        {!user && (
-          <div className="disabled-text-brutal">로그인 후 이용 가능합니다.</div>
-        )}
 
         <button
           className="search-main-button-brutal"
@@ -135,6 +132,10 @@ const FilterPanel = ({
           🔍 검색하기
         </button>
       </div>
+
+      {!user && (
+        <div className="disabled-text-brutal">로그인 후 즐겨찾기 이용 가능</div>
+      )}
     </>
   );
 };

@@ -199,6 +199,8 @@
 /* 액션 버튼들 */
 .action-buttons-brutal {
     flex-shrink: 0;
+    display: flex;
+    gap: 8px;
 }
 
 .favorites-button-brutal {
@@ -207,12 +209,11 @@
     border-radius: 0 !important;
     color: #2C2D31FF !important;
     font-weight: 700 !important;
-    padding: 10px 12px !important;
+    padding: 10px 8px !important;
     font-size: 12px !important;
     box-shadow: 2px 2px 0px 0px #2C2D31FF !important;
     transition: all 0.2s ease !important;
-    width: 100%;
-    margin-bottom: 10px;
+    flex: 1;
 }
 
 .favorites-button-brutal:hover:not(:disabled) {
@@ -236,11 +237,11 @@
     border-radius: 0 !important;
     color: white !important;
     font-weight: 700 !important;
-    padding: 12px !important;
-    font-size: 13px !important;
+    padding: 10px 8px !important;
+    font-size: 12px !important;
     box-shadow: 2px 2px 0px 0px #2C2D31FF !important;
     transition: all 0.2s ease !important;
-    width: 100%;
+    flex: 1;
 }
 
 .search-main-button-brutal:hover {
