@@ -89,16 +89,16 @@ export function LatestReviewsList() {
           <p className="reviews-subtitle">
             반려동물과 함께한 소중한 경험을 확인해보세요
           </p>
+          <Form className="search-form-brutal">
+            <Form.Control
+              type="text"
+              placeholder="태그로 리뷰 검색하기 (예: #카페, #공원)"
+              value={tagFilter}
+              onChange={(e) => setTagFilter(e.target.value)}
+              className="search-input-brutal"
+            />
+          </Form>
         </div>
-        <Form className="search-form-brutal">
-          <Form.Control
-            type="text"
-            placeholder="태그로 리뷰 검색하기 (예: #카페, #공원)"
-            value={tagFilter}
-            onChange={(e) => setTagFilter(e.target.value)}
-            className="search-input-brutal"
-          />
-        </Form>
         <div className="empty-state-brutal">
           <h3>😔 검색 결과가 없습니다</h3>
           <p>다른 태그로 검색해보거나 검색어를 지워보세요.</p>
@@ -167,7 +167,7 @@ export function LatestReviewsList() {
                               objectFit: "cover",
                               height: "100px",
                               marginBottom: "8px",
-                              border: "2px solid #2C2D31FF",
+                              borderRadius: "0",
                             }}
                           />
                         )}
@@ -183,9 +183,9 @@ export function LatestReviewsList() {
                               height: "100px",
                               overflow: "hidden",
                               marginBottom: "8px",
-                              border: "2px solid #2C2D31FF",
-                              gap: "2px",
-                              backgroundColor: "#2C2D31FF",
+                              gap: "0",
+                              backgroundColor: "gray",
+                              borderRadius: "0",
                             }}
                           >
                             {imageFiles.slice(0, 3).map((img, i) => (
@@ -215,7 +215,7 @@ export function LatestReviewsList() {
                             {imageFiles.length >= 4 && (
                               <div
                                 style={{
-                                  backgroundColor: "rgba(0,0,0,0.8)",
+                                  backgroundColor: "gray",
                                   color: "white",
                                   fontWeight: "bold",
                                   fontSize: "1.3rem",
@@ -223,7 +223,6 @@ export function LatestReviewsList() {
                                   justifyContent: "center",
                                   alignItems: "center",
                                   userSelect: "none",
-                                  border: "2px solid #D9534F",
                                   boxSizing: "border-box",
                                 }}
                               >
