@@ -19,10 +19,10 @@
 
 /* 메인 카드 - 테두리와 그림자 */
 .calendar-container .card {
-    border: 3px solid #2C2D31FF !important;
+    border: none !important;
     border-radius: 0 !important;
-    box-shadow: 5px 5px 0px 0px #2C2D31FF !important;
-    background: white !important;
+    box-shadow: none !important;
+    /*background: white !important;*/
 }
 
 .calendar-container .card-body {
@@ -202,6 +202,8 @@
     border: 3px solid #2C2D31FF;
     display: block;
     box-sizing: border-box;
+    box-shadow: 5px 5px 1px 1px #212529;
+
 }
 
 /* 요일 헤더 행 */

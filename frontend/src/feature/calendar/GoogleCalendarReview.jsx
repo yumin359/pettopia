@@ -34,9 +34,9 @@ const GoogleCalendarReview = () => {
   };
 
   return (
-    <div className="calendar-container container-fluid p-3 p-md-4">
+    <div className="calendar-container container-fluid">
       {error && <div className="alert alert-warning">...</div>}
-      <div className="card shadow-sm">
+      <div className="card">
         <div className="card-body">
           <CalendarHeader
             year={year}
@@ -46,7 +46,20 @@ const GoogleCalendarReview = () => {
             loading={loading}
           />
           {/* 범례는 여기에 직접 작성하거나 컴포넌트로 분리 가능 */}
-          <div className="d-flex flex-wrap gap-3 mb-3 small">...</div>
+          <div className="d-flex flex-wrap gap-3 small">
+            <CalendarStats
+              reviews={reviews}
+              holidays={holidays}
+              currentDate={currentDate}
+            />
+
+            <DateDetailModal
+              show={!!selectedDate}
+              onClose={handleCloseModal}
+              date={currentDate}
+              data={selectedDate}
+            />
+          </div>
 
           <CalendarGrid
             daysInMonth={daysInMonth}
@@ -59,19 +72,6 @@ const GoogleCalendarReview = () => {
           />
         </div>
       </div>
-
-      <CalendarStats
-        reviews={reviews}
-        holidays={holidays}
-        currentDate={currentDate}
-      />
-
-      <DateDetailModal
-        show={!!selectedDate}
-        onClose={handleCloseModal}
-        date={currentDate}
-        data={selectedDate}
-      />
     </div>
   );
 };

@@ -45,7 +45,7 @@
     border: 3px solid #2C2D31FF;
     font-weight: 700;
     font-size: 1rem;
-    box-shadow: 4px 4px 0px 0px #2C2D31FF;
+    box-shadow: 4px 4px #2C2D31FF;
 }
 
 /* 검색창 */
@@ -104,7 +104,7 @@
 .review-card-brutal {
     border: 3px solid #2C2D31FF !important;
     border-radius: 0 !important;
-    box-shadow: 4px 4px 0px 0px #2C2D31FF;
+    box-shadow: 4px 4px #2C2D31FF;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
     cursor: pointer;
     background: white !important;
@@ -264,7 +264,7 @@
     padding: 18px 40px !important;
     background: white !important;
     color: #2C2D31FF !important;
-    box-shadow: 4px 4px 0px 0px #2C2D31FF;
+    box-shadow: 4px 4px #2C2D31FF;
     transition: all 0.3s ease !important;
     font-family: 'Poppins', sans-serif !important;
     font-size: 1.1rem !important;
@@ -275,7 +275,7 @@
     background: #2C2D31FF !important;
     color: white !important;
     transform: translateY(-3px) !important;
-    box-shadow: 4px 4px 0px 0px #2C2D31FF;
+    box-shadow: 4px 4px #2C2D31FF;
     border-color: #2C2D31FF !important;
 }
 

@@ -1,34 +1,21 @@
-import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { Badge, Carousel, Col, Image, Row, Spinner } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
-import { useParams, useSearchParams } from "react-router";
-import { FaChevronRight } from "react-icons/fa";
-import { ReviewText } from "../../common/ReviewText.jsx";
 import { ReviewLikeContainer } from "../like/ReviewLikeContainer.jsx";
 import { FavoriteContainer } from "../kakaoMap/FavoriteContainer.jsx";
+import React, { useEffect, useRef, useState } from "react";
+import { useParams, useSearchParams } from "react-router";
+import { ReviewText } from "../../common/ReviewText.jsx";
+import { FaChevronRight } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
-
-const cardStyles = `
-  .review-card-custom {
-    background-color: #fffafa;
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    border: 1px solid #fffafa; 
-  }
-  .review-card-custom:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
-    background-color: #fffafc;
-  }
-`;
+import "../../styles/MyReview.css";
 
 export function MyReview({ memberId: memberIdFromProp }) {
   const [reviews, setReviews] = useState(null);
   const [favoriteMap, setFavoriteMap] = useState({}); // facilityId -> isFavorite
   const navigate = useNavigate();
   const { memberId: memberIdFromUrl } = useParams();
-  const [searchParams, setSearchParams] = useSearchParams(); // setSearchParams는 안 쓸 수도??
+  const [searchParams] = useSearchParams(); // setSearchParams는 안 쓸 수도??
   const memberId = memberIdFromProp || memberIdFromUrl;
   const reviewRefs = useRef({});
 
@@ -99,12 +86,10 @@ export function MyReview({ memberId: memberIdFromProp }) {
 
   return (
     <>
-      <style>{cardStyles}</style>
-      <Row className="justify-content-center mt-4">
+      <Row className="justify-content-center">
         <Col xs={12} md={9} lg={7}>
           <div className="d-flex flex-row align-items-start mb-2">
             <Image
-              roundedCircle
               className="me-3"
               src={userProfileImage}
               alt={`${userNickName} 프로필`}
@@ -131,7 +116,7 @@ export function MyReview({ memberId: memberIdFromProp }) {
             return (
               <div
                 key={r.id}
-                className="card mb-3 rounded-4 review-card-custom"
+                className="mb-3 review-card-custom"
                 ref={(el) => (reviewRefs.current[r.id] = el)}
               >
                 <div className="card-body p-4">

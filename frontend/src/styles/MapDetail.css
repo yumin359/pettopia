@@ -267,7 +267,7 @@
     .map-detail-container .container-fluid {
         padding: 20px !important;
         margin: 10px;
-        box-shadow: 5px 5px 0px 0px #2C2D31FF;
+        box-shadow: 5px 5px #2C2D31FF;
     }
 
     .map-detail-container .display-6 {
@@ -280,7 +280,7 @@
     }
 
     .map-detail-container .card {
-        box-shadow: 3px 3px 0px 0px #2C2D31FF !important;
+        box-shadow: 3px 3px #2C2D31FF !important;
     }
 
     .map-detail-container .card:hover {
