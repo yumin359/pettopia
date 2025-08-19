@@ -15,7 +15,6 @@ export default function ReviewReportList() {
   const [error, setError] = useState("");
   const [deletingId, setDeletingId] = useState(null); // 리뷰 삭제 ID
   const [reportToDelete, setReportToDelete] = useState(null); // 신고 내역 삭제 ID
-  const [openReportId, setOpenReportId] = useState(null); // 현재 열려 있는 드롭다운의 ID를 저장
   const navigate = useNavigate();
 
   function getAuthHeader() {
@@ -68,7 +67,6 @@ export default function ReviewReportList() {
       );
     } finally {
       setReportToDelete(null);
-      setOpenReportId(null); // 드롭다운 닫기
     }
   }
 
@@ -91,17 +89,19 @@ export default function ReviewReportList() {
       console.error(err);
       toast.error(
         err.response?.data?.message ||
-        "리뷰와 신고 삭제 중 오류가 발생했습니다.",
+          "리뷰와 신고 삭제 중 오류가 발생했습니다.",
       );
     } finally {
       setDeletingId(null);
-      setOpenReportId(null); // 드롭다운 닫기
     }
   }
 
   const handleRowClick = (reviewWriterId, reviewId, e) => {
     // ReviewReportActions 내부 클릭이면 이동 막기
-    if (e.target.closest(".review-actions-container") || e.target.closest(".modal")) {
+    if (
+      e.target.closest(".review-actions-container") ||
+      e.target.closest(".modal")
+    ) {
       return;
     }
 
@@ -110,11 +110,6 @@ export default function ReviewReportList() {
     } else {
       toast.error("작성자 정보가 없습니다.");
     }
-  };
-
-  // 드롭다운 토글 핸들러
-  const handleToggleDropdown = (id) => {
-    setOpenReportId(openReportId === id ? null : id);
   };
 
   if (loadingAuth || loadingReports) {
@@ -143,56 +138,53 @@ export default function ReviewReportList() {
       <h2 className="mb-4 fw-bold text-muted">리뷰 신고 내역 목록</h2>
       <Table className="review-report-table" responsive>
         <thead>
-        <tr>
-          <th>신고자 이메일</th>
-          <th>리뷰 ID</th>
-          <th>신고 사유</th>
-          <th>신고일</th>
-        </tr>
+          <tr>
+            <th>신고자 이메일</th>
+            <th>리뷰 ID</th>
+            <th>신고 사유</th>
+            <th>신고일</th>
+          </tr>
         </thead>
         <tbody>
-        {reports.map(
-          ({
-             id,
-             reporterEmail,
-             reviewId,
-             reason,
-             reportedAt,
-             reviewWriterId,
-           }) => (
-            <tr
-              key={id}
-              className={reviewWriterId ? "clickable-row" : ""}
-              onClick={(e) => handleRowClick(reviewWriterId, reviewId, e)}
-              title={reviewWriterId ? "작성자 리뷰 보기" : undefined}
-            >
-              <td className="reporter-email-cell">
-                <div className="d-flex align-items-center">
-                  <div
-                    className="flex-grow-1 text-truncate me-2"
-                    title={reporterEmail}
-                  >
-                    {reporterEmail}
+          {reports.map(
+            ({
+              id,
+              reporterEmail,
+              reviewId,
+              reason,
+              reportedAt,
+              reviewWriterId,
+            }) => (
+              <tr
+                key={id}
+                className={reviewWriterId ? "clickable-row" : ""}
+                onClick={(e) => handleRowClick(reviewWriterId, reviewId, e)}
+                title={reviewWriterId ? "작성자 리뷰 보기" : undefined}
+              >
+                <td className="reporter-email-cell">
+                  <div className="d-flex align-items-center">
+                    <div
+                      className="flex-grow-1 text-truncate me-2"
+                      title={reporterEmail}
+                    >
+                      {reporterEmail}
+                    </div>
+                    <ReviewReportActions
+                      reportId={id}
+                      reviewId={reviewId}
+                      handleDeleteReportOnly={handleDeleteReportOnly}
+                      handleDeleteReview={handleDeleteReview}
+                    />
                   </div>
-                  <ReviewReportActions
-                    reportId={id}
-                    reviewId={reviewId}
-                    handleDeleteReportOnly={handleDeleteReportOnly}
-                    handleDeleteReview={handleDeleteReview}
-                    // prop으로 openReportId와 토글 함수 전달
-                    isDropdownOpen={openReportId === id}
-                    handleToggleDropdown={handleToggleDropdown}
-                  />
-                </div>
-              </td>
-              <td>{reviewId}</td>
-              <td className="reason-cell">
-                <ReviewText text={reason} />
-              </td>
-              <td>{reportedAt ? reportedAt.substring(0, 10) : "-"}</td>
-            </tr>
-          ),
-        )}
+                </td>
+                <td>{reviewId}</td>
+                <td className="reason-cell">
+                  <ReviewText text={reason} />
+                </td>
+                <td>{reportedAt ? reportedAt.substring(0, 10) : "-"}</td>
+              </tr>
+            ),
+          )}
         </tbody>
       </Table>
     </div>
