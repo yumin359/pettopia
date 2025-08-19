@@ -2,6 +2,7 @@ import React, { useContext, useEffect } from "react";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
 import FilterGroup from "./FilterGroup.jsx";
 import SearchInput from "./SearchInput.jsx";
+import "../../styles/FilterPanel.css";
 
 const FilterPanel = ({
   selectedRegion,
@@ -28,7 +29,6 @@ const FilterPanel = ({
 }) => {
   const { user } = useContext(AuthenticationContext);
 
-  // 🆕 지역 변경 감지 및 디버깅
   useEffect(() => {
     // console.log("📍 FilterPanel - 지역 변경 감지:", selectedRegion);
   }, [selectedRegion]);
@@ -42,26 +42,20 @@ const FilterPanel = ({
   };
 
   return (
-    <div
-      className="d-flex flex-column bg-dark text-light p-3"
-      style={{
-        fontSize: "12px",
-      }}
-    >
+    <>
       {/* 검색창 */}
-      <div className="mb-2">
-        <label className="form-label small fw-bold mb-1">🔍 검색</label>
-        <SearchInput
-          searchQuery={searchQuery}
-          onSearchQueryChange={onSearchQueryChange}
-          onSearch={handleSearch}
-          placeholder="시설명, 주소, 카테고리로 검색..."
-        />
-      </div>
 
-      {/* 카테고리와 반려동물 종류*/}
-      <div className="flex-grow-1 overflow-auto mb-2" style={{ minHeight: 0 }}>
-        {/* 통합된 FilterGroup 사용 */}
+      <label className="filter-group-title">🔍 검색</label>
+      <SearchInput
+        searchQuery={searchQuery}
+        onSearchQueryChange={onSearchQueryChange}
+        onSearch={handleSearch}
+        placeholder="시설명, 주소, 카테고리로 검색..."
+        className="search-input-brutal"
+      />
+
+      {/* 필터 그룹들 */}
+      <div className="filter-content-brutal overflow-x-hidden">
         <FilterGroup
           title="📍 지역"
           type="select"
@@ -121,34 +115,27 @@ const FilterPanel = ({
         />
       </div>
 
-      {/* 찜 목록 버튼 */}
-      <div className="mb-1">
+      {/* 액션 버튼들 */}
+      <div className="action-buttons-brutal">
         <button
-          className="btn btn-danger w-100 btn-sm"
+          className="favorites-button-brutal"
           onClick={onLoadFavorites}
           disabled={!user}
-          style={{ fontSize: "12px" }}
         >
-          즐겨찾기
+          ⭐ 즐겨찾기
         </button>
         {!user && (
-          <div className="form-text text-center" style={{ fontSize: "9px" }}>
-            로그인 후 이용 가능합니다.
-          </div>
+          <div className="disabled-text-brutal">로그인 후 이용 가능합니다.</div>
         )}
-      </div>
 
-      {/* 검색 버튼 */}
-      <div className="flex-shrink-0 mt-1">
         <button
-          className="btn btn-primary w-100 btn-sm"
+          className="search-main-button-brutal"
           onClick={() => handleSearch()}
-          style={{ fontSize: "12px" }}
         >
-          검색하기
+          🔍 검색하기
         </button>
       </div>
-    </div>
+    </>
   );
 };
 

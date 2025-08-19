@@ -16,7 +16,7 @@
     padding: 40px;
     background: white;
     border: 3px solid #2C2D31FF;
-    box-shadow: 0 10px 30px rgba(44, 45, 49, 0.15);
+    box-shadow: 4px 4px 0px 0px #2C2D31FF;
     max-width: 800px;
     margin: 0 auto 50px;
     position: relative;
@@ -69,14 +69,14 @@
 
 .search-form-brutal {
     border: 3px solid #2C2D31FF !important;
-    box-shadow: 0 8px 25px rgba(44, 45, 49, 0.1) !important;
+    box-shadow: 5px 5px 1px 1px #212529 !important;
     background: white !important;
     transition: all 0.3s ease !important;
 }
 
 .search-form-brutal:focus-within {
     border-color: #D9534F !important;
-    box-shadow: 0 12px 35px rgba(217, 83, 79, 0.2) !important;
+    box-shadow: 5px 5px 1px 1px #D9534F !important;
     transform: translateY(-2px);
 }
 
@@ -114,7 +114,7 @@
 .review-card-brutal {
     border: 3px solid #2C2D31FF !important;
     border-radius: 0 !important;
-    box-shadow: 0 6px 20px rgba(44, 45, 49, 0.1) !important;
+    box-shadow: 4px 4px 0px 0px #2C2D31FF;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
     cursor: pointer;
     background: white !important;
@@ -124,7 +124,7 @@
 
 .review-card-brutal:hover {
     border-color: #D9534F !important;
-    box-shadow: 0 15px 35px rgba(217, 83, 79, 0.2) !important;
+    box-shadow: 5px 5px 1px 1px #D9534F !important;
     transform: translateY(-5px);
 }
 
