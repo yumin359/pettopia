@@ -69,6 +69,7 @@ export function LatestReviewsList() {
       return r.tags?.some((tag) => tag.name.includes(tagFilter.trim()));
     }) || [];
 
+  // 로딩
   if (!reviews) {
     return (
       <Container className="latest-reviews-container">
@@ -119,10 +120,6 @@ export function LatestReviewsList() {
           반려동물과 함께한 소중한 경험을 확인해보세요
         </p>
         <span className="reviews-count">{filteredReviews.length}개의 리뷰</span>
-      </div>
-
-      {/* 검색창 */}
-      <div className="search-section">
         <Form className="search-form-brutal">
           <Form.Control
             type="text"
@@ -154,16 +151,6 @@ export function LatestReviewsList() {
                     navigate(`${url}?${params.toString()}`);
                   }}
                 >
-                  {/* 신고 버튼 */}
-                  <Button
-                    onClick={(e) => openReportModal(r, e)}
-                    className="report-button-brutal"
-                    disabled={!user}
-                    title={user ? "신고" : "로그인 후 이용 가능"}
-                  >
-                    🚨
-                  </Button>
-
                   <Card.Body className="review-card-body">
                     {/* 시설명 */}
                     <div className="facility-name-brutal">
@@ -283,6 +270,16 @@ export function LatestReviewsList() {
                     >
                       <ReviewLikeContainer reviewId={r.id} compact={true} />
                     </div>
+
+                    {/* 신고 버튼 */}
+                    <Button
+                      onClick={(e) => openReportModal(r, e)}
+                      className="report-button-brutal"
+                      disabled={!user}
+                      title={user ? "신고" : "로그인 후 이용 가능"}
+                    >
+                      🚨
+                    </Button>
                   </Card.Body>
                 </Card>
               </Col>

@@ -500,7 +500,7 @@ const KakaoMapComponent = ({
     createStyledInfoWindow,
   ]);
 
-  // 3. 내 위치 마커 처리
+  // 3. 내 위치 마커 처리 : 웹에서는 정확한 위치처리 불가
   useEffect(() => {
     if (mapInstance.current && myLocation) {
       const { lat, lng } = myLocation;
