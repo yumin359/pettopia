@@ -1,5 +1,11 @@
 import React, { useState } from "react";
-import { Dropdown, Modal, Button } from "react-bootstrap";
+import {
+  Dropdown,
+  Modal,
+  Button,
+  Tooltip,
+  OverlayTrigger,
+} from "react-bootstrap";
 import { FaTrash } from "react-icons/fa";
 
 export default function ReviewReportActions({
@@ -40,26 +46,60 @@ export default function ReviewReportActions({
   };
 
   return (
-    <div className="review-actions-container">
-      {/* show와 onToggle prop으로 부모의 상태와 함수를 제어합니다. */}
-      <Dropdown
-        show={isDropdownOpen}
-        onToggle={() => handleToggleDropdown(reportId)}
-        container={document.body}
-      >
-        <Dropdown.Toggle variant="outline-danger" size="sm">
-          <FaTrash /> 삭제
-        </Dropdown.Toggle>
+    // <div className="review-actions-container">
+    //   {/* show와 onToggle prop으로 부모의 상태와 함수를 제어합니다. */}
+    //   <Dropdown
+    //     show={isDropdownOpen}
+    //     onToggle={() => handleToggleDropdown(reportId)}
+    //     container={document.body}
+    //   >
+    //     <Dropdown.Toggle variant="outline-danger" size="sm">
+    //       <FaTrash /> 삭제
+    //     </Dropdown.Toggle>
+    //
+    //     <Dropdown.Menu renderOnMount popperConfig={{ strategy: "fixed" }}>
+    //       <Dropdown.Item onClick={(e) => handleAction(e, "report")}>
+    //         신고 내역만 삭제
+    //       </Dropdown.Item>
+    //       <Dropdown.Item onClick={(e) => handleAction(e, "review")}>
+    //         리뷰 삭제 (신고 포함)
+    //       </Dropdown.Item>
+    //     </Dropdown.Menu>
+    //   </Dropdown>
 
-        <Dropdown.Menu renderOnMount popperConfig={{ strategy: "fixed" }}>
-          <Dropdown.Item onClick={(e) => handleAction(e, "report")}>
-            신고 내역만 삭제
-          </Dropdown.Item>
-          <Dropdown.Item onClick={(e) => handleAction(e, "review")}>
-            리뷰 삭제 (신고 포함)
-          </Dropdown.Item>
-        </Dropdown.Menu>
-      </Dropdown>
+    <div className="review-actions-container d-flex gap-2">
+      {/* 버튼 2개를 나란히 배치 */}
+      <OverlayTrigger
+        placement="top"
+        overlay={
+          <Tooltip id={`tooltip-report-${reportId}`}>신고 내역만 삭제</Tooltip>
+        }
+      >
+        <Button
+          variant="outline-warning"
+          size="sm"
+          onClick={(e) => handleAction(e, "report")}
+        >
+          ⚠️
+        </Button>
+      </OverlayTrigger>
+
+      <OverlayTrigger
+        placement="top"
+        overlay={
+          <Tooltip id={`tooltip-review-${reviewId}`}>
+            리뷰와 신고 모두 삭제
+          </Tooltip>
+        }
+      >
+        <Button
+          variant="outline-danger"
+          size="sm"
+          onClick={(e) => handleAction(e, "review")}
+        >
+          🚨
+        </Button>
+      </OverlayTrigger>
 
       {/* 모달 (재사용) */}
       <Modal
