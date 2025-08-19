@@ -36,12 +36,13 @@ const FilterGroup = ({
             key={option}
             className={`btn ${isChecked ? "text-white" : "btn-outline-secondary"} btn-sm`}
             style={{
-              backgroundColor: isChecked ? bgColor : "white",
+              backgroundColor: bgColor,
               borderColor: bgColor,
               fontSize: "10px",
               padding: "2px 6px",
-              color: isChecked ? "white" : bgColor,
+              color: "white",
               cursor: "pointer",
+              borderRadius: "0",
             }}
           >
             <input

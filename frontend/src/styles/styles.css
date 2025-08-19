@@ -243,7 +243,7 @@ textarea,
 button:hover,
 .btn:hover {
     transform: translate(-1px, -1px);
-    box-shadow: 6px 6px 1px 1px #2C2D31FF;
+    box-shadow: 3px 3px 1px 1px #2C2D31FF;
 }
 
 button:active,
