@@ -104,15 +104,16 @@ export function BoardDetail() {
           </div>
           <div className="file-list">
             {board.files.map((file, idx) => {
-              const fileName = file.split("/").pop();
+              const fileName = decodeURIComponent(file.split("/").pop()); // 디코딩해서 혹시 한글이면 안 깨지도록
               return (
                 <div key={idx} className="file-item">
-                  <span title={fileName}>{fileName}</span>
+                  {/*<span title={fileName}>{fileName}</span>그냥 뺌*/}
                   <Button
                     href={file}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="btn-neo btn-download"
+                    title={fileName}
                   >
                     <FaDownload />
                   </Button>
