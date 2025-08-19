@@ -39,3 +39,30 @@
     font-size: 1.2rem;
     font-weight: bold;
 }
+
+/* ========================================
+   고정높이를 위한
+   ======================================== */
+
+.review-author-area {
+    min-height: 32px;
+}
+
+.review-tag-area {
+    min-height: 22px;
+    max-height: 22px;
+}
+
+.review-text-area {
+    min-height: 60px;
+    max-height: 80px;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    line-height: 1.4;
+}
+
+.review-bottom-area {
+    min-height: 40px;
+}
