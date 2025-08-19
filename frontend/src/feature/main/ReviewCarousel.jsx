@@ -17,6 +17,7 @@ import {
   BsChevronLeft,
   BsChevronRight,
 } from "react-icons/bs";
+import "../../styles/ReviewCarousel.css";
 
 export const ReviewCarousel = () => {
   const [reviews, setReviews] = useState([]);
@@ -141,7 +142,7 @@ export const ReviewCarousel = () => {
                       <img
                         src="/PETOPIA-Photoroom.png"
                         alt="이미지 없음"
-                        className="w-75 h-75"
+                        className="w-100 h-100"
                         style={{ objectFit: "contain" }}
                       />
                     )}
@@ -156,23 +157,31 @@ export const ReviewCarousel = () => {
                     )}
 
                     {totalImages >= 2 && (
-                      <div className="review-image-grid overflow-hidden gap-0">
-                        {imageFiles.slice(0, 3).map((img, i) => (
-                          <div key={i} className="overflow-hidden">
-                            <img
-                              src={img}
-                              alt=""
-                              className="w-100 h-100"
-                              style={{ objectFit: "cover" }}
-                            />
-                          </div>
-                        ))}
+                      <>
+                        {" "}
+                        {/* Fragment로 감싸기 */}
+                        <div className="review-image-grid overflow-hidden gap-0">
+                          {/* 4개 이상일 땐 3개만, 3개면 3개, 2개면 2개 이미지를 표시 */}
+                          {imageFiles
+                            .slice(0, totalImages >= 4 ? 3 : totalImages)
+                            .map((img, i) => (
+                              <div key={i} className="overflow-hidden">
+                                <img
+                                  src={img}
+                                  alt=""
+                                  className="w-100 h-100"
+                                  style={{ objectFit: "cover" }}
+                                />
+                              </div>
+                            ))}
+                        </div>
+                        {/* 오버레이를 그리드와 분리 */}
                         {totalImages >= 4 && (
                           <div className="review-image-overlay d-flex justify-content-center align-items-center">
                             +{totalImages - 3}
                           </div>
                         )}
-                      </div>
+                      </>
                     )}
                   </Col>
 
