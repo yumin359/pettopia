@@ -142,9 +142,35 @@ export function MapDetail() {
   }
 
   useEffect(() => {
+    const fetchFacility = async () => {
+      if (!id) return;
+      setLoadingFacility(true);
+      try {
+        const facilityData = await get(`/pet_facilities/${id}`);
+        setFacility(facilityData);
+
+        // 로그인한 경우 서버에서 즐겨찾기 상태 확인
+        if (user) {
+          try {
+            const favRes = await axios.get(`/api/favorite/id/${facilityData.id}`);
+            setIsFavorite(favRes.data.isFavorite);
+          } catch {
+            setIsFavorite(false);
+          }
+        } else {
+          setIsFavorite(false);
+        }
+      } catch (err) {
+        console.error(`시설 조회 실패 (id=${id}):`, err);
+        setFacility(null);
+        setIsFavorite(false);
+      } finally {
+        setLoadingFacility(false);
+      }
+    };
+
     fetchFacility();
-    fetchReviews();
-  }, [id, sortBy]);
+  }, [id, user]);
 
   useEffect(() => {
     const focusReviewId = searchParams.get("focusReviewId");
@@ -189,7 +215,7 @@ export function MapDetail() {
                   facilityName={facility.name}
                   facilityId={facility.id}
                   isFavorite={isFavorite}
-                  onToggle={setIsFavorite} // <- 추가
+                  onToggle={(newVal) => setIsFavorite(newVal)} // 클릭 즉시 반영
                 />
               )}
             </div>
