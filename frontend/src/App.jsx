@@ -25,7 +25,7 @@ import ReviewReportList from "./feature/report/ReviewReportList.jsx";
 import FullFilterKakaoMap from "./feature/kakaoMap/FullFilterKakaoMap.jsx";
 import "./styles/styles.css";
 import "./styles/Carousel.css";
-import "./styles/Review.css";
+// import "./styles/Review.css"; // 이거 사라짐
 import "./styles/ReviewLike.css";
 
 function App() {
