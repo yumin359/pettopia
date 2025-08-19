@@ -21,7 +21,7 @@ export default function ReviewReportList() {
   const [reports, setReports] = useState([]);
   const [loadingReports, setLoadingReports] = useState(true);
   const [error, setError] = useState("");
-  const [deletingId, setDeletingId] = useState(null); // 삭제중인 id
+  const [deletingId, setDeletingId] = useState(null); // 삭제할 리 id
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [reportToDelete, setReportToDelete] = useState(null);
   const navigate = useNavigate();
@@ -58,10 +58,13 @@ export default function ReviewReportList() {
     fetchReports();
   }, []);
 
-  // 모달 열기
-  const handleShowDeleteModal = (event, id) => {
+  // 모달 열기 -> 아마도 id는 없어도 될 듯 최종적으로
+  const handleShowDeleteModal = (event, id, reviewId) => {
     event.stopPropagation();
-    setReportToDelete(id);
+    console.log(id); // 이때 전달되는 id는 신고 리뷰 id 이므로, reviewId를 넘겨주자
+    console.log(reviewId);
+    setReportToDelete(id); // 이건 리뷰 목록 id
+    setDeletingId(reviewId); // 진짜 리뷰 id
     setShowDeleteModal(true);
   };
 
@@ -76,18 +79,32 @@ export default function ReviewReportList() {
     if (!reportToDelete) return;
 
     try {
-      setDeletingId(reportToDelete);
-      await axios.delete(`/api/review/${reportToDelete}`, {
+      // setDeletingId(reportToDelete); // 삭제할 신고 리뷰 id -> 인데 필요한가 ?
+      // 결국 reportToDelete 가 삭제할 리뷰 id 가 됨
+      console.log(reportToDelete);
+      console.log(deletingId);
+      // 지금 리뷰 아이디가 아니라, 리뷰 신고 아이디를 보낸 것이었음.
+
+      // 진짜 리뷰 삭제 -> 백엔드에서 관련 신고들이 먼저 삭제됨
+      await axios.delete(`/api/review/delete/${deletingId}`, {
         headers: {
           "Content-Type": "application/json",
           ...getAuthHeader(),
         },
       });
 
-      toast.success("신고 삭제 완료되었습니다.");
+      // 2. 리뷰 신고 내역 목록에서 삭제
+      // await axios.delete(`/api/review/${reportToDelete}`, {
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //     ...getAuthHeader(),
+      //   },
+      // });
+
+      toast.success("리뷰와 관련 신고가 모두 삭제 완료되었습니다.");
       // 성공하면 로컬 상태에서 제거
-      setReports((prev) =>
-        prev.filter((r) => String(r.id) !== String(reportToDelete)),
+      setReports(
+        (prev) => prev.filter((r) => String(r.id) !== String(reportToDelete)), // 얘는 좀 헷갈리넹
       );
     } catch (err) {
       console.error(err);
@@ -179,13 +196,15 @@ export default function ReviewReportList() {
                     <OverlayTrigger
                       placement="top"
                       overlay={
-                        <Tooltip id={`tooltip-delete-${id}`}>신고 삭제</Tooltip>
+                        <Tooltip id={`tooltip-delete-${id}`}>
+                          신고 리뷰 삭제
+                        </Tooltip>
                       }
                     >
                       <Button
                         variant="outline-danger"
                         size="sm"
-                        onClick={(e) => handleShowDeleteModal(e, id)}
+                        onClick={(e) => handleShowDeleteModal(e, id, reviewId)}
                         disabled={deletingId === id}
                         aria-label={`delete-report-${id}`}
                       >
@@ -215,7 +234,7 @@ export default function ReviewReportList() {
           <Modal.Title>신고 삭제 확인</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          이 신고를 정말 삭제하시겠습니까? (되돌릴 수 없습니다)
+          신고된 리뷰를 정말 삭제하시겠습니까? (되돌릴 수 없습니다)
         </Modal.Body>
         <Modal.Footer>
           <Button variant="outline-secondary" onClick={handleCloseDeleteModal}>

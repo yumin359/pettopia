@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -83,11 +84,17 @@ public class ReviewController {
 
     // 리뷰 삭제
     @DeleteMapping("/delete/{id}")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("isAuthenticated() or hasAuthority('SCOPE_admin')")
     public ResponseEntity<String> deleteReview(@PathVariable Integer id, Authentication authentication) {
-        String requesterEmail = authentication.getName();
-        reviewService.delete(id, requesterEmail);
-        return ResponseEntity.ok("리뷰가 삭제되었습니다.");
+        try {
+            String requesterEmail = authentication.getName();
+            System.out.println("백엔드 컨트롤러 요청 111");
+            reviewService.delete(id, requesterEmail);
+            System.out.println("백엔드 컨트롤러 요청 222");
+            return ResponseEntity.ok("리뷰와 관련된 신고가 모두 삭제되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("리뷰 삭제중 오류 발생");
+        }
     }
 
     // 최신 리뷰 조회 - limit 옵션

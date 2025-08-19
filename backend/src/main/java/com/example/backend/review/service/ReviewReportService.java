@@ -44,7 +44,7 @@ public class ReviewReportService {
                 .collect(Collectors.toList());
     }
 
-    public void deletereview(Long id) {
+    public void deleteReviewReport(Long id) {
         if (!reviewReportRepository.existsById(id)) {
             throw new IllegalArgumentException("해당 문의가 존재하지 않습니다.");
         }

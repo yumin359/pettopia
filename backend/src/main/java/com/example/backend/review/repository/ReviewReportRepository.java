@@ -9,4 +9,5 @@ public interface ReviewReportRepository extends JpaRepository<ReviewReport, Long
     @Query("select rr from ReviewReport rr join fetch rr.review r join fetch r.memberEmail where r.id = :reviewId")
     ReviewReport findByReviewIdWithMember(@Param("reviewId") Integer reviewId);
 
+    void deleteByReview_Id(Integer reviewId);
 }
