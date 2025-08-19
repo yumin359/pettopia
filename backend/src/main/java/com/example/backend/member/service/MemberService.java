@@ -187,7 +187,7 @@ public class MemberService {
     }
 
     public List<MemberListInfo> list() {
-        return memberRepository.findAllByOrderByIdDesc();
+        return memberRepository.findAllByOrderByInsertedAtDesc();
     }
 
     public MemberDto get(String email) {
