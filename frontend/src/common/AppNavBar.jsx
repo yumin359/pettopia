@@ -99,7 +99,7 @@ export function AppNavBar() {
           style={{
             display: "block",
             padding: "8px 16px",
-            color: "white",
+            color: "black",
             textDecoration: "none",
             transition: "background-color 0.2s",
           }}
