@@ -235,11 +235,11 @@ export function AppNavBar() {
                     className="fw-bold"
                     style={{
                       boxShadow: "none",
-                      padding: "0.5rem 1.5rem",
+                      padding: "0.375rem 0.75rem",
                       color: "#D9534F",
                       backgroundColor: "transparent",
                       border: "none",
-                      fontSize: "1.25rem",
+                      fontSize: "clamp(0.9rem, 2.5vw, 1.25rem)",
                     }}
                     onClick={handleDropdownToggle}
                   >
@@ -264,7 +264,14 @@ export function AppNavBar() {
                 </Button>
               )}
             </Nav>
-            <Navbar.Toggle aria-controls="main-nav" onClick={handleToggle} />
+            <Navbar.Toggle
+              aria-controls="main-nav"
+              onClick={handleToggle}
+              style={{
+                padding: "0.25rem 0.5rem",
+                fontSize: "1rem",
+              }}
+            />
           </div>
 
           {/* 메뉴 */}
@@ -273,8 +280,9 @@ export function AppNavBar() {
               className="mx-auto mb-4 mt-3"
               style={{
                 display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
+                justifyContent: expanded ? "flex-start" : "center",
+                alignItems: expanded ? "flex-start" : "center",
+                flexDirection: expanded ? "column" : "row",
                 gap: "2rem",
               }}
             >
