@@ -83,36 +83,32 @@ export function LatestReviewsList() {
 
   if (filteredReviews.length === 0) {
     return (
-      <Container className="latest-reviews-container">
+      <div className="latest-reviews-container">
         <div className="reviews-header">
           <h2 className="reviews-title">📝 최신 리뷰</h2>
           <p className="reviews-subtitle">
             반려동물과 함께한 소중한 경험을 확인해보세요
           </p>
         </div>
-
-        <div className="search-section">
-          <Form className="search-form-brutal">
-            <Form.Control
-              type="text"
-              placeholder="태그로 리뷰 검색하기 (예: #카페, #공원)"
-              value={tagFilter}
-              onChange={(e) => setTagFilter(e.target.value)}
-              className="search-input-brutal"
-            />
-          </Form>
-        </div>
-
+        <Form className="search-form-brutal">
+          <Form.Control
+            type="text"
+            placeholder="태그로 리뷰 검색하기 (예: #카페, #공원)"
+            value={tagFilter}
+            onChange={(e) => setTagFilter(e.target.value)}
+            className="search-input-brutal"
+          />
+        </Form>
         <div className="empty-state-brutal">
           <h3>😔 검색 결과가 없습니다</h3>
           <p>다른 태그로 검색해보거나 검색어를 지워보세요.</p>
         </div>
-      </Container>
+      </div>
     );
   }
 
   return (
-    <Container className="latest-reviews-container">
+    <div className="latest-reviews-container">
       {/* 페이지 헤더 */}
       <div className="reviews-header">
         <h2 className="reviews-title">📝 최신 리뷰</h2>
@@ -132,7 +128,7 @@ export function LatestReviewsList() {
       </div>
 
       {/* 리뷰 그리드 */}
-      <div className="reviews-grid-container">
+      <div className="reviews-grid-container mx-5">
         <Row className="g-3">
           {filteredReviews.slice(0, displayCount).map((r) => {
             const imageFiles = r.files?.filter(isImageFile) || [];
@@ -290,7 +286,7 @@ export function LatestReviewsList() {
 
       {/* 더보기 버튼 */}
       {filteredReviews.length > displayCount && (
-        <div className="load-more-section">
+        <div className="load-more-section mb-5">
           <Button onClick={loadMoreReviews} className="load-more-brutal">
             더 많은 리뷰 보기
             <small>({filteredReviews.length - displayCount}개 남음)</small>
@@ -302,6 +298,6 @@ export function LatestReviewsList() {
       {reportModalOpen && reportingReviewId && (
         <ReportModal reviewId={reportingReviewId} onClose={closeReportModal} />
       )}
-    </Container>
+    </div>
   );
 }
