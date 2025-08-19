@@ -244,7 +244,15 @@ export function MapDetail() {
         <div className="row mb-5">
           <div className="col-12">
             <div className="card border-0">
-              <div className="card-body p-4">
+              <div
+                style={{
+                  backgroundColor: "#F6ECE6",
+                  borderBottom: "3px solid #212529",
+                }}
+              >
+                <h2 className="card-title mb-0 p-4">새 리뷰 작성</h2>
+              </div>
+              <div className="card-body p-5">
                 <ReviewAdd
                   facility={facility}
                   onSave={handleReviewSaved}
