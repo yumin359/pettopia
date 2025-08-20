@@ -47,7 +47,9 @@ export function MapDetail() {
 
       let isFavorite = false;
       if (user) {
-        const favResponse = await axios.get(`/api/favorite/id/${facilityData.id}`);
+        const favResponse = await axios.get(
+          `/api/favorite/id/${facilityData.id}`,
+        );
         isFavorite = favResponse.data.isFavorite;
       }
 
@@ -59,6 +61,8 @@ export function MapDetail() {
       setLoadingFacility(false);
     }
   };
+  // 그니까 얘는 한 번에 한 시설명에 대한 즐찾만 가져오니까 .. 잘 확인하고 있는거고,
+  // MyReview는 각 리뷰에서 계속 isFavorite인지 확인해야함
 
   const fetchReviews = async () => {
     if (!id) return;
@@ -177,7 +181,10 @@ export function MapDetail() {
   }, [reviews, searchParams]);
 
   return (
-    <div className="map-detail-container container-fluid px-4 py-4" style={{ maxWidth: "1400px" }}>
+    <div
+      className="map-detail-container container-fluid px-4 py-4"
+      style={{ maxWidth: "1400px" }}
+    >
       {/* 헤더 */}
       <div className="row mb-5">
         <div className="col-12">
@@ -186,7 +193,9 @@ export function MapDetail() {
               <div className="d-flex justify-content-between align-items-center">
                 <div>
                   <h1 className="display-6 fw-bold mb-2">
-                    {loadingFacility ? "불러오는 중..." : facility?.name || "시설 정보 없음"}
+                    {loadingFacility
+                      ? "불러오는 중..."
+                      : facility?.name || "시설 정보 없음"}
                   </h1>
                   <p className="opacity-75 mb-0">
                     <i className="bi bi-geo-alt me-2"></i>
@@ -199,7 +208,7 @@ export function MapDetail() {
                     facilityId={facility.id}
                     isFavorite={facility.isFavorite}
                     onToggle={(newVal) =>
-                      setFacility(prev => ({ ...prev, isFavorite: newVal }))
+                      setFacility((prev) => ({ ...prev, isFavorite: newVal }))
                     }
                   />
                 )}
@@ -224,7 +233,10 @@ export function MapDetail() {
         <div className="row mb-4">
           <div className="col-12 text-center">
             {user ? (
-              <button onClick={handleGoToWrite} className="btn btn-warning btn-lg px-5 py-3 fw-bold">
+              <button
+                onClick={handleGoToWrite}
+                className="btn btn-warning btn-lg px-5 py-3 fw-bold"
+              >
                 <i className="bi bi-pencil-square me-3 fs-5"></i>
                 리뷰 작성하기
               </button>
@@ -234,7 +246,9 @@ export function MapDetail() {
                   <i className="bi bi-info-circle-fill me-3 fs-4"></i>
                   <div>
                     <h6 className="alert-heading mb-1">로그인이 필요합니다</h6>
-                    <p className="mb-0">로그인한 사용자만 리뷰를 작성할 수 있습니다.</p>
+                    <p className="mb-0">
+                      로그인한 사용자만 리뷰를 작성할 수 있습니다.
+                    </p>
                   </div>
                 </div>
               </div>
@@ -247,18 +261,29 @@ export function MapDetail() {
         <div className="row mb-5">
           <div className="col-12">
             <div className="card border-0">
-              <div style={{ backgroundColor: "#F6ECE6", borderBottom: "3px solid #212529" }}>
+              <div
+                style={{
+                  backgroundColor: "#F6ECE6",
+                  borderBottom: "3px solid #212529",
+                }}
+              >
                 <h2 className="card-title mb-0 p-4">새 리뷰 작성</h2>
               </div>
               <div className="card-body p-5">
-                <ReviewAdd facility={facility} onSave={handleReviewSaved} onCancel={handleReviewCancel} />
+                <ReviewAdd
+                  facility={facility}
+                  onSave={handleReviewSaved}
+                  onCancel={handleReviewCancel}
+                />
               </div>
             </div>
           </div>
         </div>
       )}
 
-      {reviews.length > 0 && <ReviewStatsCard reviews={reviews} averageRating={getAverageRating()} />}
+      {reviews.length > 0 && (
+        <ReviewStatsCard reviews={reviews} averageRating={getAverageRating()} />
+      )}
 
       {/* 사진/영상 */}
       <div className="row mb-5">
@@ -269,7 +294,9 @@ export function MapDetail() {
                 <i className="bi bi-camera-fill me-3 fs-4"></i>
                 <div>
                   <h4 className="card-title mb-0">사진 ▪ 영상</h4>
-                  <small className="opacity-75">Photos & Videos from Reviews</small>
+                  <small className="opacity-75">
+                    Photos & Videos from Reviews
+                  </small>
                 </div>
               </div>
             </div>
@@ -284,11 +311,18 @@ export function MapDetail() {
               ) : allImagesAndNickNameFromReviews.length === 0 ? (
                 <div className="text-center py-5">
                   <i className="bi bi-images text-muted display-4"></i>
-                  <h5 className="mt-3 text-muted">아직 업로드된 사진이 없습니다</h5>
-                  <small className="text-muted">첫 번째 사진을 공유해보세요!</small>
+                  <h5 className="mt-3 text-muted">
+                    아직 업로드된 사진이 없습니다
+                  </h5>
+                  <small className="text-muted">
+                    첫 번째 사진을 공유해보세요!
+                  </small>
                 </div>
               ) : (
-                <ReviewCard review={{ files: allImagesAndNickNameFromReviews }} showOnlyImages={true} />
+                <ReviewCard
+                  review={{ files: allImagesAndNickNameFromReviews }}
+                  showOnlyImages={true}
+                />
               )}
             </div>
           </div>
@@ -306,9 +340,13 @@ export function MapDetail() {
                   <div>
                     <h4 className="card-title mb-0">
                       리뷰 목록
-                      <span className="badge bg-light text-dark ms-2">{reviews.length}</span>
+                      <span className="badge bg-light text-dark ms-2">
+                        {reviews.length}
+                      </span>
                     </h4>
-                    <small className="opacity-75">User Reviews & Experiences</small>
+                    <small className="opacity-75">
+                      User Reviews & Experiences
+                    </small>
                   </div>
                 </div>
 
@@ -346,8 +384,12 @@ export function MapDetail() {
               ) : sortedReviews.length === 0 ? (
                 <div className="text-center py-5">
                   <i className="bi bi-chat-left-text display-1 text-muted"></i>
-                  <h5 className="mt-3 fw-bold text-muted">아직 작성된 리뷰가 없습니다</h5>
-                  {user && <p className="text-muted">첫 번째 리뷰를 작성해보세요!</p>}
+                  <h5 className="mt-3 fw-bold text-muted">
+                    아직 작성된 리뷰가 없습니다
+                  </h5>
+                  {user && (
+                    <p className="text-muted">첫 번째 리뷰를 작성해보세요!</p>
+                  )}
                 </div>
               ) : (
                 <div className="list-group list-group-flush">
@@ -362,10 +404,18 @@ export function MapDetail() {
                           {"★".repeat(review.rating)}
                           {"☆".repeat(5 - review.rating)}
                         </span>
-                        <span className="fw-bold fs-5 text-dark">{review.rating}.0 / 5.0</span>
+                        <span className="fw-bold fs-5 text-dark">
+                          {review.rating}.0 / 5.0
+                        </span>
                       </div>
 
-                      <ReviewCard key={review.id} review={review} onUpdate={handleUpdate} onDelete={handleDelete} showOnlyImages={false} />
+                      <ReviewCard
+                        key={review.id}
+                        review={review}
+                        onUpdate={handleUpdate}
+                        onDelete={handleDelete}
+                        showOnlyImages={false}
+                      />
 
                       <div className="d-flex align-items-center gap-3 mt-4 pt-3 border-top px-4">
                         <ReviewLikeContainer reviewId={review.id} />
@@ -388,7 +438,9 @@ export function MapDetail() {
         </div>
       </div>
 
-      {reportModalOpen && <ReportModal reviewId={reportingReviewId} onClose={closeReportModal} />}
+      {reportModalOpen && (
+        <ReportModal reviewId={reportingReviewId} onClose={closeReportModal} />
+      )}
     </div>
   );
 }
