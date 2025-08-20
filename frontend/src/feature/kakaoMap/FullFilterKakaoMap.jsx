@@ -251,7 +251,10 @@ const FullFilterKakaoMap = () => {
           style={{ minHeight: "0" }}
         >
           {/* 필터 Column */}
-          <div className="col-12 col-md-4 align-self-md-start mb-3 h-100 mb-md-0 bg-dark overflow-x-hidden">
+          <div
+            className="col-12 col-md-4 align-self-md-start mb-3 h-100 mb-md-0 overflow-x-hidden p-3"
+            style={{ backgroundColor: "#F6ECE6" }}
+          >
             <FilterPanel
               {...filterStates}
               {...filterSetters}

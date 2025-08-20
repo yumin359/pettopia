@@ -97,7 +97,12 @@ public class AppConfiguration {
                         "/api/facility/**",
                         "/api/facility/detail",
                         "/api/favorite/{facilityName}",
-                        "/api/support/**"
+                        "/api/support/**",
+                        "/swagger-ui/**",
+                        "swagger-resources",
+                        "/swagger-resources/**",
+                        "/swagger-ui.html",
+                        "/v3/api-docs/**"
                 ).permitAll()
                 .requestMatchers(
                         "/api/review/add",

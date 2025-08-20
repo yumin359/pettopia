@@ -191,7 +191,6 @@ export function ReviewAdd({ facility, onSave, onCancel }) {
       });
       // 새로 생성된 리뷰 ID를 가져옴
       const reviewId = response.data.id;
-      console.log("생성된 리뷰 id : " + reviewId);
 
       toast.success("리뷰가 저장되었습니다.");
 
@@ -236,170 +235,163 @@ export function ReviewAdd({ facility, onSave, onCancel }) {
   };
 
   return (
-    <Card className="mt-3 shadow-sm" style={{ backgroundColor: "#f8f9fa" }}>
-      <Card.Body>
-        <h5 className="mb-3">📝 새 리뷰 작성</h5>
-
-        {/* 태그 선택 */}
-        <FormGroup className="mb-3">
-          <Form.Label>태그</Form.Label>
-          <Select
-            isMulti
-            isClearable
-            options={tagOptions}
-            value={selectedTags}
-            onChange={handleTagChange}
-            inputValue={inputValue}
-            onInputChange={setInputValue}
-            onCreateOption={handleCreateTag}
-            onKeyDown={handleInputKeyDown}
-            placeholder="태그를 입력하거나 선택하세요..."
-            formatCreateLabel={(inputValue) => `"${inputValue}" 태그 추가`}
-            noOptionsMessage={() => "태그가 없습니다"}
-            isDisabled={isProcessing}
-            className="react-select-container"
-            classNamePrefix="react-select"
-            formatOptionLabel={(option) => (
+    <div>
+      {/* 태그 선택 */}
+      <FormGroup className="mb-3">
+        <Form.Label>태그</Form.Label>
+        <Select
+          isMulti
+          isClearable
+          options={tagOptions}
+          value={selectedTags}
+          onChange={handleTagChange}
+          inputValue={inputValue}
+          onInputChange={setInputValue}
+          onCreateOption={handleCreateTag}
+          onKeyDown={handleInputKeyDown}
+          placeholder="태그를 입력하거나 선택하세요..."
+          formatCreateLabel={(inputValue) => `"${inputValue}" 태그 추가`}
+          noOptionsMessage={() => "태그가 없습니다"}
+          isDisabled={isProcessing}
+          className="react-select-container"
+          classNamePrefix="react-select"
+          formatOptionLabel={(option) => (
+            <span>
+              {option.label.startsWith("#") ? option.label : `#${option.label}`}
+            </span>
+          )}
+          components={{
+            MultiValueLabel: ({ data }) => (
               <span>
-                {option.label.startsWith("#")
-                  ? option.label
-                  : `#${option.label}`}
+                {data.label.startsWith("#") ? data.label : `#${data.label}`}
               </span>
-            )}
-            components={{
-              MultiValueLabel: ({ data }) => (
-                <span>
-                  {data.label.startsWith("#") ? data.label : `#${data.label}`}
-                </span>
-              ),
-            }}
-          />
-        </FormGroup>
+            ),
+          }}
+        />
+      </FormGroup>
 
-        {/* 내용 */}
-        <FormGroup className="mb-3">
-          <Form.Label>내용 *</Form.Label>
-          <FormControl
-            as="textarea"
-            rows={4}
-            placeholder="리뷰 내용을 입력하세요 (필수)"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            disabled={isProcessing}
-            maxLength={1000}
-          />
-          <Form.Text className="text-muted">{content.length}/1000자</Form.Text>
-        </FormGroup>
+      {/* 내용 */}
+      <FormGroup className="mb-3">
+        <Form.Label>내용 *</Form.Label>
+        <FormControl
+          as="textarea"
+          rows={4}
+          placeholder="리뷰 내용을 입력하세요 (필수)"
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          disabled={isProcessing}
+          maxLength={1000}
+        />
+        <Form.Text className="text-muted">{content.length}/1000자</Form.Text>
+      </FormGroup>
 
-        {/* 별점 */}
+      {/* 별점 */}
+      <FormGroup className="mb-3">
+        <Form.Label>별점</Form.Label>
+        <div className="d-flex align-items-center">
+          {[1, 2, 3, 4, 5].map((star) => (
+            <span
+              key={star}
+              style={{
+                fontSize: "1.8rem",
+                color: star <= rating ? "#ffc107" : "#e4e5e9",
+                cursor: isProcessing ? "default" : "pointer",
+                marginRight: "4px",
+              }}
+              onClick={() => !isProcessing && setRating(star)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if ((e.key === "Enter" || e.key === " ") && !isProcessing) {
+                  setRating(star);
+                }
+              }}
+            >
+              ★
+            </span>
+          ))}
+          <span className="ms-2 text-muted">({rating}점)</span>
+        </div>
+      </FormGroup>
+
+      {/* 파일 첨부 목록 */}
+      {files.length > 0 && (
         <FormGroup className="mb-3">
-          <Form.Label>별점</Form.Label>
-          <div className="d-flex align-items-center">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <span
-                key={star}
-                style={{
-                  fontSize: "1.8rem",
-                  color: star <= rating ? "#ffc107" : "#e4e5e9",
-                  cursor: isProcessing ? "default" : "pointer",
-                  marginRight: "4px",
-                }}
-                onClick={() => !isProcessing && setRating(star)}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if ((e.key === "Enter" || e.key === " ") && !isProcessing) {
-                    setRating(star);
-                  }
-                }}
-              >
-                ★
-              </span>
+          <Form.Label>첨부 파일</Form.Label>
+          <div className="d-flex flex-wrap gap-2">
+            {files.map((fileObj, idx) => (
+              <div key={idx} className="position-relative">
+                <img
+                  src={fileObj.previewUrl}
+                  alt="미리보기"
+                  style={{
+                    width: 100,
+                    height: 100,
+                    objectFit: "cover",
+                    borderRadius: "0",
+                  }}
+                />
+                {/* 오버레이 X 버튼 */}
+                <Button
+                  variant="danger"
+                  className="position-absolute top-0 end-0 p-1"
+                  style={{
+                    borderRadius: "0",
+                    lineHeight: 1,
+                  }}
+                  onClick={() => handleFileRemove(idx)}
+                  disabled={isProcessing}
+                  aria-label={`${fileObj.file.name} 삭제`}
+                >
+                  &times; {/* X 아이콘 */}
+                </Button>
+              </div>
             ))}
-            <span className="ms-2 text-muted">({rating}점)</span>
           </div>
         </FormGroup>
+      )}
 
-        {/* 파일 첨부 목록 */}
-        {files.length > 0 && (
-          <FormGroup className="mb-3">
-            <Form.Label>첨부 파일</Form.Label>
-            <div className="d-flex flex-wrap gap-2">
-              {files.map((fileObj, idx) => (
-                <div key={idx} className="position-relative">
-                  <img
-                    src={fileObj.previewUrl}
-                    alt="미리보기"
-                    style={{
-                      width: 100,
-                      height: 100,
-                      objectFit: "cover",
-                      borderRadius: "4px",
-                    }}
-                  />
-                  {/* 오버레이 X 버튼 */}
-                  <Button
-                    variant="danger"
-                    className="position-absolute top-0 end-0 p-1"
-                    style={{
-                      borderRadius: "0 4px 0 4px",
-                      lineHeight: 1,
-                      opacity: 0.8,
-                    }}
-                    onClick={() => handleFileRemove(idx)}
-                    disabled={isProcessing}
-                    aria-label={`${fileObj.file.name} 삭제`}
-                  >
-                    &times; {/* X 아이콘 */}
-                  </Button>
-                </div>
-              ))}
-            </div>
-          </FormGroup>
-        )}
+      {/* 파일 첨부 입력 */}
+      <FormGroup className="mb-3">
+        <Form.Label>파일 첨부</Form.Label>
+        <FormControl
+          type="file"
+          multiple
+          accept="image/*,.pdf"
+          onChange={handleFileChange}
+          disabled={isProcessing}
+        />
+        <Form.Text className="text-muted">
+          이미지 파일만 업로드 가능 (최대 10MB)
+        </Form.Text>
+      </FormGroup>
 
-        {/* 파일 첨부 입력 */}
-        <FormGroup className="mb-3">
-          <Form.Label>파일 첨부</Form.Label>
-          <FormControl
-            type="file"
-            multiple
-            accept="image/*,.pdf"
-            onChange={handleFileChange}
-            disabled={isProcessing}
-          />
-          <Form.Text className="text-muted">
-            이미지 파일만 업로드 가능 (최대 10MB)
-          </Form.Text>
-        </FormGroup>
+      {/* 작성자 정보 */}
+      <div className="text-muted mb-3">
+        작성자: <strong>{user.nickName}</strong>
+      </div>
 
-        {/* 작성자 정보 */}
-        <div className="text-muted mb-3">
-          작성자: <strong>{user.nickName}</strong>
-        </div>
-
-        {/* 버튼 */}
-        <div className="d-flex justify-content-end gap-2">
-          <Button
-            variant="outline-secondary"
-            onClick={handleCancel}
-            disabled={isProcessing}
-          >
-            <FaTimes /> 취소
-          </Button>
-          <Button
-            variant="primary"
-            disabled={!isValid || isProcessing}
-            onClick={handleSave}
-          >
-            {isProcessing && (
-              <Spinner animation="border" size="sm" className="me-2" />
-            )}
-            <FaSave /> 저장
-          </Button>
-        </div>
-      </Card.Body>
-    </Card>
+      {/* 버튼 */}
+      <div className="d-flex justify-content-end gap-2">
+        <Button
+          variant="outline-secondary"
+          onClick={handleCancel}
+          disabled={isProcessing}
+        >
+          <FaTimes /> 취소
+        </Button>
+        <Button
+          variant="primary"
+          disabled={!isValid || isProcessing}
+          onClick={handleSave}
+        >
+          {isProcessing && (
+            <Spinner animation="border" size="sm" className="me-2" />
+          )}
+          <FaSave /> 저장
+        </Button>
+      </div>
+    </div>
   );
 }
 

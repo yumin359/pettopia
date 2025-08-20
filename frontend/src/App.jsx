@@ -11,22 +11,22 @@ import { MemberList } from "./feature/member/MemberList.jsx";
 import { MemberEdit } from "./feature/member/MemberEdit.jsx";
 import { MemberLogin } from "./feature/member/MemberLogin.jsx";
 import { AuthenticationContextProvider } from "./common/AuthenticationContextProvider.jsx";
-import { MapDetail } from "./feature/map/MapDetail.jsx";
-import FullFilterKakaoMap from "./feature/kakaoMap/FullFilterKakaoMap.jsx";
-import { Chatbot } from "./feature/openai/Chatbot";
 import { LatestReviewsList } from "./feature/review/LatestReviewsList.jsx";
+import { KakaoCallback } from "./feature/member/KakaoCallback.jsx";
+import { MyReview } from "./feature/review/MyReview.jsx";
+import { MapDetail } from "./feature/map/MapDetail.jsx";
+import { Chatbot } from "./feature/openai/Chatbot";
+import { AdminPage } from "./AdminPage.jsx";
+import { AdminHome } from "./AdminHome.jsx";
+import { About } from "./common/About.jsx";
 import ServicePage from "./feature/service/ServicePage.jsx";
 import ServiceListPage from "./feature/service/ServiceListPage.jsx";
-import { MyReview } from "./feature/review/MyReview.jsx";
-import { KakaoCallback } from "./feature/member/KakaoCallback.jsx";
-import { AdminPage } from "./AdminPage.jsx";
 import ReviewReportList from "./feature/report/ReviewReportList.jsx";
-import { About } from "./common/About.jsx";
+import FullFilterKakaoMap from "./feature/kakaoMap/FullFilterKakaoMap.jsx";
 import "./styles/styles.css";
 import "./styles/Carousel.css";
-import "./styles/Review.css";
+// import "./styles/Review.css"; // 이거 사라짐
 import "./styles/ReviewLike.css";
-import { AdminHome } from "./AdminHome.jsx";
 
 function App() {
   return (

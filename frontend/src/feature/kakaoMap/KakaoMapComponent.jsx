@@ -303,7 +303,8 @@ const KakaoMapComponent = ({
       const locationText =
         sido && sigungu ? `${sido} ${sigungu}` : sido || "현재 화면";
       toast.success(
-        `${locationText}에서 ${facilities.length}개 시설을 찾았습니다!`,
+        `${locationText}에서
+        ${facilities.length}개 시설을 찾았습니다!`,
       );
     } catch (error) {
       console.error("❌ 지도 범위 검색 실패:", error);
@@ -365,7 +366,7 @@ const KakaoMapComponent = ({
     }
   }, [getAddressFromCoords, setSelectedRegion, setSelectedSigungu]);
 
-  // --- useEffect 훅: 사이드 이펙트 처리 (기존 코드 그대로) ---
+  // --- useEffect 훅: 사이드 이펙트 처리 ---
 
   // 1. 지도 초기화 (최초 1회 실행)
   useEffect(() => {
@@ -499,7 +500,7 @@ const KakaoMapComponent = ({
     createStyledInfoWindow,
   ]);
 
-  // 3. 내 위치 마커 처리
+  // 3. 내 위치 마커 처리 : 웹에서는 정확한 위치처리 불가
   useEffect(() => {
     if (mapInstance.current && myLocation) {
       const { lat, lng } = myLocation;
@@ -652,6 +653,7 @@ const KakaoMapComponent = ({
                 margin: 0,
                 maxWidth: "700px",
                 textAlign: "center",
+                borderRadius: 0,
               }}
             >
               📍 현재 화면 기준 검색 결과입니다. 다른 지역을 보려면 지도를
@@ -662,8 +664,15 @@ const KakaoMapComponent = ({
           {/* 좌측 하단 - 내 위치 버튼 */}
           <button
             onClick={handleGetMyLocation}
-            className="btn btn-light position-absolute shadow"
-            style={{ zIndex: 10, bottom: "20px", left: "10px" }}
+            className="btn btn-light position-absolute"
+            style={{
+              zIndex: 10,
+              bottom: "20px",
+              left: "10px",
+              borderRadius: "0",
+              border: "solid 2px black",
+              boxShadow: "3px 3px 1px 1px black",
+            }}
             title="내 위치 보기"
           >
             <FaMapMarkerAlt />
@@ -673,13 +682,17 @@ const KakaoMapComponent = ({
           <button
             onClick={searchCurrentMapBounds}
             disabled={isSearchingBounds}
-            className="btn btn-primary position-absolute shadow"
+            className="position-absolute"
             style={{
               zIndex: 10,
               bottom: "20px",
               right: "10px",
               fontSize: "12px",
               padding: "8px 12px",
+              border: "solid 2px black",
+              boxShadow: "3px 3px 1px 1px black",
+              backgroundColor: "#D9534F",
+              color: "white",
             }}
             title="현재 화면에서 검색 (지역 자동 설정)"
           >

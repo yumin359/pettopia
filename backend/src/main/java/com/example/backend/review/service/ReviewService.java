@@ -13,6 +13,7 @@ import com.example.backend.review.entity.ReviewFile;
 import com.example.backend.review.entity.ReviewFileId;
 import com.example.backend.review.entity.Tag;
 import com.example.backend.review.repository.ReviewFileRepository;
+import com.example.backend.review.repository.ReviewReportRepository;
 import com.example.backend.review.repository.ReviewRepository;
 import com.example.backend.review.repository.TagRepository;
 import com.example.backend.member.repository.MemberRepository;
@@ -22,6 +23,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -46,6 +49,7 @@ public class ReviewService {
     private final TagRepository tagRepository;
     private final PetFacilityRepository petFacilityRepository;
     private final S3Client s3Client;
+    private final ReviewReportRepository reviewReportRepository;
 
     @Value("${image.prefix}")
     private String imagePrefix;
@@ -223,13 +227,24 @@ public class ReviewService {
         }
     }
 
+    // 리뷰 삭제
     public void delete(Integer id, String requesterEmail) {
         Review review = reviewRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("리뷰를 찾을 수 없습니다: " + id));
 
-        if (!review.getMemberEmail().getEmail().equals(requesterEmail)) {
+        // 1. 현재 요청자의 권한을 가져와서 어드민인지 확인
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("SCOPE_admin"));
+
+        // 2. 요청자가 리뷰 작성자가 아니면서 어드민도 아닌 경우에만 예외를 발생시킵니다.
+        if (!review.getMemberEmail().getEmail().equals(requesterEmail) && !isAdmin) {
             throw new SecurityException("자신이 작성한 리뷰만 삭제할 수 있습니다.");
         }
+
+        // 3. 외래키 사항으로 리뷰를 삭제하려면, 해당 리뷰가 신고된 내역들이 먼저 삭제되어야 함.
+        reviewReportRepository.deleteByReview_Id(review.getId());
+        // 즉 본인이 쓴 글 지워도 관리자 신고 목록에서 사라지게 됨
 
         for (ReviewFile file : review.getFiles()) {
             String objectKey = "prj3/review/" + id + "/" + file.getId().getName();

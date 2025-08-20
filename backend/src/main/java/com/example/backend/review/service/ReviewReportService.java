@@ -39,12 +39,12 @@ public class ReviewReportService {
 
     @Transactional(readOnly = true)
     public List<ReviewReportDto> getReportList() {
-        return reviewReportRepository.findAll().stream()
+        return reviewReportRepository.findAllByOrderByReportedAtDesc().stream()
                 .map(ReviewReportDto::fromEntity)
                 .collect(Collectors.toList());
     }
 
-    public void deletereview(Long id) {
+    public void deleteReviewReport(Long id) {
         if (!reviewReportRepository.existsById(id)) {
             throw new IllegalArgumentException("해당 문의가 존재하지 않습니다.");
         }

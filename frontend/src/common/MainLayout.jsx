@@ -78,8 +78,8 @@ export function MainLayout() {
           gap: "15px",
         }}
       >
-        <AdSpace width={200} height={500} position="왼쪽" />
-        <AdSpace width={200} height={200} position="왼쪽2" />
+        <AdSpace width={200} height={650} position="왼쪽" />
+        {/*<AdSpace width={200} height={200} position="왼쪽2" />*/}
       </div>
 
       {/* 오른쪽 광고 - 절대 위치로 메인 컨테이너 바깥에 배치 */}
@@ -96,8 +96,8 @@ export function MainLayout() {
           gap: "15px",
         }}
       >
-        <AdSpace width={200} height={500} position="오른쪽" />
-        <AdSpace width={200} height={200} position="오른쪽2" />
+        <AdSpace width={200} height={650} position="오른쪽" />
+        {/*<AdSpace width={200} height={200} position="오른쪽2" />*/}
       </div>
 
       {/* 반응형: 작은 화면에서 광고 숨기기 */}

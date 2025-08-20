@@ -21,7 +21,11 @@ export function MapDetail() {
   const [searchParams, setSearchParams] = useSearchParams();
 
   // 상태 관리
-  const [facility, setFacility] = useState(null);
+  const [facility, setFacility] = useState({
+    isFavorite: false,
+    id: null,
+    name: "",
+  });
   const [reviews, setReviews] = useState([]);
   const [loadingFacility, setLoadingFacility] = useState(true);
   const [loadingReviews, setLoadingReviews] = useState(true);
@@ -40,14 +44,22 @@ export function MapDetail() {
     setLoadingFacility(true);
     try {
       const facilityData = await get(`/pet_facilities/${id}`);
-      setFacility(facilityData);
+
+      let isFavorite = false;
+      if (user) {
+        const favResponse = await axios.get(`/api/favorite/id/${facilityData.id}`);
+        isFavorite = favResponse.data.isFavorite;
+      }
+
+      setFacility({ ...facilityData, isFavorite });
     } catch (err) {
       console.error(`시설 조회 실패 (id=${id}):`, err);
-      setFacility(null);
+      setFacility({ id: null, name: "", isFavorite: false });
     } finally {
       setLoadingFacility(false);
     }
   };
+
   const fetchReviews = async () => {
     if (!id) return;
     setLoadingReviews(true);
@@ -64,7 +76,7 @@ export function MapDetail() {
     }
   };
 
-  // 리뷰 핸들러들
+  // 리뷰 핸들러
   const handleUpdate = (reviewId) => {
     fetchReviews();
     setSearchParams({ focusReviewId: reviewId });
@@ -75,6 +87,7 @@ export function MapDetail() {
         data: { email: user.email },
       });
       setSearchParams({ focusReviewId: "" });
+      toast.success("리뷰가 삭제되었습니다.");
       fetchReviews();
     } catch (err) {
       console.error("리뷰 삭제 실패:", err);
@@ -90,7 +103,7 @@ export function MapDetail() {
   };
   const handleReviewCancel = () => setIsWriting(false);
 
-  // 신고 모달 열기/닫기 (내 리뷰 신고 시 토스트 메시지 띄우기 추가)
+  // 신고 모달
   const openReportModal = (review) => {
     if (!user) return;
 
@@ -107,22 +120,17 @@ export function MapDetail() {
     setReportModalOpen(false);
   };
 
-  // 유틸 함수들
+  // 유틸
   const getAverageRating = () => {
     if (reviews.length === 0) return null;
     const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
     return (sum / reviews.length).toFixed(1);
   };
-
-  // 이것도 없애도 상관없을 것 같긴 한디
   const isImageFile = (fileUrl) => {
     const ext = fileUrl.split(".").pop().split("?")[0];
     return ["jpg", "jpeg", "png", "gif", "webp"].includes(ext.toLowerCase());
   };
-
   const allImagesAndNickNameFromReviews = reviews.flatMap((review) =>
-    // 없애면 이렇게 쓰면 됨
-    // (review.files || []).map((fileUrl) => ({
     (review.files || []).filter(isImageFile).map((fileUrl) => ({
       url: fileUrl,
       nickName: review.memberEmailNickName,
@@ -143,10 +151,15 @@ export function MapDetail() {
     });
   }
 
+  // useEffect
   useEffect(() => {
-    fetchFacility();
     fetchReviews();
   }, [id, sortBy]);
+
+  useEffect(() => {
+    // user가 undefined가 아니면 fetchFacility
+    if (user !== undefined) fetchFacility();
+  }, [id, user]);
 
   useEffect(() => {
     const focusReviewId = searchParams.get("focusReviewId");
@@ -164,33 +177,30 @@ export function MapDetail() {
   }, [reviews, searchParams]);
 
   return (
-    <div
-      className="map-detail-container container-fluid px-4 py-4"
-      style={{ maxWidth: "1400px" }}
-    >
-      {/* 헤더 섹션 */}
+    <div className="map-detail-container container-fluid px-4 py-4" style={{ maxWidth: "1400px" }}>
+      {/* 헤더 */}
       <div className="row mb-5">
         <div className="col-12">
-          <div className="card border-0 shadow-lg bg-transparent">
+          <div className="card border-0 bg-transparent">
             <div className="card-body p-4">
               <div className="d-flex justify-content-between align-items-center">
                 <div>
                   <h1 className="display-6 fw-bold mb-2">
-                    {loadingFacility
-                      ? "불러오는 중..."
-                      : facility
-                        ? facility.name
-                        : "시설 정보 없음"}
+                    {loadingFacility ? "불러오는 중..." : facility?.name || "시설 정보 없음"}
                   </h1>
                   <p className="opacity-75 mb-0">
                     <i className="bi bi-geo-alt me-2"></i>
                     반려동물과 함께하는 특별한 공간
                   </p>
                 </div>
-                {facility && facility.id && (
+                {facility?.id && (
                   <FavoriteContainer
                     facilityName={facility.name}
                     facilityId={facility.id}
+                    isFavorite={facility.isFavorite}
+                    onToggle={(newVal) =>
+                      setFacility(prev => ({ ...prev, isFavorite: newVal }))
+                    }
                   />
                 )}
               </div>
@@ -199,7 +209,7 @@ export function MapDetail() {
         </div>
       </div>
 
-      {/* 시설 정보 및 지도 섹션 */}
+      {/* 시설 정보 + 지도 */}
       <div className="row mb-5 g-4">
         <div className="col-lg-7">
           <FacilityInfoCard facility={facility} loading={loadingFacility} />
@@ -209,27 +219,22 @@ export function MapDetail() {
         </div>
       </div>
 
-      {/* 리뷰 작성 버튼 */}
+      {/* 리뷰 작성 */}
       {!isWriting && (
         <div className="row mb-4">
           <div className="col-12 text-center">
             {user ? (
-              <button
-                onClick={handleGoToWrite}
-                className="btn btn-warning btn-lg px-5 py-3 fw-bold shadow"
-              >
+              <button onClick={handleGoToWrite} className="btn btn-warning btn-lg px-5 py-3 fw-bold">
                 <i className="bi bi-pencil-square me-3 fs-5"></i>
                 리뷰 작성하기
               </button>
             ) : (
-              <div className="alert alert-info border-0 shadow">
+              <div className="alert alert-info border-0">
                 <div className="d-flex align-items-center justify-content-center">
                   <i className="bi bi-info-circle-fill me-3 fs-4"></i>
                   <div>
                     <h6 className="alert-heading mb-1">로그인이 필요합니다</h6>
-                    <p className="mb-0">
-                      로그인한 사용자만 리뷰를 작성할 수 있습니다.
-                    </p>
+                    <p className="mb-0">로그인한 사용자만 리뷰를 작성할 수 있습니다.</p>
                   </div>
                 </div>
               </div>
@@ -238,44 +243,36 @@ export function MapDetail() {
         </div>
       )}
 
-      {/* 리뷰 작성 폼 */}
       {isWriting && facility && (
         <div className="row mb-5">
           <div className="col-12">
-            <div className="card border-0 shadow">
-              <div className="card-body p-4">
-                <ReviewAdd
-                  facility={facility}
-                  onSave={handleReviewSaved}
-                  onCancel={handleReviewCancel}
-                />
+            <div className="card border-0">
+              <div style={{ backgroundColor: "#F6ECE6", borderBottom: "3px solid #212529" }}>
+                <h2 className="card-title mb-0 p-4">새 리뷰 작성</h2>
+              </div>
+              <div className="card-body p-5">
+                <ReviewAdd facility={facility} onSave={handleReviewSaved} onCancel={handleReviewCancel} />
               </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* 평균 평점 통계 */}
-      {reviews.length > 0 && (
-        <ReviewStatsCard reviews={reviews} averageRating={getAverageRating()} />
-      )}
+      {reviews.length > 0 && <ReviewStatsCard reviews={reviews} averageRating={getAverageRating()} />}
 
-      {/* 사진/영상 갤러리 */}
+      {/* 사진/영상 */}
       <div className="row mb-5">
         <div className="col-12">
-          <div className="card border-0 shadow">
+          <div className="card border-0">
             <div className="card-header bg-info text-white">
               <div className="d-flex align-items-center">
                 <i className="bi bi-camera-fill me-3 fs-4"></i>
                 <div>
                   <h4 className="card-title mb-0">사진 ▪ 영상</h4>
-                  <small className="opacity-75">
-                    Photos & Videos from Reviews
-                  </small>
+                  <small className="opacity-75">Photos & Videos from Reviews</small>
                 </div>
               </div>
             </div>
-
             <div className="card-body p-4">
               {loadingReviews ? (
                 <div className="text-center py-5">
@@ -287,18 +284,11 @@ export function MapDetail() {
               ) : allImagesAndNickNameFromReviews.length === 0 ? (
                 <div className="text-center py-5">
                   <i className="bi bi-images text-muted display-4"></i>
-                  <h5 className="mt-3 text-muted">
-                    아직 업로드된 사진이 없습니다
-                  </h5>
-                  <small className="text-muted">
-                    첫 번째 사진을 공유해보세요!
-                  </small>
+                  <h5 className="mt-3 text-muted">아직 업로드된 사진이 없습니다</h5>
+                  <small className="text-muted">첫 번째 사진을 공유해보세요!</small>
                 </div>
               ) : (
-                <ReviewCard
-                  review={{ files: allImagesAndNickNameFromReviews }}
-                  showOnlyImages={true}
-                />
+                <ReviewCard review={{ files: allImagesAndNickNameFromReviews }} showOnlyImages={true} />
               )}
             </div>
           </div>
@@ -308,7 +298,7 @@ export function MapDetail() {
       {/* 리뷰 목록 */}
       <div className="row">
         <div className="col-12">
-          <div className="card border-0 shadow">
+          <div className="card border-0">
             <div className="card-header bg-success text-white">
               <div className="d-flex justify-content-between align-items-center">
                 <div className="d-flex align-items-center">
@@ -316,13 +306,9 @@ export function MapDetail() {
                   <div>
                     <h4 className="card-title mb-0">
                       리뷰 목록
-                      <span className="badge bg-light text-dark ms-2">
-                        {reviews.length}
-                      </span>
+                      <span className="badge bg-light text-dark ms-2">{reviews.length}</span>
                     </h4>
-                    <small className="opacity-75">
-                      User Reviews & Experiences
-                    </small>
+                    <small className="opacity-75">User Reviews & Experiences</small>
                   </div>
                 </div>
 
@@ -360,12 +346,8 @@ export function MapDetail() {
               ) : sortedReviews.length === 0 ? (
                 <div className="text-center py-5">
                   <i className="bi bi-chat-left-text display-1 text-muted"></i>
-                  <h5 className="mt-3 fw-bold text-muted">
-                    아직 작성된 리뷰가 없습니다
-                  </h5>
-                  {user && (
-                    <p className="text-muted">첫 번째 리뷰를 작성해보세요!</p>
-                  )}
+                  <h5 className="mt-3 fw-bold text-muted">아직 작성된 리뷰가 없습니다</h5>
+                  {user && <p className="text-muted">첫 번째 리뷰를 작성해보세요!</p>}
                 </div>
               ) : (
                 <div className="list-group list-group-flush">
@@ -373,39 +355,24 @@ export function MapDetail() {
                     <div
                       key={review.id}
                       ref={(el) => (reviewRefs.current[review.id] = el)}
-                      className={`list-group-item px-0 py-4 ${
-                        index < sortedReviews.length - 1 ? "border-bottom" : ""
-                      }`}
+                      className={`list-group-item px-0 py-4 ${index < sortedReviews.length - 1 ? "border-bottom" : ""}`}
                     >
-                      {/* 평점 */}
                       <div className="d-flex align-items-center mb-3 px-4">
                         <span className="text-warning fs-4 me-3">
                           {"★".repeat(review.rating)}
                           {"☆".repeat(5 - review.rating)}
                         </span>
-                        <span className="fw-bold fs-5 text-dark">
-                          {review.rating}.0 / 5.0
-                        </span>
+                        <span className="fw-bold fs-5 text-dark">{review.rating}.0 / 5.0</span>
                       </div>
 
-                      {/* 리뷰 카드 */}
-                      <ReviewCard
-                        key={review.id}
-                        review={review}
-                        onUpdate={handleUpdate}
-                        onDelete={handleDelete}
-                        showOnlyImages={false}
-                      />
+                      <ReviewCard key={review.id} review={review} onUpdate={handleUpdate} onDelete={handleDelete} showOnlyImages={false} />
 
                       <div className="d-flex align-items-center gap-3 mt-4 pt-3 border-top px-4">
                         <ReviewLikeContainer reviewId={review.id} />
                         <button
                           onClick={() => openReportModal(review)}
                           className="p-0 border-0 bg-transparent"
-                          style={{
-                            cursor: user ? "pointer" : "not-allowed",
-                            boxShadow: "none",
-                          }}
+                          style={{ cursor: user ? "pointer" : "not-allowed" }}
                           disabled={!user}
                           title={user ? "리뷰 신고하기" : "로그인 후 이용 가능"}
                         >
@@ -421,10 +388,7 @@ export function MapDetail() {
         </div>
       </div>
 
-      {/* 신고 모달 */}
-      {reportModalOpen && (
-        <ReportModal reviewId={reportingReviewId} onClose={closeReportModal} />
-      )}
+      {reportModalOpen && <ReportModal reviewId={reportingReviewId} onClose={closeReportModal} />}
     </div>
   );
 }

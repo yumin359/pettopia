@@ -1,22 +1,22 @@
-// ReviewCarousel.jsx (부트스트랩 기반 간소화)
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import {
-  Carousel,
-  Spinner,
   Alert,
-  Card,
-  Row,
-  Col,
   Badge,
+  Card,
+  Carousel,
+  Col,
+  Row,
+  Spinner,
 } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import {
-  BsGeoAltFill,
-  BsHash,
   BsChevronLeft,
   BsChevronRight,
+  BsGeoAltFill,
+  BsHash,
 } from "react-icons/bs";
+import "../../styles/ReviewCarousel.css";
 
 export const ReviewCarousel = () => {
   const [reviews, setReviews] = useState([]);
@@ -66,44 +66,6 @@ export const ReviewCarousel = () => {
 
   return (
     <>
-      {/*고정 높이를 위한 CSS*/}
-      <style>
-        {`
-          .review-author-area {
-            min-height: 32px;
-          }
-          .review-tag-area {
-            min-height: 22px;
-            max-height: 22px;
-          }
-          .review-text-area {
-            min-height: 60px;
-            max-height: 80px;
-            overflow: hidden;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            line-height: 1.4;
-          }
-          .review-bottom-area {
-            min-height: 40px;
-          }
-          .review-image-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            grid-template-rows: 1fr 1fr;
-            gap: 2px;
-            width: 100%;
-            height: 100%;
-          }
-          .review-image-overlay {
-            background-color: rgba(0,0,0,0.5);
-            color: white;
-            font-weight: bold;
-            font-size: 1.5rem;
-          }
-        `}
-      </style>
       <Carousel
         indicators={false}
         interval={5000}
@@ -141,7 +103,7 @@ export const ReviewCarousel = () => {
                       <img
                         src="/PETOPIA-Photoroom.png"
                         alt="이미지 없음"
-                        className="w-75 h-75"
+                        className="w-100 h-100"
                         style={{ objectFit: "contain" }}
                       />
                     )}
@@ -156,23 +118,30 @@ export const ReviewCarousel = () => {
                     )}
 
                     {totalImages >= 2 && (
-                      <div className="review-image-grid overflow-hidden gap-0">
-                        {imageFiles.slice(0, 3).map((img, i) => (
-                          <div key={i} className="overflow-hidden">
-                            <img
-                              src={img}
-                              alt=""
-                              className="w-100 h-100"
-                              style={{ objectFit: "cover" }}
-                            />
-                          </div>
-                        ))}
+                      <>
+                        {" "}
+                        <div className="review-image-grid overflow-hidden gap-0">
+                          {/* 4개 이상일 땐 3개만, 3개면 3개, 2개면 2개 이미지를 표시 */}
+                          {imageFiles
+                            .slice(0, totalImages >= 4 ? 3 : totalImages)
+                            .map((img, i) => (
+                              <div key={i} className="overflow-hidden">
+                                <img
+                                  src={img}
+                                  alt=""
+                                  className="w-100 h-100"
+                                  style={{ objectFit: "cover" }}
+                                />
+                              </div>
+                            ))}
+                        </div>
+                        {/* 오버레이를 그리드와 분리 */}
                         {totalImages >= 4 && (
                           <div className="review-image-overlay d-flex justify-content-center align-items-center">
                             +{totalImages - 3}
                           </div>
                         )}
-                      </div>
+                      </>
                     )}
                   </Col>
 

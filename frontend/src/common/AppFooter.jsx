@@ -14,7 +14,7 @@ export function AppFooter() {
               <span className="text-light ms-2 small">Portfolio Project</span>
             </div>
             <div className="text-light ms-2" style={{ fontSize: "0.75rem" }}>
-              TEL:01-234-5678 / FAX:98-765-4321 / 중앙정보기술인재개발원
+              TEL:01-234-5678 / FAX:98-765-4322 / 중앙정보기술인재개발원
             </div>
           </div>
 

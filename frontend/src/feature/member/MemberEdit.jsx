@@ -327,7 +327,7 @@ export function MemberEdit() {
                 />
                 {member.nickName && !isNickNameValid && (
                   <FormText className="text-danger">
-                    별명은 2~20자, 한글/영문/숫자만 사용할 수 있습니다.
+                    별명은 2~20자, 한글/영문/숫자만 사용.
                   </FormText>
                 )}
               </FormGroup>

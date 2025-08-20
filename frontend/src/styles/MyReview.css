@@ -1,5 +1,21 @@
+/* ========================================
+   MyReview.css
+   ======================================== */
+.review-card-custom {
+    background-color: #fffafa;
+    box-shadow: 5px 5px 1px 1px #212529;
+    border: 3px solid black;
+    border-radius: 0;
+}
+
+.review-card-custom:hover {
+    border: 3px solid #D9534F;
+    box-shadow: 5px 5px 1px 1px #D9534F !important;
+    background-color: #fffafc;
+}
+
 .hr-color-hotpink {
-    border-top: 1px solid hotpink;
+    border-top: 1px solid #D9534F;
 }
 
 /* 리뷰 구분선 스타일 */

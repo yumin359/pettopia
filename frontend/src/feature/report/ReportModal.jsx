@@ -22,7 +22,7 @@ export default function ReportModal({ reviewId, onClose }) {
     } catch (error) {
       console.error("신고 실패:", error);
       toast.error(
-        "신고 실패: " + (error.response?.data?.message || error.message),
+        "신고 실패: " + (error.response?.data?.message || error.message)
       );
     } finally {
       setLoading(false);
@@ -34,8 +34,12 @@ export default function ReportModal({ reviewId, onClose }) {
       className="modal show d-block"
       tabIndex="-1"
       style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+      onClick={onClose} // 모달 외부 클릭 시 닫기
     >
-      <div className="modal-dialog modal-dialog-centered">
+      <div
+        className="modal-dialog modal-dialog-centered"
+        onClick={(e) => e.stopPropagation()} // 내부 클릭 시 이벤트 버블링 차단
+      >
         <div className="modal-content">
           <div className="modal-header border-0 pb-0">
             <h5 className="modal-title">
@@ -59,7 +63,7 @@ export default function ReportModal({ reviewId, onClose }) {
                 id="reportReason"
                 className="form-control"
                 rows={4}
-                maxLength={100} // 100자 제한
+                maxLength={100}
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
                 placeholder="신고 사유를 자세히 작성해주세요. (최대 100자)"
