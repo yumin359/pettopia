@@ -56,8 +56,8 @@ export function MyReview({ memberId: memberIdFromProp }) {
         });
         setFavoriteMap(map);
 
-        console.log("리뷰 데이터:", reviewData);
-        console.log("즐겨찾기 상태 맵:", map); // 이게 4개가 나왔던 이유는
+        // console.log("리뷰 데이터:", reviewData);
+        // console.log("즐겨찾기 상태 맵:", map); // 이게 4개가 나왔던 이유는
         // 지금 리뷰 목록에서 중복 제외하고, 시설명들의 id를 가져온건데,
         // 거기서 true이면 즐찾이 되어있다!! 이 말
       })
