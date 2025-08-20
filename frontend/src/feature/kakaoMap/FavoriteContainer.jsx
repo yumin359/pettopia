@@ -4,7 +4,14 @@ import { useContext, useState } from "react";
 import { OverlayTrigger, Spinner, Tooltip } from "react-bootstrap";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
 
-export function FavoriteContainer({ facilityName, facilityId, isFavorite, onToggle }) {
+export function FavoriteContainer({
+  facilityName,
+  facilityId,
+  isFavorite,
+  onToggle,
+}) {
+  // 그니까 얘는 지금 이제 즐찾 누르고, 안 누르는 것만 관리.
+  // isFavorite을 통해 현재 시설물이 즐찾이냐 아니냐라는 상태(true, false)를 받음
   const [isProcessing, setIsProcessing] = useState(false);
   const { user } = useContext(AuthenticationContext);
 
