@@ -1,5 +1,3 @@
-const API_BASE_URL = "http://localhost:8080/api";
-
 export const calendarService = {
   async getCalendarData(year, month) {
     // 1. localStorage에서 이메일이 아닌 '토큰'을 가져옵니다.
@@ -19,7 +17,7 @@ export const calendarService = {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/calendar/data?${params}`, {
+      const response = await fetch(`/api/calendar/data?${params}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
