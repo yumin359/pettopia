@@ -77,39 +77,11 @@ public class AppConfiguration {
 
         http.authorizeHttpRequests(auth -> auth
                 .requestMatchers(
-                        "/api/member/signup",
-                        "/api/member/login",
-                        "/api/member/add",
-                        "/api/member/login/kakao",
-                        "/api/pet_facilities/**",
-                        "/api/board/latest",
-                        "/api/board/list",
-                        "/api/board/*",
-                        "/api/board/{id}",
-                        "/api/review/latest",
-                        "/api/review/list",
-                        "/api/review/myReview/**",
-                        "/api/review/facility/**",
-                        "/api/chatbot",
-                        "/api/comment/list",
-                        "/api/like/board/**",
-                        "/api/reviewlike/review/**",
-                        "/api/facility/**",
-                        "/api/facility/detail",
-                        "/api/favorite/{facilityName}",
-                        "/api/support/**",
-                        "/swagger-ui/**",
-                        "swagger-resources",
-                        "/swagger-resources/**",
-                        "/swagger-ui.html",
-                        "/v3/api-docs/**"
-                ).permitAll()
-                .requestMatchers(
                         "/api/review/add",
                         "/api/review/update/**",
                         "/api/review/delete/**"
                 ).authenticated()
-                .anyRequest().authenticated()
+                .anyRequest().permitAll()
         );
         return http.build();
     }
