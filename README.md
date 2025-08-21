@@ -49,11 +49,14 @@
 * **Gradle** (빌드 도구)
 
 ### Frontend
-* **React.js 18**
-* **Vite** (빌드 툴)
+* **React 19.1.0**
+* **Vite 5.2.0** (빌드 툴)
 * **JavaScript (ES6+)**
-* **CSS3** (반응형 디자인)
-* **Axios** (API 통신)
+* **Bootstrap 5.3.7** + **React Bootstrap 2.10.10**
+* **React Router 7.7.0** (라우팅)
+* **Axios 1.10.0** (API 통신)
+* **React Toastify 11.0.5** (알림)
+* **Lucide React 0.539.0** (아이콘)
 
 ### External APIs
 * **카카오맵 API** (지도 및 장소 검색)
@@ -87,8 +90,9 @@
 
 ### 필수 요구사항
 * **Java 21** 이상
-* **Node.js 18** 이상
+* **Node.js 18** 이상 
 * **npm** 또는 **yarn**
+* **MariaDB** (로컬 개발 시) 또는 **AWS RDS** 접근 권한
 
 ### 1. 프로젝트 클론
 ```bash
@@ -101,16 +105,18 @@ cd pet-topia
 # backend 디렉토리로 이동
 cd backend
 
-# application.properties 설정
-# src/main/resources/secret/custom.properties 파일 생성 후 다음 정보 입력:
-spring.datasource.password=your_password
+# src/main/resources/secret/custom.properties 파일 생성 후 API 키 입력:
+spring.datasource.password=your_mariadb_password
 aws.access.key=your_aws_access_key
 aws.secret.key=your_aws_secret_key
+aws.s3.bucket.name=your_s3_bucket_name
+image.prefix=https://your_s3_bucket.s3.ap-northeast-2.amazonaws.com/
 kakao.app.key=your_kakao_app_key
-google.calendar.key=your_google_key
+google.calendar.key=your_google_calendar_api_key
 claude.api.key=your_claude_api_key
 
-# 애플리케이션 실행
+# Gradle 빌드 및 실행
+./gradlew clean build
 ./gradlew bootRun
 ```
 
@@ -204,9 +210,32 @@ npm run build
 - **실시간 응답:** 빠르고 정확한 답변 제공
 - **사용자 친화적 UI:** 직관적인 채팅 인터페이스
 
----
+## 📋 주요 라이브러리 및 의존성
 
-## 🔧 주요 기술적 특징
+### Frontend Dependencies
+```json
+{
+  "react": "^19.1.0",
+  "react-dom": "^19.1.0",
+  "react-router-dom": "^7.7.0",
+  "axios": "^1.10.0",
+  "bootstrap": "^5.3.7",
+  "react-bootstrap": "^2.10.10",
+  "react-toastify": "^11.0.5",
+  "jwt-decode": "^4.0.0",
+  "@react-google-maps/api": "^2.20.7",
+  "lucide-react": "^0.539.0",
+  "react-icons": "^5.5.0"
+}
+```
+
+### Backend Dependencies
+- **Spring Boot 3.x**
+- **Spring Data JPA**
+- **Spring Security 6.x**
+- **MariaDB Connector**
+- **AWS SDK for Java**
+- **JWT Support**
 
 ### 보안
 - **JWT 토큰 기반 인증**
