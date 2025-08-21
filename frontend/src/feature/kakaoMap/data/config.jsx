@@ -1,5 +1,4 @@
-// API 기본 URL
-export const API_BASE_URL = "http://localhost:8080/api";
+
 
 // 페이지당 아이템 개수
 export const ITEMS_PER_PAGE = 15;
