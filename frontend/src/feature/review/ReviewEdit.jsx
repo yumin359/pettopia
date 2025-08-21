@@ -141,18 +141,14 @@ function ReviewEdit({ review, onSave, onCancel }) {
 
       selectedTags.forEach((tag) => formData.append("tagNames", tag.value));
 
-      await axios.post(
-        `http://localhost:8080/api/review/update/${review.id}`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-          withCredentials: true,
-          timeout: 30000,
+      await axios.post(`/api/review/update/${review.id}`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-      );
+        withCredentials: true,
+        timeout: 30000,
+      });
 
       toast.success("수정 완료!");
 
