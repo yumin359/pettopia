@@ -153,7 +153,7 @@ body::before {
     background: #f6ece6;
     border: 2px solid #2C2D31FF;
     height: 16px;
-    box-shadow: 1px 1px 0px 0px #2C2D31FF;
+    box-shadow: 1px 1px #2C2D31FF;
 }
 
 /* 위 화살표 */
