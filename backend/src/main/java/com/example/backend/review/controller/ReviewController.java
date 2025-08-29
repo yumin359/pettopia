@@ -36,6 +36,7 @@ public class ReviewController {
 
         // Map 객체를 ResponseEntity에 담아 응답
         return ResponseEntity.ok(response);
+        // TODO: ResponseEntity<?> 이거로 해서 message 해서 보내면 되지 않나? 아닌가?
     }
 
     // 특정 시설 리뷰 조회 - 정렬방식과 페이징 옵션 추가
