@@ -1,6 +1,6 @@
 # 🐾 Pet-topia: 우리 동네 반려동물 정보 플랫폼 🐾
 
-**🌐 Live Demo: http://13.124.132.168:8080/**
+**🌐 Live Demo: http://43.200.170.120:8080/**
 
 ---
 
@@ -79,10 +79,10 @@
 * **서버:** AWS EC2 (t2.micro)
 * **데이터베이스:** AWS RDS MariaDB
 * **파일 저장소:** AWS S3
-* **도메인:** http://13.124.132.168:8080/
+* **도메인:** http://43.200.170.120:8080/
 
-### API Documentation
-* **Swagger UI:** http://13.124.132.168:8080/swagger-ui/index.html
+### API Documentation - 진행중중
+* **Swagger UI:** http://43.200.170.120:8080/swagger-ui/index.html
 
 ---
 
@@ -96,8 +96,8 @@
 
 ### 1. 프로젝트 클론
 ```bash
-git clone https://github.com/JIWON719CHOI/pet-topia.git
-cd pet-topia
+git clone https://github.com/yumin359/pettopia.git
+cd pettopia
 ```
 
 ### 2. 백엔드 설정
@@ -188,8 +188,8 @@ npm run build
 | 역할 | 이름 | GitHub |
 |------|------|--------|
 | **팀장** | 최지원 | [@JIWON719CHOI](https://github.com/JIWON719CHOI) |
-| **팀원** | 신유민 | [@YourGitHub](https://github.com/YourGitHub) |
-| **팀원** | 전석윤 | [@YourGitHub](https://github.com/YourGitHub) |
+| **팀원** | 신유민 | [@yumin359](https://github.com/yumin359) |
+| **팀원** | 전석윤 | [@yopig](https://github.com/yopig) |
 
 ---
 
@@ -259,7 +259,7 @@ npm run build
 
 ## 📞 문의 및 지원
 
-프로젝트 관련 문의사항이나 버그 리포트는 [Issues](https://github.com/JIWON719CHOI/pet-topia/issues)를 통해 제보해주세요.
+프로젝트 관련 문의사항이나 버그 리포트는 [Issues](https://github.com/yumin359/pettopia/issues)를 통해 제보해주세요.
 
 ---
 
